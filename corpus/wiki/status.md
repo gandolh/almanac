@@ -23,7 +23,7 @@ review round.
 | 01 | [Workspace scaffold](../briefs/done/01-workspace-scaffold.md) | done |
 | 02 | [Accounts and sign-in](../briefs/done/02-accounts-and-sign-in.md) | done |
 | 03 | [Calendars, events and settings API](../briefs/done/03-calendars-and-events-api.md) | done |
-| 04 | [Repeating events](../briefs/todo/04-repeating-events.md) | todo |
+| 04 | [Repeating events](../briefs/done/04-repeating-events.md) | done |
 | 05 | [App shell, routes, dates, tokens](../briefs/todo/05-app-shell.md) | todo |
 | 06 | [Day, week and month views](../briefs/todo/06-day-week-month-views.md) | todo |
 | 07 | [Creating and editing events](../briefs/todo/07-creating-and-editing-events.md) | todo |

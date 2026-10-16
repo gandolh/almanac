@@ -3,5 +3,6 @@ export const APP_NAME = "Almanac";
 export * from "./time.js";
 export * from "./calendar.js";
 export * from "./event.js";
+export * from "./repeat.js";
 export * from "./settings.js";
 export * from "./search.js";

@@ -251,6 +251,27 @@ describe("the writes brief 04 builds on", () => {
     expect(store.insertException(ion, series.id, "2026-10-26T07:00:00Z", timed("2026-10-26T09:00:00Z", "2026-10-26T10:00:00Z", { calendarId: theirs }))).toBeUndefined();
   });
 
+  it("moves an exception to another of the user's series and key, at most one per occurrence", () => {
+    const series = weekly();
+    const other = store.create(ana, { ...timed("2026-11-02T08:00:00Z", "2026-11-02T09:00:00Z"), tzid: ZONE, rrule: "FREQ=WEEKLY" });
+    const exception = store.insertException(ana, series.id, "2026-10-26T08:00:00Z", timed("2026-10-27T08:00:00Z", "2026-10-27T09:00:00Z"));
+    const id = exception?.id ?? 0;
+    expect(store.moveException(ana, id, other.id, "2026-11-09T08:00:00Z")).toMatchObject({
+      id,
+      seriesId: other.id,
+      originalStart: "2026-11-09T08:00:00Z",
+      start: "2026-10-27T08:00:00Z",
+    });
+    expect(store.listExceptions(ana, series.id)).toEqual([]);
+    // Not to a one-off, not another user's, not a row that is not an exception.
+    const oneOff = store.create(ana, { ...allDay("2026-10-16", "2026-10-17"), tzid: ZONE });
+    expect(store.moveException(ana, id, oneOff.id, "2026-10-16")).toBeUndefined();
+    expect(store.moveException(ion, id, other.id, "2026-11-16T08:00:00Z")).toBeUndefined();
+    expect(store.moveException(ana, oneOff.id, other.id, "2026-11-16T08:00:00Z")).toBeUndefined();
+    store.insertException(ana, other.id, "2026-11-16T08:00:00Z", timed("2026-11-17T08:00:00Z", "2026-11-17T09:00:00Z"));
+    expect(() => store.moveException(ana, id, other.id, "2026-11-16T08:00:00Z")).toThrow(/UNIQUE/);
+  });
+
   it("deletes a series with its exceptions", () => {
     const series = weekly();
     const exception = store.insertException(ana, series.id, "2026-10-26T07:00:00Z", timed("2026-10-26T09:00:00Z", "2026-10-26T10:00:00Z"));

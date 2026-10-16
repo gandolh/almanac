@@ -48,3 +48,10 @@ Migration 1, the calendar, event and settings stores, and every route shape,
 with repeats refused until brief 04. Per-user scoping with 404 for other
 users' ids. New wiki page [data-model.md](wiki/data-model.md). See
 [the brief](briefs/done/03-calendars-and-events-api.md).
+
+## [2026-10-16] done | Brief 04: repeating events
+
+Repeat presets as RRULEs, server-side expansion with rrule-temporal in the
+series' zone, and the three edit scopes for edit and delete. The as-built
+rules are in [recurrence.md](wiki/recurrence.md). See
+[the brief](briefs/done/04-repeating-events.md).

@@ -106,3 +106,110 @@ describe("GET /api/occurrences", () => {
     expect(titles(await occurrences(...DAY))).toEqual(["Holiday", "Standup"]);
   });
 });
+
+describe("GET /api/occurrences for series", () => {
+  const weekly = { freq: "weekly", end: { type: "never" } };
+  const october = ["2026-10-01T00:00:00+03:00", "2026-11-01T00:00:00+02:00"] as const;
+  const november = ["2026-11-01T00:00:00+02:00", "2026-12-01T00:00:00+02:00"] as const;
+
+  async function patch(id: number, payload: object): Promise<Occurrence> {
+    const res = await t.inject({ method: "PATCH", url: `/api/events/${id}`, payload });
+    expect(res.statusCode, res.body).toBe(200);
+    return occurrenceSchema.parse(res.json());
+  }
+
+  it("keeps a weekly Monday 10:00 Bucharest series at 10:00 local across the end of summer time", async () => {
+    const series = await create({ ...timed("Standup", "2026-10-19T10:00:00+03:00", "2026-10-19T11:00:00+03:00"), repeat: weekly });
+    expect(await occurrences(...october)).toEqual([
+      {
+        id: `s${series.eventId}:2026-10-19T07:00:00Z`,
+        eventId: series.eventId,
+        seriesId: series.eventId,
+        originalStart: "2026-10-19T07:00:00Z",
+        calendarId,
+        title: "Standup",
+        location: "",
+        notes: "",
+        allDay: false,
+        start: "2026-10-19T07:00:00Z",
+        end: "2026-10-19T08:00:00Z",
+        repeat: { freq: "weekly", byDay: ["MO"], end: { type: "never" } },
+      },
+      expect.objectContaining({
+        id: `s${series.eventId}:2026-10-26T08:00:00Z`,
+        start: "2026-10-26T08:00:00Z",
+        end: "2026-10-26T09:00:00Z",
+      }),
+    ]);
+  });
+
+  it("puts one-offs, generated occurrences and exceptions together by start", async () => {
+    const series = await create({ ...timed("Standup", "2026-10-19T10:00:00+03:00", "2026-10-19T11:00:00+03:00"), repeat: weekly });
+    await create(timed("Dentist", "2026-10-20T09:00:00+03:00", "2026-10-20T10:00:00+03:00"));
+    await create({ ...allDay("Gym", "2026-10-21", "2026-10-22"), repeat: { freq: "daily", end: { type: "count", count: 2 } } });
+    const moved = await patch(series.eventId, {
+      scope: "this",
+      occurrence: "2026-10-19T07:00:00Z",
+      changes: { title: "Planning", start: "2026-10-21T12:00:00+03:00", end: "2026-10-21T13:00:00+03:00" },
+    });
+    const found = await occurrences("2026-10-19T00:00:00+03:00", "2026-10-26T00:00:00+02:00");
+    expect(titles(found)).toEqual(["Dentist", "Gym", "Planning", "Gym"]);
+    expect(found[2]).toEqual({ ...moved, repeat: { freq: "weekly", byDay: ["MO"], end: { type: "never" } } });
+    expect(found[2]).toMatchObject({ id: `e${moved.eventId}`, seriesId: series.eventId, originalStart: "2026-10-19T07:00:00Z" });
+    expect(found[1]).toMatchObject({ allDay: true, start: "2026-10-21", end: "2026-10-22", repeat: { freq: "daily" } });
+  });
+
+  it("shows a moved exception where it went, inside or outside the range", async () => {
+    const series = await create({ ...timed("Standup", "2026-10-05T10:00:00+03:00", "2026-10-05T11:00:00+03:00"), repeat: weekly });
+    // 12 October moved out to 20 November; 2 November moved in to 30 October.
+    await patch(series.eventId, {
+      scope: "this",
+      occurrence: "2026-10-12T07:00:00Z",
+      changes: { title: "Out", start: "2026-11-20T10:00:00+02:00", end: "2026-11-20T11:00:00+02:00" },
+    });
+    await patch(series.eventId, {
+      scope: "this",
+      occurrence: "2026-11-02T08:00:00Z",
+      changes: { title: "In", start: "2026-10-30T10:00:00+02:00", end: "2026-10-30T11:00:00+02:00" },
+    });
+    const inOctober = await occurrences(...october);
+    expect(inOctober.map((o) => `${o.start.slice(5, 10)} ${o.title}`)).toEqual([
+      "10-05 Standup",
+      "10-19 Standup",
+      "10-26 Standup",
+      "10-30 In",
+    ]);
+    const inNovember = await occurrences(...november);
+    expect(inNovember.map((o) => `${o.start.slice(5, 10)} ${o.title}`)).toEqual([
+      "11-09 Standup",
+      "11-16 Standup",
+      "11-20 Out",
+      "11-23 Standup",
+      "11-30 Standup",
+    ]);
+  });
+
+  it("shows an exception moved before its series starts, in a range the series does not reach", async () => {
+    const series = await create({ ...timed("Standup", "2026-11-02T10:00:00+02:00", "2026-11-02T11:00:00+02:00"), repeat: weekly });
+    await patch(series.eventId, {
+      scope: "this",
+      occurrence: "2026-11-02T08:00:00Z",
+      changes: { start: "2026-10-30T10:00:00+02:00", end: "2026-10-30T11:00:00+02:00" },
+    });
+    expect(await occurrences(...october)).toMatchObject([
+      { title: "Standup", start: "2026-10-30T08:00:00Z", seriesId: series.eventId, repeat: { freq: "weekly", byDay: ["MO"] } },
+    ]);
+  });
+
+  it("includes an occurrence that started before the range and is still going", async () => {
+    await create({ ...timed("Night shift", "2026-10-15T22:00:00+03:00", "2026-10-16T06:00:00+03:00"), repeat: { freq: "daily", end: { type: "never" } } });
+    expect((await occurrences(...DAY)).map((o) => o.start)).toEqual(["2026-10-15T19:00:00Z", "2026-10-16T19:00:00Z"]);
+  });
+
+  it("shows another user none of the first user's series", async () => {
+    await create({ ...timed("Standup", "2026-10-05T10:00:00+03:00", "2026-10-05T11:00:00+03:00"), repeat: weekly });
+    const other = await t.signInAs("other");
+    expect(await occurrences(...october, other.inject)).toEqual([]);
+    expect(await occurrences(...october)).toHaveLength(4);
+  });
+});

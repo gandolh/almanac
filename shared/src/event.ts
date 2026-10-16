@@ -124,7 +124,6 @@ function settleTimes<T extends { allDay: boolean; start: string; end: string }>(
 /**
  * `POST /api/events`, and what a patch's changes must add up to. Left out,
  * `location` and `notes` are empty and `repeat` is null (does not repeat).
- * Until brief 04, the routes refuse any `repeat` but null.
  */
 export const eventInputSchema = z
   .strictObject({

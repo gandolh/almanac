@@ -95,3 +95,16 @@ missing something, report BLOCKED with what and why), `web/`.
   `07:00Z` then `08:00Z`).
 - Hand back `describeRepeat`'s signature and the exact scope semantics for
   the web briefs.
+
+## Outcome
+
+_2026-10-16_. Built; 262 server and shared tests, the Bucharest DST check
+passes (19 Oct `07:00Z`, 26 Oct `08:00Z`). Accepted calls beyond the text:
+"all" and "following" carry changed title, location, notes or calendar onto
+exceptions that still had the series' old value; a series' start snaps
+forward to its first real occurrence; the repeat functions take the time
+zone as a third argument and write explicit `BYDAY`/`BYMONTHDAY`/`BYMONTH`;
+`UNTIL` is the end date's last second in the series' zone (date for
+all-day); `rowOccurrence` moved to `recurrence/expand.ts`; the store gained
+`moveException`. Missing scope or occurrence on a series write is 400; a key
+that is not a live occurrence is 404.

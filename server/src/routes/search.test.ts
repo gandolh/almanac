@@ -1,4 +1,4 @@
-import { calendarListSchema, searchResponseSchema, type Occurrence } from "@almanac/shared";
+import { calendarListSchema, occurrenceSchema, searchResponseSchema, type Occurrence } from "@almanac/shared";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { databasePath, openDb } from "../db/open.js";
 import { createEventStore } from "../store/events.js";
@@ -17,10 +17,11 @@ afterEach(async () => {
   await t.close();
 });
 
-async function create(fields: object): Promise<void> {
+async function create(fields: object): Promise<Occurrence> {
   const payload = { calendarId, allDay: false, start: "2026-10-16T07:00:00Z", end: "2026-10-16T08:00:00Z", ...fields };
   const res = await t.inject({ method: "POST", url: "/api/events", payload });
   expect(res.statusCode).toBe(201);
+  return occurrenceSchema.parse(res.json());
 }
 
 async function search(q: string, inject = t.inject): Promise<Occurrence[]> {
@@ -97,3 +98,46 @@ describe("GET /api/search", () => {
     expect(titles(await search("sedinta"))).toEqual(["Ședință"]);
   });
 });
+
+describe("GET /api/search for series", () => {
+  const weekly = { freq: "weekly", end: { type: "never" } };
+  /** Monday 5 January 2026, 10:00 in Bucharest: long before now, every week since. */
+  const mondays = { title: "Standup", start: "2026-01-05T08:00:00Z", end: "2026-01-05T09:00:00Z", repeat: weekly };
+
+  it("shows a series once, as its next occurrence", async () => {
+    const series = await create(mondays);
+    const results = await search("standup");
+    expect(results).toHaveLength(1);
+    const [next] = results;
+    expect(next).toMatchObject({ eventId: series.eventId, seriesId: series.eventId, repeat: { freq: "weekly", byDay: ["MO"] } });
+    expect(next?.id).toBe(`s${series.eventId}:${next?.originalStart}`);
+    const start = Date.parse(next?.start ?? "");
+    // The first Monday 10:00 that has not ended: within a week of now, still in its hour or after it.
+    expect(Date.parse(next?.end ?? "")).toBeGreaterThan(Date.now() - 60_000);
+    expect(start).toBeLessThan(Date.now() + 7 * 86_400_000);
+    expect(new Date(start).getUTCDay()).toBe(1);
+  });
+
+  it("shows a series that is over as its last occurrence, and one not started as its first", async () => {
+    await create({ title: "Course", start: "2020-03-02T08:00:00Z", end: "2020-03-02T09:00:00Z", repeat: { freq: "weekly", end: { type: "count", count: 3 } } });
+    await create({ title: "Course later", start: "2099-03-02T08:00:00Z", end: "2099-03-02T09:00:00Z", repeat: weekly });
+    expect((await search("course")).map((o) => o.start)).toEqual(["2020-03-16T08:00:00Z", "2099-03-02T08:00:00Z"]);
+  });
+
+  it("shows an exception whose text matches as itself, beside its series", async () => {
+    const series = await create(mondays);
+    const res = await t.inject({
+      method: "PATCH",
+      url: `/api/events/${series.eventId}`,
+      payload: { scope: "this", occurrence: "2026-01-12T08:00:00Z", changes: { notes: "standup with the retro" } },
+    });
+    expect(res.statusCode).toBe(200);
+    const exception = occurrenceSchema.parse(res.json());
+    expect(titles(await search("retro"))).toEqual(["Standup"]);
+    const both = await search("standup");
+    expect(both).toHaveLength(2);
+    expect(both[0]).toMatchObject({ id: exception.id, seriesId: series.eventId, start: "2026-01-12T08:00:00Z", repeat: { freq: "weekly" } });
+    expect(both[1]?.id).toMatch(new RegExp(`^s${series.eventId}:`));
+  });
+});
+

@@ -1,45 +1,44 @@
 import {
   allDayRange,
   compareOccurrences,
-  eventOccurrenceId,
   occurrenceQuerySchema,
   parseInstant,
   type Occurrence,
   type OccurrenceList,
+  type Repeat,
 } from "@almanac/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { FeatureContext } from "../app.js";
 import { currentUserId } from "../auth/guard.js";
-import type { EventRecord } from "../store/events.js";
+import { expandSeries, isSeries, rowOccurrence, seriesRepeat } from "../recurrence/expand.js";
+import type { EventStore } from "../store/events.js";
 
-/**
- * A stored row as the occurrence the views show: a one-off event, or an
- * exception of a series (with its `seriesId` and `originalStart`). `repeat`
- * is null: no route stores a repeat until brief 04, which fills an
- * exception's from its series.
- */
-export function rowOccurrence(event: EventRecord): Occurrence {
-  return {
-    id: eventOccurrenceId(event.id),
-    eventId: event.id,
-    seriesId: event.seriesId,
-    originalStart: event.originalStart,
-    calendarId: event.calendarId,
-    title: event.title,
-    location: event.location,
-    notes: event.notes,
-    allDay: event.allDay,
-    start: event.start,
-    end: event.end,
-    repeat: null,
+/** The repeat of each series asked about (an exception's), read once per request. */
+export function seriesRepeats(events: EventStore, userId: string): (seriesId: number) => Repeat | null {
+  const known = new Map<number, Repeat | null>();
+  return (seriesId) => {
+    let repeat = known.get(seriesId);
+    if (repeat === undefined) {
+      const series = events.get(userId, seriesId);
+      repeat = series && isSeries(series) ? seriesRepeat(series) : null;
+      known.set(seriesId, repeat);
+    }
+    return repeat;
   };
 }
 
 /**
- * `GET /api/occurrences?from&to` (brief 03): the user's stored rows that
- * overlap the instants `[from, to)`, by start in their display time zone.
- * All-day rows are matched on the dates the range covers in that zone
- * (`allDayRange`). Series are brief 04's; until then nothing stores one.
+ * `GET /api/occurrences?from&to`: every occurrence of the user's events that
+ * overlaps the instants `[from, to)`, by start in their display time zone.
+ * All-day ones are matched on the dates the range covers in that zone
+ * (`allDayRange`).
+ *
+ * - One-off events, as stored: `e<id>`.
+ * - Each series' generated occurrences (`expandSeries`): `s<seriesId>:<key>`,
+ *   `eventId` the series, `originalStart` the key, less its excluded dates and
+ *   the keys its exceptions replace.
+ * - Exceptions, as stored, wherever they were moved to: `e<id>`, with
+ *   `seriesId`, `originalStart` and the series' `repeat`.
  */
 export const occurrenceRoutes: FastifyPluginAsync<FeatureContext> = async (app, { events, settings }) => {
   app.get("/api/occurrences", (request): OccurrenceList => {
@@ -48,7 +47,16 @@ export const occurrenceRoutes: FastifyPluginAsync<FeatureContext> = async (app, 
     const from = parseInstant(query.from);
     const to = parseInstant(query.to);
     const { timeZone } = settings.get(userId);
-    const rows = events.listInRange(userId, { from, to, dates: allDayRange(from, to, timeZone) });
-    return { occurrences: rows.map(rowOccurrence).sort(compareOccurrences(timeZone)) };
+    const range = { from, to, dates: allDayRange(from, to, timeZone) };
+
+    const found: Occurrence[] = [];
+    const repeatOf = seriesRepeats(events, userId);
+    for (const row of events.listInRange(userId, range)) {
+      found.push(rowOccurrence(row, row.seriesId === null ? null : repeatOf(row.seriesId)));
+    }
+    for (const series of events.listSeries(userId, range)) {
+      if (isSeries(series)) found.push(...expandSeries(series, events.listExceptions(userId, series.id), range));
+    }
+    return { occurrences: found.sort(compareOccurrences(timeZone)) };
   });
 };

@@ -94,12 +94,43 @@ describe("POST /api/events", () => {
     expect(storedRow(second.eventId)).toMatchObject({ tzid: "America/New_York" });
   });
 
-  it("refuses a repeat until brief 04 with 400 validation", async () => {
-    const repeat = { freq: "daily", end: { type: "never" } };
-    expect(expectError(await t.inject({ method: "POST", url: "/api/events", payload: { ...standup(), repeat } }), 400, "validation")).toMatch(
-      /^repeat:/,
-    );
+  it("creates a series from a repeat and answers its first occurrence", async () => {
+    const repeat = { freq: "weekly", end: { type: "count", count: 10 } };
+    const series = await create({ ...standup(), repeat });
+    expect(series).toEqual({
+      id: `s${series.eventId}:2026-10-16T07:00:00Z`,
+      eventId: series.eventId,
+      seriesId: series.eventId,
+      originalStart: "2026-10-16T07:00:00Z",
+      calendarId,
+      title: "Standup",
+      location: "",
+      notes: "",
+      allDay: false,
+      start: "2026-10-16T07:00:00Z",
+      end: "2026-10-16T07:15:00Z",
+      repeat: { freq: "weekly", byDay: ["FR"], end: { type: "count", count: 10 } },
+    });
+    expect(storedRow(series.eventId)).toMatchObject({ tzid: "Europe/Bucharest", rrule: "FREQ=WEEKLY;BYDAY=FR;COUNT=10" });
     expect((await create({ ...standup(), repeat: null })).repeat).toBeNull();
+  });
+
+  it("moves a series' start to the first day it repeats on", async () => {
+    // Friday 16 October, weekly on Monday and Wednesday: the first is Monday the 19th, at the same time.
+    const series = await create({ ...standup(), repeat: { freq: "weekly", byDay: ["WE", "MO"], end: { type: "never" } } });
+    expect(series).toMatchObject({ start: "2026-10-19T07:00:00Z", end: "2026-10-19T07:15:00Z" });
+    expect(storedRow(series.eventId)).toMatchObject({ rrule: "FREQ=WEEKLY;BYDAY=MO,WE" });
+    const weekdays = await create({ calendarId, title: "Off", allDay: true, start: "2026-10-17", end: "2026-10-18", repeat: { freq: "weekdays", end: { type: "never" } } });
+    expect(weekdays).toMatchObject({ start: "2026-10-19", end: "2026-10-20", id: `s${weekdays.eventId}:2026-10-19` });
+  });
+
+  it("refuses a repeat that ends before it starts or before it first happens", async () => {
+    const until = (date: string, byDay = ["FR"]) => ({ freq: "weekly", byDay, end: { type: "until", date } });
+    const post = (repeat: object) => t.inject({ method: "POST", url: "/api/events", payload: { ...standup(), repeat } });
+    expect(expectError(await post(until("2026-10-15")), 400, "validation")).toBe("repeat.end.date: must not be before the start");
+    expect(expectError(await post(until("2026-10-18", ["MO"])), 400, "validation")).toBe("repeat: ends before it first happens");
+    expect((await post(until("2026-10-16"))).statusCode).toBe(201);
+    expectError(await post({ freq: "monthly", byDay: ["MO"], end: { type: "never" } }), 400, "validation");
   });
 
   it("refuses a bad body naming the field", async () => {
@@ -170,11 +201,24 @@ describe("PATCH /api/events/:id", () => {
     expect(ok.statusCode).toBe(200);
     expectError(await t.inject({ method: "PATCH", url, payload: { scope: "every", changes: {} } }), 400, "validation");
     expectError(await t.inject({ method: "PATCH", url, payload: { title: "no changes wrapper" } }), 400, "validation");
-    expectError(
-      await t.inject({ method: "PATCH", url, payload: { changes: { repeat: { freq: "daily", end: { type: "never" } } } } }),
-      400,
-      "validation",
-    );
+  });
+
+  it("makes a one-off a series when it is given a repeat, and back with null", async () => {
+    const event = await create(standup());
+    const url = `/api/events/${event.eventId}`;
+    const daily = { freq: "daily", end: { type: "count", count: 3 } };
+    const res = await t.inject({ method: "PATCH", url, payload: { scope: "this", changes: { repeat: daily } } });
+    expect(res.statusCode).toBe(200);
+    expect(occurrenceSchema.parse(res.json())).toMatchObject({
+      id: `s${event.eventId}:2026-10-16T07:00:00Z`,
+      seriesId: event.eventId,
+      repeat: daily,
+    });
+    expect(storedRow(event.eventId)).toMatchObject({ rrule: "FREQ=DAILY;COUNT=3" });
+
+    const back = await t.inject({ method: "PATCH", url, payload: { scope: "all", changes: { repeat: null } } });
+    expect(occurrenceSchema.parse(back.json())).toEqual(event);
+    expect(storedRow(event.eventId)).toMatchObject({ rrule: null });
   });
 
   it("answers 404 for a bad id or one that does not exist", async () => {

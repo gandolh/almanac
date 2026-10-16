@@ -10,8 +10,8 @@ import { eventSearchText, foldSearchText } from "./search-text.js";
  *
  * It stores one-off events, series (a row with `rrule`) and exceptions (a row
  * with `seriesId` and `originalStart`), but knows nothing about repeating:
- * expanding and the edit scopes are brief 04's, built on the low-level writes
- * at the end of the interface. Inputs are already validated
+ * expanding and the edit scopes are `recurrence/` (brief 04), built on the
+ * low-level writes at the end of the interface. Inputs are already validated
  * (`eventInputSchema`); the store sets `search_text` and the times on every
  * write.
  */
@@ -32,14 +32,14 @@ export interface EventStore {
   remove(userId: string, id: number): boolean;
   /** Rows with no `rrule` (one-off events and exceptions) overlapping the range, by id. */
   listInRange(userId: string, range: EventRange): EventRecord[];
-  /** Series rows (`rrule` set) that start before the range ends, by id. Whether they reach into it is brief 04's to work out. */
+  /** Series rows (`rrule` set) that start before the range ends, by id. Whether they reach into it is `expandSeries`'s to work out. */
   listSeries(userId: string, range: EventRange): EventRecord[];
   /** A series' exceptions wherever they are, by `originalStart`. */
   listExceptions(userId: string, seriesId: number): EventRecord[];
   /** Every row whose title, location or notes contain `query`, case and diacritics folded (`foldSearchText`), by id. */
   search(userId: string, query: string): EventRecord[];
 
-  // Low-level writes for brief 04's edit scopes. Each is one statement; the caller holds the transaction.
+  // Low-level writes for the edit scopes (`recurrence/scopes.ts`). Each is one statement; the caller holds the transaction.
 
   /** Replaces a series' excluded occurrence keys (stored de-duplicated, sorted). `undefined` when there is no such event. */
   setExdates(userId: string, id: number, exdates: readonly string[]): EventRecord | undefined;
@@ -57,6 +57,14 @@ export interface EventStore {
    * one instead).
    */
   insertException(userId: string, seriesId: number, originalStart: string, content: EventContent): EventRecord | undefined;
+  /**
+   * Points an exception at another of the user's series and occurrence key
+   * (brief 04: "this and following" moves the exceptions after the split to
+   * the new series). `undefined` when the user has no such exception or no
+   * such series. Throws the database's unique error when that series already
+   * has an exception for the key.
+   */
+  moveException(userId: string, id: number, seriesId: number, originalStart: string): EventRecord | undefined;
 }
 
 /** What an event is: the fields the API sends, as `eventInputSchema` leaves them. */
@@ -195,6 +203,9 @@ export function createEventStore(db: Db, now: () => Date = () => new Date()): Ev
   const updateRrule = db.prepare<[string | null, string, string, number]>(
     "UPDATE events SET rrule = ?, updated_at = ? WHERE user_id = ? AND id = ?",
   );
+  const updateSeriesLink = db.prepare<[number, string, string, string, number]>(
+    "UPDATE events SET series_id = ?, original_start = ?, updated_at = ? WHERE user_id = ? AND id = ? AND series_id IS NOT NULL",
+  );
 
   // Timed and all-day rows apart, so each half uses its own index.
   const timedInRange = db.prepare<[string, number, number], EventRow>(
@@ -276,6 +287,15 @@ export function createEventStore(db: Db, now: () => Date = () => new Date()): Ev
     return reread(userId, id);
   }
 
+  const moveException = db.transaction(
+    (userId: string, id: number, seriesId: number, originalStart: string): EventRecord | undefined => {
+      const series = get(userId, seriesId);
+      if (!series || series.rrule === null) return undefined;
+      if (updateSeriesLink.run(seriesId, originalStart, now().toISOString(), userId, id).changes === 0) return undefined;
+      return reread(userId, id);
+    },
+  );
+
   function search(userId: string, query: string): EventRecord[] {
     const needle = foldSearchText(query);
     // instr with an empty needle matches every row: a query of only accents finds nothing.
@@ -297,5 +317,6 @@ export function createEventStore(db: Db, now: () => Date = () => new Date()): Ev
     setRrule,
     insertException: (userId, seriesId, originalStart, content) =>
       insertException(userId, seriesId, originalStart, content),
+    moveException: (userId, id, seriesId, originalStart) => moveException(userId, id, seriesId, originalStart),
   };
 }
