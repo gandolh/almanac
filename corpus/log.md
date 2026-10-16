@@ -122,3 +122,13 @@ build clean; nothing pushed, origin set. The three items left are in
 dev app when it was stopped: no source changes. To resume: fix the three,
 check them in the browser, run the gates, commit, then remove the "Paused"
 section.
+
+## [2026-10-16] maintenance | Fix round 2, resumed after the pause
+
+The three leftovers from the browser re-check are fixed and checked in the
+browser: FullCalendar's first event answer now waits for the lazy
+`CalendarArea` to mount (the React warning came from FullCalendar setting
+state during a sliced first render); `askScope` closes its dialog before it
+answers, so focus returns to Save; the phone week title shows the month
+("Oct 2026") at 17 px. 623 tests. The "Paused" section is gone from
+[status.md](wiki/status.md); v1 is done, waiting on the owner's steps.

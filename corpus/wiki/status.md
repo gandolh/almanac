@@ -1,5 +1,5 @@
 ---
-summary: Snapshot as of 2026-10-16, paused with three small fixes open. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and a browser walkthrough) with its fixes, 622 tests. Not pushed (remote is gandolh/almanac on GitHub) and not deployed. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
+summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds, 623 tests. Not pushed (remote is gandolh/almanac on GitHub) and not deployed. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
 updated: 2026-10-16
 ---
 
@@ -10,27 +10,10 @@ _2026-10-16_. v1 is built. The owner settled the design in a grill
 were built the same day with `plan-split-dispatch`, one commit per brief on
 `main`, then reviewed by three code finders (web wiring, server
 correctness, conventions) and a browser walkthrough of every flow, and the
-findings were fixed in three lanes. 622 tests pass; typecheck, lint and
+findings were fixed in three lanes, re-checked in the browser, and the last
+three leftovers fixed after a pause. 623 tests pass; typecheck, lint and
 build are clean. The remote is `https://github.com/gandolh/almanac.git`
 (set 2026-10-16); nothing is pushed. Nothing is deployed.
-
-## Paused (2026-10-16)
-
-The owner paused the run before the last fix round. The browser re-check at
-`eb546e0` passed 11 of 13 fixes; three small items are open, untouched:
-
-1. React logs "Can't perform a React state update on a component that
-   hasn't mounted yet" once, on the first load of the lazy `CalendarArea`
-   chunk (cold-load `/year/…`, press `m`). Suspects: the `React.lazy` +
-   Suspense in `layout/AppShell.tsx`, or the derive-during-render code added
-   to `event/EventEditor.tsx` (path change closes quick create) and
-   `calendar/CalendarArea.tsx`.
-2. The phone week title "12–18 Oct 2026" is cut to "12–18 Oct 2…" at 390 px.
-   Plan: phone week shows "Oct 2026" (or "Oct–Nov 2026") in
-   `rangeTitleShort` (`dates.ts`).
-3. After cancelling the scope question from Save, focus lands on the body
-   instead of Save (`event/EventForm.tsx` busy effect vs `event/scope.tsx`
-   focus restore). The Delete path is fine.
 
 ## Next (owner)
 
@@ -58,6 +41,10 @@ The owner paused the run before the last fix round. The browser re-check at
   deleted dates, as Google does.
 - Esc from search returns to the last calendar view visited.
 - Date fields in the event form follow the browser's locale format.
+- In a font wider than Roboto or San Francisco, a phone week title across
+  two years ("Dec ’26–Jan ’27") can lose a few pixels at the end.
+- `npm run dev` can fail with `ENOSPC` when VS Code holds most file
+  watchers; the polling workaround is in the owner-setup doc.
 - The first quick-create event in the very first browser walk seemed to
   vanish once; it never reproduced in later runs.
 
