@@ -32,7 +32,7 @@ export function ViewSwitcher({ view, date, compact }: ViewSwitcherProps) {
         align="end"
         trigger={
           <>
-            <span className="view-menu__label">{view ? VIEW_LABELS[view] : "View"}</span>
+            <span>{view ? VIEW_LABELS[view] : "View"}</span>
             <CaretDownIcon size={18} />
           </>
         }

@@ -56,6 +56,7 @@ export interface KeyPress {
 interface TargetLike {
   tagName?: string;
   isContentEditable?: boolean;
+  type?: string;
   closest?: (selector: string) => unknown;
 }
 
@@ -64,16 +65,23 @@ export function isTypingTarget(target: EventTarget | null): boolean {
   const element = target as TargetLike | null;
   if (element === null || typeof element !== "object") return false;
   const tag = element.tagName?.toUpperCase();
-  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+  if (tag === "TEXTAREA" || tag === "SELECT") return true;
+  // A checkbox, button or range keeps no letters for itself: focus returns there after a click.
+  if (tag === "INPUT") return TEXT_INPUT_TYPES.has((element.type ?? "text").toLowerCase());
   if (element.isContentEditable) return true;
   return typeof element.closest === "function" && element.closest(OWN_KEYS) !== null;
 }
+
+/** The input types a person types into (an element's `type` already reads "text" for an unknown one). */
+const TEXT_INPUT_TYPES: ReadonlySet<string> = new Set([
+  "text", "search", "email", "url", "tel", "password", "number", "date", "time", "datetime-local", "month", "week",
+]);
 
 /** Controls that use letters or arrows themselves. */
 const OWN_KEYS = '[role="menu"], [role="listbox"], [role="combobox"], [role="slider"], [role="textbox"], [contenteditable=""], [contenteditable="true"]';
 
 /** Open things that the shortcuts stay quiet behind. */
-export const OVERLAY_SELECTOR = 'dialog[open], [aria-modal="true"], [role="dialog"], [role="alertdialog"], [role="menu"]';
+const OVERLAY_SELECTOR = 'dialog[open], [aria-modal="true"], [role="dialog"], [role="alertdialog"], [role="menu"]';
 
 /** The shortcut a key press asks for, or `null`. `overlayOpen` is whether a dialog, popover or menu is showing. */
 export function shortcutFor(press: KeyPress, overlayOpen: boolean): Shortcut | null {

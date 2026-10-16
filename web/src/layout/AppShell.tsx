@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Temporal } from "temporal-polyfill";
-import { CalendarArea } from "../calendar/CalendarArea";
 import { PlusIcon } from "../components/icons";
 import { Toaster } from "../components/Toast";
 import { useSettings, useToday } from "../data/settings";
-import { DEFAULT_VIEW, rangeTitle, stepDate, type View } from "../dates";
+import { DEFAULT_VIEW, rangeTitle, rangeTitleShort, stepDate, type View } from "../dates";
 import { useEventEditor } from "../event/EventEditor";
 import {
   SEARCH,
@@ -28,7 +27,10 @@ import { useShortcuts, type Shortcut } from "./shortcuts";
 import { useSwipe } from "./swipe";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
-import { useIsDesktop } from "./viewport";
+import { useIsDesktop } from "../components/viewport";
+
+// FullCalendar is most of the bundle: the views load on first use, the year view and search don't need it.
+const CalendarArea = lazy(() => import("../calendar/CalendarArea").then((m) => ({ default: m.CalendarArea })));
 
 /** What the address shows: a view on a date, the search results, or nothing yet (home, or an address the app doesn't have). */
 export type Place = { kind: "view"; view: View; date: Temporal.PlainDate } | { kind: "search" } | { kind: "home" };
@@ -170,7 +172,9 @@ export function AppShell() {
       shown === "year" ? (
         <YearView year={place.date.year} onOpenDay={(day) => go("day", day)} onOpenMonth={(first) => go("month", first)} />
       ) : (
-        <CalendarArea view={shown} date={place.date} onNavigate={go} />
+        <Suspense fallback={<div className="calendar-area" />}>
+          <CalendarArea view={shown} date={place.date} onNavigate={go} />
+        </Suspense>
       );
   }
 
@@ -184,7 +188,13 @@ export function AppShell() {
           view={place.kind === "view" ? place.view : null}
           date={date}
           today={today}
-          title={place.kind === "view" ? rangeTitle(place.view, place.date) : place.kind === "search" ? "Search" : ""}
+          title={
+            place.kind === "view"
+              ? (desktop ? rangeTitle : rangeTitleShort)(place.view, place.date)
+              : place.kind === "search"
+                ? "Search"
+                : ""
+          }
           compact={!desktop}
           sidebarOpen={desktop ? columnOpen : drawerShown}
           menuButtonRef={menuButton}
@@ -220,6 +230,20 @@ export function AppShell() {
 }
 
 /**
+ * Whether Esc, pressed with focus on `active`, closes the drawer: not when
+ * another handler took it, focus is outside the drawer, or focus is in an open
+ * dialog (the New calendar dialog), which Esc closes alone.
+ */
+export function escapeClosesDrawer(
+  press: { key: string; defaultPrevented: boolean },
+  active: { closest?: (selector: string) => unknown } | null,
+  focusInDrawer: boolean,
+): boolean {
+  if (press.key !== "Escape" || press.defaultPrevented || !focusInDrawer) return false;
+  return !(typeof active?.closest === "function" && active.closest("dialog[open]"));
+}
+
+/**
  * The phone's left column: over the view from the left, with the page dimmed
  * behind it. Esc or a press on the dim closes it; the rest of the shell is
  * inert meanwhile. Not a modal `<dialog>`, so the menus and popovers the
@@ -231,7 +255,7 @@ function Drawer({ onClose, children }: { onClose: () => void; children: ReactNod
     panel.current?.querySelector<HTMLElement>("button, a[href], input")?.focus();
     const onKeyDown = (event: KeyboardEvent) => {
       // Only when focus is in the drawer itself: a menu or popover opened from it closes first.
-      if (event.key !== "Escape" || event.defaultPrevented || !panel.current?.contains(document.activeElement)) return;
+      if (!escapeClosesDrawer(event, document.activeElement, panel.current?.contains(document.activeElement) ?? false)) return;
       event.preventDefault();
       onClose();
     };

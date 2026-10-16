@@ -79,7 +79,7 @@ export function TopBar(props: TopBarProps) {
       <div className="topbar__end">
         <SearchBox />
         {compact && (
-          <button type="button" className="icon-button today-icon" aria-label={`Today, ${formatDayLong(today)}`} onClick={onToday}>
+          <button type="button" className="icon-button" aria-label={`Today, ${formatDayLong(today)}`} onClick={onToday}>
             <CalendarPageIcon />
             <span className="today-icon__number" aria-hidden="true">
               {today.day}

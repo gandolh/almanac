@@ -89,7 +89,7 @@ export function MonthGrid({ month, today, selected, marked, onPickDay, size, lab
                     onKeyDown={(event) => onKeyDown(event, date)}
                     onClick={() => onPickDay(date)}
                   >
-                    <span className="month-grid__number">{date.day}</span>
+                    <span>{date.day}</span>
                     {hasEvents && <span className="month-grid__dot" aria-hidden="true" />}
                   </button>
                 </td>

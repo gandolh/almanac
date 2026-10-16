@@ -275,7 +275,7 @@ describe("YearView", () => {
   it("draws the twelve months, named by buttons, in the year's order", () => {
     const names = [...html.matchAll(/<button[^>]*class="year-month__title"[^>]*>([^<]+)<\/button>/g)].map((m) => m[1]);
     expect(names).toEqual(["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]);
-    expect(html).toContain('aria-label="Year 2026"');
+    expect(html).toContain('aria-label="Year view"');
     expect(html.match(/<table[^>]*aria-labelledby=/g)).toHaveLength(12);
   });
 

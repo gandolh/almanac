@@ -92,7 +92,7 @@ export function accountMessage(error: AuthError): string {
     case "access_denied":
       return "Ward didn't let you in to Almanac. Allow Almanac for your account in Ward, then try again.";
     case "invalid_callback":
-      return "That Ward round trip expired. Try again.";
+      return "That Ward sign-in expired. Try again.";
     case "ward_unavailable":
       return "Ward isn't answering right now. Try again later.";
     case "ward_misconfigured":

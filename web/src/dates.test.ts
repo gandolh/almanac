@@ -12,10 +12,9 @@ import {
   isView,
   monthTitle,
   monthWeeks,
-  nextDate,
   parseDateKey,
-  previousDate,
   rangeTitle,
+  rangeTitleShort,
   sameDate,
   startOfWeek,
   stepDate,
@@ -98,23 +97,34 @@ describe("visibleRange", () => {
 
 describe("previous and next", () => {
   it("steps a day, a week, a month or a year", () => {
-    expect(nextDate("day", date("2026-10-31")).toString()).toBe("2026-11-01");
-    expect(previousDate("day", date("2026-01-01")).toString()).toBe("2025-12-31");
-    expect(nextDate("week", date("2026-10-16")).toString()).toBe("2026-10-23");
-    expect(previousDate("week", date("2026-10-02")).toString()).toBe("2026-09-25");
-    expect(nextDate("month", date("2026-10-16")).toString()).toBe("2026-11-16");
-    expect(previousDate("month", date("2026-01-16")).toString()).toBe("2025-12-16");
-    expect(nextDate("year", date("2026-10-16")).toString()).toBe("2027-10-16");
-    expect(previousDate("year", date("2026-10-16")).toString()).toBe("2025-10-16");
+    expect(stepDate("day", date("2026-10-31"), 1).toString()).toBe("2026-11-01");
+    expect(stepDate("day", date("2026-01-01"), -1).toString()).toBe("2025-12-31");
+    expect(stepDate("week", date("2026-10-16"), 1).toString()).toBe("2026-10-23");
+    expect(stepDate("week", date("2026-10-02"), -1).toString()).toBe("2026-09-25");
+    expect(stepDate("month", date("2026-10-16"), 1).toString()).toBe("2026-11-16");
+    expect(stepDate("month", date("2026-01-16"), -1).toString()).toBe("2025-12-16");
+    expect(stepDate("year", date("2026-10-16"), 1).toString()).toBe("2027-10-16");
+    expect(stepDate("year", date("2026-10-16"), -1).toString()).toBe("2025-10-16");
   });
 
   it("clamps a day the next month or year doesn't have", () => {
-    expect(nextDate("month", date("2026-01-31")).toString()).toBe("2026-02-28");
-    expect(nextDate("month", date("2028-01-31")).toString()).toBe("2028-02-29");
-    expect(previousDate("month", date("2026-03-31")).toString()).toBe("2026-02-28");
-    expect(nextDate("month", date("2026-08-31")).toString()).toBe("2026-09-30");
-    expect(nextDate("year", date("2028-02-29")).toString()).toBe("2029-02-28");
+    expect(stepDate("month", date("2026-01-31"), 1).toString()).toBe("2026-02-28");
+    expect(stepDate("month", date("2028-01-31"), 1).toString()).toBe("2028-02-29");
+    expect(stepDate("month", date("2026-03-31"), -1).toString()).toBe("2026-02-28");
+    expect(stepDate("month", date("2026-08-31"), 1).toString()).toBe("2026-09-30");
+    expect(stepDate("year", date("2028-02-29"), 1).toString()).toBe("2029-02-28");
     expect(stepDate("month", date("2026-01-31"), 12).toString()).toBe("2027-01-31");
+  });
+});
+
+describe("rangeTitleShort", () => {
+  it("keeps the year in a form that fits a phone's bar", () => {
+    expect(rangeTitleShort("day", date("2026-10-16"))).toBe("16 Oct 2026");
+    expect(rangeTitleShort("week", date("2026-10-21"))).toBe("19–25 Oct 2026");
+    expect(rangeTitleShort("week", date("2026-10-28"))).toBe("Oct–Nov 2026");
+    expect(rangeTitleShort("week", date("2026-12-31"))).toBe("Dec ’26–Jan ’27");
+    expect(rangeTitleShort("month", date("2026-10-16"))).toBe("Oct 2026");
+    expect(rangeTitleShort("year", date("2026-10-16"))).toBe("2026");
   });
 });
 

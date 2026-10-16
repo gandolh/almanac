@@ -114,7 +114,7 @@ export interface ResultsViewProps {
 export function ResultsView({ query, results, timeZone, calendars }: ResultsViewProps) {
   if (results.length === 0) {
     return (
-      <ResultsMessage role="status">{`No results for "${query}"`}</ResultsMessage>
+      <ResultsMessage role="status">{`No results for "${query}".`}</ResultsMessage>
     );
   }
   const byId = new Map(calendars.map((calendar) => [calendar.id, calendar]));
@@ -137,7 +137,7 @@ export function ResultsView({ query, results, timeZone, calendars }: ResultsView
         ))}
       </ol>
       {results.length >= SEARCH_LIMIT && (
-        <p className="search-results__limit">Showing the first {SEARCH_LIMIT} results. Search for more specific words to narrow them down.</p>
+        <p className="search-results__limit">Showing the first {SEARCH_LIMIT} results. Try more specific words.</p>
       )}
     </section>
   );

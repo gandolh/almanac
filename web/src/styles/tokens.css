@@ -135,7 +135,8 @@
 
   /* --- Search (brief 10) -------------------------------------------------- */
 
-  --search-dot: 10px; /* a result's calendar colour dot */
+  --search-dot: 10px; /* a result's (and a day list's) calendar colour dot */
+  --day-popover-width: 320px; /* the year view's day list */
   --search-field-width: 360px; /* the open field in the desktop bar */
   --search-field-width-narrow: 240px; /* ... under 1200 px */
   --search-field-width-narrowest: 160px; /* ... under 900 px */

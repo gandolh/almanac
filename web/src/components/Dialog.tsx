@@ -83,7 +83,7 @@ function OpenDialog({ onClose, title, children, footer, size = "medium", dismiss
           <h2 id={titleId} className="dialog__title">
             {title}
           </h2>
-          <button type="button" className="icon-button dialog__close" aria-label="Close" onClick={onClose}>
+          <button type="button" className="icon-button" aria-label="Close" onClick={onClose}>
             <CloseIcon size={20} />
           </button>
         </header>

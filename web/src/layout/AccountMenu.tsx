@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSession } from "../../vendor/ward/ward-auth-react.js";
 import { changePassword, linkWard, signOut, unlinkWard, useWardLink, useWardNotice } from "../account/actions";
 import { TimeZoneDialog } from "../account/TimeZoneDialog";
-import { AlertIcon } from "../auth/icons";
+import { AlertIcon } from "../components/Field";
 import { Menu, type MenuSection } from "../components/Menu";
 import { useSettings } from "../data/settings";
 

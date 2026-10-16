@@ -72,7 +72,7 @@ export function GateScreen({ state, onRetry }: GateScreenProps) {
             <p className="gate__wait">Loading…</p>
           ) : (
             <p className="gate__lede" role="alert">
-              Almanac can't be reached. Check your connection, then try again.
+              Almanac can't be reached. Check your connection and try again.
             </p>
           )}
         </header>

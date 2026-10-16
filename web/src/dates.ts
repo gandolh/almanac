@@ -222,16 +222,6 @@ export function stepDate(view: View, date: Temporal.PlainDate, by: number): Temp
   }
 }
 
-/** The shell's › button. */
-export function nextDate(view: View, date: Temporal.PlainDate): Temporal.PlainDate {
-  return stepDate(view, date, 1);
-}
-
-/** The shell's ‹ button. */
-export function previousDate(view: View, date: Temporal.PlainDate): Temporal.PlainDate {
-  return stepDate(view, date, -1);
-}
-
 // --- Text -------------------------------------------------------------------------------------
 
 /** The separator in a range, an en dash with spaces: "19 – 25 Oct 2026". */
@@ -263,6 +253,32 @@ export function rangeTitle(view: View, date: Temporal.PlainDate): string {
     case "year":
       return String(date.year);
   }
+}
+
+/**
+ * `rangeTitle` short enough for the phone's bar, which keeps the year: "16 Oct 2026",
+ * "19–25 Oct 2026", "Oct–Nov 2026", "Dec ’26–Jan ’27", "Oct 2026", "2026".
+ */
+export function rangeTitleShort(view: View, date: Temporal.PlainDate): string {
+  switch (view) {
+    case "day":
+      return formatDate(date);
+    case "week": {
+      const { start, end } = visibleRange("week", date);
+      const last = end.subtract({ days: 1 });
+      if (start.year !== last.year) return `${monthShort(start.month)} ’${yy(start.year)}–${monthShort(last.month)} ’${yy(last.year)}`;
+      if (start.month !== last.month) return `${monthShort(start.month)}–${monthShort(last.month)} ${last.year}`;
+      return `${start.day}–${last.day} ${monthShort(last.month)} ${last.year}`;
+    }
+    case "month":
+      return `${monthShort(date.month)} ${date.year}`;
+    case "year":
+      return String(date.year);
+  }
+}
+
+function yy(year: number): string {
+  return String(year % 100).padStart(2, "0");
 }
 
 /** "October 2026", for a date or a year-month. */

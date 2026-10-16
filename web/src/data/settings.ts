@@ -62,11 +62,6 @@ export function useSettings(): SettingsView {
   return useMemo(() => ({ timeZone: state.value.timeZone, status: state.status, error: state.error, ...actions }), [state]);
 }
 
-/** The display time zone as it is now, outside a component. */
-export function currentTimeZone(): string {
-  return settingsStore.resource.store.getState().value.timeZone;
-}
-
 // --- Today --------------------------------------------------------------------------
 
 /** How often the clock is looked at for a new day; also when the tab comes back into view. */

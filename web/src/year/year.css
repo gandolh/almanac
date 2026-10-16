@@ -42,7 +42,7 @@
   }
 }
 
-/* One column, a phone: the months grow to fill the width (up to 44 px a day) so the days are easy to hit. */
+/* A deliberate override of --year-cell (tokens.css): one column, a phone: the months grow to fill the width (up to 44 px a day) so the days are easy to hit. */
 @container year (width < 472px) {
   .year__months {
     --year-cell: min(44px, calc(100cqw / 7));
@@ -84,7 +84,7 @@
 /* --- A day's list, in the popover -------------------------------------------------- */
 
 .popover.day-popover {
-  width: 320px;
+  width: var(--day-popover-width);
 }
 
 .day-list {
@@ -144,8 +144,8 @@
 /* The calendar's colour comes from the row (--calendar-color), not from here. */
 .day-list__dot {
   flex: none;
-  width: 10px;
-  height: 10px;
+  width: var(--search-dot);
+  height: var(--search-dot);
   border-radius: var(--radius-pill);
   background: var(--calendar-color, var(--accent));
 }

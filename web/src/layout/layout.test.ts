@@ -4,7 +4,7 @@ import { Temporal } from "temporal-polyfill";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { HOME, LOGIN, SEARCH, route, viewRoute } from "../router";
 import { initialOf, zoneCity } from "./AccountMenu";
-import { documentTitle, placeOf } from "./AppShell";
+import { documentTitle, escapeClosesDrawer, placeOf } from "./AppShell";
 import { registerCommand, runCommand } from "./commands";
 import { MiniMonth } from "./MiniMonth";
 import { isTypingTarget, shortcutFor, type KeyPress } from "./shortcuts";
@@ -18,6 +18,18 @@ const press = (key: string, extra: Partial<KeyPress> = {}): KeyPress => ({
   shiftKey: false,
   target: { tagName: "BODY", closest: () => null } as unknown as EventTarget,
   ...extra,
+});
+
+describe("the drawer's Esc", () => {
+  const esc = { key: "Escape", defaultPrevented: false };
+  it("closes the drawer, but not when an open dialog inside it takes the key", () => {
+    expect(escapeClosesDrawer(esc, { closest: () => null }, true)).toBe(true);
+    expect(escapeClosesDrawer(esc, { closest: (selector) => (selector === "dialog[open]" ? {} : null) }, true)).toBe(false);
+    expect(escapeClosesDrawer(esc, null, true)).toBe(true);
+    expect(escapeClosesDrawer(esc, null, false)).toBe(false);
+    expect(escapeClosesDrawer({ ...esc, defaultPrevented: true }, null, true)).toBe(false);
+    expect(escapeClosesDrawer({ key: "a", defaultPrevented: false }, null, true)).toBe(false);
+  });
 });
 
 describe("shortcutFor", () => {
@@ -62,6 +74,20 @@ describe("shortcutFor", () => {
     expect(shortcutFor(press("m", { target: inMenu as unknown as EventTarget }), false)).toBeNull();
     expect(isTypingTarget({ tagName: "BUTTON", closest: () => null } as unknown as EventTarget)).toBe(false);
     expect(isTypingTarget(null)).toBe(false);
+  });
+
+  it("counts text-like inputs as typing, but not a checkbox, button or range that holds focus after a click", () => {
+    const input = (type?: string) => ({ tagName: "INPUT", type, closest: () => null }) as unknown as EventTarget;
+    for (const type of [undefined, "text", "search", "email", "url", "tel", "password", "number", "date", "time", "datetime-local", "month", "week"]) {
+      expect(isTypingTarget(input(type))).toBe(true);
+    }
+    for (const type of ["checkbox", "radio", "button", "submit", "range", "color", "file"]) {
+      expect(isTypingTarget(input(type))).toBe(false);
+    }
+    expect(shortcutFor(press("t", { target: input("checkbox") }), false)).toEqual({ kind: "today" });
+    expect(shortcutFor(press("t", { target: input("text") }), false)).toBeNull();
+    expect(isTypingTarget({ tagName: "TEXTAREA", closest: () => null } as unknown as EventTarget)).toBe(true);
+    expect(isTypingTarget({ tagName: "SELECT", closest: () => null } as unknown as EventTarget)).toBe(true);
   });
 
   it("stays quiet while a dialog, popover or menu is open", () => {

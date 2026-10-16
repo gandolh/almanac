@@ -267,7 +267,7 @@ export function usePathname(): string {
 }
 
 /** The address's query string (`?q=gym`, or `""`); re-renders on navigation and on Back/Forward. */
-export function useLocationSearch(): string {
+function useLocationSearch(): string {
   return useSyncExternalStore(subscribe, currentSearch, () => "");
 }
 

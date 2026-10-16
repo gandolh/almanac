@@ -1,15 +1,4 @@
-import {
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type FormEvent,
-  type MouseEvent,
-  type ReactNode,
-  type SyntheticEvent,
-} from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import {
   useChangePassword,
   useSession,
@@ -17,21 +6,18 @@ import {
   useWardResult,
   type AuthError,
 } from "../../vendor/ward/ward-auth-react.js";
-import { AuthField } from "../auth/Field";
-import { AlertIcon } from "../auth/icons";
 import { accountMessage } from "../auth/messages";
 // The hooks below need the client set up; the session module does that when it loads.
 import "../auth/session";
 import { Button } from "../components/Button";
-import { useIsDesktop } from "../components/viewport";
-import "../auth/auth.css";
+import { Dialog } from "../components/Dialog";
+import { AlertIcon, AuthField } from "../components/Field";
 import "./account.css";
 
 /**
  * The account menu's "Change password" (brief 02; brief 05's menu opens it):
- * a modal dialog, so focus stays in the form until it is done or cancelled.
- * On the desktop a white panel in the middle of the window; on a phone a
- * floating sheet over the bottom of the screen.
+ * a small `components/Dialog`, so focus stays in the form until it is done or
+ * cancelled.
  *
  * - With a password: the current one, the new one twice. Every other session
  *   ends; this one stays.
@@ -70,7 +56,7 @@ export function openChangePassword(): void {
 // --- Checking the new password before it is sent ----------------------------------
 
 /** The library's rule (MIN_PASSWORD_LENGTH); the server checks it again. */
-export const MIN_PASSWORD_LENGTH = 8;
+const MIN_PASSWORD_LENGTH = 8;
 
 export interface PasswordEntry {
   current: string;
@@ -116,121 +102,117 @@ export function ChangePasswordDialog() {
 }
 
 function PasswordDialog({ onClose }: { onClose: () => void }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const titleId = useId();
-  const desktop = useIsDesktop();
+  const formId = useId();
   const session = useSession();
   const user = session.status === "signed_in" ? session.user : null;
   const hasPassword = user?.hasPassword ?? true;
   const change = useChangePassword();
   const local = useSetLocalPassword();
 
-  useLayoutEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (!dialog.open) dialog.showModal();
-    dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
-    return () => {
-      if (dialog.open) dialog.close();
-    };
-  }, []);
-
-  // A press on the backdrop (which the dialog itself receives) closes it, as the panels do.
-  const onClick = (event: MouseEvent<HTMLDialogElement>) => {
-    if (event.target === event.currentTarget) onClose();
-  };
-  const onCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
-    event.preventDefault();
-    onClose();
-  };
+  const cancel = (
+    <Button variant="quiet" onClick={onClose}>
+      Cancel
+    </Button>
+  );
+  const submit = (label: string, pending: boolean) => (
+    <Button type="submit" form={formId} variant="primary" disabled={pending}>
+      {pending ? "Saving…" : label}
+    </Button>
+  );
 
   let title = "Change password";
   let body;
+  let footer;
   // Either hook: setting a first password refreshes the session, and `hasPassword` is true by the time it is done.
   if (change.done || local.done) {
     title = local.done ? "Password set" : "Password changed";
-    body = <Done desktop={desktop} onClose={onClose} />;
+    body = (
+      <p className="password-text" role="status">
+        You're still signed in here. Almanac signed you out everywhere else; use the new password there.
+      </p>
+    );
+    footer = (
+      <Button variant="primary" autoFocus onClick={onClose}>
+        Done
+      </Button>
+    );
   } else if (hasPassword) {
     body = (
       <PasswordForm
+        id={formId}
         username={user?.username ?? ""}
         needsCurrent
-        submitLabel="Change password"
-        pending={change.pending}
         failure={change.error}
-        desktop={desktop}
         onSubmit={(entry) => change.changePassword(entry.current, entry.next)}
         onEdit={change.reset}
-        onCancel={onClose}
+        pending={change.pending}
       />
+    );
+    footer = (
+      <>
+        {cancel}
+        {submit("Change password", change.pending)}
+      </>
     );
   } else if (local.reauthenticated) {
     title = "Set a password";
     body = (
       <PasswordForm
+        id={formId}
         username={user?.username ?? ""}
         needsCurrent={false}
         intro="Ward confirmed it's you. Choose a password for Almanac, so you can sign in without Ward too."
-        submitLabel="Set password"
-        pending={local.pending}
         failure={local.error}
-        desktop={desktop}
         onSubmit={(entry) => local.setPassword(entry.next)}
         onEdit={local.reset}
-        onCancel={onClose}
+        pending={local.pending}
       />
+    );
+    footer = (
+      <>
+        {cancel}
+        {submit("Set password", local.pending)}
+      </>
     );
   } else {
     title = "Set a password";
-    body = (
-      <ConfirmWithWard
-        pending={local.pending}
-        failure={local.error}
-        desktop={desktop}
-        onConfirm={() => void local.reauthenticate()}
-        onCancel={onClose}
-      />
+    body = <ConfirmWithWard failure={local.error} />;
+    footer = (
+      <>
+        {cancel}
+        <Button variant="primary" disabled={local.pending} data-autofocus onClick={() => void local.reauthenticate()}>
+          {local.pending ? "Opening Ward…" : "Confirm with Ward"}
+        </Button>
+      </>
     );
   }
 
   return (
-    <dialog
-      ref={dialogRef}
-      aria-labelledby={titleId}
-      className={desktop ? "password-dialog password-dialog--centered" : "password-dialog password-dialog--sheet"}
-      onClick={onClick}
-      onCancel={onCancel}
-    >
-      <div className="password-dialog__frame">
-        <h2 id={titleId} className="password-dialog__title">
-          {title}
-        </h2>
-        {body}
-      </div>
-    </dialog>
+    <Dialog open onClose={onClose} title={title} size="small" dismissOnBackdrop={false} footer={footer}>
+      {body}
+    </Dialog>
   );
 }
 
 interface PasswordFormProps {
+  /** The form's id, so the dialog footer's button can submit it. */
+  id: string;
   /** For password managers: which account the new password belongs to. */
   username: string;
   needsCurrent: boolean;
   intro?: string;
-  submitLabel: string;
   pending: boolean;
   failure: AuthError | null;
-  desktop: boolean;
   /** Resolves true when the password was saved. */
   onSubmit: (entry: PasswordEntry) => Promise<boolean>;
   /** A field changed: the last failure no longer applies. */
   onEdit: () => void;
-  onCancel: () => void;
 }
 
 const FIELDS = ["current", "next", "repeat"] as const;
 
 function PasswordForm(props: PasswordFormProps) {
-  const { username, needsCurrent, intro, submitLabel, pending, failure, desktop, onSubmit, onEdit, onCancel } = props;
+  const { id, username, needsCurrent, intro, pending, failure, onSubmit, onEdit } = props;
   const [entry, setEntry] = useState<PasswordEntry>({ current: "", next: "", repeat: "" });
   const [problems, setProblems] = useState<PasswordProblems>({});
   const currentRef = useRef<HTMLInputElement>(null);
@@ -267,8 +249,8 @@ function PasswordForm(props: PasswordFormProps) {
   const blockFailure = failure !== null && !wrongCurrent ? accountMessage(failure) : null;
 
   return (
-    <form className="password-dialog__form" onSubmit={submit} noValidate>
-      {intro && <p className="password-dialog__text">{intro}</p>}
+    <form id={id} className="password-form" onSubmit={submit} noValidate>
+      {intro && <p className="password-text">{intro}</p>}
       <input className="visually-hidden" type="text" name="username" autoComplete="username" value={username} readOnly tabIndex={-1} aria-hidden="true" />
       {needsCurrent && (
         <AuthField
@@ -308,20 +290,14 @@ function PasswordForm(props: PasswordFormProps) {
           <span className="auth-error__text">{blockFailure}</span>
         </p>
       )}
-      <Actions desktop={desktop} onCancel={onCancel}>
-        <Button type="submit" variant="primary" size={desktop ? "regular" : "large"} block={!desktop} disabled={pending}>
-          {pending ? "Saving…" : submitLabel}
-        </Button>
-      </Actions>
     </form>
   );
 }
 
-function ConfirmWithWard(props: { pending: boolean; failure: AuthError | null; desktop: boolean; onConfirm: () => void; onCancel: () => void }) {
-  const { pending, failure, desktop, onConfirm, onCancel } = props;
+function ConfirmWithWard({ failure }: { failure: AuthError | null }) {
   return (
-    <div className="password-dialog__form">
-      <p className="password-dialog__text">
+    <div className="password-form">
+      <p className="password-text">
         You sign in with Ward, and Almanac has no password for you yet. Confirm it's you with your Ward password, then choose
         one here, so you can still sign in while Ward is down.
       </p>
@@ -331,38 +307,6 @@ function ConfirmWithWard(props: { pending: boolean; failure: AuthError | null; d
           <span className="auth-error__text">{accountMessage(failure)}</span>
         </p>
       )}
-      <Actions desktop={desktop} onCancel={onCancel}>
-        <Button variant="primary" size={desktop ? "regular" : "large"} block={!desktop} disabled={pending} data-autofocus onClick={onConfirm}>
-          {pending ? "Opening Ward…" : "Confirm with Ward"}
-        </Button>
-      </Actions>
-    </div>
-  );
-}
-
-function Done({ desktop, onClose }: { desktop: boolean; onClose: () => void }) {
-  return (
-    <div className="password-dialog__form">
-      <p className="password-dialog__text" role="status">
-        You're still signed in here. Almanac signed you out everywhere else; use the new password there.
-      </p>
-      <div className="password-dialog__actions">
-        <Button variant="primary" size={desktop ? "regular" : "large"} block={!desktop} data-autofocus onClick={onClose}>
-          Done
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-/** Cancel and the action: on the desktop a row on the right, the action last; on a phone the action on top, full width. */
-function Actions({ desktop, onCancel, children }: { desktop: boolean; onCancel: () => void; children: ReactNode }) {
-  return (
-    <div className="password-dialog__actions">
-      <Button variant="quiet" size={desktop ? "regular" : "large"} block={!desktop} onClick={onCancel}>
-        Cancel
-      </Button>
-      {children}
     </div>
   );
 }

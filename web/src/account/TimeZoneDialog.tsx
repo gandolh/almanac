@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type RefObject } from "react";
 import { isApiError } from "../api";
-import { AuthField } from "../auth/Field";
+import { AuthField } from "../components/Field";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/Dialog";
 import { CheckIcon } from "../components/icons";

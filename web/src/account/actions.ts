@@ -5,9 +5,8 @@ import { LOGIN, pathFor } from "../router";
 import { openChangePassword } from "./ChangePassword";
 
 /**
- * What the account menu does (brief 05's `layout/AccountMenu.tsx`; until
- * then the placeholder home in `App.tsx`). Each action resolves when done; a
- * rejection's `message` is shown to the user beside the control, so it says
+ * What the account menu does (`layout/AccountMenu.tsx` calls these). Each
+ * action resolves when done; a rejection's `message` is shown to the user beside the control, so it says
  * what went wrong and what to do. An action that opens its own dialog
  * resolves once it has opened it.
  */

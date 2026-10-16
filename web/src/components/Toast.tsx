@@ -45,7 +45,7 @@ export function showToast(message: string, options: ToastOptions = {}): () => vo
 }
 
 /** Take away whatever toast is shown. */
-export function dismissToast(): void {
+function dismissToast(): void {
   clearTimeout(timer);
   toasts.setState(null);
 }

@@ -134,7 +134,7 @@ async function send(url: string, init: RequestInit, signal: AbortSignal | undefi
     return await fetch(url, init);
   } catch (error) {
     if (signal?.aborted) throw signal.reason ?? error;
-    throw new ApiError(0, "network", "Almanac can't be reached. Check your connection.", { cause: error });
+    throw new ApiError(0, "network", "Almanac can't be reached. Check your connection and try again.", { cause: error });
   }
 }
 

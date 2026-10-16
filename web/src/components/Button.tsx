@@ -1,8 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
-import { Link, type LinkProps } from "./Link";
 
 /**
- * The three buttons (brief 05 settles their final look):
+ * The three buttons:
  *
  * - `primary`: the accent pill, one per view ("Sign in", "Change password").
  * - `secondary`: a flat fill on `control` ("Sign in with Ward", "Sign out"); `pill` rounds it fully.
@@ -48,17 +47,5 @@ export function Button({ variant, size, pill, icon, block, className, type = "bu
       {icon}
       {children}
     </button>
-  );
-}
-
-export interface ButtonLinkProps extends ButtonLook, LinkProps {}
-
-/** An in-app link that looks like a button. */
-export function ButtonLink({ variant, size, pill, icon, block, className, children, ...rest }: ButtonLinkProps) {
-  return (
-    <Link {...rest} className={buttonClass({ variant, size, pill, block }, className)}>
-      {icon}
-      {children}
-    </Link>
   );
 }

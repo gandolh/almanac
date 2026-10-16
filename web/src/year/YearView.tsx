@@ -72,7 +72,7 @@ export function YearView({ year, onOpenDay, onOpenMonth }: YearViewProps) {
   };
 
   return (
-    <section ref={rootRef} className="year" aria-label={`Year ${year}`}>
+    <section ref={rootRef} className="year" aria-label="Year view">
       <div className="year__months">
         {Array.from({ length: 12 }, (_, index) => (
           <YearMonth

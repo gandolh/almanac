@@ -110,10 +110,7 @@ a:hover {
 }
 
 /* Times, dates and counts line up in columns. */
-.tabular,
-time,
-td.num,
-th.num {
+time {
   font-variant-numeric: tabular-nums;
 }
 
