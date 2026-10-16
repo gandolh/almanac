@@ -132,3 +132,14 @@ state during a sliced first render); `askScope` closes its dialog before it
 answers, so focus returns to Save; the phone week title shows the month
 ("Oct 2026") at 17 px. 623 tests. The "Paused" section is gone from
 [status.md](wiki/status.md); v1 is done, waiting on the owner's steps.
+
+## [2026-10-16] docs | README and docs/ to the readme-docs standard
+
+The README is now a landing page: one-liner, a month-view hero, status, what
+it does and what it leaves out, four screenshots, how it works, run it
+locally, layout, docs, license (none yet). New in `docs/`: `README.md` (the
+index), `getting-started.md` (took over owner-setup's "Local development"
+section, which is now a pointer), `architecture.md`, and `images/` with
+`shots.md` and `demo-seed.mjs`. The images come from a throwaway clone with a
+made-up `demo` account. [status.md](wiki/status.md) caught up: `main` is
+pushed, `../wzd_auth`'s `22e1fd2` too, and `../vps-deploy` has no remote.

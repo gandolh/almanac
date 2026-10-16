@@ -1,5 +1,5 @@
 ---
-summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds, 623 tests. Not pushed (remote is gandolh/almanac on GitHub) and not deployed. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
+summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds, 623 tests. Pushed to gandolh/almanac on GitHub, not deployed. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
 updated: 2026-10-16
 ---
 
@@ -12,23 +12,23 @@ were built the same day with `plan-split-dispatch`, one commit per brief on
 correctness, conventions) and a browser walkthrough of every flow, and the
 findings were fixed in three lanes, re-checked in the browser, and the last
 three leftovers fixed after a pause. 623 tests pass; typecheck, lint and
-build are clean. The remote is `https://github.com/gandolh/almanac.git`
-(set 2026-10-16); nothing is pushed. Nothing is deployed.
+build are clean. `main` is pushed to `https://github.com/gandolh/almanac.git`,
+and so is `../wzd_auth`'s local seed entry (`22e1fd2`). `../vps-deploy` has
+no remote; its Almanac stack (`8e247a3`) is a local commit, which is where
+the deploy runs from. The README and `docs/` follow the readme-docs standard
+since the evening of 2026-10-16. Nothing is deployed.
 
 ## Next (owner)
 
-1. Push `main` here (`git push -u origin main`), and the unpushed commits in
-   `../vps-deploy` (`8e247a3`, the Almanac stack) and `../wzd_auth`
-   (`22e1fd2`, the local seed entry).
-2. Register Almanac in production Ward and write
+1. Register Almanac in production Ward and write
    `../vps-deploy/secrets/almanac.env` with `WARD_OIDC_CLIENT_KEY` (the only
    key), then deploy, following [docs/owner-setup.md](../../docs/owner-setup.md).
-3. Create your account with the seed inside the container. Sign in locally
+2. Create your account with the seed inside the container. Sign in locally
    first, then link Ward from the account menu, or Ward creates a second,
    empty user.
-4. Grant your Ward account (and anyone else who should have a calendar) the
+3. Grant your Ward account (and anyone else who should have a calendar) the
    `almanac` app in Ward's console.
-5. Not tried here: the "Sign in with Ward" round trip, locally (needs the
+4. Not tried here: the "Sign in with Ward" round trip, locally (needs the
    local Ward seed with Docker Desktop's WSL integration on) or in
    production; adding it to a phone's home screen.
 
@@ -44,7 +44,8 @@ build are clean. The remote is `https://github.com/gandolh/almanac.git`
 - In a font wider than Roboto or San Francisco, a phone week title across
   two years ("Dec ’26–Jan ’27") can lose a few pixels at the end.
 - `npm run dev` can fail with `ENOSPC` when VS Code holds most file
-  watchers; the polling workaround is in the owner-setup doc.
+  watchers; the polling workaround is in
+  [docs/getting-started.md](../../docs/getting-started.md#common-problems).
 - The first quick-create event in the very first browser walk seemed to
   vanish once; it never reproduced in later runs.
 
