@@ -1,0 +1,38 @@
+{
+  "name": "@almanac/server",
+  "version": "0.1.0",
+  "description": "The Almanac API (Fastify + SQLite).",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "seed": "tsx src/seed.ts"
+  },
+  "dependencies": {
+    "@almanac/shared": "0.1.0",
+    "better-sqlite3": "13.0.3",
+    "fastify": "5.12.5",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "9.6.0",
+    "tsx": "4.23.13"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/testApp.d.ts",
+      "default": "./dist/testing/testApp.js"
+    },
+    "./app": {
+      "types": "./dist/app.d.ts",
+      "default": "./dist/app.js"
+    }
+  }
+}

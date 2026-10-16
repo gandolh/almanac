@@ -1,0 +1,23 @@
+node_modules/
+dist/
+dev-dist/
+coverage/
+*.tsbuildinfo
+*.log
+.vite/
+vite.config.ts.timestamp-*
+
+# Secrets: the seed values and the Ward keys live in .env, never in git
+.env
+.env.*
+!.env.example
+
+# The SQLite database
+data/
+
+# Local dev certificates
+*.pem
+*.local
+
+# Deploy secrets
+infrastructure/.env

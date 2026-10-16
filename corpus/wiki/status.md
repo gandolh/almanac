@@ -20,7 +20,7 @@ review round.
 
 | # | Brief | State |
 |---|---|---|
-| 01 | [Workspace scaffold](../briefs/todo/01-workspace-scaffold.md) | todo |
+| 01 | [Workspace scaffold](../briefs/done/01-workspace-scaffold.md) | done |
 | 02 | [Accounts and sign-in](../briefs/todo/02-accounts-and-sign-in.md) | todo |
 | 03 | [Calendars, events and settings API](../briefs/todo/03-calendars-and-events-api.md) | todo |
 | 04 | [Repeating events](../briefs/todo/04-repeating-events.md) | todo |

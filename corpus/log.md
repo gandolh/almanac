@@ -27,3 +27,10 @@ stubs with fixed signatures so the web briefs after 06 run in parallel
 without editing the shell. The two technical checks were answered first
 (FullCalendar v7 takes named zones; the server uses `temporal-polyfill`) and
 recorded in [architecture.md](wiki/architecture.md).
+
+## [2026-10-16] done | Brief 01: workspace scaffold
+
+Three workspaces on Shelfmark's layout, Fastify health route, SQLite opener
+with an empty migration list, Vite page through the `/almanac-api` proxy. The
+Ward library came over early for `config.ts`; `ERROR_STATUS` has
+`unauthorized`. See [the brief](briefs/done/01-workspace-scaffold.md).

@@ -91,3 +91,13 @@ web/src/main.tsx  web/src/App.tsx  web/src/base.ts
 - `npm run dev` serves the page at `http://localhost:5177/almanac/` and it
   shows the health result through the proxy.
 - `git status` shows every new file tracked-able (nothing source-like ignored).
+
+## Outcome
+
+_2026-10-16_. Built as specified; 22 tests, typecheck, lint and build clean,
+and the dev proxy served `/almanac/` and `/almanac-api/api/health`. Two
+departures: `server/vendor/ward/` was copied here already, because the kept
+Ward and trusted-proxy parsing in `config.ts` imports it (brief 02 only
+verifies it and adds the web copy); `ERROR_STATUS` gained `unauthorized: 401`
+for brief 02's `currentUserId` and lost Shelfmark's `upstream: 502`. Health
+answers `{ status: "ok" }`.
