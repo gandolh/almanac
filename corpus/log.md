@@ -34,3 +34,10 @@ Three workspaces on Shelfmark's layout, Fastify health route, SQLite opener
 with an empty migration list, Vite page through the `/almanac-api` proxy. The
 Ward library came over early for `config.ts`; `ERROR_STATUS` has
 `unauthorized`. See [the brief](briefs/done/01-workspace-scaffold.md).
+
+## [2026-10-16] done | Brief 02: accounts and sign-in
+
+Ward auth plugin registered first, origin guard, `currentUserId` in
+`auth/guard.ts`, seed, multi-user test helpers (`signInAs`), and the web
+login, auth gate and change-password dialog copied from Shelfmark with a
+Google-like light palette. See [the brief](briefs/done/02-accounts-and-sign-in.md).

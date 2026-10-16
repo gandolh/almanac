@@ -1,0 +1,88 @@
+/*
+ * Almanac's design tokens: the one place a colour, a size of type, a radius
+ * or a shadow is written down. Every other stylesheet reads these; none
+ * writes a colour of its own.
+ *
+ * Google Calendar's look, light only (corpus/wiki/decisions.md): white
+ * surfaces, near-black text, grey hairlines, one blue accent, the system font
+ * with Roboto where it is installed. There is no dark theme and no
+ * `prefers-color-scheme` rule. These are brief 02's values, enough for the
+ * login page and the account dialogs; brief 05 owns the final set.
+ */
+
+:root {
+  /* --- Colour -------------------------------------------------------------- */
+
+  --ground: #FFFFFF; /* page background */
+  --surface: #FFFFFF; /* panels, menus, dialogs */
+  --control: #E9EEF6; /* secondary buttons */
+  --field: #F0F4F9; /* filled text fields */
+  --hairline: #DADCE0; /* borders between surfaces */
+  --divider: #DADCE0; /* rules inside a surface */
+  --ink: #1F1F1F; /* primary text */
+  --ink-2: #444746; /* secondary text */
+  --muted: #5F6368; /* captions, labels (6.3:1 on white) */
+  --accent: #0B57D0; /* the one interactive colour */
+  --accent-press: #0842A0; /* pressed, link hover */
+  --accent-tint: #D3E3FD; /* an open menu button, the selection */
+  --accent-tint-soft: #E8F0FE; /* a menu row under the pointer, a notice */
+
+  /* --- Derived: mixes and aliases of the above, never a new hue ----------- */
+
+  --on-accent: var(--surface); /* text on the accent */
+  --control-hover: color-mix(in srgb, var(--control) 92%, var(--ink));
+  --control-press: color-mix(in srgb, var(--control) 84%, var(--ink));
+  --field-placeholder: var(--muted);
+  --focus-ring: var(--accent);
+  --selection: var(--accent-tint);
+  --scrollbar-thumb: color-mix(in srgb, var(--muted) 40%, var(--ground));
+
+  /* --- Type --------------------------------------------------------------- */
+
+  --font-sans: Roboto, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+
+  --text-title: 34px; /* the login page's wordmark, 700, -0.02em */
+  --text-title-phone: 32px;
+  --text-action-large: 16px; /* a large primary action, 600 */
+  --text-input-phone: 16px; /* fields: below 16 px iOS zooms in */
+  --text-body: 15px;
+  --text-meta: 14px; /* controls on the desktop */
+  --text-small: 13px; /* hints and field errors */
+  --text-label: 12px; /* field labels, 600 */
+
+  --weight-regular: 400;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --tracking-title: -0.02em;
+
+  --leading-body: 1.45;
+  --leading-phone: 1.4;
+  --leading-tight: 1.25;
+
+  /* --- Radii -------------------------------------------------------------- */
+
+  --radius-control: 8px; /* buttons, notices */
+  --radius-field: 10px; /* text fields */
+  --radius-container: 16px; /* the login panel */
+  --radius-sheet: 20px; /* dialogs */
+  --radius-pill: 999px;
+
+  /* --- Elevation: only what floats casts a shadow ------------------------- */
+
+  --shadow-float: 0 4px 8px 3px rgba(60, 64, 67, 0.15), 0 1px 3px rgba(60, 64, 67, 0.3);
+
+  /* --- Sizes -------------------------------------------------------------- */
+
+  --touch: 44px; /* the smallest target on a phone */
+  --control-height: 34px; /* buttons on the desktop */
+  --control-height-large: 48px; /* a large primary action */
+  --gutter-phone: 16px;
+
+  /* --- Motion: state changes only, short, ease-out ------------------------ */
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 120ms;
+  --duration: 180ms;
+  --duration-sheet: 240ms;
+}

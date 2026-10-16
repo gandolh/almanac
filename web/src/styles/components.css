@@ -1,0 +1,124 @@
+/*
+ * The small components every page uses (web/src/components): Button, for
+ * now; brief 05 adds the rest. Colours, sizes and shadows come from
+ * tokens.css. Below 768 px is the phone, where every target is 44 px.
+ */
+
+/* --- Button ------------------------------------------------------------------ */
+
+.button {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: var(--control-height);
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--ink);
+  font-size: var(--text-meta);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-tight);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.button--pill {
+  border-radius: var(--radius-pill);
+}
+
+/* The whole row in a column; an equal share of it in a row of block buttons. */
+.button--block {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+.button--primary {
+  padding: 0 16px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: var(--weight-semibold);
+}
+
+.button--primary:hover,
+.button--primary:active {
+  background: var(--accent-press);
+  color: var(--on-accent);
+}
+
+.button--secondary {
+  background: var(--control);
+  color: var(--ink);
+}
+
+.button--secondary:hover {
+  background: var(--control-hover);
+  color: var(--ink);
+}
+
+.button--secondary:active {
+  background: var(--control-press);
+}
+
+/* A menu's button while its menu is open (Export in the mock-up). */
+.button--secondary[aria-expanded="true"] {
+  background: var(--accent-tint);
+  color: var(--accent-press);
+  font-weight: var(--weight-semibold);
+}
+
+.button--quiet {
+  padding: 0 4px;
+  color: var(--accent);
+  font-size: var(--text-body);
+}
+
+.button--quiet:hover,
+.button--quiet:active {
+  color: var(--accent-press);
+}
+
+.button--large {
+  min-height: var(--control-height-large);
+  padding: 0 24px;
+  font-size: var(--text-action-large);
+  font-weight: var(--weight-semibold);
+}
+
+.button:disabled,
+.button[aria-disabled="true"] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.button svg {
+  flex: none;
+}
+
+@media (max-width: 767.98px) {
+  .button--regular {
+    min-height: var(--touch);
+    padding-inline: 18px;
+    font-size: var(--text-body);
+  }
+
+  .button--quiet.button--regular {
+    padding-inline: 4px;
+  }
+
+  /* A compact button keeps its 34 px look and gets a 44 px target. */
+  .button--compact::before {
+    content: "";
+    position: absolute;
+    inset: calc((var(--control-height) - var(--touch)) / 2) 0;
+  }
+}

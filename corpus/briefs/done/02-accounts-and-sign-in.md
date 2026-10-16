@@ -77,3 +77,14 @@ anything calendar-related.
   `npm run dev`: signing in at `/almanac/login` lands on the home placeholder;
   Sign out returns to the login page.
 - typecheck, lint, test and build pass.
+
+## Outcome
+
+_2026-10-16_. Built and tried for real: seed, login, session, cross-origin
+refusal, logout through the Vite proxy, and the browser flow. 112 tests.
+`currentUserId(request)` lives in `server/src/auth/guard.ts`, not `app.ts`.
+`useIsDesktop` lives in `web/src/components/viewport.ts`. `app.test.ts` and a
+new `web/src/App.test.ts` changed outside the list because the guard answers
+401 before 404. The placeholder home has a Change password button until the
+shell's account menu exists. "Brief 06 owns the final tokens" above means
+brief 05.

@@ -1,0 +1,134 @@
+/*
+ * The account menu's dialogs (web/src/account): Change password. A white
+ * floating panel with the menus' shadow, over a dimmed page: in the middle of
+ * the window on the desktop, the floating sheet over the bottom on a phone.
+ * Its fields and errors are the login page's (auth/auth.css).
+ */
+
+.password-dialog {
+  flex-direction: column;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  color: var(--ink);
+}
+
+.password-dialog[open] {
+  display: flex;
+}
+
+.password-dialog::backdrop {
+  background: color-mix(in srgb, var(--ink) 32%, transparent);
+}
+
+/* Desktop: in the middle, a little above the centre, rising a few pixels as it opens. */
+.password-dialog--centered {
+  position: fixed;
+  inset: 0;
+  width: 400px;
+  max-width: calc(100vw - 32px);
+  height: fit-content;
+  max-height: calc(100dvh - 48px);
+  margin: auto;
+  margin-top: max(24px, 16vh);
+  border-radius: var(--radius-sheet);
+  animation: password-dialog-in var(--duration) var(--ease-out);
+}
+
+/* Phone: the floating sheet, 8 px off the edges, rising from below. */
+.password-dialog--sheet {
+  position: fixed;
+  inset: auto 8px max(8px, env(safe-area-inset-bottom)) 8px;
+  width: auto;
+  max-height: min(90dvh, 680px);
+  border-radius: var(--radius-sheet);
+  animation: password-sheet-in var(--duration-sheet) var(--ease-out);
+}
+
+@keyframes password-dialog-in {
+  from {
+    transform: translateY(8px);
+  }
+}
+
+@keyframes password-sheet-in {
+  from {
+    transform: translateY(calc(100% + 12px));
+  }
+}
+
+.password-dialog__frame {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 0;
+  padding: 22px 24px 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.password-dialog--sheet .password-dialog__frame {
+  padding: 20px 16px 16px;
+}
+
+/* 15/600, centred on the phone sheet. */
+.password-dialog__title {
+  color: var(--ink);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+}
+
+.password-dialog--sheet .password-dialog__title {
+  text-align: center;
+}
+
+.password-dialog__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.password-dialog__text {
+  color: var(--ink-2);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+}
+
+/* Desktop: Cancel, then the action, on the right. */
+.password-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+/* Phone: the action on top, full width, Cancel under it. */
+.password-dialog--sheet .password-dialog__actions {
+  flex-direction: column-reverse;
+  align-items: stretch;
+  gap: 4px;
+}
+
+/*
+ * The account notice (brief 05's shell.css) when it reports a failure: the app's error,
+ * ink and semibold with the drawn mark (brief 05's layout/AccountMenu.tsx). Its place,
+ * surface and timing stay the notice's own.
+ */
+.account__notice--error[data-shown] {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-weight: var(--weight-semibold);
+}
+
+.account__notice--error svg {
+  flex: none;
+  margin-top: -1px;
+}
