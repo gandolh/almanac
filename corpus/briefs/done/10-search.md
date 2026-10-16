@@ -43,3 +43,12 @@ Everything outside `web/src/search/`.
 - typecheck, lint, `npx vitest run web` and build pass.
 - In the browser `/`, "sedinta", Enter lists an event titled "Ședință"; a
   click opens its day.
+
+## Outcome
+
+_2026-10-16_. Built with 17 tests on grouping, labels and markup. Results
+are real links to the day; requests abort when the query changes; a note
+shows when 50 come back. Results from hidden calendars are listed (the brief
+asked for no filter). Open: on a phone the field covers the bar but the
+buttons under it stay in tab order (TopBar would need `inert`); the
+768-1200 px field widths need a browser look.

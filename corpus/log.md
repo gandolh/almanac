@@ -80,3 +80,8 @@ popover, links to the day and month. See [the brief](briefs/done/08-year-view.md
 Dockerfile and compose (port 8797), the vps-deploy stack (`8e247a3`) and the
 local Ward seed entry (`22e1fd2`), both unpushed, `docs/owner-setup.md` and
 the README. See [the brief](briefs/done/11-deploy-and-docs.md).
+
+## [2026-10-16] done | Brief 10: search
+
+Top-bar search field, `/` to focus, results grouped by date, a click opens
+the day. See [the brief](briefs/done/10-search.md).

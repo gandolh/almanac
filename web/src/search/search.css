@@ -1,0 +1,279 @@
+/*
+ * Search (brief 10): the top bar's field and Google's results list, each date
+ * at the left with its events beside it. Colours, type sizes and radii come
+ * from tokens.css. Below 768 px is the phone: the open field covers the whole
+ * top bar, and each date sits over its events.
+ */
+
+/* tokens to move into tokens.css */
+:root {
+  --search-dot: 10px; /* a result's calendar colour dot */
+  --search-field-width: 360px; /* the open field in the desktop bar */
+  --search-field-width-narrow: 240px; /* ... under 1200 px */
+  --search-field-width-narrowest: 160px; /* ... under 900 px */
+  --search-date-column: 160px; /* the date at the left of its results */
+  --search-time-column: 120px; /* "10:00 – 11:00" */
+  --search-content-max: 880px; /* the results' reading width */
+}
+
+/* --- The field --------------------------------------------------------------- */
+
+.search {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  width: var(--search-field-width);
+  height: var(--control-height-large);
+  padding: 0 4px;
+  border-radius: var(--radius-pill);
+  background: var(--field);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+/* The field takes the focus ring's place: it lifts and whitens. */
+.search:focus-within {
+  background: var(--surface);
+  box-shadow: var(--shadow-raised);
+}
+
+.search__input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--ink);
+  font-size: var(--text-body);
+  appearance: none;
+}
+
+.search__input:focus-visible {
+  outline: none;
+}
+
+/* The browser's own ✕; ours clears and keeps the focus. */
+.search__input::-webkit-search-cancel-button,
+.search__input::-webkit-search-decoration {
+  display: none;
+  appearance: none;
+}
+
+@media (max-width: 1199.98px) {
+  .search {
+    width: var(--search-field-width-narrow);
+  }
+}
+
+@media (max-width: 899.98px) {
+  .search {
+    width: var(--search-field-width-narrowest);
+  }
+}
+
+/* On a phone the field is the top bar: back arrow, the field, ✕. */
+@media (max-width: 767.98px) {
+  .search,
+  .search:focus-within {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: auto;
+    height: auto;
+    padding: 0 var(--gutter-phone) 0 8px;
+    border-radius: 0;
+    background: var(--ground);
+    box-shadow: none;
+  }
+
+  .search__input {
+    padding: 0 8px;
+    font-size: var(--text-input-phone);
+  }
+}
+
+/* --- The results ------------------------------------------------------------- */
+
+.search-results {
+  flex: none;
+  width: 100%;
+  max-width: var(--search-content-max);
+  margin: 0 auto;
+  padding: 8px 24px 32px;
+}
+
+/* A sentence in the middle of the page: searching, nothing found, an error. */
+.search-results--message {
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 72px;
+}
+
+.search-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: var(--muted);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.search-results__limit {
+  margin: 16px 0 0;
+  padding: 0 12px;
+  color: var(--muted);
+  font-size: var(--text-small);
+}
+
+.search-days,
+.search-day__events {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search-day {
+  display: grid;
+  grid-template-columns: var(--search-date-column) minmax(0, 1fr);
+  padding: 8px 0;
+  border-top: 1px solid var(--divider);
+}
+
+.search-day:first-child {
+  border-top: 0;
+}
+
+/* "16 OCT 2026, FRI": the words are written as dates are everywhere else; the capitals are the look. */
+.search-day__date {
+  margin: 0;
+  padding: 12px 0 0 12px;
+  color: var(--ink);
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* One result: its calendar's dot, the time, then the title and where. */
+.search-event {
+  display: grid;
+  grid-template-columns: var(--search-dot) var(--search-time-column) minmax(0, 1fr);
+  align-items: start;
+  column-gap: 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius-control);
+  color: var(--ink);
+  font-size: var(--text-meta);
+  line-height: var(--leading-tight);
+  text-decoration: none;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.search-event:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+
+.search-event:active {
+  background: var(--press);
+}
+
+.search-event:focus-visible {
+  outline-offset: -2px;
+}
+
+/* The calendar's colour comes from the link (--calendar-color); a calendar not yet known gets a neutral dot. */
+.search-event__dot {
+  grid-area: 1 / 1;
+  width: var(--search-dot);
+  height: var(--search-dot);
+  margin-top: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--calendar-color, var(--muted));
+}
+
+.search-event__time {
+  grid-area: 1 / 2;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.search-event__body {
+  display: flex;
+  grid-area: 1 / 3;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.search-event__line {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 12px;
+}
+
+.search-event__title {
+  font-weight: var(--weight-medium);
+  overflow-wrap: anywhere;
+}
+
+.search-event__location,
+.search-event__repeat {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.search-event__repeat {
+  font-size: var(--text-small);
+}
+
+@media (max-width: 767.98px) {
+  .search-results {
+    padding: 0 var(--gutter-phone) 24px;
+  }
+
+  .search-results--message {
+    padding-top: 48px;
+  }
+
+  .search-day {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 12px 0 4px;
+  }
+
+  .search-day__date {
+    padding: 0 0 4px;
+  }
+
+  /* The dot beside the time, the title and where under it. */
+  .search-event {
+    grid-template-columns: var(--search-dot) minmax(0, 1fr);
+    row-gap: 2px;
+    min-height: var(--touch);
+    padding: 8px 0;
+    border-radius: 0;
+  }
+
+  .search-event__dot {
+    grid-area: 1 / 1 / 3 / 2;
+    margin-top: 3px;
+  }
+
+  .search-event__time {
+    grid-area: 1 / 2;
+  }
+
+  .search-event__body {
+    grid-area: 2 / 2;
+  }
+}
