@@ -6,25 +6,6 @@
  * the screen.
  */
 
-/* tokens to move into tokens.css */
-:root {
-  --editor-field-height: 36px; /* a field on the desktop (a phone's is --touch) */
-  --editor-lead: 44px; /* the icon column of a form row */
-  --date-field-width: 148px;
-  --time-field-width: 88px;
-  --count-field-width: 72px;
-  --time-list-height: 240px; /* the time list scrolls past this */
-  --day-toggle: 32px; /* a weekday's round toggle in "Custom days…" */
-}
-
-@media (max-width: 767.98px) {
-  :root {
-    --editor-field-height: var(--touch);
-    --editor-lead: 36px;
-    --day-toggle: 36px;
-  }
-}
-
 /* --- Fields ------------------------------------------------------------------ */
 
 .editor-input {

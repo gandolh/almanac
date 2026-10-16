@@ -133,6 +133,26 @@
   --gutter-desktop: 8px; /* the top bar's ends */
   --gutter-phone: 16px;
 
+  /* --- Search (brief 10) -------------------------------------------------- */
+
+  --search-dot: 10px; /* a result's calendar colour dot */
+  --search-field-width: 360px; /* the open field in the desktop bar */
+  --search-field-width-narrow: 240px; /* ... under 1200 px */
+  --search-field-width-narrowest: 160px; /* ... under 900 px */
+  --search-date-column: 160px; /* the date at the left of its results */
+  --search-time-column: 120px; /* "10:00 – 11:00" */
+  --search-content-max: 880px; /* the results' reading width */
+
+  /* --- The event editor (brief 07) ---------------------------------------- */
+
+  --editor-field-height: 36px; /* a field on the desktop (a phone's is --touch) */
+  --editor-lead: 44px; /* the icon column of a form row */
+  --date-field-width: 148px;
+  --time-field-width: 88px;
+  --count-field-width: 72px;
+  --time-list-height: 240px; /* the time list scrolls past this */
+  --day-toggle: 32px; /* a weekday's round toggle in "Custom days…" */
+
   /* --- Layers --------------------------------------------------------------- */
 
   --z-bar: 10;
@@ -146,4 +166,13 @@
   --duration-fast: 120ms;
   --duration: 180ms;
   --duration-sheet: 240ms;
+}
+
+/* The event editor's phone sizes: every target is 44 px. */
+@media (max-width: 767.98px) {
+  :root {
+    --editor-field-height: var(--touch);
+    --editor-lead: 36px;
+    --day-toggle: 36px;
+  }
 }

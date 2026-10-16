@@ -5,17 +5,6 @@
  * top bar, and each date sits over its events.
  */
 
-/* tokens to move into tokens.css */
-:root {
-  --search-dot: 10px; /* a result's calendar colour dot */
-  --search-field-width: 360px; /* the open field in the desktop bar */
-  --search-field-width-narrow: 240px; /* ... under 1200 px */
-  --search-field-width-narrowest: 160px; /* ... under 900 px */
-  --search-date-column: 160px; /* the date at the left of its results */
-  --search-time-column: 120px; /* "10:00 – 11:00" */
-  --search-content-max: 880px; /* the results' reading width */
-}
-
 /* --- The field --------------------------------------------------------------- */
 
 .search {
