@@ -58,3 +58,12 @@ web/src/account/time-zones.ts  web/src/account/time-zones.test.ts
   every view, rename it, recolour it and its events change colour, delete it
   and its events go. Switch the time zone to Europe/London and a 10:00
   Bucharest event shows at 08:00; switch back.
+
+## Outcome
+
+_2026-10-16_. Built with 44 tests. Departures: the colour palette opens as
+a popover of swatches from a "Colour…" menu item rather than ten text items
+in the ⋮ menu; the last calendar's disabled Delete shows "Only calendar" as
+its detail (menu items take no title); a new `account/time-zone.css`. The
+time zone list adds UTC, runs west to east, and matches city, region and
+offsets ("+3", "gmt+3", "+5:30"), ignoring case and accents.

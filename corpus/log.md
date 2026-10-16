@@ -85,3 +85,9 @@ the README. See [the brief](briefs/done/11-deploy-and-docs.md).
 
 Top-bar search field, `/` to focus, results grouped by date, a click opens
 the day. See [the brief](briefs/done/10-search.md).
+
+## [2026-10-16] done | Brief 09: managing calendars, and the time zone setting
+
+"My calendars" with show/hide, rename, colour and delete, a new-calendar
+dialog, and the time zone dialog in the account menu. See
+[the brief](briefs/done/09-calendars-and-time-zone.md).

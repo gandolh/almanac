@@ -28,7 +28,7 @@ review round.
 | 06 | [Day, week and month views](../briefs/done/06-day-week-month-views.md) | done |
 | 07 | [Creating and editing events](../briefs/todo/07-creating-and-editing-events.md) | todo |
 | 08 | [Year view](../briefs/done/08-year-view.md) | done |
-| 09 | [Calendars and time zone](../briefs/todo/09-calendars-and-time-zone.md) | todo |
+| 09 | [Calendars and time zone](../briefs/done/09-calendars-and-time-zone.md) | done |
 | 10 | [Search](../briefs/done/10-search.md) | done |
 | 11 | [Deploy and docs](../briefs/done/11-deploy-and-docs.md) | done |
 

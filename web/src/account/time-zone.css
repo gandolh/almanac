@@ -1,0 +1,120 @@
+/*
+ * The time zone dialog (account/TimeZoneDialog.tsx): the current zone, a search
+ * field and the zones as one scrolling list. Its fields are the login page's
+ * (auth/auth.css). Only tokens.
+ */
+
+.zone-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.zone-dialog__intro {
+  color: var(--ink-2);
+  font-size: var(--text-meta);
+  line-height: var(--leading-body);
+}
+
+/* The zone times show in now, on the accent tint. */
+.zone-current {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: var(--radius-control);
+  background: var(--accent-tint-soft);
+  color: var(--accent-ink);
+}
+
+.zone-current__caption {
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+}
+
+.zone-current__label {
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+}
+
+.zone-current__zone {
+  font-size: var(--text-small);
+}
+
+.zone-dialog__error {
+  color: var(--ink);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+}
+
+/* --- The list ------------------------------------------------------------------------------ */
+
+.zone-list {
+  position: relative; /* the rows' offsets are measured against it */
+  height: min(320px, 40dvh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-control);
+}
+
+.zone-list__empty {
+  padding: 24px 12px;
+  color: var(--muted);
+  font-size: var(--text-meta);
+  text-align: center;
+}
+
+.zone-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 6px 12px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  text-align: left;
+}
+
+.zone-option:hover {
+  background: var(--hover);
+}
+
+.zone-option[aria-checked="true"] {
+  background: var(--accent-tint-soft);
+}
+
+.zone-option:focus-visible {
+  outline-offset: -2px;
+}
+
+/* The tick's column, kept on every row so the labels line up. */
+.zone-option__tick {
+  display: flex;
+  flex: none;
+  width: 18px;
+  color: var(--accent);
+}
+
+.zone-option__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.zone-option__label {
+  font-size: var(--text-meta);
+}
+
+.zone-option__zone {
+  color: var(--muted);
+  font-size: var(--text-small);
+}
+
+@media (max-width: 767.98px) {
+  .zone-option__label {
+    font-size: var(--text-body);
+  }
+}

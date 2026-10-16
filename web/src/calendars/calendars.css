@@ -1,0 +1,290 @@
+/*
+ * The left column's "My calendars" (calendars/CalendarList.tsx): a heading with
+ * "+", one row per calendar (a checkbox drawn in its colour, its name, a ⋮
+ * that appears on hover or focus), the colour palette, and the two dialogs.
+ * Every colour is a token; a row's own colour arrives as --calendar-color and a
+ * swatch's as --swatch, both set inline from the shared palette.
+ */
+
+/* --- The list ---------------------------------------------------------------------------- */
+
+.calendar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 8px 0 16px;
+}
+
+.calendar-list__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  padding-left: 4px;
+}
+
+.calendar-list__title {
+  color: var(--ink);
+  font-size: var(--text-meta);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-tight);
+}
+
+.calendar-list__note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 4px;
+  color: var(--muted);
+  font-size: var(--text-small);
+}
+
+.calendar-list__rows {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  list-style: none;
+}
+
+/* --- A row -------------------------------------------------------------------------------- */
+
+.calendar-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding-right: 4px;
+  border-radius: var(--radius-control);
+}
+
+.calendar-row:hover,
+.calendar-row:focus-within {
+  background: var(--hover);
+}
+
+/* The label is the whole name: pressing it shows or hides the calendar. */
+.calendar-row__toggle {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  align-self: stretch;
+  min-width: 0;
+  padding-left: 4px;
+  color: var(--ink);
+  font-size: var(--text-meta);
+  cursor: pointer;
+}
+
+/* While the name is being edited the label shrinks to the box and the field takes the width. */
+.calendar-row[data-renaming] .calendar-row__toggle {
+  flex: none;
+}
+
+/* The real checkbox stays in place for the keyboard and screen readers; the box is drawn. */
+.calendar-row__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.calendar-row__box {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--swatch-size);
+  height: var(--swatch-size);
+  border: 2px solid var(--calendar-color);
+  border-radius: var(--radius-small);
+  color: var(--on-accent);
+}
+
+.calendar-row__box svg {
+  opacity: 0;
+}
+
+.calendar-row__input:checked + .calendar-row__box {
+  background: var(--calendar-color);
+}
+
+.calendar-row__input:checked + .calendar-row__box svg {
+  opacity: 1;
+}
+
+.calendar-row__input:focus-visible + .calendar-row__box {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.calendar-row__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The ⋮ shows under the pointer, with the keyboard, and while its menu is open; a touch screen always has it. */
+.calendar-row__more {
+  opacity: 0;
+}
+
+.calendar-row:hover .calendar-row__more,
+.calendar-row:focus-within .calendar-row__more,
+.calendar-row__more[aria-expanded="true"] {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .calendar-row__more {
+    opacity: 1;
+  }
+}
+
+/* Renaming in place: a filled field where the name was. */
+.calendar-row__edit {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 2px 0;
+}
+
+.calendar-row__rename {
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--radius-small);
+  background: var(--field);
+  color: var(--ink);
+  font-size: var(--text-meta);
+}
+
+.calendar-row__rename:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 0;
+}
+
+.calendar-row__rename[aria-invalid="true"] {
+  outline: 1.5px solid var(--ink-2);
+  outline-offset: -1.5px;
+}
+
+.calendar-row__error {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: var(--ink);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+}
+
+.calendar-row__error svg {
+  flex: none;
+  margin-top: -1px;
+}
+
+@media (max-width: 767.98px) {
+  .calendar-row {
+    min-height: var(--touch);
+  }
+
+  .calendar-row__toggle {
+    font-size: var(--text-body);
+  }
+
+  /* 16 px: iOS doesn't zoom into the field. */
+  .calendar-row__rename {
+    height: 36px;
+    font-size: var(--text-input-phone);
+  }
+}
+
+/* --- The palette ------------------------------------------------------------------------------ */
+
+.color-picker {
+  display: grid;
+  grid-template-columns: repeat(5, 32px);
+  gap: 8px;
+}
+
+.color-picker__swatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--swatch);
+  color: var(--on-accent);
+  transition: box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.color-picker__swatch:hover {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--swatch) 24%, transparent);
+}
+
+.color-picker__swatch:focus-visible {
+  outline-offset: 3px;
+}
+
+@media (max-width: 767.98px) {
+  .color-picker {
+    grid-template-columns: repeat(5, var(--touch));
+  }
+
+  .color-picker__swatch {
+    width: var(--touch);
+    height: var(--touch);
+  }
+}
+
+/* In the popover beside a row. */
+.calendar-colors {
+  padding: 16px;
+}
+
+/* --- The dialogs ------------------------------------------------------------------------------- */
+
+.calendar-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 4px;
+}
+
+.calendar-form__group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* The same small label the text fields have (auth/auth.css). */
+.calendar-form__label {
+  color: var(--muted);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+}
+
+.calendar-dialog__text {
+  color: var(--ink);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+}
+
+.calendar-dialog__text--note {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: var(--text-meta);
+}
