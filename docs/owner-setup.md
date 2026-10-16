@@ -1,9 +1,9 @@
 # Owner setup
 
-Everything you do by hand to put Almanac on the VPS, and how to run it on your
-own machine. Nothing in the repo deploys or writes a secret for you. Commands
-run on your machine unless a step says otherwise. The deploy builds the API
-image on the VPS. Local development is at the end of this page.
+Everything you do by hand to put Almanac on the VPS. Nothing in the repo
+deploys or writes a secret for you. Commands run on your machine unless a step
+says otherwise. The deploy builds the API image on the VPS. Running it on your
+own machine is in [getting-started.md](getting-started.md).
 
 `<production origin>` below means `https://` plus your site's host, with no path.
 
@@ -152,36 +152,6 @@ Home Screen. The icon opens Almanac without the browser's address bar.
 
 ## Local development
 
-Node 24 and npm. From the repo root:
-
-```
-npm install
-cp .env.example .env     # the defaults work
-npm run seed -w @almanac/server
-npm run dev
-```
-
-The seed creates the account you sign in with. It asks on the terminal for a
-username and password, or reads `SEED_USERNAME` and `SEED_PASSWORD` from `.env`
-or the environment. `.env` is git-ignored; keep any real value out of
-everything else. Open `http://localhost:5177/almanac/`. The API listens on
-port 8809, and Vite proxies `/almanac-api` to it, so the paths match
-production. The database is `data/almanac.db`.
-
-If `npm run dev` stops with `ENOSPC` (the system ran out of file watchers,
-which happens when VS Code holds most of them), run it with polling instead:
-`CHOKIDAR_USEPOLLING=1 CHOKIDAR_INTERVAL=300 npm run dev`.
-
-To try "Sign in with Ward" locally, start Ward in Docker and run its seed. The
-steps are in `../wzd_auth/infrastructure/local/README.md`. The seed registers
-Almanac and writes the five `WARD_OIDC_*` values into this repo's `.env`;
-restart `npm run dev` afterwards. Without them the login page has no Ward
-button and local accounts still work.
-
-Checks:
-
-```
-npm run typecheck
-npm run lint
-npm test
-```
+Moved to [getting-started.md](getting-started.md): install, the seed, `npm run
+dev`, "Sign in with Ward" against the local Ward, the checks, and the `ENOSPC`
+workaround.
