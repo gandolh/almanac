@@ -1,0 +1,47 @@
+# Almanac's API. Build context is the repo root (..) because the image needs the
+# root lockfile and every workspace manifest.
+#
+#   docker compose -f infrastructure/docker-compose.yml up -d almanac-api
+#
+# `.env` in THIS directory is written by the deploy (vps-deploy's `server`
+# phase, 0600) and is read twice: compose interpolates ${...} below from it, and
+# the service declares it as env_file so the same values reach the process.
+# For a local run, `touch infrastructure/.env` is enough, or copy PUBLIC_ORIGIN
+# and the WARD_OIDC_ values from the repo's `.env`. It is git-ignored because it
+# carries Almanac's Ward client key. In a container behind a proxy, also set
+# AUTH_TRUSTED_PROXIES to the proxy's range.
+services:
+  almanac-api:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile
+      target: prod
+    image: almanac-api:1.0
+    ports:
+      # LOOPBACK ONLY. Without the 127.0.0.1 prefix this would be published on
+      # every interface, reachable over plain HTTP past Caddy and its TLS. The
+      # server's HOST is 0.0.0.0 because that is inside the container's network
+      # namespace; this line is what decides who can reach it.
+      - "127.0.0.1:${ALMANAC_PORT:-8797}:${ALMANAC_PORT:-8797}"
+    env_file:
+      - .env
+    # These beat env_file. A dev .env copied here (HOST=127.0.0.1, PORT=8809,
+    # DATA_DIR=./data) would otherwise override the image's ENV and leave the
+    # server unreachable from the published port, or writing outside /data.
+    # PORT follows ALMANAC_PORT so the publish line, the healthcheck and the
+    # listening port always agree.
+    environment:
+      HOST: 0.0.0.0
+      PORT: "${ALMANAC_PORT:-8797}"
+      DATA_DIR: /data
+    volumes:
+      # The calendar database. Bind-mounted from the host so it survives deploys
+      # and "back up Almanac" means one path. Defaults to a local dir so a dev
+      # `compose up` works.
+      - ${ALMANAC_DATA_DIR:-../data}:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- \"http://127.0.0.1:${ALMANAC_PORT:-8797}/api/health\""]
+      interval: 30s
+      timeout: 3s
+      start_period: 10s

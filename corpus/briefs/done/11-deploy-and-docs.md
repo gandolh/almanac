@@ -80,3 +80,17 @@ stacks and `secrets/`. Don't create `secrets/almanac.env`; the owner does.
 - `docker build -f infrastructure/Dockerfile .` succeeds, or the hand-back
   says Docker wasn't reachable.
 - No domain name, password or key in any file.
+
+## Outcome
+
+_2026-10-16_. Built. `docker build` and a compose run passed locally: healthy
+container, `/api/health` ok, the seed inside the container works and is
+idempotent. `../vps-deploy` commit `8e247a3` (stack, registration, Caddyfile,
+listings now at 38 stacks with rows for Shelfmark and Almanac; `synth` and
+`--check` pass) and `../wzd_auth` commit `22e1fd2` (seed entry, README row),
+both unpushed; their trailers name the Sonnet agent that wrote them. The
+owner must create `vps-deploy/secrets/almanac.env` with
+`WARD_OIDC_CLIENT_KEY` only. Added `.dockerignore`. Left stale outside this
+brief: wzd_auth's main README app count and `docs/cutover-oidc.md` table,
+Shelfmark's owner-setup step about redeploying Ward's UI (obsolete since
+Ward brief 30), vps-deploy's corpus stack count.

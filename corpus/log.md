@@ -74,3 +74,9 @@ resize. See [the brief](briefs/done/06-day-week-month-views.md).
 
 Twelve mini-months with dots on days that have events, a day list in a
 popover, links to the day and month. See [the brief](briefs/done/08-year-view.md).
+
+## [2026-10-16] done | Brief 11: container, VPS stack, Ward entry, owner docs
+
+Dockerfile and compose (port 8797), the vps-deploy stack (`8e247a3`) and the
+local Ward seed entry (`22e1fd2`), both unpushed, `docs/owner-setup.md` and
+the README. See [the brief](briefs/done/11-deploy-and-docs.md).
