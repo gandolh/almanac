@@ -45,6 +45,18 @@ As Shelfmark: Caddy on the VPS serves the web app at `/almanac/*` and forwards
 The Ward callback is `<origin>/almanac-api/auth/ward/callback`, registered by
 the local seed in `../wzd_auth`.
 
+## Time zones
+
+Checked 2026-10-16. FullCalendar v7 (`@fullcalendar/react` 7.1.3) takes a
+named zone directly (`timeZone: 'Europe/Bucharest'`) with no Luxon or
+moment-timezone plugin; `temporal-polyfill` is its peer dependency. The API
+sends instants as UTC ISO strings (`…Z`) and FullCalendar shifts them into the
+display time zone. Dates FullCalendar hands back in callbacks are real
+instants; convert them with
+`info.date.toTemporalInstant().toZonedDateTimeISO(zone)` when wall-clock
+fields are needed. Node 24 has no global `Temporal`, so the server imports
+`temporal-polyfill` too, and rrule-temporal takes its `ZonedDateTime`s.
+
 ## Ports
 
 Dev: API `8809`, Vite `5177`. Production: API container on `127.0.0.1:8797`.

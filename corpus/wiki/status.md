@@ -1,5 +1,5 @@
 ---
-summary: Snapshot as of 2026-10-16. Nothing is built. The corpus is bootstrapped, the owner's grill is done and every product question is answered; the briefs are next. Local git on main, no remote yet. The todo list by tier.
+summary: Snapshot as of 2026-10-16. Nothing is built yet. The grill is done, the 11 v1 briefs are written with their build waves, one line per brief. Local git on main, no remote yet. The todo list by tier.
 updated: 2026-10-16
 ---
 
@@ -12,13 +12,25 @@ the owner will create the repo later.
 
 ## Next
 
-1. Check the two technical questions in [open-questions.md](open-questions.md).
-2. Write the v1 briefs (`corpus-flow` §2), in dependency waves.
-3. Build them with `plan-split-dispatch`, one commit per brief.
+Build the v1 briefs with `plan-split-dispatch`, one commit per brief, in
+these waves: `01 → 02 → 03 → 04 ‖ 05 → 06 → 07 ‖ 08 ‖ 09 ‖ 10 ‖ 11`, then a
+review round.
 
 ## Briefs
 
-None yet.
+| # | Brief | State |
+|---|---|---|
+| 01 | [Workspace scaffold](../briefs/todo/01-workspace-scaffold.md) | todo |
+| 02 | [Accounts and sign-in](../briefs/todo/02-accounts-and-sign-in.md) | todo |
+| 03 | [Calendars, events and settings API](../briefs/todo/03-calendars-and-events-api.md) | todo |
+| 04 | [Repeating events](../briefs/todo/04-repeating-events.md) | todo |
+| 05 | [App shell, routes, dates, tokens](../briefs/todo/05-app-shell.md) | todo |
+| 06 | [Day, week and month views](../briefs/todo/06-day-week-month-views.md) | todo |
+| 07 | [Creating and editing events](../briefs/todo/07-creating-and-editing-events.md) | todo |
+| 08 | [Year view](../briefs/todo/08-year-view.md) | todo |
+| 09 | [Calendars and time zone](../briefs/todo/09-calendars-and-time-zone.md) | todo |
+| 10 | [Search](../briefs/todo/10-search.md) | todo |
+| 11 | [Deploy and docs](../briefs/todo/11-deploy-and-docs.md) | todo |
 
 ## Todos
 
