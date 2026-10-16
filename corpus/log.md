@@ -69,3 +69,8 @@ tracked. See [the brief](briefs/done/05-app-shell.md).
 FullCalendar v7 with the Monarch theme on our tokens, the occurrences data
 layer, the details popover, linkify, the edit-scope dialog, drag, drop and
 resize. See [the brief](briefs/done/06-day-week-month-views.md).
+
+## [2026-10-16] done | Brief 08: year view
+
+Twelve mini-months with dots on days that have events, a day list in a
+popover, links to the day and month. See [the brief](briefs/done/08-year-view.md).

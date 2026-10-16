@@ -1,0 +1,180 @@
+/*
+ * The year view (brief 08): twelve months on one page, and the popover that
+ * lists a day's events. The month grids themselves are components.css's
+ * `.month-grid--year`; this sheet lays them out. Colours and sizes from
+ * tokens.css.
+ */
+
+/*
+ * The columns follow the width of the view, not the window's, so they keep
+ * up when the left column is hidden or shown. A year-size month is
+ * 7 x --year-cell (224 px) wide; the widths below add the column gap
+ * (24 px) to that: 2 x 224 + 24, 3 x 224 + 2 x 24, 4 x 224 + 3 x 24. A
+ * container query can't read a token, so they are written out.
+ */
+.year {
+  container: year / inline-size;
+  padding: 12px 24px 16px;
+}
+
+.year__months {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: 20px 24px;
+}
+
+@container year (min-width: 472px) {
+  .year__months {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container year (min-width: 720px) {
+  .year__months {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container year (min-width: 968px) {
+  .year__months {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* One column, a phone: the months grow to fill the width (up to 44 px a day) so the days are easy to hit. */
+@container year (width < 472px) {
+  .year__months {
+    --year-cell: min(44px, calc(100cqw / 7));
+    --year-day: calc(var(--year-cell) - 4px);
+  }
+
+  .year .month-grid--year {
+    font-size: var(--text-meta);
+  }
+}
+
+/* --- A month ------------------------------------------------------------------- */
+
+.year-month {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: calc(var(--year-cell) * 7);
+}
+
+.year-month__title {
+  align-self: stretch;
+  height: 28px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--ink);
+  font-size: var(--text-meta);
+  font-weight: var(--weight-medium);
+  text-align: left;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.year-month__title:hover {
+  background: var(--hover);
+}
+
+/* --- A day's list, in the popover -------------------------------------------------- */
+
+.popover.day-popover {
+  width: 320px;
+}
+
+.day-list {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 8px 8px;
+}
+
+.day-list:focus {
+  outline: none;
+}
+
+.day-list__title {
+  margin: 0;
+  padding: 0 8px 8px;
+  color: var(--ink);
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-tight);
+}
+
+.day-list__empty {
+  margin: 0;
+  padding: 4px 8px 12px;
+  color: var(--muted);
+  font-size: var(--text-meta);
+}
+
+.day-list__events {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.day-list__event {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 32px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: var(--radius-small);
+  background: none;
+  color: var(--ink);
+  font-size: var(--text-meta);
+  text-align: left;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.day-list__event:hover {
+  background: var(--hover);
+}
+
+/* The calendar's colour comes from the row (--calendar-color), not from here. */
+.day-list__dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-pill);
+  background: var(--calendar-color, var(--accent));
+}
+
+.day-list__time {
+  flex: none;
+  min-width: 52px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.day-list__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.day-list__open {
+  align-self: flex-start;
+  margin: 8px 0 0;
+  padding: 6px 8px;
+  border-radius: var(--radius-small);
+  color: var(--accent);
+  font-size: var(--text-meta);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+}
+
+.day-list__open:hover {
+  background: var(--accent-tint-soft);
+}

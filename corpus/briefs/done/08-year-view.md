@@ -46,3 +46,11 @@ with what), everything outside `web/src/year/`.
 - In the browser the year fits on a laptop screen without scrolling the page
   at 1440 × 900, the dots match the month view, and a click on a day lists
   its events and opens it.
+
+## Outcome
+
+_2026-10-16_. Built with 27 tests on the pure day-marking logic
+(`year/days.ts`: zone conversion, exclusive ends, DST days, month and year
+edges, hidden calendars). Columns follow container queries on the year
+section, so they track the sidebar. "Open day" is a real link. The 1440×900
+fit and phone widths were left for the controller's browser walk.
