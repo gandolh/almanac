@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@almanac/shared": "0.1.0",
+    "@fullcalendar/react": "7.1.3",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "temporal-polyfill": "1.0.6"
