@@ -4,8 +4,9 @@ A personal calendar that works like Google Calendar, light theme only. Several
 people can have an account, and each sees only their own calendars. A React app
 on a Fastify + SQLite API.
 
-Version 1 is being built and is not deployed yet. The plan, the decisions and
-the work queue live in [corpus/](corpus/index.md).
+Version 1 is built and works locally; it is not deployed yet. Deploying is
+described in [docs/owner-setup.md](docs/owner-setup.md). The plan, the
+decisions and the work queue live in [corpus/](corpus/index.md).
 
 ## What it does
 

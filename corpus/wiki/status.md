@@ -1,20 +1,65 @@
 ---
-summary: Snapshot as of 2026-10-16. Nothing is built yet. The grill is done, the 11 v1 briefs are written with their build waves, one line per brief. Local git on main, no remote yet. The todo list by tier.
+summary: Snapshot as of 2026-10-16, paused with three small fixes open. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and a browser walkthrough) with its fixes, 622 tests. Not pushed (remote is gandolh/almanac on GitHub) and not deployed. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
 updated: 2026-10-16
 ---
 
 # Status
 
-_2026-10-16_. Design settled, no code yet. The owner answered the grill on
-2026-10-16; the calls are in [decisions.md](decisions.md) and the screens in
-[features.md](features.md). The repo is local git on `main` with no remote;
-the owner will create the repo later.
+_2026-10-16_. v1 is built. The owner settled the design in a grill
+([decisions.md](decisions.md), [features.md](features.md)); the 11 briefs
+were built the same day with `plan-split-dispatch`, one commit per brief on
+`main`, then reviewed by three code finders (web wiring, server
+correctness, conventions) and a browser walkthrough of every flow, and the
+findings were fixed in three lanes. 622 tests pass; typecheck, lint and
+build are clean. The remote is `https://github.com/gandolh/almanac.git`
+(set 2026-10-16); nothing is pushed. Nothing is deployed.
 
-## Next
+## Paused (2026-10-16)
 
-Build the v1 briefs with `plan-split-dispatch`, one commit per brief, in
-these waves: `01 → 02 → 03 → 04 ‖ 05 → 06 → 07 ‖ 08 ‖ 09 ‖ 10 ‖ 11`, then a
-review round.
+The owner paused the run before the last fix round. The browser re-check at
+`eb546e0` passed 11 of 13 fixes; three small items are open, untouched:
+
+1. React logs "Can't perform a React state update on a component that
+   hasn't mounted yet" once, on the first load of the lazy `CalendarArea`
+   chunk (cold-load `/year/…`, press `m`). Suspects: the `React.lazy` +
+   Suspense in `layout/AppShell.tsx`, or the derive-during-render code added
+   to `event/EventEditor.tsx` (path change closes quick create) and
+   `calendar/CalendarArea.tsx`.
+2. The phone week title "12–18 Oct 2026" is cut to "12–18 Oct 2…" at 390 px.
+   Plan: phone week shows "Oct 2026" (or "Oct–Nov 2026") in
+   `rangeTitleShort` (`dates.ts`).
+3. After cancelling the scope question from Save, focus lands on the body
+   instead of Save (`event/EventForm.tsx` busy effect vs `event/scope.tsx`
+   focus restore). The Delete path is fine.
+
+## Next (owner)
+
+1. Push `main` here (`git push -u origin main`), and the unpushed commits in
+   `../vps-deploy` (`8e247a3`, the Almanac stack) and `../wzd_auth`
+   (`22e1fd2`, the local seed entry).
+2. Register Almanac in production Ward and write
+   `../vps-deploy/secrets/almanac.env` with `WARD_OIDC_CLIENT_KEY` (the only
+   key), then deploy, following [docs/owner-setup.md](../../docs/owner-setup.md).
+3. Create your account with the seed inside the container. Sign in locally
+   first, then link Ward from the account menu, or Ward creates a second,
+   empty user.
+4. Grant your Ward account (and anyone else who should have a calendar) the
+   `almanac` app in Ward's console.
+5. Not tried here: the "Sign in with Ward" round trip, locally (needs the
+   local Ward seed with Docker Desktop's WSL integration on) or in
+   production; adding it to a phone's home screen.
+
+## Known and accepted
+
+- A repeating event at a wall-clock time inside the spring-forward hour
+  (03:00-04:00 on the last Sunday of March in Bucharest) skips that day
+  ([recurrence.md](recurrence.md)).
+- Changing the time or repeat of "all" or "following" drops exceptions and
+  deleted dates, as Google does.
+- Esc from search returns to the last calendar view visited.
+- Date fields in the event form follow the browser's locale format.
+- The first quick-create event in the very first browser walk seemed to
+  vanish once; it never reproduced in later runs.
 
 ## Briefs
 
@@ -35,3 +80,4 @@ review round.
 ## Todos
 
 - v1.x: [phone notifications](../todos/phone-notifications.md).
+- later: [stale counts in sibling repos](../todos/sibling-repo-listings.md).

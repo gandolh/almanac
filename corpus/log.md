@@ -97,3 +97,28 @@ dialog, and the time zone dialog in the account menu. See
 Quick create, the event form, the repeat picker, the 24-hour time field, `c`
 to create, scope questions on series edits. See
 [the brief](briefs/done/07-creating-and-editing-events.md).
+
+## [2026-10-16] maintenance | Review round and fixes
+
+Three read-only finders (web wiring on Opus, server correctness and
+conventions on Sonnet) and a browser walkthrough of every flow at 1440×900
+and 390×844. No Critical findings; all ten browser flows passed. Fixed in
+three lanes: shortcuts after a checkbox click, the phone time list, a
+failed delete hidden under the form, quick-create edge cases, the drawer's
+Esc, clipped titles, the opening scroll, Change password on the shared
+Dialog, a compact phone title, FullCalendar lazy-loaded (entry 734 → 446
+kB), event length and repeat-end caps, a series that won't expand skipped
+instead of a 500, calendar deletes keeping moved occurrences consistent,
+"all" and "following" measured from an exception's current start, search
+keeping the 50 closest to now, migrations in one immediate transaction.
+The DST-gap skip is accepted ([recurrence.md](wiki/recurrence.md)). The
+remote `gandolh/almanac` was added; nothing is pushed.
+
+## [2026-10-16] resume | Paused before fix round 2
+
+State: HEAD `eb546e0` plus this docs commit; 622 tests, typecheck, lint and
+build clean; nothing pushed, origin set. The three items left are in
+[status.md](wiki/status.md) "Paused". A fix agent had only signed in to the
+dev app when it was stopped: no source changes. To resume: fix the three,
+check them in the browser, run the gates, commit, then remove the "Paused"
+section.

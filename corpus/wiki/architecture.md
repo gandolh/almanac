@@ -1,11 +1,11 @@
 ---
-summary: How Almanac will be put together, planned 2026-10-16 before any code. Shelfmark's three workspaces (shared, server, web), what each owns, the planned API routes, request paths behind Caddy, dev and production ports (API 8809, Vite 5177, VPS 8797), where data lives, and secrets.
+summary: How Almanac is put together, planned and then built on 2026-10-16. Shelfmark's three workspaces (shared, server, web), what each owns, the planned API routes, request paths behind Caddy, dev and production ports (API 8809, Vite 5177, VPS 8797), where data lives, and secrets.
 updated: 2026-10-16
 ---
 
 # Architecture
 
-Planned, not built. The code wins once it exists.
+Built by briefs 01-11 on 2026-10-16. The code wins where this page and it disagree. FullCalendar is lazy-loaded: `CalendarArea` is its own chunk, so the shell, year view and search load without it.
 
 ## Pieces
 
