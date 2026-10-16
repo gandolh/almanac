@@ -91,3 +91,9 @@ the day. See [the brief](briefs/done/10-search.md).
 "My calendars" with show/hide, rename, colour and delete, a new-calendar
 dialog, and the time zone dialog in the account menu. See
 [the brief](briefs/done/09-calendars-and-time-zone.md).
+
+## [2026-10-16] done | Brief 07: creating and editing events
+
+Quick create, the event form, the repeat picker, the 24-hour time field, `c`
+to create, scope questions on series edits. See
+[the brief](briefs/done/07-creating-and-editing-events.md).

@@ -26,7 +26,7 @@ review round.
 | 04 | [Repeating events](../briefs/done/04-repeating-events.md) | done |
 | 05 | [App shell, routes, dates, tokens](../briefs/done/05-app-shell.md) | done |
 | 06 | [Day, week and month views](../briefs/done/06-day-week-month-views.md) | done |
-| 07 | [Creating and editing events](../briefs/todo/07-creating-and-editing-events.md) | todo |
+| 07 | [Creating and editing events](../briefs/done/07-creating-and-editing-events.md) | done |
 | 08 | [Year view](../briefs/done/08-year-view.md) | done |
 | 09 | [Calendars and time zone](../briefs/done/09-calendars-and-time-zone.md) | done |
 | 10 | [Search](../briefs/done/10-search.md) | done |

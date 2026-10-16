@@ -77,3 +77,14 @@ web/src/event/*.test.ts         (for these files)
   the form. Make a weekly series, edit one occurrence with "This event" and
   the rest stay; change the repeat and only the two broader scopes are
   offered.
+
+## Outcome
+
+_2026-10-16_. Built with 73 new tests (pure logic in `editor-state.ts`).
+Quick create is a side popover; the event form a large dialog that ignores
+backdrop clicks. A repeat counts as changed only once the picker is touched
+and the rule differs, so moving one occurrence to another weekday still
+allows "This event". Start and end are sent together when either moved.
+After 23:00 the default start is tomorrow 00:00. The editor imports
+`deleteOccurrence` and `whenText` from `DetailsPopover`, an import cycle
+resolved at call time. Browser checks were left for the controller's walk.
