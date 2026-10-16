@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { EventDetails, type EventDetailsProps } from "./DetailsPopover";
 import { whenText } from "./occurrence-text";
-import { SCOPE_LABELS, ScopeDialog, scopeChoices, scopeTitle } from "./scope";
+import { SCOPE_LABELS, ScopeDialog, answerOnce, scopeChoices, scopeTitle } from "./scope";
 
 const BUCHAREST = "Europe/Bucharest";
 
@@ -146,5 +146,18 @@ describe("the edit scope", () => {
     expect(html).not.toContain("This event<");
     expect(html).toMatch(/checked="" value="following"/);
     expect(html).toContain("Delete recurring event");
+  });
+
+  it("takes the dialog away before the asker hears the answer, after the click", async () => {
+    const steps: string[] = [];
+    const answer = answerOnce<string | null>(
+      () => steps.push("close"),
+      (scope) => steps.push(`answer ${scope}`),
+    );
+    answer(null);
+    answer("all");
+    steps.push("click over");
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    expect(steps).toEqual(["click over", "close", "answer null"]);
   });
 });

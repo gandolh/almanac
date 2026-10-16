@@ -256,8 +256,9 @@ export function rangeTitle(view: View, date: Temporal.PlainDate): string {
 }
 
 /**
- * `rangeTitle` short enough for the phone's bar, which keeps the year: "16 Oct 2026",
- * "19–25 Oct 2026", "Oct–Nov 2026", "Dec ’26–Jan ’27", "Oct 2026", "2026".
+ * `rangeTitle` short enough for the phone's bar, which keeps the year: "16 Oct 2026";
+ * a week by its month, as Google's phone app writes it, "Oct 2026", "Oct–Nov 2026",
+ * "Dec ’26–Jan ’27"; "Oct 2026"; "2026".
  */
 export function rangeTitleShort(view: View, date: Temporal.PlainDate): string {
   switch (view) {
@@ -268,7 +269,7 @@ export function rangeTitleShort(view: View, date: Temporal.PlainDate): string {
       const last = end.subtract({ days: 1 });
       if (start.year !== last.year) return `${monthShort(start.month)} ’${yy(start.year)}–${monthShort(last.month)} ’${yy(last.year)}`;
       if (start.month !== last.month) return `${monthShort(start.month)}–${monthShort(last.month)} ${last.year}`;
-      return `${start.day}–${last.day} ${monthShort(last.month)} ${last.year}`;
+      return `${monthShort(last.month)} ${last.year}`;
     }
     case "month":
       return `${monthShort(date.month)} ${date.year}`;

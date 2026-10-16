@@ -90,23 +90,39 @@ export function CalendarArea({ view, date, onNavigate }: CalendarAreaProps) {
     latest.current = { onNavigate, editor, timeZone };
   });
 
+  // FullCalendar asks for its events while it renders, and takes the answer
+  // as a state update of its own. The first time the view loads (lazily: React
+  // renders it in slices, letting other work run between them) the answer can
+  // come before that render is on the screen, and React refuses an update to
+  // a component that hasn't mounted. So the request goes at once and the
+  // answer waits for the mount. A render React throws away never mounts, and
+  // its answer is never given.
+  const [mounted] = useState(createGate);
+  useEffect(() => mounted.open(), [mounted]);
+
   // The occurrences of the range on screen, kept until a write anywhere: a
   // calendar shown, hidden or recoloured draws them again without a fetch,
   // and two asks for one range share one request.
   const fetched = useRef<{ key: string; request: Promise<Occurrence[]> } | null>(null);
-  const events = useCallback(async (info: EventSourceFuncInfo): Promise<EventInput[]> => {
-    const from = wireInstant(Temporal.Instant.fromEpochMilliseconds(info.start.getTime()));
-    const to = wireInstant(Temporal.Instant.fromEpochMilliseconds(info.end.getTime()));
-    const key = `${from}/${to}`;
-    if (fetched.current?.key !== key) fetched.current = { key, request: fetchOccurrences(from, to) };
-    const kept = fetched.current;
-    try {
-      return toEventInputs(await kept.request, currentCalendars());
-    } catch (error) {
-      if (fetched.current === kept) fetched.current = null;
-      throw error;
-    }
-  }, []);
+  const events = useCallback(
+    async (info: EventSourceFuncInfo): Promise<EventInput[]> => {
+      const from = wireInstant(Temporal.Instant.fromEpochMilliseconds(info.start.getTime()));
+      const to = wireInstant(Temporal.Instant.fromEpochMilliseconds(info.end.getTime()));
+      const key = `${from}/${to}`;
+      if (fetched.current?.key !== key) fetched.current = { key, request: fetchOccurrences(from, to) };
+      const kept = fetched.current;
+      try {
+        const occurrences = await kept.request;
+        await mounted.opened;
+        return toEventInputs(occurrences, currentCalendars());
+      } catch (error) {
+        if (fetched.current === kept) fetched.current = null;
+        await mounted.opened;
+        throw error;
+      }
+    },
+    [mounted],
+  );
 
   const api = useCallback((): CalendarApi | null => calendarRef.current?.getApi() ?? null, []);
 
@@ -362,4 +378,13 @@ function onSelection(root: HTMLElement, x: number, y: number): boolean {
 
 function pointRect(point: { x: number; y: number } | null): DOMRect | null {
   return point ? new DOMRect(point.x, point.y, 0, 0) : null;
+}
+
+/** A promise that settles when `open` is first called; later calls do nothing. */
+function createGate(): { opened: Promise<void>; open: () => void } {
+  let open = () => {};
+  const opened = new Promise<void>((resolve) => {
+    open = resolve;
+  });
+  return { opened, open };
 }

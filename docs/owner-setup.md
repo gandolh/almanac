@@ -168,6 +168,10 @@ everything else. Open `http://localhost:5177/almanac/`. The API listens on
 port 8809, and Vite proxies `/almanac-api` to it, so the paths match
 production. The database is `data/almanac.db`.
 
+If `npm run dev` stops with `ENOSPC` (the system ran out of file watchers,
+which happens when VS Code holds most of them), run it with polling instead:
+`CHOKIDAR_USEPOLLING=1 CHOKIDAR_INTERVAL=300 npm run dev`.
+
 To try "Sign in with Ward" locally, start Ward in Docker and run its seed. The
 steps are in `../wzd_auth/infrastructure/local/README.md`. The seed registers
 Almanac and writes the five `WARD_OIDC_*` values into this repo's `.env`;

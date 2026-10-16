@@ -97,13 +97,32 @@ export function ScopeDialog({ action, allowThis, onDone }: ScopeDialogProps) {
   );
 }
 
+/**
+ * The dialog's answer, taken once: after the click that answered has
+ * finished with the dialog, `close` takes it away, and only then does
+ * `resolve` tell the asker. While the modal dialog is open the page behind it
+ * is inert, so focus the asker moves on hearing the answer (the event form
+ * back to its Save) would go nowhere if the dialog were still there.
+ */
+export function answerOnce<T>(close: () => void, resolve: (answer: T) => void): (answer: T) => void {
+  let answered = false;
+  return (answer) => {
+    if (answered) return;
+    answered = true;
+    queueMicrotask(() => {
+      close();
+      resolve(answer);
+    });
+  };
+}
+
 let pending: ((scope: EditScope | null) => void) | null = null;
 
 /**
  * Ask which occurrences an edit or delete of a series applies to. Resolves
  * to the scope chosen, or `null` when the user backs out (then change
- * nothing, and put back whatever moved). Asking again while a question is
- * open answers the first one `null`.
+ * nothing, and put back whatever moved), once the dialog has gone. Asking
+ * again while a question is open answers the first one `null`.
  */
 export function askScope(options: AskScopeOptions): Promise<EditScope | null> {
   pending?.(null);
@@ -111,17 +130,13 @@ export function askScope(options: AskScopeOptions): Promise<EditScope | null> {
     const host = document.createElement("div");
     document.body.append(host);
     const root = createRoot(host);
-    let settled = false;
+    const answer = answerOnce<EditScope | null>(() => {
+      root.unmount();
+      host.remove();
+    }, resolve);
     const done = (scope: EditScope | null) => {
-      if (settled) return;
-      settled = true;
       if (pending === done) pending = null;
-      resolve(scope);
-      // After the click that answered has finished with this root.
-      queueMicrotask(() => {
-        root.unmount();
-        host.remove();
-      });
+      answer(scope);
     };
     pending = done;
     root.render(<ScopeDialog action={options.action} allowThis={options.allowThis} onDone={done} />);

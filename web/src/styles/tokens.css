@@ -57,7 +57,7 @@
   --text-title-phone: 32px;
   --text-brand: 22px; /* "Almanac" in the top bar */
   --text-range: 22px; /* "October 2026" in the top bar */
-  --text-range-phone: 18px;
+  --text-range-phone: 17px;
   --text-heading: 18px; /* a dialog's title */
   --text-action-large: 16px; /* a large primary action, 600 */
   --text-input-phone: 16px; /* fields: below 16 px iOS zooms in */

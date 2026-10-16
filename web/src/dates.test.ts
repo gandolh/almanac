@@ -120,7 +120,8 @@ describe("previous and next", () => {
 describe("rangeTitleShort", () => {
   it("keeps the year in a form that fits a phone's bar", () => {
     expect(rangeTitleShort("day", date("2026-10-16"))).toBe("16 Oct 2026");
-    expect(rangeTitleShort("week", date("2026-10-21"))).toBe("19–25 Oct 2026");
+    expect(rangeTitleShort("week", date("2026-10-21"))).toBe("Oct 2026");
+    expect(rangeTitleShort("week", date("2026-10-16"))).toBe("Oct 2026");
     expect(rangeTitleShort("week", date("2026-10-28"))).toBe("Oct–Nov 2026");
     expect(rangeTitleShort("week", date("2026-12-31"))).toBe("Dec ’26–Jan ’27");
     expect(rangeTitleShort("month", date("2026-10-16"))).toBe("Oct 2026");
