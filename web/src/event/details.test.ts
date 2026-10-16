@@ -2,7 +2,8 @@ import type { Calendar, Occurrence } from "@almanac/shared";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { EventDetails, whenText, type EventDetailsProps } from "./DetailsPopover";
+import { EventDetails, type EventDetailsProps } from "./DetailsPopover";
+import { whenText } from "./occurrence-text";
 import { SCOPE_LABELS, ScopeDialog, scopeChoices, scopeTitle } from "./scope";
 
 const BUCHAREST = "Europe/Bucharest";
@@ -80,6 +81,8 @@ describe("EventDetails", () => {
     expect(html).toContain('style="--calendar-color:#009688"');
     expect(html).toContain('<p class="details__text">Work</p>');
     for (const label of ["Edit event", "Delete event", "Close"]) expect(html).toContain(`aria-label="${label}"`);
+    // Every icon at 20 px, the size details.css lays the rows out for.
+    expect(html.match(/<svg width="(\d+)"/g)).toEqual(Array(4).fill('<svg width="20"'));
     expect(html).not.toContain("details__repeat");
     expect(html).not.toContain("Location");
   });

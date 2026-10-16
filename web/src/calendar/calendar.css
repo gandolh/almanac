@@ -140,6 +140,16 @@
   border-color: transparent;
 }
 
+/* --- Events: a title or time that doesn't fit ends in "…", as Google's do -------------- */
+
+.cal-event-title,
+.cal-event-time {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 /* --- The selection quick create hangs from --------------------------------------------- */
 
 .cal-mirror {

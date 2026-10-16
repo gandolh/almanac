@@ -28,7 +28,7 @@ import { Temporal, VIEW_LABELS, dateKey, wireInstant, type CalendarView, type Vi
 import { DetailsPopover } from "../event/DetailsPopover";
 import { useEventEditor, type EventEditor } from "../event/EventEditor";
 import { askScope } from "../event/scope";
-import { dayHeaderContent, eventTimeText, slotLabel } from "./content";
+import { dayHeaderContent, eventContent, eventTimeText, slotLabel } from "./content";
 import {
   VIEW_TYPES,
   clickEnd,
@@ -140,6 +140,24 @@ export function CalendarArea({ view, date, onNavigate }: CalendarAreaProps) {
   // Quick create lets the selection go through `releaseSelection()`.
   useEffect(() => holdSelection(() => api()?.unselect()), [api]);
 
+  // A press on the shaded selection (month, the all-day row) is quick
+  // create's own: FullCalendar selects the same span again and the editor
+  // keeps quick create as it is, so the popover must not take the press for
+  // one outside it and close first. The day's number row is drawn over the
+  // shading, so the press goes by where it lands, not by what it lands on;
+  // events, links and buttons in the shading keep their own presses.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target instanceof Element ? event.target : null;
+      if (target?.closest("[data-no-swipe], a, button, [role=button], [role=link]")) return;
+      if (onSelection(root, event.clientX, event.clientY)) event.stopPropagation();
+    };
+    root.addEventListener("pointerdown", onPointerDown);
+    return () => root.removeEventListener("pointerdown", onPointerDown);
+  }, []);
+
   // FullCalendar's callbacks: made once, reading the props of the moment through `latest`.
   const select = useCallback((info: DateSelectInfo) => selectionMade(info, latest.current, rootRef.current), []);
   const eventClick = useCallback((info: EventClickInfo) => {
@@ -202,7 +220,7 @@ const OPTIONS: CalendarOptions = {
   className: "cal",
   // Flush with the page, as Google's grid is: no frame round the view.
   borderless: true,
-  // Time: 30-minute rows labelled each hour, 15-minute snapping, opened at 08:00, a line at now.
+  // Time: 30-minute rows labelled each hour, 15-minute snapping, a line at now.
   slotDuration: "00:30:00",
   snapDuration: "00:15:00",
   slotHeaderInterval: "01:00:00",
@@ -214,9 +232,19 @@ const OPTIONS: CalendarOptions = {
   // Google's 48 px an hour, the same at every width. (FullCalendar measures the
   // labels first; rows that change height later would leave 08:00 scrolled wrong.)
   slotMinHeight: 24,
-  scrollTime: "08:00:00",
+  // Opened at 08:00 with its label whole: the label sits across its hour's
+  // line (calendar.css), so the top is 15 minutes (12 px) above the line.
+  scrollTime: "07:45:00",
   scrollTimeReset: false,
   nowIndicator: true,
+  // Events: titles and times end in "…" when they don't fit (calendar.css).
+  eventTitleClass: "cal-event-title",
+  eventTimeClass: "cal-event-time",
+  // Day and week: Monarch keeps an event under 50 px to one line, title then
+  // time. Google gives an hour (48 px) two, the title over the time, and two
+  // lines take 44 px; from 45 minutes (36 px) down, one line.
+  eventShortHeight: 40,
+  eventContent,
   eventTimeFormat: eventTimeText,
   allDayText: "All day",
   allDayHeaderInnerClass: "cal-all-day",
@@ -321,6 +349,15 @@ function pointerOf(event: UIEvent | null): { x: number; y: number } | null {
 /** The selection on screen: the mirror block in day and week, the first shaded cell in month and the all-day row. */
 function selectionElement(root: HTMLElement | null): Element | null {
   return root?.querySelector(".cal-mirror") ?? root?.querySelector(".cal-highlight") ?? null;
+}
+
+/** Whether a point in the window is on the shaded selection (one shading per week it covers). */
+function onSelection(root: HTMLElement, x: number, y: number): boolean {
+  for (const shade of root.querySelectorAll(".cal-highlight")) {
+    const box = shade.getBoundingClientRect();
+    if (x >= box.left && x < box.right && y >= box.top && y < box.bottom) return true;
+  }
+  return false;
 }
 
 function pointRect(point: { x: number; y: number } | null): DOMRect | null {

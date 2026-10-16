@@ -1,6 +1,6 @@
 import { CALENDAR_NAME_MAX, calendarCreateSchema, type Calendar, type CalendarColor } from "@almanac/shared";
 import { useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
-import { AlertIcon } from "../auth/icons";
+import { AlertIcon } from "../components/Field";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/Dialog";
 import { CheckIcon } from "../components/icons";

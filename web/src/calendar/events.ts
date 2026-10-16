@@ -93,11 +93,6 @@ export function plainDateOf(date: Date, timeZone: string): Temporal.PlainDate {
   return instantOf(date).toZonedDateTimeISO(timeZone).toPlainDate();
 }
 
-/** A FullCalendar `Date` on the wire: `…Z` for a timed time, the date in `timeZone` for an all-day one. */
-export function wireTimeOf(date: Date, allDay: boolean, timeZone: string): string {
-  return allDay ? plainDateOf(date, timeZone).toString() : wireInstant(instantOf(date));
-}
-
 /** A span on the wire, as quick create and a patch take it. */
 export interface WireSpan {
   start: string;

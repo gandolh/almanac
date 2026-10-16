@@ -1,15 +1,15 @@
-import { useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { isApiError } from "../api";
 import { Button } from "../components/Button";
-import { CloseIcon } from "../components/icons";
+import { CalendarIcon, ClockIcon, CloseIcon } from "../components/icons";
 import { Popover } from "../components/Popover";
 import { useCalendars } from "../data/calendars";
 import { createEvent } from "../data/occurrences";
 import { useSettings } from "../data/settings";
-import { whenText } from "./DetailsPopover";
+import type { QuickCreateInit } from "./editor-session";
 import { EVENT_TITLE_MAX, pickCalendar, readLastCalendar, rememberCalendar, titleOf, type FormSeed } from "./editor-state";
-import type { QuickCreateInit } from "./EventEditor";
-import { CalendarIcon, CalendarSelect, ClockIcon } from "./EventForm";
+import { CalendarSelect } from "./EventForm";
+import { whenText } from "./occurrence-text";
 import "./editor.css";
 
 /**
@@ -19,7 +19,9 @@ import "./editor.css";
  *
  * Enter saves (an empty title saves as "(No title)"). Esc, the ✕ and a
  * press outside discard. The caller closes it however it ends, and must
- * let go of the view's selection then (`releaseSelection`).
+ * let go of the view's selection then (`releaseSelection`). A new `init`
+ * for the same span (its selection pressed again) keeps what was typed and
+ * puts the focus back in the title.
  */
 export interface QuickCreateProps {
   init: QuickCreateInit;
@@ -30,6 +32,9 @@ export interface QuickCreateProps {
   /** "More options": open the event form with this. */
   onMoreOptions: (seed: FormSeed) => void;
 }
+
+/** Quick create's icons: 20 px, in the column editor.css keeps for them. */
+const ICON = 20;
 
 export function QuickCreate(props: QuickCreateProps) {
   return (
@@ -49,7 +54,16 @@ export function QuickCreateForm({ init, onClose, onSaved, onMoreOptions }: Quick
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const failureId = useId();
+  const titleRef = useRef<HTMLInputElement>(null);
   const calendarId = chosen ?? pickCalendar(calendars, lastCalendar);
+
+  // The popover puts the focus in the title when it opens; a press on the selection since may have taken it.
+  const initShown = useRef(init);
+  useEffect(() => {
+    if (initShown.current === init) return;
+    initShown.current = init;
+    titleRef.current?.focus({ preventScroll: true });
+  }, [init]);
 
   async function save() {
     if (busy || calendarId === null) return;
@@ -75,10 +89,11 @@ export function QuickCreateForm({ init, onClose, onSaved, onMoreOptions }: Quick
     <form className="quick-create__form" onSubmit={onSubmit} noValidate>
       <div className="quick-create__head">
         <button type="button" className="icon-button" aria-label="Close" title="Close" onClick={onClose}>
-          <CloseIcon size={20} />
+          <CloseIcon size={ICON} />
         </button>
       </div>
       <input
+        ref={titleRef}
         type="text"
         className="editor-title"
         aria-label="Title"
@@ -89,15 +104,15 @@ export function QuickCreateForm({ init, onClose, onSaved, onMoreOptions }: Quick
         data-autofocus=""
         onChange={(event) => setTitle(event.target.value)}
       />
-      <p className="quick-create__row quick-create__when">
+      <p className="quick-create__row">
         <span className="quick-create__lead">
-          <ClockIcon />
+          <ClockIcon size={ICON} />
         </span>
         <span>{whenText({ allDay: init.allDay, start: init.start, end: init.end }, timeZone)}</span>
       </p>
       <div className="quick-create__row">
         <span className="quick-create__lead">
-          <CalendarIcon />
+          <CalendarIcon size={ICON} />
         </span>
         <CalendarSelect calendars={calendars} value={calendarId} onChange={setChosen} />
       </div>

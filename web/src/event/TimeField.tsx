@@ -1,5 +1,6 @@
 import { useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import { parseTimeText, type TimeOption } from "./editor-state";
+import { placeTimeList, roomAround } from "./time-list";
 import "./editor.css";
 
 /**
@@ -12,6 +13,9 @@ import "./editor.css";
  * - ↑ ↓ move through the list, Enter picks, Esc closes the list (and only
  *   the list: the dialog behind stays open).
  * - Picking from the list never takes focus out of the field.
+ * - The list stays where it can be seen (time-list.ts): lined up with the
+ *   field's right edge when the left one would run it off the screen, and
+ *   cut short, or opened upwards, in a short window.
  */
 export interface TimeFieldProps {
   /** "14:30" */
@@ -34,9 +38,37 @@ export function TimeField({ value, options: getOptions, onChange, label, invalid
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const listId = useId();
+  const fieldRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const options = open ? getOptions() : NO_OPTIONS;
   const selected = options.findIndex((option) => option.value === value);
+  const listShown = open && options.length > 0;
+
+  // Placed before it is first painted, and again when the window (or the room the keyboard leaves) changes.
+  useLayoutEffect(() => {
+    const field = fieldRef.current;
+    const list = listRef.current;
+    if (!listShown || !field || !list) return;
+    const place = () => {
+      list.style.maxHeight = "";
+      const { align, side, maxHeight } = placeTimeList(
+        field.getBoundingClientRect(),
+        { width: list.offsetWidth, height: list.offsetHeight },
+        roomAround(field),
+      );
+      list.dataset.align = align;
+      list.dataset.side = side;
+      if (maxHeight !== null) list.style.maxHeight = `${maxHeight}px`;
+    };
+    place();
+    const viewport = window.visualViewport;
+    window.addEventListener("resize", place);
+    viewport?.addEventListener("resize", place);
+    return () => {
+      window.removeEventListener("resize", place);
+      viewport?.removeEventListener("resize", place);
+    };
+  }, [listShown]);
 
   // On opening, the chosen time is in the middle of the list; moving by key keeps the active one in view.
   useLayoutEffect(() => {
@@ -112,7 +144,7 @@ export function TimeField({ value, options: getOptions, onChange, label, invalid
 
   const activeId = open && active >= 0 ? `${listId}-${active}` : undefined;
   return (
-    <div className="time-field">
+    <div ref={fieldRef} className="time-field">
       <input
         type="text"
         role="combobox"
@@ -145,7 +177,7 @@ export function TimeField({ value, options: getOptions, onChange, label, invalid
         }}
         onKeyDown={onKeyDown}
       />
-      {open && options.length > 0 && (
+      {listShown && (
         // A press in the list (its scrollbar too) never takes focus from the field; a click on a row picks.
         <ul
           ref={listRef}

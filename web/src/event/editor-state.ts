@@ -34,12 +34,11 @@ export { EVENT_LOCATION_MAX, EVENT_NOTES_MAX, EVENT_TITLE_MAX, REPEAT_COUNT_MAX 
 
 // --- The draft ---------------------------------------------------------------------------
 
-/** The choices of the repeat picker, in its order. */
-export const REPEAT_PRESETS = ["none", "daily", "weekly", "weekdays", "monthly", "yearly", "custom"] as const;
-export type RepeatPreset = (typeof REPEAT_PRESETS)[number];
+/** The choices of the repeat picker (`repeatOptions` words them, in its order). */
+export type RepeatPreset = "none" | "daily" | "weekly" | "weekdays" | "monthly" | "yearly" | "custom";
 
-export const REPEAT_ENDS = ["never", "until", "count"] as const;
-export type RepeatEndKind = (typeof REPEAT_ENDS)[number];
+/** How a repeat ends: never, on a date, or after a number of times. */
+export type RepeatEndKind = "never" | "until" | "count";
 
 /** The repeat picker's state. `until` and `count` are kept as typed, and both kept while the other is chosen. */
 export interface RepeatDraft {
@@ -137,7 +136,7 @@ export interface TimeOption {
 }
 
 /** Every 15 minutes of a day, 24-hour. */
-export const TIME_STEP = 15;
+const TIME_STEP = 15;
 
 function slots(): string[] {
   const all: string[] = [];
@@ -387,7 +386,7 @@ function inWeekOrder(days: readonly Weekday[]): Weekday[] {
 }
 
 /** Where "On" starts: a month on for most, a year for monthly, five for annual. */
-export function defaultUntil(preset: RepeatPreset, startDate: string): string {
+function defaultUntil(preset: RepeatPreset, startDate: string): string {
   const start = parseDateKey(startDate);
   if (!start) return "";
   const later = preset === "yearly" ? start.add({ years: 5 }) : preset === "monthly" ? start.add({ years: 1 }) : start.add({ months: 1 });

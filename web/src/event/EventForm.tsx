@@ -1,13 +1,15 @@
 import type { Calendar, EditScope, Occurrence } from "@almanac/shared";
-import { useId, useRef, useState, type CSSProperties, type FormEvent, type ReactNode, type SVGProps } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 import { isApiError } from "../api";
 import { occurrencePatch } from "../calendar/events";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/Dialog";
+import { CalendarIcon, ClockIcon, NotesIcon, PlaceIcon, RepeatIcon } from "../components/icons";
+import { showToast } from "../components/Toast";
 import { calendarColor, useCalendars } from "../data/calendars";
 import { createEvent, updateEvent } from "../data/occurrences";
 import { useSettings } from "../data/settings";
-import { deleteOccurrence } from "./DetailsPopover";
+import { deleteOccurrence } from "./delete-occurrence";
 import {
   EVENT_LOCATION_MAX,
   EVENT_NOTES_MAX,
@@ -53,6 +55,16 @@ import "./editor.css";
  * - Saving a series' occurrence asks the edit scope first; when the repeat
  *   changed, "This event" isn't offered. The server's refusals show under
  *   the field they are about, and the form stays open with what was typed.
+ *   A delete that fails says so above the buttons too, not in a toast the
+ *   dialog would cover.
+ * - It opens once the display time zone is known: its fields are wall-clock
+ *   times in that zone, drafted once, so drafting them in the default zone
+ *   while the settings load would save other instants than were shown.
+ *   The settings load with the shell, so the wait is hardly ever seen; if
+ *   they fail, the default zone is the zone, as everywhere else.
+ * - Backing out of the scope question, or a save or delete that fails, puts
+ *   the focus back on the button that started it (it was disabled meanwhile,
+ *   so the focus had fallen to the page).
  */
 export interface EventFormProps {
   /** A new event: what opened the form. */
@@ -63,17 +75,38 @@ export interface EventFormProps {
   onClose: () => void;
 }
 
-export function EventForm({ seed, occurrence, onClose }: EventFormProps) {
-  const { timeZone } = useSettings();
+export function EventForm(props: EventFormProps) {
+  const { timeZone, status } = useSettings();
+  // The zone the form drafts in, once it is known; the form keeps it while it is open.
+  const [zone, setZone] = useState(status === "loading" ? null : timeZone);
+  if (zone === null && status !== "loading") setZone(timeZone);
+  return zone === null ? null : <EventFormDialog {...props} timeZone={zone} />;
+}
+
+/** The form itself, for a known display time zone (for tests, which have no settings). */
+export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFormProps & { timeZone: string }) {
   const { calendars } = useCalendars();
   const [draft, setDraft] = useState<EventDraft>(() => (occurrence ? draftOfOccurrence(occurrence, timeZone) : draftOfSeed(seed ?? {}, timeZone)));
   const [lastCalendar] = useState(readLastCalendar);
   const [attempted, setAttempted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
+  const [deleteFailure, setDeleteFailure] = useState<string | null>(null);
   const formId = useId();
   const whenErrorId = useId();
+  const saveId = useId();
+  const deleteId = useId();
   const formRef = useRef<HTMLFormElement>(null);
+
+  // The button whose save or delete is under way; it gets the focus back if the form is still open after.
+  const busyButton = useRef<string | null>(null);
+  useEffect(() => {
+    if (busy || busyButton.current === null) return;
+    document.getElementById(busyButton.current)?.focus();
+    busyButton.current = null;
+  }, [busy]);
+  // An error above the buttons is scrolled to when it appears: on a phone it can be a screen away.
+  const showError = useCallback((node: HTMLElement | null) => node?.scrollIntoView({ block: "nearest" }), []);
 
   const calendarId = draft.calendarId ?? pickCalendar(calendars, lastCalendar);
   const problems = problemsOf(draft);
@@ -86,6 +119,7 @@ export function EventForm({ seed, occurrence, onClose }: EventFormProps) {
 
   async function save() {
     setFailure(null);
+    setDeleteFailure(null);
     setAttempted(true);
     if (hasProblems(problems)) {
       // The fields mark themselves invalid on the next render; then the first one gets the focus.
@@ -97,6 +131,7 @@ export function EventForm({ seed, occurrence, onClose }: EventFormProps) {
       return;
     }
     setBusy(true);
+    busyButton.current = saveId;
     try {
       let remember = occurrence === undefined;
       if (occurrence === undefined) {
@@ -136,10 +171,18 @@ export function EventForm({ seed, occurrence, onClose }: EventFormProps) {
 
   async function remove() {
     if (occurrence === undefined || busy) return;
+    setFailure(null);
+    setDeleteFailure(null);
     setBusy(true);
-    const deleted = await deleteOccurrence(occurrence);
-    if (deleted) onClose();
-    else setBusy(false);
+    busyButton.current = deleteId;
+    const result = await deleteOccurrence(occurrence);
+    if (result.outcome === "deleted") {
+      showToast("Event deleted");
+      onClose();
+      return;
+    }
+    if (result.outcome === "failed") setDeleteFailure(result.message);
+    setBusy(false);
   }
 
   const onSubmit = (event: FormEvent) => {
@@ -155,18 +198,17 @@ export function EventForm({ seed, occurrence, onClose }: EventFormProps) {
       size="large"
       // A form with typing in it: a stray press on the backdrop must not lose it.
       dismissOnBackdrop={false}
-      className="event-form-dialog"
       footer={
         <>
           {occurrence && (
-            <Button variant="quiet" className="event-form__delete" onClick={() => void remove()} disabled={busy}>
+            <Button id={deleteId} variant="quiet" className="event-form__delete" onClick={() => void remove()} disabled={busy}>
               Delete
             </Button>
           )}
           <Button variant="quiet" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" form={formId} variant="primary" disabled={busy}>
+          <Button id={saveId} type="submit" form={formId} variant="primary" disabled={busy}>
             Save
           </Button>
         </>
@@ -185,7 +227,7 @@ export function EventForm({ seed, occurrence, onClose }: EventFormProps) {
           onChange={(event) => setDraft((current) => ({ ...current, title: event.target.value }))}
         />
 
-        <Row icon={<ClockIcon />} label="When">
+        <Row icon={<ClockIcon size={ICON} />} label="When">
           <div className="editor-when">
             <input
               type="date"
@@ -243,7 +285,7 @@ export function EventForm({ seed, occurrence, onClose }: EventFormProps) {
           )}
         </Row>
 
-        <Row icon={<RepeatIcon />} label="Repeat">
+        <Row icon={<RepeatIcon size={ICON} />} label="Repeat">
           <RepeatPicker
             repeat={draft.repeat}
             labelDate={repeatLabelDate(draft)}
@@ -255,11 +297,11 @@ export function EventForm({ seed, occurrence, onClose }: EventFormProps) {
           />
         </Row>
 
-        <Row icon={<CalendarIcon />} label="Calendar">
+        <Row icon={<CalendarIcon size={ICON} />} label="Calendar">
           <CalendarSelect calendars={calendars} value={calendarId} onChange={(id) => setDraft((current) => ({ ...current, calendarId: id }))} />
         </Row>
 
-        <Row icon={<PlaceIcon />} label="Location">
+        <Row icon={<PlaceIcon size={ICON} />} label="Location">
           <input
             type="text"
             className="editor-input"
@@ -272,7 +314,7 @@ export function EventForm({ seed, occurrence, onClose }: EventFormProps) {
           />
         </Row>
 
-        <Row icon={<NotesIcon />} label="Notes">
+        <Row icon={<NotesIcon size={ICON} />} label="Notes">
           <textarea
             className="editor-input editor-notes"
             aria-label="Notes"
@@ -285,14 +327,22 @@ export function EventForm({ seed, occurrence, onClose }: EventFormProps) {
         </Row>
 
         {failure !== null && place === "general" && (
-          <p className="editor-error editor-error--form" role="alert">
+          <p ref={showError} className="editor-error editor-error--form" role="alert">
             {failure}
+          </p>
+        )}
+        {deleteFailure !== null && (
+          <p ref={showError} className="editor-error editor-error--form" role="alert">
+            {deleteFailure}
           </p>
         )}
       </form>
     </Dialog>
   );
 }
+
+/** The rows' icons: 20 px, in the column editor.css keeps for them. */
+const ICON = 20;
 
 function Row({ icon, label, children }: { icon: ReactNode; label: string; children: ReactNode }) {
   return (
@@ -338,72 +388,5 @@ export function CalendarSelect({ calendars, value, onChange, label = "Calendar" 
         ))}
       </select>
     </div>
-  );
-}
-
-// --- Icons, in the app's stroke (as the details popover's) -----------------------------------------------
-
-type IconProps = Omit<SVGProps<SVGSVGElement>, "children"> & { size?: number };
-
-function Icon({ size = 20, children, ...rest }: IconProps & { children: ReactNode }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-      {...rest}
-    >
-      {children}
-    </svg>
-  );
-}
-
-export function ClockIcon(props: IconProps) {
-  return (
-    <Icon {...props}>
-      <circle cx="12" cy="12" r="8.5" />
-      <path d="M12 7.5V12l3 2" />
-    </Icon>
-  );
-}
-
-function RepeatIcon(props: IconProps) {
-  return (
-    <Icon {...props}>
-      <path d="M4.5 11V9.5a3 3 0 0 1 3-3H18M15 3.5l3 3-3 3M19.5 13v1.5a3 3 0 0 1-3 3H6M9 20.5l-3-3 3-3" />
-    </Icon>
-  );
-}
-
-export function CalendarIcon(props: IconProps) {
-  return (
-    <Icon {...props}>
-      <rect x="4" y="5" width="16" height="15" rx="2.5" />
-      <path d="M4 9.5h16M8.5 3v4M15.5 3v4" />
-    </Icon>
-  );
-}
-
-function PlaceIcon(props: IconProps) {
-  return (
-    <Icon {...props}>
-      <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" />
-      <circle cx="12" cy="10" r="2.3" />
-    </Icon>
-  );
-}
-
-function NotesIcon(props: IconProps) {
-  return (
-    <Icon {...props}>
-      <path d="M5 6.5h14M5 11h14M5 15.5h9" />
-    </Icon>
   );
 }

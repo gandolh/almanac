@@ -7,13 +7,12 @@ import "./details.css";
 
 /**
  * The edit-scope question (glossary: edit scope), Google's "Edit recurring
- * event" dialog: three radio buttons, Cancel and OK. Any brief can ask it
- * with `askScope`; the dialog mounts in a React root of its own, so the
- * caller needs no component in its tree. What each answer does to the
- * stored rows is corpus/wiki/recurrence.md's "Edit scopes".
+ * event" dialog: three radio buttons, Cancel and OK. Anything can ask it
+ * with `askScope` (the event form, a drag in a view, a delete); the dialog
+ * mounts in a React root of its own, so the caller needs no component in its
+ * tree. What each answer does to the stored rows is
+ * corpus/wiki/recurrence.md's "Edit scopes".
  */
-
-export type Scope = EditScope;
 
 export interface AskScopeOptions {
   /** "Edit recurring event" or "Delete recurring event". */
@@ -33,6 +32,11 @@ export function scopeChoices(allowThis: boolean): EditScope[] {
   return allowThis ? ["this", "following", "all"] : ["following", "all"];
 }
 
+/**
+ * The dialog's title, in Google's words. The glossary keeps "recurring event"
+ * out of code and docs, and the UI otherwise says "Repeats"; these two titles
+ * keep Google's wording on purpose.
+ */
 export function scopeTitle(action: AskScopeOptions["action"]): string {
   return action === "edit" ? "Edit recurring event" : "Delete recurring event";
 }
@@ -54,7 +58,6 @@ export function ScopeDialog({ action, allowThis, onDone }: ScopeDialogProps) {
       onClose={() => onDone(null)}
       title={scopeTitle(action)}
       size="small"
-      className="scope-dialog"
       footer={
         <>
           <Button variant="quiet" onClick={() => onDone(null)}>
@@ -106,7 +109,6 @@ export function askScope(options: AskScopeOptions): Promise<EditScope | null> {
   pending?.(null);
   return new Promise((resolve) => {
     const host = document.createElement("div");
-    host.className = "scope-root";
     document.body.append(host);
     const root = createRoot(host);
     let settled = false;

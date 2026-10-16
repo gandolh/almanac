@@ -1,9 +1,8 @@
 /*
- * Quick create and the event form (brief 07), Google's layout: filled
- * fields on the `field` colour, rows of a 20 px icon in a fixed column and
- * the control beside it. Colours, type and radii come from tokens.css;
- * below 768 px is the phone, where every target is 44 px and the form fills
- * the screen.
+ * Quick create and the event form, Google's layout: filled fields on the
+ * `field` colour, rows of a 20 px icon in a fixed column and the control
+ * beside it. Colours, type and radii come from tokens.css; below 768 px is
+ * the phone, where every target is 44 px and the form fills the screen.
  */
 
 /* --- Fields ------------------------------------------------------------------ */
@@ -223,6 +222,17 @@
   background: var(--surface);
   box-shadow: var(--shadow-float);
   list-style: none;
+}
+
+/* Where TimeField places it (time-list.ts): against the field's right edge, or over the field. */
+.time-field__list[data-align="end"] {
+  right: 0;
+  left: auto;
+}
+
+.time-field__list[data-side="above"] {
+  top: auto;
+  bottom: calc(100% + 4px);
 }
 
 .time-field__option {

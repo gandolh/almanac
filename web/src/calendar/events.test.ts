@@ -1,8 +1,8 @@
 import type { Calendar, Occurrence } from "@almanac/shared";
-import { createElement } from "react";
+import { Fragment, createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { DayHead, eventTimeText, slotLabel, weekdayHead } from "./content";
+import { DayHead, eventContent, eventTimeText, slotLabel, weekdayHead } from "./content";
 import {
   VIEW_TYPES,
   clickEnd,
@@ -14,7 +14,6 @@ import {
   plainDateOf,
   toEventInputs,
   wireSpan,
-  wireTimeOf,
 } from "./events";
 import { holdSelection, releaseSelection } from "./selection";
 
@@ -114,8 +113,11 @@ describe("FullCalendar's dates back on the wire", () => {
   it("takes an all-day date in the display time zone, and a timed one as the instant", () => {
     expect(plainDateOf(midnight16, BUCHAREST).toString()).toBe("2026-10-16");
     expect(plainDateOf(midnight16, "UTC").toString()).toBe("2026-10-15");
-    expect(wireTimeOf(midnight16, true, BUCHAREST)).toBe("2026-10-16");
-    expect(wireTimeOf(new Date("2026-10-16T07:15:30.500Z"), false, BUCHAREST)).toBe("2026-10-16T07:15:30Z");
+    expect(wireSpan(new Date("2026-10-16T07:15:30.500Z"), new Date("2026-10-16T08:15:30.500Z"), false, BUCHAREST)).toEqual({
+      start: "2026-10-16T07:15:30Z",
+      end: "2026-10-16T08:15:30Z",
+      allDay: false,
+    });
   });
 
   it("makes a span, filling in an end FullCalendar left out", () => {
@@ -187,6 +189,23 @@ describe("the views' words", () => {
     );
     expect(renderToStaticMarkup(createElement(DayHead, { dow: 0, dayNumber: "", today: false }))).toBe(
       '<span class="cal-head"><span class="cal-head__weekday">SUN</span></span>',
+    );
+  });
+});
+
+describe("an event's inside", () => {
+  const block = { timeText: "10:00 – 11:00", timeClass: "time", titleClass: "title" };
+
+  it("is FullCalendar's own for events, dragged ones too", () => {
+    expect(eventContent({ ...block, isMirror: false, event: { title: "Standup" } })).toBe(true);
+    expect(eventContent({ ...block, isMirror: true, event: { title: "Standup" } })).toBe(true);
+  });
+
+  it("writes (No title) over the time of a selection's block", () => {
+    const inside = eventContent({ ...block, isMirror: true, event: { title: "" } });
+    expect(inside).not.toBe(true);
+    expect(renderToStaticMarkup(createElement(Fragment, null, inside as ReactNode))).toBe(
+      '<div class="time">10:00 – 11:00</div><div class="title">(No title)</div>',
     );
   });
 });

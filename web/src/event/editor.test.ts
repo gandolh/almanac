@@ -3,7 +3,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { repeatDraftOf, startTimeOptions, type RepeatDraft } from "./editor-state";
-import { CalendarSelect, EventForm } from "./EventForm";
+import { CalendarSelect, EventForm, EventFormDialog } from "./EventForm";
 import { QuickCreateForm } from "./QuickCreate";
 import { RepeatPicker, type RepeatPickerProps } from "./RepeatPicker";
 import { TimeField } from "./TimeField";
@@ -141,6 +141,7 @@ describe("QuickCreateForm", () => {
     expect(page).toContain('aria-label="Calendar"');
     expect(page).toContain("More options");
     expect(page).toContain(">Save</button>");
+    expect(page.match(/"quick-create__lead"><svg width="20"/g)).toHaveLength(2);
   });
 
   it("says All day for an all-day selection", () => {
@@ -150,9 +151,21 @@ describe("QuickCreateForm", () => {
 
 describe("EventForm", () => {
   const form = (props: { seed?: Parameters<typeof EventForm>[0]["seed"]; occurrence?: Occurrence }) =>
-    renderToStaticMarkup(createElement(EventForm, { onClose: none, ...props }));
+    renderToStaticMarkup(createElement(EventFormDialog, { onClose: none, timeZone: BUCHAREST, ...props }));
 
-  it("opens a new event with the fields of the brief and no Delete", () => {
+  it("waits for the display time zone before drafting any time", () => {
+    // Nothing has loaded the settings here: their status is "loading".
+    expect(renderToStaticMarkup(createElement(EventForm, { onClose: none, seed: { start: "2026-10-20T07:00:00Z" } }))).toBe("");
+  });
+
+  it("drafts the times in the display time zone it is given", () => {
+    const seed = { start: "2026-10-20T07:00:00Z", end: "2026-10-20T08:00:00Z" };
+    const london = renderToStaticMarkup(createElement(EventFormDialog, { onClose: none, timeZone: "Europe/London", seed }));
+    expect(london).toMatch(/aria-label="Start time"[^>]*value="08:00"/);
+    expect(form({ seed })).toMatch(/aria-label="Start time"[^>]*value="10:00"/);
+  });
+
+  it("opens a new event with every field and no Delete", () => {
     const html = form({ seed: { start: "2026-10-20T07:00:00Z", end: "2026-10-20T08:30:00Z", title: "Plan" } });
     expect(html).toContain("New event");
     expect(html).toContain('value="Plan"');
@@ -170,6 +183,8 @@ describe("EventForm", () => {
     expect(html).toContain(">Cancel</button>");
     expect(html).toContain(">Save</button>");
     expect(html).not.toContain(">Delete</button>");
+    // The rows' icons at 20 px, the size editor.css lays the rows out for.
+    expect(html.match(/"editor-row__lead"><svg width="20"/g)).toHaveLength(5);
   });
 
   it("hides the times of an all-day event", () => {

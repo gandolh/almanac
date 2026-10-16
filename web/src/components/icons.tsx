@@ -3,12 +3,14 @@ import type { ReactNode, SVGProps } from "react";
 /**
  * The app's icons, on a 24-unit grid in one stroke (2, round caps), coloured
  * by `currentColor`. Decorative: the control around each one carries the
- * name.
+ * name. 24 px unless `size` says otherwise; the event editor and the details
+ * popover draw theirs at 20.
  */
 
 export type IconProps = Omit<SVGProps<SVGSVGElement>, "children"> & { size?: number };
 
-function Icon({ size = 24, strokeWidth = 2, children, ...rest }: IconProps & { children: ReactNode }) {
+/** The frame every icon draws in; for an icon that is needed in one place only. */
+export function Icon({ size = 24, strokeWidth = 2, children, ...rest }: IconProps & { children: ReactNode }) {
   return (
     <svg
       width={size}
@@ -104,12 +106,76 @@ export function BackIcon(props: IconProps) {
   );
 }
 
-/** A calendar page: the phone's Today button, with the day's number laid over it by the caller. */
-export function CalendarPageIcon(props: IconProps) {
+/** A calendar page: which calendar an event is on. */
+export function CalendarIcon(props: IconProps) {
   return (
-    <Icon strokeWidth={1.8} {...props}>
+    <Icon {...props}>
       <rect x="4" y="5" width="16" height="15" rx="2.5" />
       <path d="M4 9.5h16M8.5 3v4M15.5 3v4" />
+    </Icon>
+  );
+}
+
+/** The same page, a finer line: the phone's Today button, with the day's number laid over it by the caller. */
+export function CalendarPageIcon(props: IconProps) {
+  return <CalendarIcon strokeWidth={1.8} {...props} />;
+}
+
+// --- Events: the event form's rows and the details popover --------------------------
+
+/** When an event happens. */
+export function ClockIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 2" />
+    </Icon>
+  );
+}
+
+/** How it repeats. */
+export function RepeatIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4.5 11V9.5a3 3 0 0 1 3-3H18M15 3.5l3 3-3 3M19.5 13v1.5a3 3 0 0 1-3 3H6M9 20.5l-3-3 3-3" />
+    </Icon>
+  );
+}
+
+/** Where: a map pin. */
+export function PlaceIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" />
+      <circle cx="12" cy="10" r="2.3" />
+    </Icon>
+  );
+}
+
+/** The notes: lines of text. */
+export function NotesIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M5 6.5h14M5 11h14M5 15.5h9" />
+    </Icon>
+  );
+}
+
+/** A pencil: Edit. */
+export function EditIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3" />
+      <path d="m13.5 8.5 2 2" />
+    </Icon>
+  );
+}
+
+/** A bin: Delete. */
+export function DeleteIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4.5 7h15M10 11v6M14 11v6M6.5 7l1 12a1.5 1.5 0 0 0 1.5 1.4h6a1.5 1.5 0 0 0 1.5-1.4l1-12M9.5 7V4.5h5V7" />
     </Icon>
   );
 }

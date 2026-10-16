@@ -1,7 +1,7 @@
 import { CALENDAR_NAME_MAX, nextCalendarColor, type Calendar, type CalendarColor, type CalendarCreate } from "@almanac/shared";
 import { useId, useState, type FormEvent } from "react";
 import { isApiError } from "../api";
-import { AuthField } from "../auth/Field";
+import { AuthField } from "../components/Field";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/Dialog";
 import { PlusIcon } from "../components/icons";
@@ -52,7 +52,7 @@ export function CalendarList() {
         <h2 id={headingId} className="calendar-list__title">
           My calendars
         </h2>
-        <button type="button" className="icon-button icon-button--small" aria-label="Create new calendar" onClick={() => setCreating(true)}>
+        <button type="button" className="icon-button icon-button--small" aria-label="New calendar" onClick={() => setCreating(true)}>
           <PlusIcon size={20} />
         </button>
       </header>

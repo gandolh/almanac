@@ -3,6 +3,8 @@ import { createContext, useCallback, useContext, useEffect, useLayoutEffect, use
 import { releaseSelection } from "../calendar/selection";
 import { useIsDesktop } from "../components/viewport";
 import { registerCommand } from "../layout/commands";
+import { usePathname } from "../router";
+import { quickSession, type CreateInit, type QuickCreateInit, type Session } from "./editor-session";
 import type { FormSeed } from "./editor-state";
 import { EventForm } from "./EventForm";
 import { QuickCreate } from "./QuickCreate";
@@ -14,27 +16,13 @@ import { QuickCreate } from "./QuickCreate";
  * two is open; any view or button opens them through `useEventEditor()`.
  *
  * - `openQuickCreate` is the desktop's popover. Below 768 px it opens the
- *   event form instead, with the same times.
- * - Quick create ends five ways (saved, discarded, Esc, "More options", and
- *   the phone's form instead) and every one lets go of the view's selection
- *   (`releaseSelection`).
+ *   event form instead, with the same times. Asked again for the span it
+ *   already shows (a press on its own selection), it stays as it is.
+ * - Quick create ends six ways (saved, discarded, Esc, "More options", the
+ *   phone's form instead, and the address moving, Back and Forward too) and
+ *   every one lets go of the view's selection (`releaseSelection`).
  * - The "create" command (the `c` key) opens the form for a new event.
  */
-
-export interface CreateInit {
-  /** A `…Z` instant, or `YYYY-MM-DD` when `allDay`. */
-  start?: string;
-  end?: string;
-  allDay?: boolean;
-}
-
-export interface QuickCreateInit {
-  start: string;
-  end: string;
-  allDay: boolean;
-  /** What quick create's popover hangs from: the selection's element or rectangle. */
-  anchor: Element | DOMRect;
-}
 
 export interface EventEditor {
   /** The event form for a new event (the Create button, the `c` key). */
@@ -52,12 +40,6 @@ const NOTHING: EventEditor = {
 };
 
 const EditorContext = createContext<EventEditor>(NOTHING);
-
-/** What is open. `key` makes each opening a fresh form, whatever was open before. */
-type Session =
-  | { kind: "quick"; key: number; init: QuickCreateInit }
-  | { kind: "create"; key: number; seed: FormSeed }
-  | { kind: "edit"; key: number; occurrence: Occurrence };
 
 /** Wraps the shell (App.tsx). */
 export function EventEditorProvider({ children }: { children: ReactNode }) {
@@ -81,7 +63,8 @@ export function EventEditorProvider({ children }: { children: ReactNode }) {
       setSession({ kind: "create", key: ++opened.current, seed: { start: init.start, end: init.end, allDay: init.allDay } });
       return;
     }
-    setSession({ kind: "quick", key: ++opened.current, init });
+    const key = ++opened.current;
+    setSession((current) => quickSession(current, init, key));
   }, []);
 
   const openEdit = useCallback((occurrence: Occurrence) => {
@@ -101,6 +84,18 @@ export function EventEditorProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const closeForm = useCallback(() => setSession(null), []);
+
+  // The address moved (a link, a shortcut, Back or Forward): quick create
+  // belonged to the view that was there. The event form stays, with its typing.
+  const pathname = usePathname();
+  const [pathShown, setPathShown] = useState(pathname);
+  if (pathShown !== pathname) {
+    setPathShown(pathname);
+    if (session?.kind === "quick") setSession(null);
+  }
+  useEffect(() => {
+    releaseSelection();
+  }, [pathname]);
 
   useEffect(() => registerCommand("create", () => openCreate()), [openCreate]);
 
