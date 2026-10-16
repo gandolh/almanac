@@ -89,3 +89,15 @@ web/src/event/details.css  web/src/event/*.test.ts (for these files)
   events.
 - Hand back `askScope`, the `data/occurrences.ts` exports and how the
   editor's anchor is passed.
+
+## Outcome
+
+_2026-10-16_. Built and checked in a browser: display zone and a second zone,
+24-hour, Monday start, the DST week, drag and resize with each scope, cancel
+and server errors reverting, month moves, all-day to timed and back, the
+details popover with links, delete, nav links, phone swipes. 433 tests.
+FullCalendar's Monarch theme, with its palette mapped to our tokens on
+`:root` (dragged events leave the view's subtree). A click on the hours
+selects one hour, as Google does; events carry `data-no-swipe`. Brief 07
+must call `releaseSelection()` whenever quick create closes. The bundle is
+692 kB (204 kB gzip), over Vite's warning, mostly FullCalendar.

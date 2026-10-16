@@ -1,0 +1,153 @@
+/*
+ * Day, week and month: FullCalendar's Monarch theme in Almanac's colours,
+ * light only. Monarch's own palettes are not loaded; every name a palette
+ * defines is set here from the tokens. They sit on `:root`, not on the view,
+ * because FullCalendar moves an event being dragged to the end of the
+ * document, outside the view.
+ */
+
+:root {
+  /* primary, secondary and tertiary: the accent and its tint. Tertiary is today's disc. */
+  --fc-monarch-primary: var(--accent);
+  --fc-monarch-primary-foreground: var(--on-accent);
+  --fc-monarch-primary-over: var(--accent-press);
+  --fc-monarch-primary-down: var(--accent-press);
+  --fc-monarch-secondary: var(--accent-tint);
+  --fc-monarch-secondary-foreground: var(--accent-ink);
+  --fc-monarch-secondary-over: color-mix(in srgb, var(--accent-tint) 92%, var(--ink));
+  --fc-monarch-secondary-down: color-mix(in srgb, var(--accent-tint) 84%, var(--ink));
+  --fc-monarch-tertiary: var(--accent);
+  --fc-monarch-tertiary-foreground: var(--on-accent);
+  --fc-monarch-tertiary-over: var(--accent-press);
+  --fc-monarch-tertiary-down: var(--accent-press);
+
+  /* calendar content: an event without a colour, the selection, the time now */
+  --fc-monarch-event: var(--accent);
+  --fc-monarch-event-contrast: var(--on-accent);
+  --fc-monarch-highlight: color-mix(in srgb, var(--accent-tint) 60%, transparent);
+  --fc-monarch-now: var(--now-line);
+
+  /* controls (FullCalendar's toolbar, which Almanac doesn't show) */
+  --fc-monarch-selected: var(--ink-2);
+  --fc-monarch-selected-foreground: var(--on-accent);
+  --fc-monarch-selected-over: var(--ink);
+  --fc-monarch-selected-down: var(--ink);
+  --fc-monarch-outline: var(--focus-ring);
+
+  /* popover */
+  --fc-monarch-popover: var(--surface);
+  --fc-monarch-popover-foreground: var(--ink);
+
+  /* neutral backgrounds: Google's state layers */
+  --fc-monarch-background: var(--ground);
+  --fc-monarch-faint: color-mix(in srgb, var(--ink-2) 5%, transparent);
+  --fc-monarch-muted: var(--hover);
+  --fc-monarch-strong: var(--press);
+  --fc-monarch-stronger: color-mix(in srgb, var(--ink-2) 16%, transparent);
+  --fc-monarch-strongest: color-mix(in srgb, var(--ink-2) 20%, transparent);
+
+  /* neutral foregrounds and borders */
+  --fc-monarch-foreground: var(--ink);
+  --fc-monarch-strong-foreground: var(--ink);
+  --fc-monarch-faint-foreground: var(--muted);
+  --fc-monarch-muted-foreground: var(--muted);
+  --fc-monarch-border: var(--hairline);
+  --fc-monarch-strong-border: var(--outline);
+}
+
+/* The view fills the space under the top bar; FullCalendar scrolls the hours itself. */
+.calendar-area {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--ground);
+}
+
+.calendar-area .cal {
+  flex: 1;
+  min-height: 0;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-event);
+  line-height: var(--leading-tight);
+}
+
+/* --- Column heads: "MON" over "19", today's date in the accent disc ---------------------- */
+
+.cal-head {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-block: 4px 6px;
+}
+
+.cal-head__weekday {
+  color: var(--muted);
+  font-size: var(--text-mini);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.08em;
+}
+
+.cal-head__day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--day-disc);
+  height: var(--day-disc);
+  border-radius: var(--radius-pill);
+  color: var(--ink-2);
+  font-size: var(--text-day-number);
+  line-height: 1;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.cal-head:hover .cal-head__day {
+  background: var(--hover);
+}
+
+.cal-head--today .cal-head__weekday {
+  color: var(--accent);
+}
+
+.cal-head--today .cal-head__day,
+.cal-head--today:hover .cal-head__day {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+@media (max-width: 767.98px) {
+  .cal-head__day {
+    width: var(--day-disc-phone);
+    height: var(--day-disc-phone);
+    font-size: var(--text-day-number-phone);
+  }
+}
+
+/* --- The hours down the side: small, muted, centred on their line ---------------------- */
+
+.calendar-area .cal-slot-label {
+  top: -0.5em;
+  margin-block: 0;
+  color: var(--muted);
+  font-size: var(--text-mini);
+  line-height: 1;
+}
+
+.calendar-area .cal-half-hour {
+  border-color: transparent;
+}
+
+/* --- The selection quick create hangs from --------------------------------------------- */
+
+.cal-mirror {
+  box-shadow: var(--shadow-raised);
+}
+
+/* The all-day row's label, quiet as Google's gutter. */
+.calendar-area .cal-all-day {
+  color: var(--muted);
+  font-size: var(--text-mini);
+}

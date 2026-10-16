@@ -63,3 +63,9 @@ Google-style top bar, sidebar with mini-month, drawer on phones, view routes
 shortcuts and commands, Popover, Dialog, Toast, MonthGrid, the home-screen
 icon, and stubs for briefs 06-10. `.gitignore` fixed so `web/src/data/` is
 tracked. See [the brief](briefs/done/05-app-shell.md).
+
+## [2026-10-16] done | Brief 06: day, week and month views
+
+FullCalendar v7 with the Monarch theme on our tokens, the occurrences data
+layer, the details popover, linkify, the edit-scope dialog, drag, drop and
+resize. See [the brief](briefs/done/06-day-week-month-views.md).

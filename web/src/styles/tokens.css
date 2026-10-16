@@ -32,6 +32,7 @@
   --toast-surface: #303030; /* the snackbar */
   --toast-ink: #F2F2F2;
   --toast-action: #A8C7FA;
+  --now-line: #EA4335; /* the current time across day and week, Google's red */
 
   /* --- Derived: mixes and aliases of the above, never a new hue ----------- */
 
@@ -66,6 +67,9 @@
   --text-label: 12px; /* field labels, 600; the year view's days */
   --text-mini: 11px; /* the mini-month's days and weekday initials */
   --text-badge: 9px; /* the day's number on the phone's Today icon, 700 */
+  --text-day-number: 26px; /* the date under a weekday in day and week */
+  --text-day-number-phone: 18px;
+  --text-event: 12px; /* events and the hour labels in the views */
 
   --weight-regular: 400;
   --weight-medium: 500;
@@ -119,6 +123,8 @@
   --day-dot: 4px; /* the "has events" dot */
   --swatch-size: 14px; /* a calendar's colour square in the left column */
   --popover-width: 448px;
+  --day-disc: 46px; /* the circle round a date in day and week's heads; today's is filled */
+  --day-disc-phone: 32px;
   --menu-width: 224px;
   --dialog-small: 400px;
   --dialog-medium: 560px;
