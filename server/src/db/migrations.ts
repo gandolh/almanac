@@ -1,9 +1,9 @@
 import type { Database } from "better-sqlite3";
 
 /**
- * Applied in order on boot, each in its own transaction, tracked in
- * `PRAGMA user_version`. Never edit a shipped entry; append a new one with a
- * comment naming its brief.
+ * Applied in order on boot, tracked in `PRAGMA user_version` (`migrate`).
+ * Never edit a shipped entry; append a new one with a comment naming its
+ * brief.
  *
  * `openDb` runs the vendored auth library's own migrations first, so
  * `auth_users`, which every table here hangs off, exists before these run.
@@ -79,19 +79,24 @@ export const migrations: readonly string[] = [
   `,
 ];
 
-/** Brings the schema up to `list.length`, tracked in `PRAGMA user_version`. */
+/**
+ * Brings the schema up to `list.length`, tracked in `PRAGMA user_version`.
+ *
+ * Reading the version and applying what is missing is one `BEGIN IMMEDIATE`
+ * transaction: two processes opening a fresh database at once take turns,
+ * and the second finds the version the first wrote, instead of both reading
+ * 0 and both running entry 1. An entry that fails rolls back the whole run.
+ * Inside a caller's transaction (`migrateAll`) it is a savepoint of that.
+ */
 export function migrate(db: Database, list: readonly string[] = migrations): void {
-  const current = db.pragma("user_version", { simple: true }) as number;
-  if (current > list.length) {
-    throw new Error(
-      `The database is at schema version ${current}, but this server only knows ${list.length}. Run a newer server.`,
-    );
-  }
-  list.slice(current).forEach((sql, index) => {
-    const version = current + index + 1;
-    db.transaction(() => {
-      db.exec(sql);
-      db.pragma(`user_version = ${version}`);
-    })();
-  });
+  db.transaction(() => {
+    const current = db.pragma("user_version", { simple: true }) as number;
+    if (current > list.length) {
+      throw new Error(
+        `The database is at schema version ${current}, but this server only knows ${list.length}. Run a newer server.`,
+      );
+    }
+    for (const sql of list.slice(current)) db.exec(sql);
+    if (list.length > current) db.pragma(`user_version = ${list.length}`);
+  }).immediate();
 }

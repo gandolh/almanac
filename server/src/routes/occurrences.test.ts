@@ -1,5 +1,7 @@
 import { calendarListSchema, occurrenceListSchema, occurrenceSchema, type Occurrence } from "@almanac/shared";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { databasePath, openDb } from "../db/open.js";
+import { createEventStore, type NewEvent } from "../store/events.js";
 import { startSignedInApp, type SignedInTestApp } from "../testing/testApp.js";
 
 let t: SignedInTestApp;
@@ -31,6 +33,17 @@ async function occurrences(from: string, to: string, inject = t.inject): Promise
 }
 
 const titles = (list: Occurrence[]) => list.map((occurrence) => occurrence.title);
+
+/** Stores a row as it is, past the API's checks, on a second connection. */
+function insertRow(event: NewEvent): void {
+  const db = openDb(databasePath(t.dataDir));
+  try {
+    const userId = (db.prepare("SELECT id FROM auth_users WHERE username = 'owner'").get() as { id: string }).id;
+    createEventStore(db).create(userId, event);
+  } finally {
+    db.close();
+  }
+}
 
 /** 16 October 2026 in Bucharest (UTC+3), midnight to midnight. */
 const DAY = ["2026-10-16T00:00:00+03:00", "2026-10-17T00:00:00+03:00"] as const;
@@ -204,6 +217,14 @@ describe("GET /api/occurrences for series", () => {
   it("includes an occurrence that started before the range and is still going", async () => {
     await create({ ...timed("Night shift", "2026-10-15T22:00:00+03:00", "2026-10-16T06:00:00+03:00"), repeat: { freq: "daily", end: { type: "never" } } });
     expect((await occurrences(...DAY)).map((o) => o.start)).toEqual(["2026-10-15T19:00:00Z", "2026-10-16T19:00:00Z"]);
+  });
+
+  it("skips a series that will not expand, and answers the rest", async () => {
+    await create({ ...timed("Standup", "2026-10-05T10:00:00+03:00", "2026-10-05T11:00:00+03:00"), repeat: weekly });
+    await create(timed("Dentist", "2026-10-20T09:00:00+03:00", "2026-10-20T10:00:00+03:00"));
+    // All-day to the year 9999: no write takes it now (EVENT_LENGTH_MAX_DAYS), but a row from before may be there.
+    insertRow({ calendarId, title: "Forever", location: "", notes: "", allDay: true, start: "2026-10-01", end: "9999-12-31", tzid: "Europe/Bucharest", rrule: "FREQ=DAILY" });
+    expect(titles(await occurrences(...october))).toEqual(["Standup", "Standup", "Standup", "Dentist", "Standup"]);
   });
 
   it("shows another user none of the first user's series", async () => {

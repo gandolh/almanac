@@ -63,6 +63,8 @@ describe("repeatToRRule", () => {
     expect(until("2026-12-01", "Pacific/Kiritimati")).toBe("FREQ=DAILY;UNTIL=20261201T095959Z");
     // Santiago's clocks go back from midnight to 23:00 on 4 April: 23:59:59 happens twice, the later one counts.
     expect(until("2026-04-04", "America/Santiago")).toBe("FREQ=DAILY;UNTIL=20260405T035959Z");
+    // The last date the schema takes (REPEAT_UNTIL_MAX), in a zone behind UTC, still has a four-digit year.
+    expect(until("9998-12-31", "Pacific/Pago_Pago")).toBe("FREQ=DAILY;UNTIL=99990101T105959Z");
   });
 
   it("ends on a date as the date for an all-day series", () => {

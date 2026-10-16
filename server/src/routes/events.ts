@@ -20,8 +20,8 @@ function eventId(raw: string): number {
  * The event writes, each scoped to the signed-in user and run as one
  * transaction by `recurrence/scopes.ts`, which says what each edit scope
  * does. The calendar must be the user's (404 otherwise, as for an event).
- * New rows take `tzid` from the user's display time zone; a series keeps
- * its own.
+ * New rows take `tzid` from the user's display time zone, and so does a
+ * one-off that becomes a series; a series keeps its own.
  *
  * `:id` is an occurrence's `eventId`: a one-off event, a series (with
  * `occurrence`, the occurrence's key, for "this" and "following"), or an
@@ -50,7 +50,7 @@ export const eventRoutes: FastifyPluginAsync<FeatureContext> = async (app, { db,
     const userId = currentUserId(request);
     const id = eventId(request.params.id);
     const patch = eventPatchSchema.parse(request.body);
-    return updateEvent({ db, events }, userId, id, patch);
+    return updateEvent({ db, events }, userId, id, patch, settings.get(userId).timeZone);
   });
 
   app.delete<IdParams>("/api/events/:id", (request, reply) => {

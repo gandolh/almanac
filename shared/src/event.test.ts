@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  EVENT_LENGTH_MAX_DAYS,
+  REPEAT_UNTIL_MAX,
   compareOccurrences,
   eventChangesSchema,
   eventInputSchema,
@@ -11,6 +13,7 @@ import {
   seriesOccurrenceId,
   type Occurrence,
 } from "./event.js";
+import { addDays } from "./time.js";
 
 const timed = {
   calendarId: 1,
@@ -60,6 +63,17 @@ describe("eventInputSchema", () => {
     ).toBe("end: must be after the start");
   });
 
+  it("refuses an event longer than EVENT_LENGTH_MAX_DAYS, timed or all-day", () => {
+    const last = addDays("2026-10-16", EVENT_LENGTH_MAX_DAYS);
+    const tooLong = `end: must be at most ${EVENT_LENGTH_MAX_DAYS} days after the start`;
+    expect(eventInputSchema.safeParse({ ...timed, start: "2026-10-16T07:00:00Z", end: `${last}T07:00:00Z` }).success).toBe(true);
+    expect(issue(eventInputSchema.safeParse({ ...timed, start: "2026-10-16T07:00:00Z", end: `${last}T07:00:01Z` }))).toBe(tooLong);
+    const allDay = { ...timed, allDay: true, start: "2026-10-16" };
+    expect(eventInputSchema.safeParse({ ...allDay, end: last }).success).toBe(true);
+    expect(issue(eventInputSchema.safeParse({ ...allDay, end: addDays(last, 1) }))).toBe(tooLong);
+    expect(issue(eventInputSchema.safeParse({ ...allDay, end: "9999-12-31" }))).toBe(tooLong);
+  });
+
   it("trims the title, and refuses a blank or long one and unknown keys", () => {
     expect(eventInputSchema.parse({ ...timed, title: "  Standup  " }).title).toBe("Standup");
     expect(issue(eventInputSchema.safeParse({ ...timed, title: "   " }))).toBe("title: an event needs a title");
@@ -82,6 +96,13 @@ describe("repeatSchema", () => {
     for (const end of [{ type: "never" }, { type: "until", date: "2026-12-01" }, { type: "count", count: 730 }]) {
       expect(repeatSchema.safeParse({ freq: "daily", end }).success, end.type).toBe(true);
     }
+  });
+
+  it("refuses an end date after REPEAT_UNTIL_MAX, which a zone behind UTC would push past the year 9999", () => {
+    expect(repeatSchema.safeParse({ freq: "daily", end: { type: "until", date: REPEAT_UNTIL_MAX } }).success).toBe(true);
+    expect(issue(repeatSchema.safeParse({ freq: "daily", end: { type: "until", date: "9999-01-01" } }))).toBe(
+      `end.date: must be on or before ${REPEAT_UNTIL_MAX}`,
+    );
   });
 
   it("refuses byDay outside weekly, an empty byDay, and a count out of range", () => {

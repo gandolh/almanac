@@ -18,6 +18,7 @@ import {
 import { Temporal } from "temporal-polyfill";
 import type { Db } from "../db/open.js";
 import { ApiError } from "../errors.js";
+import type { CalendarStore } from "../store/calendars.js";
 import type { EventContent, EventRecord, EventStore } from "../store/events.js";
 import {
   contentOf,
@@ -51,7 +52,9 @@ import {
  *   is refused (400).
  * - **following**: the old series ends before this occurrence (`UNTIL` the
  *   day before, or `COUNT` cut to the occurrences before it), and a new series
- *   starts at this occurrence with the changes and the rest of the old end.
+ *   starts at this occurrence's slot, moved as far as the edit moved the
+ *   occurrence from where it is now (as for **all**), with the changes and the
+ *   rest of the old end. A new repeat follows this occurrence's date.
  *   Exceptions and excluded dates from this occurrence on move to the new
  *   series, re-keyed by as far as the edit moved this occurrence, and are
  *   dropped when the new rule does not generate their new key. A moved
@@ -60,18 +63,20 @@ import {
  *   occurrence (none before it that is not deleted) it is **all**. Deleting
  *   ends the old series there and drops what came after.
  * - **all**: the series row changes. When the times or the repeat change,
- *   the series moves so that this occurrence lands where the edit put it
- *   (a drag shifts every occurrence by the same wall-clock offset, a weekly
- *   repeat's days with it), and its exceptions and excluded dates are
- *   dropped. A new repeat follows this occurrence's date (monthly on its
+ *   every occurrence moves by as far as the edit moved this one from where
+ *   it is now (a drag shifts every occurrence by the same wall-clock offset,
+ *   a weekly repeat's days with it; an exception moved to another day whose
+ *   end alone changes moves nothing), and its exceptions and excluded dates
+ *   are dropped. A new repeat follows this occurrence's date (monthly on its
  *   day of the month). Changes to the title, location, notes or calendar keep the
  *   exceptions, and reach each exception that still had the series' old
  *   value (the edited occurrence takes them anyway). Deleting removes the
  *   series and its exceptions.
  *
  * One-off events ignore `scope` and `occurrence`; a one-off given a `repeat`
- * becomes a series, and `repeat: null` on a series ("all" or "following")
- * leaves this occurrence as a one-off event.
+ * becomes a series in the user's display time zone (its `tzid` changes to
+ * it), and `repeat: null` on a series ("all" or "following") leaves this
+ * occurrence as a one-off event.
  *
  * A series' start is always its first occurrence: when a repeat leaves out
  * the start's day (weekly on Monday from a Friday), the start moves forward
@@ -292,11 +297,15 @@ export function createEvent(ctx: ScopeContext, userId: string, input: EventInput
 // ---------------------------------------------------------------------------
 // Update
 
-/** `PATCH /api/events/:id`. Answers the occurrence the edit leaves (see the routes). */
-export function updateEvent(ctx: ScopeContext, userId: string, id: number, patch: EventPatch): Occurrence {
+/**
+ * `PATCH /api/events/:id`. Answers the occurrence the edit leaves (see the
+ * routes). `tzid` is the user's display time zone, which a one-off that
+ * becomes a series takes; a series keeps its own.
+ */
+export function updateEvent(ctx: ScopeContext, userId: string, id: number, patch: EventPatch, tzid: string): Occurrence {
   return ctx.db.transaction((): Occurrence => {
     const target = aim(ctx.events, userId, id, patch.scope, patch.occurrence);
-    if (target.kind === "single") return updateSingle(ctx.events, userId, target.event, patch.changes);
+    if (target.kind === "single") return updateSingle(ctx.events, userId, target.event, patch.changes, tzid);
     const next = apply(target.current, patch.changes, target.repeat);
     const repeatChanged =
       patch.changes.repeat !== undefined &&
@@ -316,13 +325,17 @@ export function updateEvent(ctx: ScopeContext, userId: string, id: number, patch
   })();
 }
 
-/** A one-off event: changed as given; a repeat makes it a series from its (new) start. */
-function updateSingle(events: EventStore, userId: string, event: EventRecord, changes: EventChanges): Occurrence {
+/**
+ * A one-off event: changed as given; a repeat makes it a series from its
+ * (new) start in `tzid`, the user's display time zone now, as a new series
+ * would be: the form worded the repeat in that zone ("Weekly on Thursday").
+ */
+function updateSingle(events: EventStore, userId: string, event: EventRecord, changes: EventChanges, tzid: string): Occurrence {
   const next = apply(contentOf(event), changes, null);
   if (next.repeat === null) return rowOccurrence(rewrite(events, userId, event.id, contentOf(next)), null);
-  const timing = seriesTiming(contentOf(next), next.repeat, next.start, event.tzid);
+  const timing = seriesTiming(contentOf(next), next.repeat, next.start, tzid);
   rewrite(events, userId, event.id, contentOf(timing));
-  events.setRrule(userId, event.id, timing.rrule);
+  events.setRrule(userId, event.id, timing.rrule, tzid);
   return firstOccurrence(events, userId, event.id);
 }
 
@@ -366,7 +379,7 @@ function spreadFields(events: EventStore, userId: string, target: Aim, fields: F
 
 /** Every occurrence. */
 function updateAll(events: EventStore, userId: string, target: Aim, next: EventInput, repeatChanged: boolean): Occurrence {
-  const { series, key, current } = target;
+  const { series, current } = target;
   const timeChanged = timesChanged(current, next);
   const fields = changedFields(current, next);
 
@@ -386,14 +399,16 @@ function updateAll(events: EventStore, userId: string, target: Aim, next: EventI
     return firstOccurrence(events, userId, series.id);
   }
 
-  // The series moves so that this occurrence's slot lands where the edit put it (nowhere, if only the repeat changed).
+  // The series moves as far as the edit moved this occurrence from where it is now (nowhere, if only the repeat
+  // changed). From where it is, not from its slot: an exception moved to Tuesday whose end alone changes moves nothing.
   const tzid = series.tzid;
-  const to = timeChanged ? next.start : key;
+  const from = current.start;
+  const to = timeChanged ? next.start : from;
   const allDay = timeChanged ? next.allDay : series.allDay;
-  const start = shift(series.start, wallDelta(key, to, tzid), allDay, tzid);
+  const start = shift(series.start, wallDelta(from, to, tzid), allDay, tzid);
   const moved = { ...contentOf(series), ...fields, allDay, ...withLength(start, timeChanged ? next : series, tzid) };
-  const repeat = repeatChanged ? next.repeat : rotate(target.repeat, dayShift(key, to, tzid));
-  // A new repeat follows this occurrence, as the form labels it ("Monthly on day 16"); an unchanged one moves with the series.
+  const repeat = repeatChanged ? next.repeat : rotate(target.repeat, dayShift(from, to, tzid));
+  // A new repeat follows this occurrence's date, as the form labels it ("Monthly on day 16"); an unchanged one moves with the series.
   const timing = seriesTiming(moved, repeat, repeatChanged ? to : start, tzid);
 
   for (const exception of target.exceptions) events.remove(userId, exception.id);
@@ -436,15 +451,25 @@ function updateFollowing(events: EventStore, userId: string, target: Aim, next: 
     return rowOccurrence(events.create(userId, { ...contentOf(next), tzid }), null);
   }
 
-  // The new series starts at this occurrence: where the edit put it, else its slot in the old series.
-  const to = timeChanged ? next.start : key;
-  const delta = wallDelta(key, to, tzid);
+  // The new series starts at this occurrence's slot, moved as far as the edit moved the occurrence from where it is
+  // now (as "all" does). At its slot that is where the edit put it; an exception moved to Tuesday whose end alone
+  // changes leaves the new series on Monday, and keeps its own Tuesday as an exception of it.
+  const from = current.start;
+  const to = timeChanged ? next.start : from;
+  const delta = wallDelta(from, to, tzid);
   const slot = { ...contentOf(series), start: key, end: occurrenceEnd(series, key) };
-  const content = timeChanged ? { ...slot, ...fields, ...withTimes(next) } : { ...slot, ...fields };
+  const allDay = timeChanged ? next.allDay : series.allDay;
+  const times = !timeChanged
+    ? {}
+    : from === key
+      ? withTimes(next)
+      : { allDay, ...withLength(shift(key, delta, allDay, tzid), next, tzid) };
+  const content = { ...slot, ...fields, ...times };
   const end = target.repeat.end;
   const rest: Repeat["end"] = end.type === "count" ? { type: "count", count: end.count - before } : end;
-  const repeat = repeatChanged ? next.repeat : { ...rotate(target.repeat, dayShift(key, to, tzid)), end: rest };
-  const timing = seriesTiming(content, repeat, content.start, tzid);
+  const repeat = repeatChanged ? next.repeat : { ...rotate(target.repeat, dayShift(from, to, tzid)), end: rest };
+  // A new repeat follows this occurrence's date, as the form words it; an unchanged one moves with the series.
+  const timing = seriesTiming(content, repeat, repeatChanged ? to : content.start, tzid);
   const created = events.create(userId, { ...contentOf(timing), tzid, rrule: timing.rrule });
 
   // What the old series had from here on moves over, as far as this occurrence moved, if it still falls on the rule.
@@ -502,5 +527,29 @@ export function deleteEvent(ctx: ScopeContext, userId: string, id: number, query
       if ((exception.originalStart ?? "") >= key) ctx.events.remove(userId, exception.id);
     }
     cutSeries(ctx.events, userId, target);
+  })();
+}
+
+// ---------------------------------------------------------------------------
+// Calendars
+
+/**
+ * `DELETE /api/calendars/:id`: the calendar and its events (the cascade),
+ * leaving the series and exceptions in other calendars consistent
+ * (`EventStore.releaseCalendar`). An occurrence moved out of the calendar
+ * stays, as a one-off; one moved into it stays deleted from its series; a
+ * series left with no occurrence goes too, as deleting its last occurrence
+ * does. `false` when the user has no such calendar. The `conflict` for the
+ * user's last calendar rolls everything back.
+ */
+export function removeCalendar(ctx: ScopeContext & { calendars: CalendarStore }, userId: string, calendarId: number): boolean {
+  return ctx.db.transaction((): boolean => {
+    for (const id of ctx.events.releaseCalendar(userId, calendarId)) {
+      const series = ctx.events.get(userId, id);
+      if (series && isSeries(series) && nextKey(series, series.start, new Set(series.exdates)) === undefined) {
+        ctx.events.remove(userId, id);
+      }
+    }
+    return ctx.calendars.remove(userId, calendarId);
   })();
 }

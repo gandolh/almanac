@@ -19,8 +19,9 @@ export type SearchQuery = z.infer<typeof searchQuerySchema>;
 
 /**
  * What a search answers: up to `SEARCH_LIMIT` matching occurrences, by start
- * in the user's display time zone (`compareOccurrences`). A series
- * contributes one occurrence (brief 04).
+ * in the user's display time zone (`compareOccurrences`). With more matches,
+ * the ones closest to now: those not over yet, then the latest past ones. A
+ * series contributes one occurrence (brief 04).
  */
 export const searchResponseSchema = z.object({ results: z.array(occurrenceSchema) });
 export type SearchResponse = z.infer<typeof searchResponseSchema>;

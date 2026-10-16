@@ -56,6 +56,26 @@ way back. FullCalendar only ever sees concrete occurrences.
   "this" and "following" need the occurrence key. A key that isn't a live
   occurrence is 404.
 - Search shows a series once, at its first occurrence that hasn't ended
-  (or its last one), and a matching exception as itself.
+  (or its last one), and a matching exception as itself. With more than 50
+  matches it keeps the 50 closest to now (those not over yet, soonest first,
+  then the latest past ones) and shows them by date.
+- A one-off given a repeat becomes a series in the display time zone it is
+  edited in, which becomes its `tzid`.
+- "All" moves the series by as far as the edit moved the occurrence from
+  where it is now, so on an exception moved to another day, changing only
+  the end moves nothing.
+- An event lasts at most `EVENT_LENGTH_MAX_DAYS` (3660 days), and a repeat
+  ends on `REPEAT_UNTIL_MAX` (9998-12-31) at the latest, so `UNTIL` in UTC
+  keeps a four-digit year. A series that still fails to expand is logged and
+  left out of `GET /api/occurrences` and `GET /api/search`; the rest
+  answers.
+- "Following" starts the new series the same way: at this occurrence's slot,
+  moved as far as the edit moved the occurrence from where it is now, and a
+  new repeat follows the occurrence's own date.
 - Changing the display time zone leaves each series anchored in the zone it
   was created in; only the display shifts.
+- A wall-clock time that doesn't exist (inside the spring-forward hour, e.g.
+  03:30 on 29 March 2026 in Bucharest) is skipped by rrule-temporal rather
+  than moved to 04:30 as RFC 5545 asks, and doesn't count toward `COUNT`.
+  Known and accepted (review 2026-10-16); only events between 03:00 and
+  04:00 on one night a year are affected.

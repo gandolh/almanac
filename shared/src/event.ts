@@ -22,11 +22,20 @@ export const repeatFreqSchema = z.enum(REPEAT_FREQS);
 export type RepeatFreq = z.infer<typeof repeatFreqSchema>;
 
 export const REPEAT_COUNT_MAX = 730;
+/**
+ * The last end date a repeat takes. A timed series' `UNTIL` is the end date's
+ * last second in its zone, as UTC (`repeat.ts`): from a zone behind UTC,
+ * 31 December 9999 would be in the year 10000, which no instant here can be.
+ */
+export const REPEAT_UNTIL_MAX = "9998-12-31";
 
-/** How a series ends: never, after a date (inclusive, in the series' zone), or after a number of occurrences. */
+/** How a series ends: never, after a date (inclusive, in the series' zone, at most `REPEAT_UNTIL_MAX`), or after a number of occurrences. */
 export const repeatEndSchema = z.discriminatedUnion("type", [
   z.strictObject({ type: z.literal("never") }),
-  z.strictObject({ type: z.literal("until"), date: dateSchema }),
+  z.strictObject({
+    type: z.literal("until"),
+    date: dateSchema.refine((date) => date <= REPEAT_UNTIL_MAX, { message: `must be on or before ${REPEAT_UNTIL_MAX}` }),
+  }),
   z.strictObject({
     type: z.literal("count"),
     count: z
@@ -68,6 +77,12 @@ export type EditScope = z.infer<typeof editScopeSchema>;
 export const EVENT_TITLE_MAX = 200;
 export const EVENT_LOCATION_MAX = 1000;
 export const EVENT_NOTES_MAX = 20_000;
+/**
+ * The longest an event lasts, timed or all-day: ten years and a few days. A
+ * series expands by looking back from a range by its length, so an event that
+ * lasts to the year 9999 would break every range.
+ */
+export const EVENT_LENGTH_MAX_DAYS = 3660;
 
 const titleSchema = z
   .string({ error: "an event needs a title" })
@@ -101,7 +116,8 @@ const eventFields = {
  * Checks `start` and `end` against `allDay` and turns them into the wire
  * forms: instants for a timed event (any offset in, `…Z` out), dates for an
  * all-day one. The end must be after the start; for all-day that means at
- * least one day, the end being exclusive.
+ * least one day, the end being exclusive. And at most
+ * `EVENT_LENGTH_MAX_DAYS` after it.
  */
 function settleTimes<T extends { allDay: boolean; start: string; end: string }>(value: T, ctx: z.RefinementCtx): T {
   const parser = value.allDay ? dateSchema : instantSchema;
@@ -116,6 +132,11 @@ function settleTimes<T extends { allDay: boolean; start: string; end: string }>(
   // Both are in one fixed-width form, so the strings order as the times do.
   if (end.data <= start.data) {
     ctx.addIssue({ code: "custom", path: ["end"], message: "must be after the start" });
+    return z.NEVER;
+  }
+  // A date parses as its midnight in UTC, so both kinds measure the same way.
+  if (parseInstant(end.data) - parseInstant(start.data) > EVENT_LENGTH_MAX_DAYS * DAY_MS) {
+    ctx.addIssue({ code: "custom", path: ["end"], message: `must be at most ${EVENT_LENGTH_MAX_DAYS} days after the start` });
     return z.NEVER;
   }
   return { ...value, start: start.data, end: end.data };

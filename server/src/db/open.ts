@@ -20,7 +20,7 @@ export function databasePath(dataDir: string): string {
  * The vendored auth library's tables go first (`auth_migrations`, its own
  * runner, which `openAccounts` runs again as a no-op): Almanac's rows
  * reference `auth_users`, so it must exist before Almanac's migrations and
- * before any store writes.
+ * before any store writes. Both run in one transaction (`migrateAll`).
  */
 export function openDb(path: string): Db {
   if (path !== ":memory:" && path !== "") mkdirSync(dirname(path), { recursive: true });
@@ -30,11 +30,24 @@ export function openDb(path: string): Db {
     // Off by default in SQLite, per connection: without it the cascades in the schema do nothing.
     db.pragma("foreign_keys = ON");
     db.pragma("busy_timeout = 5000");
-    migrateSqlite(db);
-    migrate(db);
+    migrateAll(db);
   } catch (err) {
     db.close();
     throw err;
   }
   return db;
+}
+
+/**
+ * The auth library's migrations, then Almanac's, in one `BEGIN IMMEDIATE`
+ * transaction. Each runner reads its version before writing, so without the
+ * lock two processes opening a fresh database could both read "none" and both
+ * run the first migration; with it the second waits (`busy_timeout`) and finds
+ * nothing to do. The library's runner nests its savepoints under it.
+ */
+export function migrateAll(db: Db): void {
+  db.transaction(() => {
+    migrateSqlite(db);
+    migrate(db);
+  }).immediate();
 }

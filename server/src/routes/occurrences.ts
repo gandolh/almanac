@@ -39,6 +39,9 @@ export function seriesRepeats(events: EventStore, userId: string): (seriesId: nu
  *   the keys its exceptions replace.
  * - Exceptions, as stored, wherever they were moved to: `e<id>`, with
  *   `seriesId`, `originalStart` and the series' `repeat`.
+ *
+ * A series that throws while expanding is logged and left out; the rest of
+ * the range still answers.
  */
 export const occurrenceRoutes: FastifyPluginAsync<FeatureContext> = async (app, { events, settings }) => {
   app.get("/api/occurrences", (request): OccurrenceList => {
@@ -55,7 +58,13 @@ export const occurrenceRoutes: FastifyPluginAsync<FeatureContext> = async (app, 
       found.push(rowOccurrence(row, row.seriesId === null ? null : repeatOf(row.seriesId)));
     }
     for (const series of events.listSeries(userId, range)) {
-      if (isSeries(series)) found.push(...expandSeries(series, events.listExceptions(userId, series.id), range));
+      if (!isSeries(series)) continue;
+      try {
+        found.push(...expandSeries(series, events.listExceptions(userId, series.id), range));
+      } catch (err) {
+        // One bad row (a rule or a length the expansion can't take) costs its own occurrences, not the whole view.
+        request.log.error({ err, seriesId: series.id }, "skipped a series that would not expand");
+      }
     }
     return { occurrences: found.sort(compareOccurrences(timeZone)) };
   });

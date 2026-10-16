@@ -4,7 +4,7 @@ import { join } from "node:path";
 import Database from "better-sqlite3";
 import { afterEach, describe, expect, it } from "vitest";
 import { migrate, migrations } from "./migrations.js";
-import { databasePath, openDb, type Db } from "./open.js";
+import { databasePath, migrateAll, openDb, type Db } from "./open.js";
 
 const opened: Db[] = [];
 const dirs: string[] = [];
@@ -84,5 +84,78 @@ describe("migrate", () => {
     opened.push(db);
     migrate(db, ["CREATE TABLE a (x INTEGER)"]);
     expect(() => migrate(db, [])).toThrow(/schema version 1, but this server only knows 0/);
+  });
+});
+
+/**
+ * `db`, where the first call of `method` whose first argument matches `when`
+ * runs `rival` straight after it: another process that opened the same file
+ * at the same moment and got in between that call and the next.
+ */
+function interleaved(db: Db, method: "pragma" | "prepare", when: RegExp, rival: () => void): Db {
+  let fired = false;
+  return new Proxy(db, {
+    get(target, prop) {
+      const value: unknown = Reflect.get(target, prop, target);
+      if (typeof value !== "function") return value;
+      if (prop !== method) return value.bind(target);
+      return (...args: unknown[]) => {
+        const result: unknown = value.apply(target, args);
+        if (!fired && when.test(String(args[0]))) {
+          fired = true;
+          rival();
+        }
+        return result;
+      };
+    },
+  });
+}
+
+/** A second connection to `path` that gives up at once on a locked database, as a second process would after its busy timeout. */
+function impatient(path: string): Db {
+  const db = new Database(path, { timeout: 0 });
+  db.pragma("journal_mode = WAL");
+  opened.push(db);
+  return db;
+}
+
+describe("two processes opening a fresh database at once", () => {
+  it("run migration 1 once: the second waits for the first, then has nothing to do", () => {
+    const path = databasePath(tempDir());
+    const list = ["CREATE TABLE a (x INTEGER)"];
+    const first = impatient(path);
+    let refused: unknown;
+    const second = interleaved(impatient(path), "pragma", /^user_version$/, () => {
+      // The first reads the version just after the second did, and finds the database taken.
+      try {
+        migrate(first, list);
+      } catch (error) {
+        refused = error;
+      }
+    });
+    migrate(second, list);
+    expect(refused).toMatchObject({ code: "SQLITE_BUSY" });
+    migrate(first, list);
+    expect(version(first)).toBe(1);
+    expect(tables(first)).toEqual(["a"]);
+  });
+
+  it("covers the auth library's migrations too", () => {
+    const path = databasePath(tempDir());
+    const first = impatient(path);
+    let refused: unknown;
+    // Between the auth library reading its version and running its first migration.
+    const second = interleaved(impatient(path), "prepare", /^INSERT INTO auth_migrations/, () => {
+      try {
+        migrateAll(first);
+      } catch (error) {
+        refused = error;
+      }
+    });
+    migrateAll(second);
+    expect(refused).toMatchObject({ code: "SQLITE_BUSY" });
+    migrateAll(first);
+    expect(version(first)).toBe(migrations.length);
+    expect(tables(first)).toEqual(expect.arrayContaining(["auth_users", "calendars", "events"]));
   });
 });

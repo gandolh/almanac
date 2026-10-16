@@ -1,4 +1,4 @@
-import { calendarListSchema, occurrenceSchema, searchResponseSchema, type Occurrence } from "@almanac/shared";
+import { addDays, calendarListSchema, occurrenceSchema, searchResponseSchema, type Occurrence } from "@almanac/shared";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { databasePath, openDb } from "../db/open.js";
 import { createEventStore } from "../store/events.js";
@@ -55,32 +55,59 @@ describe("GET /api/search", () => {
     expect(titles(await search("meet"))).toEqual(["Meet first", "Meet day", "Meet early", "Meet late"]);
   });
 
-  it("answers at most 50", async () => {
+  /** One-day all-day events, `count` in a row from `first`, stored on a second connection. */
+  function addRun(title: string, first: string, count: number): void {
     const db = openDb(databasePath(t.dataDir));
     try {
       const userId = (db.prepare("SELECT id FROM auth_users WHERE username = 'owner'").get() as { id: string }).id;
       const events = createEventStore(db);
       db.transaction(() => {
-        for (let i = 0; i < 60; i++) {
-          const day = String(1 + (i % 28)).padStart(2, "0");
-          events.create(userId, {
-            calendarId,
-            title: `Run ${i}`,
-            location: "",
-            notes: "",
-            allDay: true,
-            start: `2026-11-${day}`,
-            end: `2026-11-${String(2 + (i % 28)).padStart(2, "0")}`,
-            tzid: "Europe/Bucharest",
-          });
+        for (let i = 0; i < count; i++) {
+          const start = addDays(first, i);
+          events.create(userId, { calendarId, title, location: "", notes: "", allDay: true, start, end: addDays(start, 1), tzid: "Europe/Bucharest" });
         }
       })();
     } finally {
       db.close();
     }
-    const results = await search("run");
-    expect(results).toHaveLength(50);
-    expect(results[0]?.start).toBe("2026-11-01");
+  }
+
+  const run = (first: string, count: number) => Array.from({ length: count }, (_, i) => addDays(first, i));
+
+  // Long past and far ahead: whatever day the tests run, the first are over and the rest to come.
+  it("answers the 50 upcoming ones closest to now when there are more, by date", async () => {
+    addRun("Run past", "2020-01-01", 5);
+    addRun("Run ahead", "2040-01-01", 60);
+    expect((await search("run")).map((o) => o.start)).toEqual(run("2040-01-01", 50));
+  });
+
+  it("fills up to 50 with the latest past ones, by date", async () => {
+    addRun("Run past", "2020-01-01", 40);
+    addRun("Run ahead", "2040-01-01", 30);
+    expect((await search("run")).map((o) => o.start)).toEqual([...run("2020-01-21", 20), ...run("2040-01-01", 30)]);
+  });
+
+  it("skips a row it can't place, and answers the rest", async () => {
+    await create({ title: "Run" });
+    const db = openDb(databasePath(t.dataDir));
+    try {
+      const userId = (db.prepare("SELECT id FROM auth_users WHERE username = 'owner'").get() as { id: string }).id;
+      // All-day to the year 9999, daily: no write takes it now (EVENT_LENGTH_MAX_DAYS), but a row from before may be there.
+      createEventStore(db).create(userId, {
+        calendarId,
+        title: "Run forever",
+        location: "",
+        notes: "",
+        allDay: true,
+        start: "2026-10-01",
+        end: "9999-12-31",
+        tzid: "Europe/Bucharest",
+        rrule: "FREQ=DAILY",
+      });
+    } finally {
+      db.close();
+    }
+    expect(titles(await search("run"))).toEqual(["Run"]);
   });
 
   it("refuses an empty or long query with 400 validation", async () => {

@@ -24,8 +24,9 @@ export interface EventStore {
   create(userId: string, event: NewEvent): EventRecord;
   /**
    * Changes what is given and keeps the rest; `tzid`, `rrule`, `exdates` and
-   * the series link stay. `undefined` when the user has no such event.
-   * Throws a `not_found` `ApiError` for a calendar that is not the user's.
+   * the series link stay (`setRrule` changes the first two). `undefined`
+   * when the user has no such event. Throws a `not_found` `ApiError` for a
+   * calendar that is not the user's.
    */
   update(userId: string, id: number, changes: Partial<EventContent>): EventRecord | undefined;
   /** `false` when the user has no such event. A series takes its exceptions with it (cascade). */
@@ -44,10 +45,12 @@ export interface EventStore {
   /** Replaces a series' excluded occurrence keys (stored de-duplicated, sorted). `undefined` when there is no such event. */
   setExdates(userId: string, id: number, exdates: readonly string[]): EventRecord | undefined;
   /**
-   * Sets or clears a row's `rrule`. `undefined` when there is no such event.
-   * An exception cannot have one (the schema refuses it).
+   * Sets or clears a row's `rrule`, and with `tzid` the zone its wall-clock
+   * times belong to (a one-off that becomes a series takes the display time
+   * zone). `undefined` when there is no such event. An exception cannot have
+   * one (the schema refuses it).
    */
-  setRrule(userId: string, id: number, rrule: string | null): EventRecord | undefined;
+  setRrule(userId: string, id: number, rrule: string | null, tzid?: string): EventRecord | undefined;
   /**
    * Stores an exception: the occurrence `originalStart` of the series, as
    * `content`, in the series' `tzid`. `undefined` when the user has no such
@@ -65,6 +68,17 @@ export interface EventStore {
    * has an exception for the key.
    */
   moveException(userId: string, id: number, seriesId: number, originalStart: string): EventRecord | undefined;
+  /**
+   * Readies the user's calendar `calendarId` to be deleted, which takes its
+   * rows with it (the cascade), so that what stays still adds up: an
+   * exception in another calendar whose series is in this one becomes a
+   * one-off (no series link), and an exception in this one whose series is
+   * in another has its occurrence key added to that series' excluded dates,
+   * so the occurrence doesn't come back. Answers the ids of the series it
+   * excluded occurrences from. The caller holds the transaction and deletes
+   * the calendar next.
+   */
+  releaseCalendar(userId: string, calendarId: number): number[];
 }
 
 /** What an event is: the fields the API sends, as `eventInputSchema` leaves them. */
@@ -200,12 +214,23 @@ export function createEventStore(db: Db, now: () => Date = () => new Date()): Ev
   const updateExdates = db.prepare<[string, string, string, number]>(
     "UPDATE events SET exdates = ?, updated_at = ? WHERE user_id = ? AND id = ?",
   );
-  const updateRrule = db.prepare<[string | null, string, string, number]>(
-    "UPDATE events SET rrule = ?, updated_at = ? WHERE user_id = ? AND id = ?",
+  const updateRrule = db.prepare<[string | null, string | null, string, string, number]>(
+    "UPDATE events SET rrule = ?, tzid = COALESCE(?, tzid), updated_at = ? WHERE user_id = ? AND id = ?",
   );
   const updateSeriesLink = db.prepare<[number, string, string, string, number]>(
     "UPDATE events SET series_id = ?, original_start = ?, updated_at = ? WHERE user_id = ? AND id = ? AND series_id IS NOT NULL",
   );
+
+  // Both columns at once, as the CHECK wants them; NULLs never collide in the unique (series_id, original_start) index.
+  const detachFromCalendar = db.prepare<[string, string, number, string, number]>(`
+    UPDATE events SET series_id = NULL, original_start = NULL, updated_at = ?
+    WHERE user_id = ? AND calendar_id <> ?
+      AND series_id IN (SELECT id FROM events WHERE user_id = ? AND calendar_id = ?)`);
+  const strandedKeys = db.prepare<[string, number, number], { seriesId: number; originalStart: string }>(`
+    SELECT exception.series_id AS seriesId, exception.original_start AS originalStart
+    FROM events AS exception JOIN events AS series ON series.id = exception.series_id AND series.user_id = exception.user_id
+    WHERE exception.user_id = ? AND exception.calendar_id = ? AND series.calendar_id <> ?
+    ORDER BY exception.series_id, exception.original_start`);
 
   // Timed and all-day rows apart, so each half uses its own index.
   const timedInRange = db.prepare<[string, number, number], EventRow>(
@@ -282,8 +307,8 @@ export function createEventStore(db: Db, now: () => Date = () => new Date()): Ev
     return reread(userId, id);
   }
 
-  function setRrule(userId: string, id: number, rrule: string | null): EventRecord | undefined {
-    if (updateRrule.run(rrule, now().toISOString(), userId, id).changes === 0) return undefined;
+  function setRrule(userId: string, id: number, rrule: string | null, tzid?: string): EventRecord | undefined {
+    if (updateRrule.run(rrule, tzid ?? null, now().toISOString(), userId, id).changes === 0) return undefined;
     return reread(userId, id);
   }
 
@@ -295,6 +320,19 @@ export function createEventStore(db: Db, now: () => Date = () => new Date()): Ev
       return reread(userId, id);
     },
   );
+
+  const releaseCalendar = db.transaction((userId: string, calendarId: number): number[] => {
+    const keys = new Map<number, string[]>();
+    for (const { seriesId, originalStart } of strandedKeys.all(userId, calendarId, calendarId)) {
+      keys.set(seriesId, [...(keys.get(seriesId) ?? []), originalStart]);
+    }
+    for (const [seriesId, more] of keys) {
+      const series = get(userId, seriesId);
+      if (series) setExdates(userId, seriesId, [...series.exdates, ...more]);
+    }
+    detachFromCalendar.run(now().toISOString(), userId, calendarId, userId, calendarId);
+    return [...keys.keys()];
+  });
 
   function search(userId: string, query: string): EventRecord[] {
     const needle = foldSearchText(query);
@@ -318,5 +356,6 @@ export function createEventStore(db: Db, now: () => Date = () => new Date()): Ev
     insertException: (userId, seriesId, originalStart, content) =>
       insertException(userId, seriesId, originalStart, content),
     moveException: (userId, id, seriesId, originalStart) => moveException(userId, id, seriesId, originalStart),
+    releaseCalendar: (userId, calendarId) => releaseCalendar(userId, calendarId),
   };
 }

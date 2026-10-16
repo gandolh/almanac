@@ -28,8 +28,10 @@ export interface CalendarStore {
   update(userId: string, id: number, patch: CalendarPatch): Calendar | undefined;
   /**
    * `false` when the user has no such calendar. Its events go with it
-   * (cascade). Throws a `conflict` `ApiError` for the user's last calendar:
-   * a user always has one to put events on.
+   * (cascade), exceptions of its series in other calendars included: the
+   * route goes through `removeCalendar` (`recurrence/scopes.ts`), which
+   * detaches those first. Throws a `conflict` `ApiError` for the user's last
+   * calendar: a user always has one to put events on.
    */
   remove(userId: string, id: number): boolean;
   /** Creates "Personal" in blue when the user has no calendar (a new user). True when it did. */

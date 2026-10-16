@@ -317,6 +317,58 @@ describe("this and following events", () => {
     ]);
   });
 
+  /** 19 October moved to Tuesday the 20th, same time: an exception away from its slot. */
+  async function tuesdayException(seriesId: number): Promise<Occurrence> {
+    return edit(seriesId, {
+      scope: "this",
+      occurrence: OCT[19],
+      changes: { start: "2026-10-20T10:00:00+03:00", end: "2026-10-20T11:00:00+03:00" },
+    });
+  }
+
+  /** The series "following" made: the row with a rule that isn't the old series. */
+  const createdSeries = (oldId: number) => rows().find((row) => row.rrule !== null && row.id !== oldId);
+
+  it("keeps the new series on the slot when only the end of a moved exception changes", async () => {
+    const series = await create(MONDAYS);
+    const tuesday = await tuesdayException(series.eventId);
+    await edit(tuesday.eventId, { scope: "following", changes: { end: "2026-10-20T11:30:00+03:00" } });
+    const created = createdSeries(series.eventId);
+    expect(created).toMatchObject({ rrule: "FREQ=WEEKLY;BYDAY=MO", start: OCT[19] });
+    expect(rows().find((row) => row.id === tuesday.eventId)).toMatchObject({ series_id: created?.id, original_start: OCT[19] });
+    expect((await autumn()).slice(0, 4).map((o) => [o.start, o.end])).toEqual([
+      [OCT[5], "2026-10-05T08:00:00Z"],
+      [OCT[12], "2026-10-12T08:00:00Z"],
+      ["2026-10-20T07:00:00Z", "2026-10-20T08:30:00Z"],
+      [OCT[26], "2026-10-26T09:30:00Z"],
+    ]);
+  });
+
+  it("shifts the new series by as far as a moved exception is dragged", async () => {
+    const series = await create(MONDAYS);
+    const tuesday = await tuesdayException(series.eventId);
+    // An hour later on its Tuesday: from the 19th on, Mondays an hour later.
+    await edit(tuesday.eventId, {
+      scope: "following",
+      changes: { start: "2026-10-20T11:00:00+03:00", end: "2026-10-20T12:00:00+03:00" },
+    });
+    const created = createdSeries(series.eventId);
+    expect(created).toMatchObject({ rrule: "FREQ=WEEKLY;BYDAY=MO", start: "2026-10-19T08:00:00Z" });
+    expect(rows().find((row) => row.id === tuesday.eventId)).toMatchObject({
+      series_id: created?.id,
+      original_start: "2026-10-19T08:00:00Z",
+    });
+    expect((await autumn()).slice(2, 4).map((o) => o.start)).toEqual(["2026-10-20T08:00:00Z", "2026-10-26T09:00:00Z"]);
+  });
+
+  it("follows a moved exception's own date for a new repeat from there", async () => {
+    const series = await create(MONDAYS);
+    const tuesday = await tuesdayException(series.eventId);
+    const first = await edit(tuesday.eventId, { scope: "following", changes: { repeat: { freq: "monthly", end: never } } });
+    expect(first).toMatchObject({ start: "2026-10-20T07:00:00Z", repeat: { freq: "monthly", end: never } });
+    expect(createdSeries(series.eventId)).toMatchObject({ rrule: "FREQ=MONTHLY;BYMONTHDAY=20" });
+  });
+
   it("moves the chosen weekdays with a drag to another day", async () => {
     const series = await create({ ...MONDAYS, repeat: { freq: "weekly", byDay: ["MO", "WE"], end: never } });
     // Wednesday 14 October dragged to Thursday: from then on, Tuesdays and Thursdays.
@@ -462,6 +514,51 @@ describe("all events", () => {
       [OCT[19], "2026-10-19T08:30:00Z"],
       [OCT[26], "2026-10-26T09:30:00Z"],
     ]);
+  });
+
+  it("moves the series only as far as a moved exception moves, not by where it was moved to", async () => {
+    const series = await create(MONDAYS);
+    const tuesday = await edit(series.eventId, {
+      scope: "this",
+      occurrence: OCT[19],
+      changes: { start: "2026-10-20T10:00:00+03:00", end: "2026-10-20T11:00:00+03:00" },
+    });
+    // Only the end changes: every occurrence gets longer, and stays on Monday at 10:00.
+    const longer = await edit(tuesday.eventId, { scope: "all", changes: { end: "2026-10-20T11:30:00+03:00" } });
+    expect(longer).toMatchObject({ start: OCT[5], end: "2026-10-05T08:30:00Z", repeat: { freq: "weekly", byDay: ["MO"] } });
+    expect(rows()).toMatchObject([{ id: series.eventId, rrule: "FREQ=WEEKLY;BYDAY=MO" }]);
+    expect((await autumn()).slice(2, 4).map((o) => [o.start, o.end])).toEqual([
+      [OCT[19], "2026-10-19T08:30:00Z"],
+      [OCT[26], "2026-10-26T09:30:00Z"],
+    ]);
+  });
+
+  it("shifts the series by as far as a moved exception is dragged", async () => {
+    const series = await create(MONDAYS);
+    const tuesday = await edit(series.eventId, {
+      scope: "this",
+      occurrence: OCT[19],
+      changes: { start: "2026-10-20T10:00:00+03:00", end: "2026-10-20T11:00:00+03:00" },
+    });
+    // An hour later on its Tuesday: the Mondays move an hour later, and stay Mondays.
+    const first = await edit(tuesday.eventId, {
+      scope: "all",
+      changes: { start: "2026-10-20T11:00:00+03:00", end: "2026-10-20T12:00:00+03:00" },
+    });
+    expect(first).toMatchObject({ start: "2026-10-05T08:00:00Z", end: "2026-10-05T09:00:00Z", repeat: { byDay: ["MO"] } });
+    expect(rows()).toMatchObject([{ id: series.eventId, rrule: "FREQ=WEEKLY;BYDAY=MO" }]);
+  });
+
+  it("follows a moved exception's own date for a new repeat, as the form words it", async () => {
+    const series = await create(MONDAYS);
+    const tuesday = await edit(series.eventId, {
+      scope: "this",
+      occurrence: OCT[19],
+      changes: { start: "2026-10-20T10:00:00+03:00", end: "2026-10-20T11:00:00+03:00" },
+    });
+    const first = await edit(tuesday.eventId, { scope: "all", changes: { repeat: { freq: "monthly", end: never } } });
+    expect(first).toMatchObject({ start: "2026-10-20T07:00:00Z", repeat: { freq: "monthly", end: never } });
+    expect(rows()).toMatchObject([{ id: series.eventId, rrule: "FREQ=MONTHLY;BYMONTHDAY=20" }]);
   });
 
   it("changes the repeat and drops the exceptions and deleted dates", async () => {

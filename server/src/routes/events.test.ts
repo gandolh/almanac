@@ -1,4 +1,4 @@
-import { calendarListSchema, occurrenceSchema, type Occurrence } from "@almanac/shared";
+import { EVENT_LENGTH_MAX_DAYS, REPEAT_UNTIL_MAX, calendarListSchema, occurrenceSchema, type Occurrence } from "@almanac/shared";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { databasePath, openDb } from "../db/open.js";
 import { startSignedInApp, type SignedInTestApp } from "../testing/testApp.js";
@@ -133,6 +133,20 @@ describe("POST /api/events", () => {
     expectError(await post({ freq: "monthly", byDay: ["MO"], end: { type: "never" } }), 400, "validation");
   });
 
+  it("refuses an event longer than EVENT_LENGTH_MAX_DAYS", async () => {
+    const res = await t.inject({ method: "POST", url: "/api/events", payload: { ...standup(), allDay: true, start: "2026-10-01", end: "9999-12-31" } });
+    expect(expectError(res, 400, "validation")).toBe(`end: must be at most ${EVENT_LENGTH_MAX_DAYS} days after the start`);
+  });
+
+  it("refuses a repeat ending after REPEAT_UNTIL_MAX, which a zone behind UTC would push past the year 9999", async () => {
+    await t.inject({ method: "PATCH", url: "/api/settings", payload: { timeZone: "America/New_York" } });
+    const until = (date: string) => ({ ...standup(), repeat: { freq: "daily", end: { type: "until", date } } });
+    const res = await t.inject({ method: "POST", url: "/api/events", payload: until("9999-12-31") });
+    expect(expectError(res, 400, "validation")).toBe(`repeat.end.date: must be on or before ${REPEAT_UNTIL_MAX}`);
+    const last = await create(until(REPEAT_UNTIL_MAX));
+    expect(last.repeat).toEqual({ freq: "daily", end: { type: "until", date: REPEAT_UNTIL_MAX } });
+  });
+
   it("refuses a bad body naming the field", async () => {
     const bad = async (payload: object) =>
       expectError(await t.inject({ method: "POST", url: "/api/events", payload }), 400, "validation");
@@ -166,6 +180,22 @@ describe("PATCH /api/events/:id", () => {
       payload: { changes: { end: "2026-10-16T06:00:00Z" } },
     });
     expect(expectError(backwards, 400, "validation")).toBe("end: must be after the start");
+  });
+
+  it("checks the length once the changes are merged, for a one-off and a series", async () => {
+    const tooLong = `end: must be at most ${EVENT_LENGTH_MAX_DAYS} days after the start`;
+    const event = await create(standup());
+    const far = { end: "2037-01-01T07:00:00Z" };
+    expect(expectError(await t.inject({ method: "PATCH", url: `/api/events/${event.eventId}`, payload: { changes: far } }), 400, "validation")).toBe(tooLong);
+    const series = await create({ ...standup(), repeat: { freq: "weekly", end: { type: "never" } } });
+    for (const scope of ["this", "following", "all"]) {
+      const res = await t.inject({
+        method: "PATCH",
+        url: `/api/events/${series.eventId}`,
+        payload: { scope, occurrence: "2026-10-23T07:00:00Z", changes: far },
+      });
+      expect(expectError(res, 400, "validation"), scope).toBe(tooLong);
+    }
   });
 
   it("turns a timed event all-day, and needs dates to do it", async () => {
@@ -219,6 +249,23 @@ describe("PATCH /api/events/:id", () => {
     const back = await t.inject({ method: "PATCH", url, payload: { scope: "all", changes: { repeat: null } } });
     expect(occurrenceSchema.parse(back.json())).toEqual(event);
     expect(storedRow(event.eventId)).toMatchObject({ rrule: null });
+  });
+
+  it("makes a one-off a series in the display time zone it is in now, and keeps that zone on the row", async () => {
+    // Friday 05:00 in Bucharest, where it was made; Thursday 22:00 in New York, where the user is now.
+    const event = await create({ ...standup(), start: "2026-10-16T02:00:00Z", end: "2026-10-16T03:00:00Z" });
+    await t.inject({ method: "PATCH", url: "/api/settings", payload: { timeZone: "America/New_York" } });
+    const res = await t.inject({
+      method: "PATCH",
+      url: `/api/events/${event.eventId}`,
+      payload: { changes: { repeat: { freq: "weekly", end: { type: "never" } } } },
+    });
+    expect(res.statusCode, res.body).toBe(200);
+    expect(res.json()).toMatchObject({ start: "2026-10-16T02:00:00Z", repeat: { freq: "weekly", byDay: ["TH"] } });
+    expect(storedRow(event.eventId)).toMatchObject({ tzid: "America/New_York", rrule: "FREQ=WEEKLY;BYDAY=TH" });
+    // Still 22:00 on Thursdays once New York's summer time ends on 1 November.
+    const after = await t.inject({ method: "GET", url: "/api/occurrences?from=2026-11-02T00:00:00Z&to=2026-11-09T00:00:00Z" });
+    expect((after.json() as { occurrences: Occurrence[] }).occurrences.map((o) => o.start)).toEqual(["2026-11-06T03:00:00Z"]);
   });
 
   it("answers 404 for a bad id or one that does not exist", async () => {

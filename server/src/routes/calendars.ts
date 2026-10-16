@@ -3,6 +3,7 @@ import type { FastifyPluginAsync } from "fastify";
 import type { FeatureContext } from "../app.js";
 import { currentUserId } from "../auth/guard.js";
 import { ApiError } from "../errors.js";
+import { removeCalendar } from "../recurrence/scopes.js";
 
 interface IdParams {
   Params: { id: string };
@@ -21,9 +22,10 @@ function calendarId(raw: string): number {
  * The calendar routes (brief 03), each scoped to the signed-in user. A list
  * answers `{ calendars }`; one calendar answers the calendar itself. A user
  * always has a calendar: the list makes "Personal" for a new user, and the
- * last one cannot be deleted (409 `conflict`).
+ * last one cannot be deleted (409 `conflict`). Deleting one takes its events,
+ * and keeps the repeating events in other calendars whole (`removeCalendar`).
  */
-export const calendarRoutes: FastifyPluginAsync<FeatureContext> = async (app, { calendars }) => {
+export const calendarRoutes: FastifyPluginAsync<FeatureContext> = async (app, { db, calendars, events }) => {
   app.get("/api/calendars", (request): CalendarList => {
     const userId = currentUserId(request);
     calendars.ensureDefault(userId);
@@ -47,7 +49,7 @@ export const calendarRoutes: FastifyPluginAsync<FeatureContext> = async (app, { 
 
   app.delete<IdParams>("/api/calendars/:id", (request, reply) => {
     const userId = currentUserId(request);
-    if (!calendars.remove(userId, calendarId(request.params.id))) throw noSuchCalendar();
+    if (!removeCalendar({ db, calendars, events }, userId, calendarId(request.params.id))) throw noSuchCalendar();
     return reply.code(204).send();
   });
 };

@@ -8,8 +8,10 @@ updated: 2026-10-16
 Migration 1 in `server/src/db/migrations.ts` (brief 03). The vendored Ward
 library keeps its own tables (`auth_users`, `auth_sessions`,
 `auth_ward_links`) and its own version table; `openDb` runs its migration
-first so the foreign keys below always have a target. The code wins where
-this page and it disagree.
+first so the foreign keys below always have a target. Both runners go in one
+`BEGIN IMMEDIATE` transaction (`migrateAll`), so two processes opening a
+fresh database take turns instead of both running migration 1. The code
+wins where this page and it disagree.
 
 ## Tables
 
@@ -35,7 +37,11 @@ and `end_at` (UTC ms), all-day rows set `start_date` and `end_date`
 zone when the row was written, which anchors a series' wall-clock times);
 `exdates` (JSON array of deleted occurrence keys); `search_text` (title,
 location and notes, lower-cased with diacritics stripped, so "sedinta" finds
-"Ședință"). Deleting a series cascades to its exceptions.
+"Ședință"). Deleting a series cascades to its exceptions. Deleting a
+calendar first keeps the rest consistent (`removeCalendar` in
+`server/src/recurrence/scopes.ts`): an exception in another calendar whose
+series goes becomes a one-off, an exception that goes adds its key to its
+series' `exdates` elsewhere, and a series left with no occurrence goes too.
 
 **`user_settings`**: `user_id` PK, `time_zone` (default
 `Europe/Bucharest`). No row means the default.
