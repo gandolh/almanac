@@ -16,6 +16,7 @@
     "dev": "tsc -b shared && concurrently --names server,web --kill-others-on-fail \"npm run dev -w @almanac/server\" \"npm run dev -w @almanac/web\"",
     "build": "tsc -b && npm run build -w @almanac/web",
     "start": "node server/dist/index.js",
+    "pretest": "tsc -b shared",
     "test": "vitest run",
     "typecheck": "tsc -b && tsc -p web --noEmit",
     "lint": "eslint ."

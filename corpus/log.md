@@ -41,3 +41,10 @@ Ward auth plugin registered first, origin guard, `currentUserId` in
 `auth/guard.ts`, seed, multi-user test helpers (`signInAs`), and the web
 login, auth gate and change-password dialog copied from Shelfmark with a
 Google-like light palette. See [the brief](briefs/done/02-accounts-and-sign-in.md).
+
+## [2026-10-16] done | Brief 03: calendars, events and settings API
+
+Migration 1, the calendar, event and settings stores, and every route shape,
+with repeats refused until brief 04. Per-user scoping with 404 for other
+users' ids. New wiki page [data-model.md](wiki/data-model.md). See
+[the brief](briefs/done/03-calendars-and-events-api.md).

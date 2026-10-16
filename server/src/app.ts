@@ -5,12 +5,26 @@ import { registerOriginGuard } from "./auth/guard.js";
 import { AUTH_ROUTE_PREFIX, type Config } from "./config.js";
 import { databasePath, openDb, type Db } from "./db/open.js";
 import { registerErrorHandling } from "./errors.js";
+import { calendarRoutes } from "./routes/calendars.js";
+import { eventRoutes } from "./routes/events.js";
+import { occurrenceRoutes } from "./routes/occurrences.js";
+import { searchRoutes } from "./routes/search.js";
+import { settingsRoutes } from "./routes/settings.js";
+import { createCalendarStore, type CalendarStore } from "./store/calendars.js";
+import { createEventStore, type EventStore } from "./store/events.js";
+import { createSettingsStore, type SettingsStore } from "./store/settings.js";
 
 /** What every feature is handed. Add a field only when more than one feature needs it. */
 export interface FeatureContext {
   config: Config;
   /** The one connection, migrated, closed with the app. */
   db: Db;
+  /** The user's calendars (brief 03): the calendar routes. */
+  calendars: CalendarStore;
+  /** Events, series and exceptions (brief 03): the event, occurrence and search routes. */
+  events: EventStore;
+  /** The display time zone (brief 03): the settings routes, and every route that turns times into dates. */
+  settings: SettingsStore;
 }
 
 /** The session cookie's name. Unique in the estate: every app shares one origin. */
@@ -86,7 +100,14 @@ export type Feature = (app: FastifyInstance, ctx: FeatureContext) => PromiseLike
  * nowhere else in this file. `signIn` stays first: a route set up before it
  * would have no guard.
  */
-const FEATURES: Feature[] = [signIn];
+const FEATURES: Feature[] = [
+  signIn,
+  (app, ctx) => app.register(calendarRoutes, ctx),
+  (app, ctx) => app.register(eventRoutes, ctx),
+  (app, ctx) => app.register(occurrenceRoutes, ctx),
+  (app, ctx) => app.register(searchRoutes, ctx),
+  (app, ctx) => app.register(settingsRoutes, ctx),
+];
 
 export interface BuildAppOptions {
   /** Fastify's logger option. Default off; `index.ts` turns it on. */
@@ -124,7 +145,13 @@ export async function buildApp(config: Config, options: BuildAppOptions = {}): P
 
   app.get("/api/health", async () => ({ status: "ok" }));
 
-  const ctx: FeatureContext = { config, db };
+  const ctx: FeatureContext = {
+    config,
+    db,
+    calendars: createCalendarStore(db),
+    events: createEventStore(db),
+    settings: createSettingsStore(db),
+  };
   for (const feature of FEATURES) await feature(app, ctx);
 
   return app;

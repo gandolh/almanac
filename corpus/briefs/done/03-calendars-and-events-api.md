@@ -112,3 +112,14 @@ server/src/app.ts             (add stores to FeatureContext and routes to FEATUR
   404.
 - Hand back the exact exported schema and type names and the store
   interfaces for briefs 04-11.
+
+## Outcome
+
+_2026-10-16_. Built as specified, 224 tests. Outside the list: `db/open.ts`
+runs the Ward library's migration before Almanac's so the `auth_users`
+foreign keys always resolve; the root `package.json` gained `pretest: tsc -b
+shared`; the controller updated `auth/accounts.test.ts`, which assumed an
+empty migration list. No CHECK on `calendars.color` (zod checks it).
+`isIanaZone` keeps the name as given rather than Intl's canonical one
+(`Europe/Kyiv` stays). POST and PATCH answer an occurrence. Schema:
+[data-model.md](../../wiki/data-model.md).

@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { afterEach, describe, expect, it } from "vitest";
+import { migrations } from "../db/migrations.js";
 import { openDb, type Db } from "../db/open.js";
 import { USER_ROLE, openAccounts, seedUser } from "./accounts.js";
 
@@ -51,7 +52,7 @@ describe("seedUser", () => {
 
   it("keeps the library's tables out of Almanac's schema version", async () => {
     accounts();
-    expect(db?.pragma("user_version", { simple: true })).toBe(0);
+    expect(db?.pragma("user_version", { simple: true })).toBe(migrations.length);
     const tables = db?.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE 'auth_%'").all();
     expect(tables).toEqual(expect.arrayContaining([{ name: "auth_users" }, { name: "auth_sessions" }]));
   });
