@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Almanac's icon: a calendar page on the accent (tokens.css: #0B57D0,
+       #D3E3FD, white). A header band with two binder rings, then three weeks
+       of days with today filled. The page stays inside the maskable safe zone
+       (a circle of 40% of the size around the centre), so the same image
+       serves as the maskable icon. No text, no gradients. -->
+  <rect width="512" height="512" fill="#0B57D0"/>
+  <!-- Drawn at 512, then grown 12% about the centre and nudged down to sit
+       in the middle; its farthest corner stays 196 from the centre (< 204.8). -->
+  <g transform="translate(0 8) translate(256 256) scale(1.12) translate(-256 -256)">
+  <rect x="136" y="150" width="240" height="226" rx="28" fill="#FFFFFF"/>
+  <path d="M136 214v-36a28 28 0 0 1 28-28h184a28 28 0 0 1 28 28v36z" fill="#D3E3FD"/>
+  <g fill="#FFFFFF" stroke="#0B57D0" stroke-width="12">
+    <rect x="190" y="122" width="28" height="60" rx="14"/>
+    <rect x="294" y="122" width="28" height="60" rx="14"/>
+  </g>
+  <g fill="#D3E3FD">
+    <rect x="165" y="231" width="32" height="32" rx="8"/>
+    <rect x="215" y="231" width="32" height="32" rx="8"/>
+    <rect x="265" y="231" width="32" height="32" rx="8"/>
+    <rect x="315" y="231" width="32" height="32" rx="8"/>
+    <rect x="165" y="279" width="32" height="32" rx="8"/>
+    <rect x="215" y="279" width="32" height="32" rx="8"/>
+    <rect x="315" y="279" width="32" height="32" rx="8"/>
+    <rect x="165" y="327" width="32" height="32" rx="8"/>
+    <rect x="215" y="327" width="32" height="32" rx="8"/>
+    <rect x="265" y="327" width="32" height="32" rx="8"/>
+    <rect x="315" y="327" width="32" height="32" rx="8"/>
+  </g>
+  <rect x="265" y="279" width="32" height="32" rx="8" fill="#0B57D0"/>
+  </g>
+</svg>

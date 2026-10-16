@@ -1,41 +1,52 @@
 /*
- * Almanac's design tokens: the one place a colour, a size of type, a radius
- * or a shadow is written down. Every other stylesheet reads these; none
- * writes a colour of its own.
+ * Almanac's design tokens: the one place a colour, a size of type, a radius,
+ * a shadow or a layout size is written down. Every other stylesheet reads
+ * these; none writes a colour of its own.
  *
- * Google Calendar's look, light only (corpus/wiki/decisions.md): white
- * surfaces, near-black text, grey hairlines, one blue accent, the system font
- * with Roboto where it is installed. There is no dark theme and no
- * `prefers-color-scheme` rule. These are brief 02's values, enough for the
- * login page and the account dialogs; brief 05 owns the final set.
+ * Google Calendar's look, played straight and light only
+ * (corpus/wiki/decisions.md): white surfaces, #1f1f1f text, #444746
+ * secondary, #dadce0 hairlines, one #0b57d0 accent, today as a filled accent
+ * circle, a 64 px top bar over a 256 px left column, the system font with
+ * Roboto where it is installed, 8 px radii and soft shadows on what floats.
+ * There is no dark theme and no `prefers-color-scheme` rule.
  */
 
 :root {
   /* --- Colour -------------------------------------------------------------- */
 
   --ground: #FFFFFF; /* page background */
-  --surface: #FFFFFF; /* panels, menus, dialogs */
+  --surface: #FFFFFF; /* panels, menus, popovers, dialogs */
   --control: #E9EEF6; /* secondary buttons */
   --field: #F0F4F9; /* filled text fields */
-  --hairline: #DADCE0; /* borders between surfaces */
+  --hairline: #DADCE0; /* borders between surfaces, the grid's lines */
   --divider: #DADCE0; /* rules inside a surface */
+  --outline: #747775; /* outlined buttons: Today, the view switcher */
   --ink: #1F1F1F; /* primary text */
-  --ink-2: #444746; /* secondary text */
-  --muted: #5F6368; /* captions, labels (6.3:1 on white) */
-  --accent: #0B57D0; /* the one interactive colour */
+  --ink-2: #444746; /* secondary text, icons */
+  --muted: #5F6368; /* captions, labels, other months' days (6.3:1 on white) */
+  --accent: #0B57D0; /* the one interactive colour, and today */
   --accent-press: #0842A0; /* pressed, link hover */
-  --accent-tint: #D3E3FD; /* an open menu button, the selection */
+  --accent-ink: #041E49; /* text on the accent tint: the chosen view */
+  --accent-tint: #D3E3FD; /* the chosen view, the shown date, an open menu button */
   --accent-tint-soft: #E8F0FE; /* a menu row under the pointer, a notice */
+  --toast-surface: #303030; /* the snackbar */
+  --toast-ink: #F2F2F2;
+  --toast-action: #A8C7FA;
 
   /* --- Derived: mixes and aliases of the above, never a new hue ----------- */
 
   --on-accent: var(--surface); /* text on the accent */
   --control-hover: color-mix(in srgb, var(--control) 92%, var(--ink));
   --control-press: color-mix(in srgb, var(--control) 84%, var(--ink));
+  /* Google's state layers: ink at 8% under the pointer, 12% pressed. */
+  --hover: color-mix(in srgb, var(--ink-2) 8%, transparent);
+  --press: color-mix(in srgb, var(--ink-2) 12%, transparent);
   --field-placeholder: var(--muted);
   --focus-ring: var(--accent);
   --selection: var(--accent-tint);
   --scrollbar-thumb: color-mix(in srgb, var(--muted) 40%, var(--ground));
+  --scrim: color-mix(in srgb, var(--ink) 32%, transparent); /* behind a dialog or the drawer */
+  --toast-hover: color-mix(in srgb, var(--toast-ink) 8%, transparent); /* the toast's buttons under the pointer */
 
   /* --- Type --------------------------------------------------------------- */
 
@@ -43,14 +54,21 @@
 
   --text-title: 34px; /* the login page's wordmark, 700, -0.02em */
   --text-title-phone: 32px;
+  --text-brand: 22px; /* "Almanac" in the top bar */
+  --text-range: 22px; /* "October 2026" in the top bar */
+  --text-range-phone: 18px;
+  --text-heading: 18px; /* a dialog's title */
   --text-action-large: 16px; /* a large primary action, 600 */
   --text-input-phone: 16px; /* fields: below 16 px iOS zooms in */
   --text-body: 15px;
-  --text-meta: 14px; /* controls on the desktop */
+  --text-meta: 14px; /* controls on the desktop, menu rows, Create */
   --text-small: 13px; /* hints and field errors */
-  --text-label: 12px; /* field labels, 600 */
+  --text-label: 12px; /* field labels, 600; the year view's days */
+  --text-mini: 11px; /* the mini-month's days and weekday initials */
+  --text-badge: 9px; /* the day's number on the phone's Today icon, 700 */
 
   --weight-regular: 400;
+  --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
 
@@ -62,22 +80,59 @@
 
   /* --- Radii -------------------------------------------------------------- */
 
-  --radius-control: 8px; /* buttons, notices */
+  --radius-small: 4px; /* a menu row, a colour swatch */
+  --radius-control: 8px; /* buttons, notices, popovers, menus */
   --radius-field: 10px; /* text fields */
-  --radius-container: 16px; /* the login panel */
+  --radius-container: 16px; /* the login panel, the Create button */
   --radius-sheet: 20px; /* dialogs */
   --radius-pill: 999px;
 
   /* --- Elevation: only what floats casts a shadow ------------------------- */
 
+  /* Google's level 1: the Create button at rest. */
+  --shadow-raised: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+  /* Level 2: the Create button under the pointer, the round phone button. */
+  --shadow-raised-hover: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+  /* Menus, popovers, the toast. */
   --shadow-float: 0 4px 8px 3px rgba(60, 64, 67, 0.15), 0 1px 3px rgba(60, 64, 67, 0.3);
+  /* Dialogs. */
+  --shadow-dialog: 0 24px 38px 3px rgba(60, 64, 67, 0.14), 0 9px 46px 8px rgba(60, 64, 67, 0.12), 0 11px 15px -7px rgba(60, 64, 67, 0.2);
 
   /* --- Sizes -------------------------------------------------------------- */
 
   --touch: 44px; /* the smallest target on a phone */
   --control-height: 34px; /* buttons on the desktop */
   --control-height-large: 48px; /* a large primary action */
+  --icon-button: 40px; /* round icon buttons: ☰ ‹ › */
+  --icon-button-small: 28px; /* the mini-month's ‹ › */
+  --outlined-height: 36px; /* Today, the view switcher */
+  --topbar-height: 64px;
+  --sidebar-width: 256px;
+  --drawer-width: 304px;
+  --create-height: 56px;
+  --fab-size: 56px;
+  --account-disc: 32px;
+  --mini-cell: 32px; /* a mini-month column */
+  --mini-day: 24px; /* its day circle */
+  --year-cell: 32px; /* a year view column */
+  --year-day: 28px; /* its day circle */
+  --day-dot: 4px; /* the "has events" dot */
+  --swatch-size: 14px; /* a calendar's colour square in the left column */
+  --popover-width: 448px;
+  --menu-width: 224px;
+  --dialog-small: 400px;
+  --dialog-medium: 560px;
+  --dialog-large: 720px;
+  --toast-width: 568px;
+  --gutter-desktop: 8px; /* the top bar's ends */
   --gutter-phone: 16px;
+
+  /* --- Layers --------------------------------------------------------------- */
+
+  --z-bar: 10;
+  --z-drawer: 50;
+  --z-float: 100; /* menus, popovers */
+  --z-toast: 200;
 
   /* --- Motion: state changes only, short, ease-out ------------------------ */
 

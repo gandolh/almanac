@@ -1,5 +1,5 @@
 ---
-summary: How repeating events work in Almanac, as built by brief 04 on 2026-10-16. The repeat presets, storing a series as one row with an RRULE plus exception rows, expanding occurrences on the server with rrule-temporal in the user's display time zone, and what each edit scope (this, this and following, all) does to the stored rows.
+summary: How repeating events work in Almanac, as built by brief 04 on 2026-10-16. The repeat presets, storing a series as one row with an RRULE plus exception rows, expanding occurrences on the server with rrule-temporal in the zone each series was created in, and what each edit scope (this, this and following, all) does to the stored rows.
 updated: 2026-10-16
 ---
 

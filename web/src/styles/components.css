@@ -1,7 +1,8 @@
 /*
- * The small components every page uses (web/src/components): Button, for
- * now; brief 05 adds the rest. Colours, sizes and shadows come from
- * tokens.css. Below 768 px is the phone, where every target is 44 px.
+ * The small components every page uses (web/src/components): Button, the
+ * round icon button, Menu, Popover, Dialog, Toast and MonthGrid. Colours,
+ * sizes and shadows come from tokens.css. Below 768 px is the phone, where
+ * every target is 44 px.
  */
 
 /* --- Button ------------------------------------------------------------------ */
@@ -121,4 +122,509 @@
     position: absolute;
     inset: calc((var(--control-height) - var(--touch)) / 2) 0;
   }
+}
+
+/* --- Icon button: ☰ ‹ › and the like, Google's round 40 px ------------------ */
+
+.icon-button {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--icon-button);
+  height: var(--icon-button);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--ink-2);
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.icon-button:hover {
+  background: var(--hover);
+}
+
+.icon-button:active {
+  background: var(--press);
+}
+
+.icon-button--small {
+  width: var(--icon-button-small);
+  height: var(--icon-button-small);
+}
+
+@media (max-width: 767.98px) {
+  /* The look stays; the target grows to 44 px. */
+  .icon-button::before {
+    content: "";
+    position: absolute;
+    inset: calc((var(--icon-button) - var(--touch)) / 2);
+  }
+
+  .icon-button--small::before {
+    inset: calc((var(--icon-button-small) - var(--touch)) / 2);
+  }
+}
+
+/* --- Menu ---------------------------------------------------------------------- */
+
+.menu-trigger__label {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.menu-trigger__label::after {
+  content: attr(data-label);
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  font-weight: var(--weight-semibold);
+  user-select: none;
+  pointer-events: none;
+}
+
+.menu {
+  position: fixed;
+  z-index: var(--z-float);
+  display: flex;
+  flex-direction: column;
+  min-width: var(--menu-width);
+  max-width: calc(100vw - 16px);
+  padding: 8px 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  color: var(--ink);
+  visibility: hidden; /* until it is placed by its button */
+}
+
+.menu[data-placed] {
+  visibility: visible;
+  animation: float-in var(--duration) var(--ease-out);
+}
+
+@keyframes float-in {
+  from {
+    transform: translateY(-4px);
+  }
+}
+
+.menu__section {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu__label {
+  padding: 6px 16px 2px;
+  color: var(--muted);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+}
+
+.menu__separator {
+  height: 1px;
+  margin: 8px 0;
+  background: var(--divider);
+}
+
+.menu__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-size: var(--text-meta);
+  text-align: left;
+}
+
+.menu__item:hover,
+.menu__item:focus {
+  background: var(--hover);
+}
+
+.menu__item:focus-visible {
+  outline-offset: -2px;
+}
+
+.menu__item:disabled {
+  color: var(--muted);
+  background: none;
+}
+
+.menu__item-label {
+  flex: 1;
+}
+
+.menu__item-detail {
+  margin-left: 12px;
+  color: var(--muted);
+  font-size: var(--text-small);
+}
+
+/* The tick's column, kept for every row of a choice so the labels line up. */
+.menu__check {
+  display: flex;
+  flex: none;
+  width: 18px;
+  color: var(--ink-2);
+}
+
+@media (max-width: 767.98px) {
+  .menu__item {
+    min-height: var(--touch);
+    font-size: var(--text-body);
+  }
+}
+
+/* --- Popover --------------------------------------------------------------------- */
+
+.popover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-float);
+  width: max-content;
+  max-width: min(var(--popover-width), calc(100vw - 16px));
+  max-height: calc(100dvh - 16px);
+  overflow: auto;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  color: var(--ink);
+  visibility: hidden; /* until it is placed by its anchor */
+}
+
+.popover:focus {
+  outline: none;
+}
+
+.popover[data-placed] {
+  visibility: visible;
+  animation: float-in var(--duration) var(--ease-out);
+}
+
+/* --- Dialog ---------------------------------------------------------------------- */
+
+.dialog {
+  max-width: none;
+  max-height: none;
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-sheet);
+  background: var(--surface);
+  box-shadow: var(--shadow-dialog);
+  color: var(--ink);
+}
+
+.dialog[open] {
+  display: flex;
+}
+
+.dialog::backdrop {
+  background: var(--scrim);
+}
+
+.dialog--small {
+  width: min(var(--dialog-small), calc(100vw - 32px));
+}
+
+.dialog--medium {
+  width: min(var(--dialog-medium), calc(100vw - 32px));
+}
+
+.dialog--large {
+  width: min(var(--dialog-large), calc(100vw - 32px));
+}
+
+/* The frame moves, not the dialog: a menu portalled into the dialog is
+   placed against the window, which a transformed dialog would break. */
+.dialog__frame {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  max-height: calc(100dvh - 48px);
+  animation: dialog-in var(--duration) var(--ease-out);
+}
+
+@keyframes dialog-in {
+  from {
+    transform: translateY(8px);
+  }
+}
+
+.dialog__head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px 8px 24px;
+}
+
+.dialog__title {
+  flex: 1;
+  min-width: 0;
+  color: var(--ink);
+  font-size: var(--text-heading);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-tight);
+}
+
+.dialog__body {
+  flex: 1;
+  min-height: 0;
+  padding: 8px 24px 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.dialog__footer {
+  display: flex;
+  flex: none;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 24px 20px;
+}
+
+/* Phone: the whole screen; the close button first, the actions along the bottom. */
+@media (max-width: 767.98px) {
+  .dialog,
+  .dialog--small,
+  .dialog--medium,
+  .dialog--large {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .dialog__frame {
+    max-height: none;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+    animation-name: sheet-in;
+    animation-duration: var(--duration-sheet);
+  }
+
+  .dialog__head {
+    flex-direction: row-reverse;
+    padding: 8px 16px 8px 8px;
+  }
+
+  .dialog__body {
+    padding: 8px var(--gutter-phone) 16px;
+  }
+
+  .dialog__footer {
+    padding: 12px var(--gutter-phone) max(12px, env(safe-area-inset-bottom));
+    border-top: 1px solid var(--divider);
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(24px);
+  }
+}
+
+/* --- Toast ------------------------------------------------------------------------ */
+
+.toaster {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: var(--z-toast);
+  display: flex;
+  max-width: min(var(--toast-width), calc(100vw - 48px));
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 48px;
+  padding: 6px 8px 6px 16px;
+  border-radius: var(--radius-small);
+  background: var(--toast-surface);
+  box-shadow: var(--shadow-float);
+  color: var(--toast-ink);
+  font-size: var(--text-meta);
+  line-height: var(--leading-tight);
+  pointer-events: auto;
+  animation: toast-in var(--duration-sheet) var(--ease-out);
+}
+
+@keyframes toast-in {
+  from {
+    transform: translateY(calc(100% + 24px));
+  }
+}
+
+.toast__message {
+  flex: 1;
+  margin-right: 8px;
+  padding: 8px 0;
+}
+
+.toast__action {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--radius-small);
+  background: none;
+  color: var(--toast-action);
+  font-size: var(--text-meta);
+  font-weight: var(--weight-medium);
+}
+
+.toast__action:hover,
+.toast__close:hover {
+  background: var(--toast-hover);
+}
+
+.toast__close {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--toast-ink);
+}
+
+.toast :focus-visible {
+  outline-color: var(--toast-action);
+}
+
+@media (max-width: 767.98px) {
+  .toaster {
+    right: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    left: 8px;
+    max-width: none;
+  }
+
+  .toast {
+    flex: 1;
+  }
+}
+
+/* --- MonthGrid: the mini-month and the year view's months -------------------------- */
+
+.month-grid {
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-variant-numeric: tabular-nums;
+}
+
+.month-grid--mini {
+  --cell: var(--mini-cell);
+  --day: var(--mini-day);
+  width: calc(var(--cell) * 7);
+  font-size: var(--text-mini);
+}
+
+.month-grid--year {
+  --cell: var(--year-cell);
+  --day: var(--year-day);
+  width: calc(var(--cell) * 7);
+  font-size: var(--text-label);
+}
+
+.month-grid__weekday {
+  width: var(--cell);
+  height: var(--day);
+  padding: 0;
+  color: var(--ink-2);
+  font-weight: var(--weight-medium);
+  text-align: center;
+}
+
+.month-grid__cell {
+  width: var(--cell);
+  height: var(--day);
+  padding: 0;
+  text-align: center;
+}
+
+.month-grid--year .month-grid__cell {
+  height: calc(var(--day) + 2px);
+}
+
+.month-grid__day {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--day);
+  height: var(--day);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--ink);
+  font-size: inherit;
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.month-grid__day:hover {
+  background: var(--hover);
+}
+
+.month-grid__day[data-outside] {
+  color: var(--muted);
+  font-weight: var(--weight-regular);
+}
+
+/* The date the main view is on: a light accent circle. */
+.month-grid__day[data-selected],
+.month-grid__day[data-selected]:hover {
+  background: var(--accent-tint);
+  color: var(--accent-ink);
+}
+
+/* Today: the filled accent circle, everywhere. */
+.month-grid__day[data-today],
+.month-grid__day[data-today]:hover {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.month-grid__day[data-today]:hover {
+  background: var(--accent-press);
+}
+
+.month-grid__day:focus-visible {
+  outline-offset: 0;
+}
+
+/* A day with events: a dot under the number. */
+.month-grid__dot {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  width: var(--day-dot);
+  height: var(--day-dot);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  transform: translateX(-50%);
+}
+
+.month-grid__day[data-today] .month-grid__dot {
+  background: var(--on-accent);
 }

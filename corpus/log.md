@@ -55,3 +55,11 @@ Repeat presets as RRULEs, server-side expansion with rrule-temporal in the
 series' zone, and the three edit scopes for edit and delete. The as-built
 rules are in [recurrence.md](wiki/recurrence.md). See
 [the brief](briefs/done/04-repeating-events.md).
+
+## [2026-10-16] done | Brief 05: app shell, routes, dates and tokens
+
+Google-style top bar, sidebar with mini-month, drawer on phones, view routes
+`/<view>/y/m/d`, `dates.ts` on Temporal, calendar and settings data hooks,
+shortcuts and commands, Popover, Dialog, Toast, MonthGrid, the home-screen
+icon, and stubs for briefs 06-10. `.gitignore` fixed so `web/src/data/` is
+tracked. See [the brief](briefs/done/05-app-shell.md).

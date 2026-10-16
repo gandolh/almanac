@@ -24,7 +24,7 @@ review round.
 | 02 | [Accounts and sign-in](../briefs/done/02-accounts-and-sign-in.md) | done |
 | 03 | [Calendars, events and settings API](../briefs/done/03-calendars-and-events-api.md) | done |
 | 04 | [Repeating events](../briefs/done/04-repeating-events.md) | done |
-| 05 | [App shell, routes, dates, tokens](../briefs/todo/05-app-shell.md) | todo |
+| 05 | [App shell, routes, dates, tokens](../briefs/done/05-app-shell.md) | done |
 | 06 | [Day, week and month views](../briefs/todo/06-day-week-month-views.md) | todo |
 | 07 | [Creating and editing events](../briefs/todo/07-creating-and-editing-events.md) | todo |
 | 08 | [Year view](../briefs/todo/08-year-view.md) | todo |

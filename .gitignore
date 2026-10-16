@@ -14,6 +14,8 @@ vite.config.ts.timestamp-*
 
 # The SQLite database
 data/
+# …but not the web app's data layer (web/src/data), which is source.
+!web/src/data/
 
 # Local dev certificates
 *.pem

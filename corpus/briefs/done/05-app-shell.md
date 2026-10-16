@@ -116,3 +116,14 @@ web/src/search/SearchResults.tsx      STUB, replaced by brief 10
   the mini-month and the keys move between views and dates and the URL
   follows; reload keeps the place; the phone width shows the drawer.
 - Hand back every stub signature and the data hook shapes as built.
+
+## Outcome
+
+_2026-10-16_. Built and checked signed in, in a browser, desktop and 375 px.
+Departures: `.gitignore` gained `!web/src/data/` because the root `data/`
+rule hid the data layer; `web/src/App.test.ts` was replaced by layout and
+component tests; the phone bar has no ‹ ›, a sideways swipe steps the view
+instead (`layout/swipe.ts`, opt out with `data-no-swipe`), as in Google's
+app; today is the filled accent circle everywhere; a round Create button on
+phones; the sidebar's open state is remembered per browser. Stubs import
+`styles/stubs.css`, to be deleted after the last stub goes.
