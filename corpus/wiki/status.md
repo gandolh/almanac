@@ -1,6 +1,6 @@
 ---
 summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds, 623 tests. Pushed to gandolh/almanac on GitHub, not deployed. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
-updated: 2026-10-16
+updated: 2026-10-23
 ---
 
 # Status
@@ -64,6 +64,7 @@ since the evening of 2026-10-16. Nothing is deployed.
 | 09 | [Calendars and time zone](../briefs/done/09-calendars-and-time-zone.md) | done |
 | 10 | [Search](../briefs/done/10-search.md) | done |
 | 11 | [Deploy and docs](../briefs/done/11-deploy-and-docs.md) | done |
+| 12 | [Base UI under Dialog, Popover, Menu and the drawer](../briefs/todo/12-base-ui-primitives.md) | todo, filed 2026-10-23 |
 
 ## Todos
 

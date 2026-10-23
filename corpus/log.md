@@ -143,3 +143,11 @@ section, which is now a pointer), `architecture.md`, and `images/` with
 `shots.md` and `demo-seed.mjs`. The images come from a throwaway clone with a
 made-up `demo` account. [status.md](wiki/status.md) caught up: `main` is
 pushed, `../wzd_auth`'s `22e1fd2` too, and `../vps-deploy` has no remote.
+
+## [2026-10-23] todo | Brief 12 filed: Base UI under the primitives
+
+The owner asked for Base UI in the apps that still hand-build their widgets.
+[Brief 12](briefs/todo/12-base-ui-primitives.md) rebuilds `Dialog`, `Popover`,
+`Menu` and the phone drawer on Base UI, keeping their props, and deletes
+`layer.ts`. They move together because a Base UI modal traps focus away from
+a hand-built popover. Native selects, checkboxes and radios stay.
