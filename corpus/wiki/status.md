@@ -69,8 +69,12 @@ not pushed; 618 tests pass (the five removed tested deleted code).
 | 10 | [Search](../briefs/done/10-search.md) | done |
 | 11 | [Deploy and docs](../briefs/done/11-deploy-and-docs.md) | done |
 | 12 | [Base UI under Dialog, Popover, Menu and the drawer](../briefs/done/12-base-ui-primitives.md) | done 2026-10-23, local commits, not pushed |
+| 13 | [Fix the stale app lists in sibling repos](../briefs/todo/13-sibling-repo-listings.md) | todo (filed 2026-10-23) |
+| 14 | [Phone notifications 1: the worker and the push subscription](../briefs/todo/14-push-subscription-and-worker.md) | todo (filed 2026-10-23) |
+| 15 | [Phone notifications 2: a reminder on each event](../briefs/todo/15-a-reminder-on-each-event.md) | todo (filed 2026-10-23); independent of 14 |
+| 16 | [Phone notifications 3: send due reminders](../briefs/todo/16-send-due-reminders.md) | todo (filed 2026-10-23); after 14 and 15 |
 
 ## Todos
 
-- v1.x: [phone notifications](../todos/phone-notifications.md).
-- later: [stale counts in sibling repos](../todos/sibling-repo-listings.md).
+- None open. Phone notifications became briefs 14–16 and the sibling-repo counts
+  brief 13 (2026-10-23).

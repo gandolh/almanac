@@ -164,3 +164,16 @@ static-markup dialog tests mock Base UI's dialog with
 `components/dialog-stub.ts`. 618 tests, typecheck, lint and build pass; before
 and after screenshots at 1440 and 390 px match. The decision is in
 [decisions.md](wiki/decisions.md).
+
+## [2026-10-23] todo | Briefs 13–16 from the two open todos
+
+[13](briefs/todo/13-sibling-repo-listings.md) fixes the stale app lists in
+`../wzd_auth` (README, the OIDC runbook's redirect table) and `../shelfmark` (the obsolete
+"redeploy Ward's UI" step), one commit per repo; the vps-deploy count was already right
+(39 stacks). Phone notifications split into three: [14](briefs/todo/14-push-subscription-and-worker.md)
+a push-only service worker, VAPID keys and stored subscriptions, copied from Satchel's
+code; [15](briefs/todo/15-a-reminder-on-each-event.md) one reminder per event, off by
+default, with the choices phone calendars offer; [16](briefs/todo/16-send-due-reminders.md)
+a one-minute timer that sends due reminders once, expands series only over the window,
+and skips anything more than 15 minutes stale after a restart. 16 replaces the "No
+reminders in v1" decision when it ships.

@@ -1,9 +1,14 @@
 ---
 title: Phone notifications before events
 created: 2026-10-16
-status: open
+status: promoted
 tags: [v1.x]
 ---
+
+Promoted 2026-10-23 into three briefs, built in order:
+[14](../briefs/todo/14-push-subscription-and-worker.md) the worker and the push
+subscription, [15](../briefs/todo/15-a-reminder-on-each-event.md) a reminder on each
+event, [16](../briefs/todo/16-send-due-reminders.md) sending due reminders.
 
 # Phone notifications before events
 

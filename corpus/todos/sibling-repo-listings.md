@@ -1,9 +1,12 @@
 ---
 title: Fix the stale app counts and tables in sibling repos
 created: 2026-10-16
-status: open
+status: promoted
 tags: [later]
 ---
+
+Promoted 2026-10-23 into [brief 13](../briefs/todo/13-sibling-repo-listings.md).
+The vps-deploy line was already fixed by then.
 
 # Fix the stale app counts and tables in sibling repos
 
