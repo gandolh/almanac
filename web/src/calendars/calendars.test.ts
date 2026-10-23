@@ -5,6 +5,9 @@ import { describe, expect, it, vi } from "vitest";
 import { CalendarRow, checkCalendarName, DeleteCalendarDialog, LAST_CALENDAR_REASON, RenameField, rowMenuSections, type CalendarRowProps } from "./CalendarRow";
 import { ColorPicker } from "./ColorPicker";
 
+// Base UI's dialog portal needs a DOM; this renders the dialog in place.
+vi.mock("@base-ui/react/dialog", () => import("../components/dialog-stub"));
+
 const work: Calendar = {
   id: 2,
   name: "Work",

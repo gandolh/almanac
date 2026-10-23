@@ -1,10 +1,13 @@
 import type { Calendar, Occurrence } from "@almanac/shared";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { EventDetails, type EventDetailsProps } from "./DetailsPopover";
 import { whenText } from "./occurrence-text";
 import { SCOPE_LABELS, ScopeDialog, answerOnce, scopeChoices, scopeTitle } from "./scope";
+
+// Base UI's dialog portal needs a DOM; this renders the dialog in place.
+vi.mock("@base-ui/react/dialog", () => import("../components/dialog-stub"));
 
 const BUCHAREST = "Europe/Bucharest";
 

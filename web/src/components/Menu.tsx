@@ -1,16 +1,6 @@
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type KeyboardEvent,
-  type ReactNode,
-} from "react";
-import { createPortal } from "react-dom";
+import { Menu as BaseMenu } from "@base-ui/react/menu";
+import { useRef, type ReactNode } from "react";
 import { CheckIcon } from "./icons";
-import { layerFor } from "./layer";
 
 export interface MenuItem {
   label: string;
@@ -49,146 +39,27 @@ const GAP = 4; // between the button and the menu
 const MARGIN = 8; // the menu never comes closer to the window's edge than this
 
 /**
- * A menu button (the WAI-ARIA pattern, Shelfmark's): the button opens a white
- * floating list of actions. Enter, Space or ↓ open it on the first item, ↑ on
- * the last; ↑ ↓ Home End move, a letter jumps to the next item starting with
- * it, Enter or Space chooses, Escape closes and returns to the button, Tab
- * closes and moves on. A click outside closes it. The list is portalled (to
- * `body`, or into the open dialog the button is in) and placed by the button,
- * so no container clips it.
+ * A menu button on Base UI's `Menu` (the WAI-ARIA pattern): the button opens
+ * a white floating list of actions. Base UI does the keys (Enter, Space or ↓
+ * open it, ↑ ↓ Home End move, a letter jumps to the next item starting with
+ * it, Escape closes and returns to the button), the placement under the
+ * button and the portal, so no container clips it. It is not modal: a click
+ * outside closes it and still lands where it was aimed.
+ *
+ * A chosen item runs when the menu hands focus back, right after focus is on
+ * the button again, so an item that opens a dialog, or swaps the button for
+ * a field (Rename), takes focus from there and keeps it.
  */
 export function Menu({ label, sections, trigger, triggerLabel, triggerClassName, align = "start" }: MenuProps) {
-  const [open, setOpen] = useState(false);
-  const [layer, setLayer] = useState<HTMLElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const focusOnOpen = useRef<"first" | "last">("first");
-  const menuId = useId();
-
-  const itemElements = useCallback(
-    (): HTMLButtonElement[] =>
-      Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>("[role^=menuitem]:not(:disabled)") ?? []),
-    [],
-  );
-
-  const close = useCallback((returnFocus: boolean) => {
-    setOpen(false);
-    if (returnFocus) triggerRef.current?.focus();
-  }, []);
-
-  // Place the menu under the button (above it when there is no room), kept
-  // inside the window, then focus the chosen item, or the first or last. It
-  // follows the button while the page scrolls or resizes. Written straight
-  // to the element: measuring needs it in the DOM, and a re-render adds nothing.
-  useLayoutEffect(() => {
-    const menu = menuRef.current;
-    if (!open || !menu) return;
-    const place = () => {
-      const button = triggerRef.current?.getBoundingClientRect();
-      if (!button) return;
-      const width = menu.offsetWidth;
-      const height = menu.offsetHeight;
-      const preferredLeft = align === "end" ? button.right - width : button.left;
-      const left = Math.min(Math.max(preferredLeft, MARGIN), window.innerWidth - width - MARGIN);
-      const below = button.bottom + GAP;
-      const top = below + height <= window.innerHeight - MARGIN ? below : Math.max(MARGIN, button.top - GAP - height);
-      menu.style.left = `${Math.round(left)}px`;
-      menu.style.top = `${Math.round(top)}px`;
-      menu.dataset.placed = "";
-    };
-    place();
-    const elements = itemElements();
-    const chosen = elements.find((element) => element.getAttribute("aria-checked") === "true");
-    (chosen ?? (focusOnOpen.current === "last" ? elements.at(-1) : elements[0]))?.focus();
-    window.addEventListener("resize", place);
-    window.addEventListener("scroll", place, true);
-    return () => {
-      window.removeEventListener("resize", place);
-      window.removeEventListener("scroll", place, true);
-    };
-  }, [open, align, itemElements, layer]);
-
-  // A press anywhere outside the button and the menu closes it.
-  useEffect(() => {
-    if (!open) return;
-    const onPointerDown = (event: PointerEvent) => {
-      const target = event.target as Node;
-      if (menuRef.current?.contains(target) || triggerRef.current?.contains(target)) return;
-      close(false);
-    };
-    document.addEventListener("pointerdown", onPointerDown);
-    return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [open, close]);
-
-  const openWith = (focus: "first" | "last") => {
-    focusOnOpen.current = focus;
-    setLayer(layerFor(triggerRef.current));
-    setOpen(true);
-  };
-
-  const onTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      event.preventDefault();
-      openWith(event.key === "ArrowUp" ? "last" : "first");
-    }
-  };
-
-  const onMenuKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const elements = itemElements();
-    const index = elements.indexOf(document.activeElement as HTMLButtonElement);
-    const move = (next: number) => {
-      event.preventDefault();
-      elements[(next + elements.length) % elements.length]?.focus();
-    };
-    switch (event.key) {
-      case "ArrowDown":
-        return move(index + 1);
-      case "ArrowUp":
-        return move(index - 1);
-      case "Home":
-        return move(0);
-      case "End":
-        return move(elements.length - 1);
-      case "Escape":
-        event.preventDefault();
-        event.stopPropagation();
-        return close(true);
-      case "Tab":
-        // Back on the button before the browser moves focus, so Tab carries
-        // on from where the menu was opened rather than from `body`.
-        return close(true);
-      default:
-        // Space stays the button's (it chooses). The app's shortcuts ignore keys inside a menu.
-        if (event.key.length === 1 && event.key !== " " && !event.ctrlKey && !event.metaKey && !event.altKey) {
-          const letter = event.key.toLocaleLowerCase();
-          const after = [...elements.slice(index + 1), ...elements.slice(0, index + 1)];
-          const found = after.find((element) => element.textContent?.trim().toLocaleLowerCase().startsWith(letter));
-          if (found) {
-            event.preventDefault();
-            found.focus();
-          }
-        }
-    }
-  };
-
-  const choose = (item: MenuItem) => {
-    close(true);
-    item.onSelect();
+  const chosen = useRef<MenuItem | null>(null);
+  const choose = (item: MenuItem) => () => {
+    chosen.current = item;
   };
 
   return (
-    <>
-      <button
-        ref={triggerRef}
-        type="button"
-        className={triggerClassName ?? "button button--secondary button--regular menu-trigger"}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-controls={open ? menuId : undefined}
-        aria-label={triggerLabel}
-        onClick={() => (open ? close(false) : openWith("first"))}
-        onKeyDown={onTriggerKeyDown}
-      >
+    <BaseMenu.Root modal={false}>
+      <BaseMenu.Trigger ref={triggerRef} className={triggerClassName ?? "button button--secondary button--regular menu-trigger"} aria-label={triggerLabel}>
         {typeof trigger === "string" ? (
           // The open button's label turns semibold; keep its width from moving the row.
           <span className="menu-trigger__label" data-label={trigger}>
@@ -197,47 +68,73 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
         ) : (
           trigger
         )}
-      </button>
-      {open &&
-        layer &&
-        createPortal(
-          <div ref={menuRef} id={menuId} role="menu" aria-label={label} className="menu" onKeyDown={onMenuKeyDown}>
-            {sections.map((section, sectionIndex) => (
-              <div key={section.label ?? sectionIndex} role="group" aria-label={section.label} className="menu__section">
-                {section.label ? (
-                  <div className="menu__label" aria-hidden="true">
-                    {section.label}
-                  </div>
-                ) : sectionIndex > 0 ? (
-                  <div role="separator" className="menu__separator" />
-                ) : null}
-                {section.items.map((item) => (
-                  <button
-                    key={item.label}
-                    type="button"
-                    role={item.selected === undefined ? "menuitem" : "menuitemradio"}
-                    aria-checked={item.selected}
-                    tabIndex={-1}
-                    className="menu__item"
-                    disabled={item.disabled}
-                    onClick={() => choose(item)}
-                    // Focus follows the pointer, so one row is ever highlighted.
-                    onPointerMove={(event) => {
-                      if (document.activeElement !== event.currentTarget) event.currentTarget.focus({ preventScroll: true });
-                    }}
-                  >
-                    {item.selected !== undefined && (
-                      <span className="menu__check">{item.selected && <CheckIcon size={18} />}</span>
-                    )}
-                    <span className="menu__item-label">{item.label}</span>
-                    {item.detail && <span className="menu__item-detail">{item.detail}</span>}
-                  </button>
-                ))}
-              </div>
-            ))}
-          </div>,
-          layer,
-        )}
+      </BaseMenu.Trigger>
+      <BaseMenu.Portal>
+        <BaseMenu.Positioner className="menu-positioner" side="bottom" align={align} sideOffset={GAP} collisionPadding={MARGIN}>
+          <BaseMenu.Popup
+            className="menu"
+            aria-label={label}
+            finalFocus={() => {
+              const item = chosen.current;
+              if (!item) return true;
+              chosen.current = null;
+              triggerRef.current?.focus();
+              item.onSelect();
+              return false;
+            }}
+          >
+            {sections.map((section, sectionIndex) => {
+              const heading = section.label ? (
+                <BaseMenu.GroupLabel className="menu__label">{section.label}</BaseMenu.GroupLabel>
+              ) : sectionIndex > 0 ? (
+                <BaseMenu.Separator className="menu__separator" />
+              ) : null;
+              const chosen = section.items.find((item) => item.selected);
+              // A section whose items are choices is a radio group, the chosen one ticked.
+              return section.items.some((item) => item.selected !== undefined) ? (
+                <BaseMenu.RadioGroup key={section.label ?? sectionIndex} className="menu__section" value={chosen?.label ?? null}>
+                  {heading}
+                  {section.items.map((item) => (
+                    <BaseMenu.RadioItem
+                      key={item.label}
+                      value={item.label}
+                      className="menu__item"
+                      disabled={item.disabled}
+                      closeOnClick
+                      onClick={choose(item)}
+                    >
+                      <span className="menu__check">
+                        <BaseMenu.RadioItemIndicator className="menu__tick">
+                          <CheckIcon size={18} />
+                        </BaseMenu.RadioItemIndicator>
+                      </span>
+                      <ItemText item={item} />
+                    </BaseMenu.RadioItem>
+                  ))}
+                </BaseMenu.RadioGroup>
+              ) : (
+                <BaseMenu.Group key={section.label ?? sectionIndex} className="menu__section">
+                  {heading}
+                  {section.items.map((item) => (
+                    <BaseMenu.Item key={item.label} className="menu__item" disabled={item.disabled} onClick={choose(item)}>
+                      <ItemText item={item} />
+                    </BaseMenu.Item>
+                  ))}
+                </BaseMenu.Group>
+              );
+            })}
+          </BaseMenu.Popup>
+        </BaseMenu.Positioner>
+      </BaseMenu.Portal>
+    </BaseMenu.Root>
+  );
+}
+
+function ItemText({ item }: { item: MenuItem }) {
+  return (
+    <>
+      <span className="menu__item-label">{item.label}</span>
+      {item.detail && <span className="menu__item-detail">{item.detail}</span>}
     </>
   );
 }

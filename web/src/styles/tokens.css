@@ -158,7 +158,7 @@
 
   --z-bar: 10;
   --z-drawer: 50;
-  --z-float: 100; /* menus, popovers */
+  --z-float: 100; /* menus, popovers, dialogs: the later one opened sits above */
   --z-toast: 200;
 
   /* --- Motion: state changes only, short, ease-out ------------------------ */

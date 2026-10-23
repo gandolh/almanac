@@ -186,9 +186,12 @@
   pointer-events: none;
 }
 
-.menu {
-  position: fixed;
+/* Base UI places the positioner; the menu inside it is the white list. */
+.menu-positioner {
   z-index: var(--z-float);
+}
+
+.menu {
   display: flex;
   flex-direction: column;
   min-width: var(--menu-width);
@@ -198,11 +201,7 @@
   background: var(--surface);
   box-shadow: var(--shadow-float);
   color: var(--ink);
-  visibility: hidden; /* until it is placed by its button */
-}
-
-.menu[data-placed] {
-  visibility: visible;
+  outline: none;
   animation: float-in var(--duration) var(--ease-out);
 }
 
@@ -241,10 +240,11 @@
   color: var(--ink);
   font-size: var(--text-meta);
   text-align: left;
+  cursor: default;
+  user-select: none;
 }
 
-.menu__item:hover,
-.menu__item:focus {
+.menu__item[data-highlighted] {
   background: var(--hover);
 }
 
@@ -252,7 +252,7 @@
   outline-offset: -2px;
 }
 
-.menu__item:disabled {
+.menu__item[data-disabled] {
   color: var(--muted);
   background: none;
 }
@@ -275,6 +275,10 @@
   color: var(--ink-2);
 }
 
+.menu__tick {
+  display: flex;
+}
+
 @media (max-width: 767.98px) {
   .menu__item {
     min-height: var(--touch);
@@ -284,11 +288,11 @@
 
 /* --- Popover --------------------------------------------------------------------- */
 
-.popover {
-  position: fixed;
-  top: 0;
-  left: 0;
+.popover-positioner {
   z-index: var(--z-float);
+}
+
+.popover {
   width: max-content;
   max-width: min(var(--popover-width), calc(100vw - 16px));
   max-height: calc(100dvh - 16px);
@@ -297,23 +301,30 @@
   background: var(--surface);
   box-shadow: var(--shadow-float);
   color: var(--ink);
-  visibility: hidden; /* until it is placed by its anchor */
+  animation: float-in var(--duration) var(--ease-out);
 }
 
 .popover:focus {
   outline: none;
 }
 
-.popover[data-placed] {
-  visibility: visible;
-  animation: float-in var(--duration) var(--ease-out);
-}
-
 /* --- Dialog ---------------------------------------------------------------------- */
 
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-float);
+  background: var(--scrim);
+}
+
+/* Centred by the margins: fixed, as tall as its content. Menus and popovers
+   opened from inside share its z-index and open later, so they sit above. */
 .dialog {
-  max-width: none;
-  max-height: none;
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-float);
+  display: flex;
+  height: fit-content;
   margin: auto;
   padding: 0;
   overflow: hidden;
@@ -322,14 +333,6 @@
   background: var(--surface);
   box-shadow: var(--shadow-dialog);
   color: var(--ink);
-}
-
-.dialog[open] {
-  display: flex;
-}
-
-.dialog::backdrop {
-  background: var(--scrim);
 }
 
 .dialog--small {
@@ -344,8 +347,7 @@
   width: min(var(--dialog-large), calc(100vw - 32px));
 }
 
-/* The frame moves, not the dialog: a menu portalled into the dialog is
-   placed against the window, which a transformed dialog would break. */
+/* The frame moves, not the dialog, so the centring is left alone. */
 .dialog__frame {
   display: flex;
   flex: 1;

@@ -4,7 +4,7 @@ import { Temporal } from "temporal-polyfill";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { HOME, LOGIN, SEARCH, route, viewRoute } from "../router";
 import { initialOf, zoneCity } from "./AccountMenu";
-import { documentTitle, escapeClosesDrawer, placeOf } from "./AppShell";
+import { documentTitle, placeOf } from "./AppShell";
 import { registerCommand, runCommand } from "./commands";
 import { MiniMonth } from "./MiniMonth";
 import { isTypingTarget, shortcutFor, type KeyPress } from "./shortcuts";
@@ -18,18 +18,6 @@ const press = (key: string, extra: Partial<KeyPress> = {}): KeyPress => ({
   shiftKey: false,
   target: { tagName: "BODY", closest: () => null } as unknown as EventTarget,
   ...extra,
-});
-
-describe("the drawer's Esc", () => {
-  const esc = { key: "Escape", defaultPrevented: false };
-  it("closes the drawer, but not when an open dialog inside it takes the key", () => {
-    expect(escapeClosesDrawer(esc, { closest: () => null }, true)).toBe(true);
-    expect(escapeClosesDrawer(esc, { closest: (selector) => (selector === "dialog[open]" ? {} : null) }, true)).toBe(false);
-    expect(escapeClosesDrawer(esc, null, true)).toBe(true);
-    expect(escapeClosesDrawer(esc, null, false)).toBe(false);
-    expect(escapeClosesDrawer({ ...esc, defaultPrevented: true }, null, true)).toBe(false);
-    expect(escapeClosesDrawer({ key: "a", defaultPrevented: false }, null, true)).toBe(false);
-  });
 });
 
 describe("shortcutFor", () => {

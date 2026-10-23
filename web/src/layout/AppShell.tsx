@@ -1,4 +1,5 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Dialog } from "@base-ui/react/dialog";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import type { Temporal } from "temporal-polyfill";
 import { PlusIcon } from "../components/icons";
 import { Toaster } from "../components/Toast";
@@ -122,17 +123,7 @@ export function AppShell() {
   }, [place]);
 
   const go = useCallback((to: View, on: Temporal.PlainDate) => navigate(viewRoute(to, on)), []);
-  // Focus goes back to the menu button once the drawer has gone and the bar is no longer inert.
-  const refocusMenu = useRef(false);
-  const closeDrawer = useCallback(() => {
-    refocusMenu.current = true;
-    setDrawerOpen(false);
-  }, []);
-  useEffect(() => {
-    if (drawerOpen || !refocusMenu.current) return;
-    refocusMenu.current = false;
-    menuButton.current?.focus();
-  }, [drawerOpen]);
+  const closeDrawer = useCallback(() => setDrawerOpen(false), []);
 
   useShortcuts((shortcut: Shortcut) => {
     switch (shortcut.kind) {
@@ -183,7 +174,7 @@ export function AppShell() {
       <a className="skip-link" href="#main">
         Skip to the calendar
       </a>
-      <div className="shell__bar" inert={drawerShown || undefined}>
+      <div className="shell__bar">
         <TopBar
           view={place.kind === "view" ? place.view : null}
           date={date}
@@ -214,11 +205,13 @@ export function AppShell() {
             {sidebar}
           </aside>
         )}
-        <main ref={mainRef} id="main" className="shell__main" tabIndex={-1} inert={drawerShown || undefined}>
+        <main ref={mainRef} id="main" className="shell__main" tabIndex={-1}>
           {main}
         </main>
       </div>
-      {drawerShown && <Drawer onClose={closeDrawer}>{sidebar}</Drawer>}
+      <Drawer open={drawerShown} onClose={closeDrawer} menuButton={menuButton}>
+        {sidebar}
+      </Drawer>
       {!desktop && !drawerShown && (
         <button type="button" className="fab" aria-label="Create" onClick={() => editor.openCreate()}>
           <PlusIcon size={26} />
@@ -230,44 +223,37 @@ export function AppShell() {
 }
 
 /**
- * Whether Esc, pressed with focus on `active`, closes the drawer: not when
- * another handler took it, focus is outside the drawer, or focus is in an open
- * dialog (the New calendar dialog), which Esc closes alone.
- */
-export function escapeClosesDrawer(
-  press: { key: string; defaultPrevented: boolean },
-  active: { closest?: (selector: string) => unknown } | null,
-  focusInDrawer: boolean,
-): boolean {
-  if (press.key !== "Escape" || press.defaultPrevented || !focusInDrawer) return false;
-  return !(typeof active?.closest === "function" && active.closest("dialog[open]"));
-}
-
-/**
  * The phone's left column: over the view from the left, with the page dimmed
- * behind it. Esc or a press on the dim closes it; the rest of the shell is
- * inert meanwhile. Not a modal `<dialog>`, so the menus and popovers the
- * calendars open from inside it (portalled to `body`) still work.
+ * behind it. A modal Base UI `Dialog`: Esc or a press on the dim closes it,
+ * the rest of the shell is inert meanwhile, and focus goes back to the menu
+ * button. The menus and popovers the calendars open from inside it nest in
+ * it, so Esc closes the innermost first.
  */
-function Drawer({ onClose, children }: { onClose: () => void; children: ReactNode }) {
-  const panel = useRef<HTMLElement>(null);
-  useEffect(() => {
-    panel.current?.querySelector<HTMLElement>("button, a[href], input")?.focus();
-    const onKeyDown = (event: KeyboardEvent) => {
-      // Only when focus is in the drawer itself: a menu or popover opened from it closes first.
-      if (!escapeClosesDrawer(event, document.activeElement, panel.current?.contains(document.activeElement) ?? false)) return;
-      event.preventDefault();
-      onClose();
-    };
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
+function Drawer({
+  open,
+  onClose,
+  menuButton,
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  menuButton: RefObject<HTMLButtonElement | null>;
+  children: ReactNode;
+}) {
   return (
-    <div className="drawer">
-      <div className="drawer__scrim" aria-hidden="true" onClick={onClose} />
-      <aside ref={panel} id="sidebar" className="drawer__panel" role="dialog" aria-label="Calendars">
-        {children}
-      </aside>
-    </div>
+    <Dialog.Root
+      open={open}
+      onOpenChange={(next, details) => {
+        // An Esc a control inside already used (renaming a calendar) isn't the drawer's.
+        if (!next && !(details.reason === "escape-key" && details.event.defaultPrevented)) onClose();
+      }}
+    >
+      <Dialog.Portal>
+        <Dialog.Backdrop className="drawer__scrim" />
+        <Dialog.Popup id="sidebar" className="drawer__panel" aria-label="Calendars" finalFocus={menuButton}>
+          {children}
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }

@@ -1,11 +1,13 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Temporal } from "temporal-polyfill";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Dialog } from "./Dialog";
 import { MonthGrid, type MonthGridProps } from "./MonthGrid";
-import { placePopover } from "./Popover";
 import { ToastView } from "./Toast";
+
+// Base UI's dialog portal needs a DOM; this renders the dialog in place.
+vi.mock("@base-ui/react/dialog", () => import("./dialog-stub"));
 
 const october = Temporal.PlainYearMonth.from("2026-10");
 const today = Temporal.PlainDate.from("2026-10-16");
@@ -87,29 +89,6 @@ describe("MonthGrid", () => {
   });
 });
 
-describe("placePopover", () => {
-  const viewport = { width: 1000, height: 800 };
-  const panel = { width: 300, height: 200 };
-
-  it("hangs below the anchor, lined up with its start", () => {
-    expect(placePopover({ top: 100, bottom: 130, left: 50, right: 150 }, panel, viewport, "below")).toEqual({ top: 138, left: 50 });
-  });
-
-  it("flips above when there's no room below, and stays in the window", () => {
-    expect(placePopover({ top: 700, bottom: 730, left: 900, right: 950 }, panel, viewport, "below")).toEqual({ top: 492, left: 692 });
-  });
-
-  it("sits to the right of the anchor, or flips to its left", () => {
-    expect(placePopover({ top: 100, bottom: 160, left: 200, right: 300 }, panel, viewport, "side")).toEqual({ top: 100, left: 308 });
-    expect(placePopover({ top: 100, bottom: 160, left: 650, right: 800 }, panel, viewport, "side")).toEqual({ top: 100, left: 342 });
-  });
-
-  it("centres over a wide anchor with no room either side, and keeps the bottom in", () => {
-    const placed = placePopover({ top: 700, bottom: 760, left: 100, right: 900 }, panel, viewport, "side");
-    expect(placed).toEqual({ top: 592, left: 350 });
-  });
-});
-
 describe("Toast", () => {
   it("is an empty live region with nothing to say", () => {
     expect(renderToStaticMarkup(createElement(ToastView, { toast: null, onDismiss: () => undefined }))).toBe(
@@ -134,7 +113,7 @@ describe("Dialog", () => {
 
   it("titles itself and offers a close button", () => {
     const html = renderToStaticMarkup(createElement(Dialog, { open: true, onClose: () => undefined, title: "Time zone", children: "Body", footer: "Actions" }));
-    expect(html).toMatch(/<dialog aria-labelledby="([^"]+)" class="dialog dialog--medium">/);
+    expect(html).toContain('<div role="dialog" class="dialog dialog--medium">');
     expect(html).toContain('class="dialog__title">Time zone</h2>');
     expect(html).toContain('aria-label="Close"');
     expect(html).toContain('<footer class="dialog__footer">Actions</footer>');
