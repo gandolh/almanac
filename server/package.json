@@ -14,7 +14,7 @@
   "dependencies": {
     "@almanac/shared": "0.1.0",
     "better-sqlite3": "13.0.3",
-    "fastify": "5.12.5",
+    "fastify": "5.12.7",
     "rrule-temporal": "2.2.8",
     "temporal-polyfill": "1.0.6",
     "zod": "4.5.4"
