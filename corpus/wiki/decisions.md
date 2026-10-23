@@ -1,6 +1,6 @@
 ---
-summary: Locked calls for Almanac, each with date, rejected alternatives and reason. React + Fastify + SQLite on Shelfmark's layout; FullCalendar v7 for day, week and month with a year view of our own; several users, each with a private calendar and no sign-up; named calendars; common repeats with three edit scopes, expanded on the server; no import; no reminders in v1; one display time zone per user, Bucharest by default; phone browser without offline; deployed on the VPS; Google Calendar's layout, light only.
-updated: 2026-10-16
+summary: Locked calls for Almanac, each with date, rejected alternatives and reason. React + Fastify + SQLite on Shelfmark's layout; FullCalendar v7 for day, week and month with a year view of our own; several users, each with a private calendar and no sign-up; named calendars; Base UI under the dialogs, popovers and menus; common repeats with three edit scopes, expanded on the server; no import; no reminders in v1; one display time zone per user, Bucharest by default; phone browser without offline; deployed on the VPS; Google Calendar's layout, light only.
+updated: 2026-10-23
 ---
 
 # Decisions
@@ -85,3 +85,14 @@ _2026-10-16_. The owner asked for something that works like Google Calendar
 and always light. The UI copies Google's layout straight, with no design
 direction round and no dark mode. Rejected: themed directions, which the owner
 turned down for showcase and Shelfmark. Layout: [features.md](features.md).
+
+## Base UI under the dialogs, popovers, menus and drawer
+_2026-10-23_, the owner's call, to match their other apps (atrium,
+imbatranimOS, sports-app, trips and others). `Dialog`, `Popover`, `Menu` and
+the phone drawer sit on `@base-ui/react` (pinned 1.9.0), styled by Almanac's
+own CSS; their props didn't change ([brief 12](../briefs/done/12-base-ui-primitives.md)).
+Base UI owns focus, keys, placement and nesting, which `layer.ts` and the
+hand-written key handling did before. It costs about 50 kB gzip on the main
+chunk. Native selects, checkboxes and radios stay native, and so does the
+time field's list. Rejected: keeping the hand-built components, and shadcn,
+which brings Tailwind, which Almanac doesn't use.
