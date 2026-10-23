@@ -108,3 +108,67 @@ Say so in the outcome note if one does.
   Take before/after screenshots of each. They should match.
 - `layer.ts` and the hand-built focus, keyboard and positioning code are gone.
 - `bash corpus/lint.sh` passes.
+
+## Outcome (2026-10-23)
+
+Done. `@base-ui/react` 1.9.0 is pinned in `web/package.json`. `Dialog`,
+`Popover` and `Menu` keep their props, and no call site changed. The drawer is
+a modal Base UI `Dialog`, not `Drawer`: Base UI's docs say a side panel
+without swipe gestures is a positioned Dialog, and Almanac's drawer has none.
+`layer.ts`, `placePopover`, `escapeClosesDrawer` and the hand-written focus,
+key and placement code are deleted.
+
+Three behaviours needed explicit code to survive the move:
+
+- **Esc a control already used.** With the time list open, Esc closed the
+  whole event form, because Base UI's Esc listener doesn't check
+  `defaultPrevented`. The dialog, the popover and the drawer now ignore an Esc
+  that a control inside already handled, as the native `<dialog>` and the old
+  popover did.
+- **Rename from the row menu in the drawer.** Base UI returns focus after a
+  choice. The trigger was gone (Rename swaps it for a field), so Base UI fell
+  back to "Main menu", which blurred the field and cancelled the rename. The
+  chosen item now runs from the menu's `finalFocus`: focus goes to the button,
+  then the item runs, the old order.
+- **A press on a popover's anchor** is ignored in `onOpenChange`, so the
+  anchor's own click still toggles.
+
+Tests changed outside the owned files. `layout.test.ts` lost the
+`escapeClosesDrawer` test, and `components.test.ts` lost the `placePopover`
+ones. Base UI's portal renders nothing without a DOM, so the static-markup
+tests that render a dialog (`components`, `editor`, `details`, `calendars`)
+mock `@base-ui/react/dialog` with the new `components/dialog-stub.ts`, which
+renders the parts in place. 618 tests pass, down from 623 by the five deleted
+ones.
+
+Checked: typecheck, lint, tests and build. The main chunk grows from 137.79
+to 187.92 kB gzip. In Chromium at 1440 and 390 px against a scratch account,
+the same scripted steps were run before and after:
+
+- the event form: focus on the title, Tab held, Esc closes, and focus back on
+  Create;
+- quick create from a slot, flipping left near the right edge;
+- the details and year-day popovers;
+- the row and account menus: arrows, Home/End, type-ahead, and Esc back to the
+  button;
+- Change password;
+- the drawer, with the row menu, the colour popover and New calendar inside
+  it: Esc closes only the innermost layer, and a scrim press returns focus to
+  Main menu;
+- the view menu's tick;
+- shortcuts staying off under each overlay.
+
+The screenshots match, with three differences:
+
+- a menu opened by mouse no longer highlights its first item;
+- the phone's view menu opened by keyboard starts on the first view, not the
+  chosen one;
+- on a phone, the event details popover hangs below the event instead of
+  covering it. `placePopover` centred it over the anchor when neither side had
+  room; Base UI moves it to the other axis. It was kept: the event stays
+  visible, and copying the old centring would mean offset maths on top of
+  Base UI.
+
+**TimeField (step 6) was not ported.** Its list is rendered inline, not
+portalled, so it works inside the Base UI dialog as it is. Its commit-on-blur
+and Esc rules are tested and hold. The four required moves were the brief.

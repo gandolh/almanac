@@ -147,7 +147,20 @@ pushed, `../wzd_auth`'s `22e1fd2` too, and `../vps-deploy` has no remote.
 ## [2026-10-23] todo | Brief 12 filed: Base UI under the primitives
 
 The owner asked for Base UI in the apps that still hand-build their widgets.
-[Brief 12](briefs/todo/12-base-ui-primitives.md) rebuilds `Dialog`, `Popover`,
+[Brief 12](briefs/done/12-base-ui-primitives.md) rebuilds `Dialog`, `Popover`,
 `Menu` and the phone drawer on Base UI, keeping their props, and deletes
 `layer.ts`. They move together because a Base UI modal traps focus away from
 a hand-built popover. Native selects, checkboxes and radios stay.
+
+## [2026-10-23] done | Brief 12: Base UI under the primitives
+
+[Brief 12](briefs/done/12-base-ui-primitives.md) is built. `Dialog`,
+`Popover`, `Menu` and the phone drawer (a modal Base UI `Dialog`) are on Base
+UI with their props unchanged. `layer.ts` and the hand-written focus, key and
+placement code are gone. Two fixes kept old behaviour: an Esc a control
+already used no longer closes the dialog around it, and a chosen menu item
+runs from `finalFocus`, so Rename's field keeps focus in the drawer. The
+static-markup dialog tests mock Base UI's dialog with
+`components/dialog-stub.ts`. 618 tests, typecheck, lint and build pass; before
+and after screenshots at 1440 and 390 px match. The decision is in
+[decisions.md](wiki/decisions.md).

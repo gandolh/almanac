@@ -1,5 +1,5 @@
 ---
-summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds, 623 tests. Pushed to gandolh/almanac on GitHub, not deployed. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
+summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds. Pushed to gandolh/almanac on GitHub, not deployed. Brief 12 (Base UI under the overlays) built 2026-10-23, local, 618 tests. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
 updated: 2026-10-23
 ---
 
@@ -17,6 +17,10 @@ and so is `../wzd_auth`'s local seed entry (`22e1fd2`). `../vps-deploy` has
 no remote; its Almanac stack (`8e247a3`) is a local commit, which is where
 the deploy runs from. The README and `docs/` follow the readme-docs standard
 since the evening of 2026-10-16. Nothing is deployed.
+
+_2026-10-23_. Brief 12 moved `Dialog`, `Popover`, `Menu` and the phone drawer
+onto Base UI ([decisions.md](decisions.md)). It is two local commits on `main`,
+not pushed; 618 tests pass (the five removed tested deleted code).
 
 ## Next (owner)
 
@@ -64,7 +68,7 @@ since the evening of 2026-10-16. Nothing is deployed.
 | 09 | [Calendars and time zone](../briefs/done/09-calendars-and-time-zone.md) | done |
 | 10 | [Search](../briefs/done/10-search.md) | done |
 | 11 | [Deploy and docs](../briefs/done/11-deploy-and-docs.md) | done |
-| 12 | [Base UI under Dialog, Popover, Menu and the drawer](../briefs/todo/12-base-ui-primitives.md) | todo, filed 2026-10-23 |
+| 12 | [Base UI under Dialog, Popover, Menu and the drawer](../briefs/done/12-base-ui-primitives.md) | done 2026-10-23, local commits, not pushed |
 
 ## Todos
 
