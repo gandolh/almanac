@@ -62,3 +62,41 @@ repo's style, on its own `main`.
 - Shelfmark's owner steps no longer ask to redeploy Ward's UI.
 - Each touched repo's own lint passes, where it has one for docs
   (`bash corpus/lint.sh` does not cover `docs/`).
+
+## Outcome (2026-10-27)
+
+Done, one commit in each repo on its `main`, not pushed: `../wzd_auth`
+`39ec172` and `../shelfmark` `4d48bd4`. The facts were rechecked on
+2026-10-27, after Ward's briefs 34-38. They still held.
+
+- **`../wzd_auth/README.md`.** The status paragraph now names shelfmark among
+  the apps that offer "Sign in with Ward" in production. Ward's status page has
+  it redeployed with the new issuer. Almanac is named beside satchel as
+  registered for local development, since it is in Ward's local seed and not yet
+  in production Ward. The screenshot's alt text drops "six registered apps" and
+  says the capture is from a local copy on 2026-10-09, then lists the six apps
+  it shows. `grep -n "six registered"` finds nothing.
+- **`../wzd_auth/docs/cutover-oidc.md`.** The table in step 4 gains
+  `shelfmark` (`<origin>/shelfmark-api/auth/ward/callback`, `<origin>/shelfmark/`)
+  and `almanac` (`<origin>/almanac-api/auth/ward/callback`, `<origin>/almanac/`).
+  Both were read from each server's config (the API prefix, plus
+  `WARD_CALLBACK_PATH` = `/auth/ward/callback`) and match the vps-deploy
+  stacks' `basePath` and `apiPrefix`. The note under the table says those two
+  apps' JWKs come from their own `docs/owner-setup.md`, and that almanac, like
+  satchel, may need its app row created first. No count stood beside the table.
+- **`../shelfmark/docs/owner-setup.md`.** Step 2's item 5, "Redeploy Ward's UI",
+  is gone. It was the section's last item, so nothing needed renumbering.
+
+Neither repo lints its docs: Ward's `npm run lint` covers TypeScript only, and
+Shelfmark's eslint doesn't read Markdown. Both `corpus/lint.sh` runs are clean.
+Ward's docs site syncs only `corpus/wiki/`, so the runbook isn't on it.
+
+Left as they were, outside this brief's lines:
+
+- `docs/images/console-apps.webp` in Ward is from 2026-10-09. It shows six
+  apps and the console from before briefs 33-40. Ward's `docs/images/shots.md`
+  says how to retake it.
+- Ward's README status still says brief 32 moves Ward to its own host "with its
+  next deploy". Ward's own status page says that release is live.
+- The cutover table's satchel row still reads `<origin>/satchel-api/...`.
+  Satchel has had a host of its own since 2026-10-22.

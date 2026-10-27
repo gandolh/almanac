@@ -1,5 +1,5 @@
 ---
-summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds. Pushed to gandolh/almanac on GitHub, not deployed. Brief 12 (Base UI under the overlays) built 2026-10-23; briefs 14-16 (phone notifications: the push worker, a reminder on each event, sending them) built 2026-10-27, local, 745 tests. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
+summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds. Pushed to gandolh/almanac on GitHub, not deployed. Brief 12 (Base UI under the overlays) built 2026-10-23; briefs 14-16 (phone notifications: the push worker, a reminder on each event, sending them) built 2026-10-27, local, 745 tests; brief 13 fixed the app lists in wzd_auth and shelfmark the same day. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
 updated: 2026-10-27
 ---
 
@@ -31,6 +31,8 @@ Brief 15 gave each event one reminder, stored and shown in the form and the
 details. Brief 16 sends them: a tick a minute in the API process, each
 reminder once, nothing more than 15 minutes late. 745 tests. A real Web Push
 reached FCM from the built server on this machine; no phone has shown one yet.
+Brief 13 fixed the stale app lists in `../wzd_auth` (`39ec172`) and
+`../shelfmark` (`4d48bd4`), one local commit each, not pushed. No brief is open.
 
 ## Next (owner)
 
@@ -91,7 +93,7 @@ reached FCM from the built server on this machine; no phone has shown one yet.
 | 10 | [Search](../briefs/done/10-search.md) | done |
 | 11 | [Deploy and docs](../briefs/done/11-deploy-and-docs.md) | done |
 | 12 | [Base UI under Dialog, Popover, Menu and the drawer](../briefs/done/12-base-ui-primitives.md) | done 2026-10-23, local commits, not pushed |
-| 13 | [Fix the stale app lists in sibling repos](../briefs/todo/13-sibling-repo-listings.md) | todo (filed 2026-10-23) |
+| 13 | [Fix the stale app lists in sibling repos](../briefs/done/13-sibling-repo-listings.md) | done 2026-10-27: `../wzd_auth` `39ec172`, `../shelfmark` `4d48bd4`, local commits, not pushed |
 | 14 | [Phone notifications 1: the worker and the push subscription](../briefs/done/14-push-subscription-and-worker.md) | done 2026-10-27, local commits, not pushed; no live push tried |
 | 15 | [Phone notifications 2: a reminder on each event](../briefs/done/15-a-reminder-on-each-event.md) | done 2026-10-27, local commits, not pushed |
 | 16 | [Phone notifications 3: send due reminders](../briefs/done/16-send-due-reminders.md) | done 2026-10-27, local commits, not pushed; no phone tried |
@@ -99,4 +101,4 @@ reached FCM from the built server on this machine; no phone has shown one yet.
 ## Todos
 
 - None open. Phone notifications became briefs 14–16 and the sibling-repo counts
-  brief 13 (2026-10-23).
+  brief 13 (2026-10-23); all four are done (2026-10-27).

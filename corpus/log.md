@@ -167,7 +167,7 @@ and after screenshots at 1440 and 390 px match. The decision is in
 
 ## [2026-10-23] todo | Briefs 13–16 from the two open todos
 
-[13](briefs/todo/13-sibling-repo-listings.md) fixes the stale app lists in
+[13](briefs/done/13-sibling-repo-listings.md) fixes the stale app lists in
 `../wzd_auth` (README, the OIDC runbook's redirect table) and `../shelfmark` (the obsolete
 "redeploy Ward's UI" step), one commit per repo; the vps-deploy count was already right
 (39 stacks). Phone notifications split into three: [14](briefs/done/14-push-subscription-and-worker.md)
@@ -221,3 +221,16 @@ phone was tried. The decision "No reminders in v1" in
 [decisions.md](wiki/decisions.md) is replaced by "Reminders by Web Push, one
 per event", and [overview.md](wiki/overview.md), [features.md](wiki/features.md)
 and [architecture.md](wiki/architecture.md) caught up.
+
+## [2026-10-27] done | Brief 13: the app lists in sibling repos
+
+[Brief 13](briefs/done/13-sibling-repo-listings.md) is built, once the agent
+working in `../wzd_auth` had finished. Its facts still held after Ward's briefs
+34-38. In `../wzd_auth` (`39ec172`), the README names shelfmark among the apps
+with "Sign in with Ward" and almanac as registered for local development, the
+screenshot's alt text drops its count, and the cutover table has rows for
+shelfmark and almanac read from their server configs. In `../shelfmark`
+(`4d48bd4`), the obsolete "Redeploy Ward's UI" owner step is gone. Both are
+local commits, not pushed. Flagged, not changed: Ward's console screenshot is
+from 2026-10-09, its README still calls the move to its own host pending, and
+the cutover table's satchel row predates Satchel's own host.
