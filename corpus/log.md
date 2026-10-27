@@ -170,10 +170,26 @@ and after screenshots at 1440 and 390 px match. The decision is in
 [13](briefs/todo/13-sibling-repo-listings.md) fixes the stale app lists in
 `../wzd_auth` (README, the OIDC runbook's redirect table) and `../shelfmark` (the obsolete
 "redeploy Ward's UI" step), one commit per repo; the vps-deploy count was already right
-(39 stacks). Phone notifications split into three: [14](briefs/todo/14-push-subscription-and-worker.md)
+(39 stacks). Phone notifications split into three: [14](briefs/done/14-push-subscription-and-worker.md)
 a push-only service worker, VAPID keys and stored subscriptions, copied from Satchel's
 code; [15](briefs/todo/15-a-reminder-on-each-event.md) one reminder per event, off by
 default, with the choices phone calendars offer; [16](briefs/todo/16-send-due-reminders.md)
 a one-minute timer that sends due reminders once, expands series only over the window,
 and skips anything more than 15 minutes stale after a restart. 16 replaces the "No
 reminders in v1" decision when it ships.
+
+## [2026-10-27] done | Brief 14: the push worker and the subscriptions
+
+[Brief 14](briefs/done/14-push-subscription-and-worker.md) is built. The
+server takes three `VAPID_*` settings (all or none) and stores each browser's
+subscription in `push_subscriptions`. The routes are `/api/push/key`,
+`/api/push/subscriptions` (PUT, DELETE) and `/api/push/test`. With push off,
+DELETE still works and the rest are 404. `sendToUser` deletes a subscription
+the push service says is gone; brief 16 sends through it. The worker is a
+plain `web/public/sw.js`: push and notification presses only, nothing cached.
+The account menu has a Notifications dialog, and `npm run vapid-keys` writes
+a pair into `.env`. 694 tests. The worker and the dialog's states were checked
+in headless Chromium; no real push reached a browser or a phone. The
+"no service worker" line in [decisions.md](wiki/decisions.md) now says the
+worker is push-only. Production needs the `VAPID_*` values passed by
+`../vps-deploy`'s Almanac stack, an owner step.

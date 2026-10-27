@@ -1,6 +1,6 @@
 ---
-summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds. Pushed to gandolh/almanac on GitHub, not deployed. Brief 12 (Base UI under the overlays) built 2026-10-23, local, 618 tests. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
-updated: 2026-10-23
+summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds. Pushed to gandolh/almanac on GitHub, not deployed. Brief 12 (Base UI under the overlays) built 2026-10-23; brief 14 (push worker and subscriptions) built 2026-10-27, local, 694 tests. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
+updated: 2026-10-27
 ---
 
 # Status
@@ -22,6 +22,12 @@ _2026-10-23_. Brief 12 moved `Dialog`, `Popover`, `Menu` and the phone drawer
 onto Base UI ([decisions.md](decisions.md)). It is two local commits on `main`,
 not pushed; 618 tests pass (the five removed tested deleted code).
 
+_2026-10-27_. Brief 14 added Web Push: a push-only service worker, stored
+subscriptions, and the account menu's Notifications dialog with a test
+notification. Local commits, not pushed, 694 tests. A real push to a browser
+or a phone has not been tried. Production push needs the `VAPID_*` values
+passed by `../vps-deploy`'s Almanac stack, which doesn't pass them yet.
+
 ## Next (owner)
 
 1. Register Almanac in production Ward and write
@@ -35,6 +41,13 @@ not pushed; 618 tests pass (the five removed tested deleted code).
 4. Not tried here: the "Sign in with Ward" round trip, locally (needs the
    local Ward seed with Docker Desktop's WSL integration on) or in
    production; adding it to a phone's home screen.
+5. Notifications (brief 14): add the three `VAPID_*` values to
+   `../vps-deploy/stacks/almanac.ts` (as `../vps-deploy/stacks/satchel.ts`
+   has them), make a pair and put it in `../vps-deploy/secrets/almanac.env`
+   with a real `VAPID_SUBJECT`, then deploy both halves, following
+   [docs/owner-setup.md](../../docs/owner-setup.md) step 8. Then turn
+   Notifications on in a desktop browser and on the iPhone's Home Screen app,
+   and press "Send a test".
 
 ## Known and accepted
 
@@ -70,7 +83,7 @@ not pushed; 618 tests pass (the five removed tested deleted code).
 | 11 | [Deploy and docs](../briefs/done/11-deploy-and-docs.md) | done |
 | 12 | [Base UI under Dialog, Popover, Menu and the drawer](../briefs/done/12-base-ui-primitives.md) | done 2026-10-23, local commits, not pushed |
 | 13 | [Fix the stale app lists in sibling repos](../briefs/todo/13-sibling-repo-listings.md) | todo (filed 2026-10-23) |
-| 14 | [Phone notifications 1: the worker and the push subscription](../briefs/todo/14-push-subscription-and-worker.md) | todo (filed 2026-10-23) |
+| 14 | [Phone notifications 1: the worker and the push subscription](../briefs/done/14-push-subscription-and-worker.md) | done 2026-10-27, local commits, not pushed; no live push tried |
 | 15 | [Phone notifications 2: a reminder on each event](../briefs/todo/15-a-reminder-on-each-event.md) | todo (filed 2026-10-23); independent of 14 |
 | 16 | [Phone notifications 3: send due reminders](../briefs/todo/16-send-due-reminders.md) | todo (filed 2026-10-23); after 14 and 15 |
 

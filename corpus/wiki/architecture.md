@@ -1,6 +1,6 @@
 ---
 summary: How Almanac is put together, planned and then built on 2026-10-16. Shelfmark's three workspaces (shared, server, web), what each owns, the planned API routes, request paths behind Caddy, dev and production ports (API 8809, Vite 5177, VPS 8797), where data lives, and secrets.
-updated: 2026-10-16
+updated: 2026-10-27
 ---
 
 # Architecture
@@ -21,7 +21,9 @@ TypeScript strict, Vitest, ESLint:
   does it (`../shelfmark/server/vendor/ward`).
 - `web`: Vite + React. FullCalendar v7 (`daygrid`, `timegrid`, `interaction`)
   for day, week and month; our own year view; plain CSS with tokens, light
-  only. A web manifest for the home-screen icon, no service worker.
+  only. A web manifest for the home-screen icon, and since brief 14
+  (2026-10-27) a push-only service worker, `web/public/sw.js`, that caches
+  nothing.
 
 ## Planned routes
 
@@ -32,6 +34,7 @@ TypeScript strict, Vitest, ESLint:
 | `POST /api/events`, `PATCH /api/events/:id`, `DELETE /api/events/:id` | create, edit, delete, with an edit scope for series |
 | `GET /api/search?q` | the user's events matching title, location or notes |
 | `GET`, `PATCH /api/settings` | display time zone |
+| `GET /api/push/key`, `PUT`, `DELETE /api/push/subscriptions`, `POST /api/push/test` | Web Push: the server's key, this browser's subscription, a test notification (brief 14) |
 | `/auth/*` | the vendored Ward auth plugin: local login and Sign in with Ward |
 
 Every query is scoped to the signed-in user.
@@ -69,5 +72,6 @@ own test fixtures).
 
 ## Secrets
 
-`.env` (gitignored) holds the seed user values and the `WARD_OIDC_*` values the
-Ward seed writes. `.env.example` lists the keys with no values.
+`.env` (gitignored) holds the seed user values, the `WARD_OIDC_*` values the
+Ward seed writes, and the `VAPID_*` push keys `npm run vapid-keys` writes
+(brief 14). `.env.example` lists the keys with no values.

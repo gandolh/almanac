@@ -1,6 +1,6 @@
 ---
 summary: Locked calls for Almanac, each with date, rejected alternatives and reason. React + Fastify + SQLite on Shelfmark's layout; FullCalendar v7 for day, week and month with a year view of our own; several users, each with a private calendar and no sign-up; named calendars; Base UI under the dialogs, popovers and menus; common repeats with three edit scopes, expanded on the server; no import; no reminders in v1; one display time zone per user, Bucharest by default; phone browser without offline; deployed on the VPS; Google Calendar's layout, light only.
-updated: 2026-10-23
+updated: 2026-10-27
 ---
 
 # Decisions
@@ -73,6 +73,8 @@ _2026-10-16_. The layout works on a phone and a web manifest gives it a
 home-screen icon. There is no service worker and no offline mode. Rejected:
 desktop only; a full offline PWA like Shelfmark's, which would need caching and
 syncing edits made offline.
+_2026-10-27_, brief 14: a service worker now exists for Web Push only. It has
+no fetch handler and caches nothing, so there is still no offline mode.
 
 ## Deployed on the VPS like Shelfmark
 _2026-10-16_. Caddy serves the app at `/almanac/` and forwards `/almanac-api/`
