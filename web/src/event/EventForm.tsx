@@ -4,7 +4,7 @@ import { isApiError } from "../api";
 import { occurrencePatch } from "../calendar/events";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/Dialog";
-import { CalendarIcon, ClockIcon, NotesIcon, PlaceIcon, RepeatIcon } from "../components/icons";
+import { BellIcon, CalendarIcon, ClockIcon, NotesIcon, PlaceIcon, RepeatIcon } from "../components/icons";
 import { showToast } from "../components/Toast";
 import { calendarColor, useCalendars } from "../data/calendars";
 import { createEvent, updateEvent } from "../data/occurrences";
@@ -25,6 +25,9 @@ import {
   problemsOf,
   readLastCalendar,
   rememberCalendar,
+  reminderOfValue,
+  reminderOptions,
+  reminderValue,
   repeatLabelDate,
   repeatSummary,
   scopeQuestion,
@@ -45,7 +48,7 @@ import "./editor.css";
 /**
  * The event form (glossary: event form), Google's full editor: a dialog,
  * the whole screen on a phone, with the title, when it starts and ends, All
- * day, how it repeats, which calendar, where, and notes. Save, Cancel and,
+ * day, the reminder (brief 15), how it repeats, which calendar, where, and notes. Save, Cancel and,
  * when editing, Delete.
  *
  * - A new event starts as `seed` says (the next full hour for an hour when
@@ -283,6 +286,21 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
               {whenError}
             </p>
           )}
+        </Row>
+
+        <Row icon={<BellIcon size={ICON} />} label="Reminder">
+          <select
+            className="editor-input editor-select editor-reminder"
+            aria-label="Reminder"
+            value={reminderValue(draft.reminderMinutes)}
+            onChange={(event) => setDraft((current) => ({ ...current, reminderMinutes: reminderOfValue(event.target.value) }))}
+          >
+            {reminderOptions(draft.allDay).map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </Row>
 
         <Row icon={<RepeatIcon size={ICON} />} label="Repeat">

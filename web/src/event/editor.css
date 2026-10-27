@@ -40,6 +40,13 @@
   padding-inline-end: 8px;
 }
 
+/* The reminder (brief 15): as wide as its longest choice, as the repeat's select is. */
+.editor-reminder {
+  width: fit-content;
+  min-width: 240px;
+  max-width: 100%;
+}
+
 .editor-notes {
   height: auto;
   min-height: 96px;

@@ -16,6 +16,7 @@ const oneOff: Occurrence = {
   start: "2026-10-16T07:00:00Z",
   end: "2026-10-16T08:00:00Z",
   repeat: null,
+  reminderMinutes: null,
 };
 
 /** The third Monday of a weekly series, moved an hour later (an exception). */

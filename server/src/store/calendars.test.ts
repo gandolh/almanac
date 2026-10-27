@@ -107,7 +107,7 @@ describe("remove", () => {
     const events = createEventStore(db, clock);
     const work = store.create(ana, { name: "Work" });
     const home = store.create(ana, { name: "Home" });
-    const content = { title: "x", location: "", notes: "", allDay: true, start: "2026-10-16", end: "2026-10-17" };
+    const content = { title: "x", location: "", notes: "", allDay: true, start: "2026-10-16", end: "2026-10-17", reminderMinutes: null };
     const gone = events.create(ana, { ...content, calendarId: work.id, tzid: "Europe/Bucharest" });
     const kept = events.create(ana, { ...content, calendarId: home.id, tzid: "Europe/Bucharest" });
     expect(store.remove(ana, work.id)).toBe(true);

@@ -652,6 +652,72 @@ describe("all-day series", () => {
   });
 });
 
+describe("a series' reminder", () => {
+  const reminders = (list: Occurrence[]) => list.slice(0, 7).map((o) => `${o.start} ${o.reminderMinutes}`);
+
+  it("is every occurrence's", async () => {
+    await create({ ...MONDAYS, reminderMinutes: 10 });
+    expect(new Set((await autumn()).map((o) => o.reminderMinutes))).toEqual(new Set([10]));
+  });
+
+  it("changes for every occurrence with all, exceptions that had the old one included, and keeps one edited on its own", async () => {
+    const series = await create({ ...MONDAYS, reminderMinutes: 10 });
+    await edit(series.eventId, { scope: "this", occurrence: OCT[12], changes: { title: "Planning" } });
+    await edit(series.eventId, { scope: "this", occurrence: OCT[19], changes: { reminderMinutes: 60 } });
+    await edit(series.eventId, { scope: "all", occurrence: OCT[26], changes: { reminderMinutes: 15 } });
+    expect(reminders(await autumn())).toEqual([
+      `${OCT[5]} 15`,
+      `${OCT[12]} 15`,
+      `${OCT[19]} 60`,
+      `${OCT[26]} 15`,
+      `${NOV[2]} 15`,
+      `${NOV[9]} 15`,
+      `${NOV[16]} 15`,
+    ]);
+  });
+
+  it("changes for that one occurrence only with this", async () => {
+    const series = await create({ ...MONDAYS, reminderMinutes: 10 });
+    const one = await edit(series.eventId, { scope: "this", occurrence: OCT[19], changes: { reminderMinutes: null } });
+    expect(one).toMatchObject({ seriesId: series.eventId, originalStart: OCT[19], reminderMinutes: null });
+    expect(reminders(await autumn())).toEqual([
+      `${OCT[5]} 10`,
+      `${OCT[12]} 10`,
+      `${OCT[19]} null`,
+      `${OCT[26]} 10`,
+      `${NOV[2]} 10`,
+      `${NOV[9]} 10`,
+      `${NOV[16]} 10`,
+    ]);
+  });
+
+  it("changes from that occurrence on with following, the exceptions after it that had the old one included", async () => {
+    const series = await create({ ...MONDAYS, reminderMinutes: 10 });
+    await edit(series.eventId, { scope: "this", occurrence: NOV[2], changes: { title: "Planning" } });
+    await edit(series.eventId, { scope: "following", occurrence: OCT[19], changes: { reminderMinutes: 120 } });
+    expect(reminders(await autumn())).toEqual([
+      `${OCT[5]} 10`,
+      `${OCT[12]} 10`,
+      `${OCT[19]} 120`,
+      `${OCT[26]} 120`,
+      `${NOV[2]} 120`,
+      `${NOV[9]} 120`,
+      `${NOV[16]} 120`,
+    ]);
+  });
+
+  it("goes when the series turns all-day, as it would for a one-off", async () => {
+    const series = await create({ ...MONDAYS, reminderMinutes: 10 });
+    const allDay = await edit(series.eventId, {
+      scope: "all",
+      occurrence: OCT[5],
+      changes: { allDay: true, start: "2026-10-05", end: "2026-10-06" },
+    });
+    expect(allDay.reminderMinutes).toBeNull();
+    expect(new Set((await autumn()).map((o) => o.reminderMinutes))).toEqual(new Set([null]));
+  });
+});
+
 describe("aiming at an occurrence", () => {
   it("needs a scope for a series or an exception", async () => {
     const series = await create(MONDAYS);

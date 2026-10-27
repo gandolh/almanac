@@ -92,6 +92,8 @@ export interface EventContent {
   start: string;
   /** As `start`. Exclusive for an all-day event: a one-day event on the 16th ends on the 17th. */
   end: string;
+  /** The reminder (brief 15): minutes before the start, or before 00:00 of the start date for an all-day event. Null is none. */
+  reminderMinutes: number | null;
 }
 
 /** A new row: its content, the zone its wall-clock times belong to (the user's display time zone), and `rrule` for a series. */
@@ -139,6 +141,7 @@ interface EventRow {
   endAt: number | null;
   startDate: string | null;
   endDate: string | null;
+  reminderMinutes: number | null;
   tzid: string;
   rrule: string | null;
   exdates: string;
@@ -151,7 +154,7 @@ interface EventRow {
 const SELECT = `
   SELECT id, calendar_id AS calendarId, title, location, notes, all_day AS allDay,
          start_at AS startAt, end_at AS endAt, start_date AS startDate, end_date AS endDate,
-         tzid, rrule, exdates, series_id AS seriesId, original_start AS originalStart,
+         reminder_minutes AS reminderMinutes, tzid, rrule, exdates, series_id AS seriesId, original_start AS originalStart,
          created_at AS createdAt, updated_at AS updatedAt
   FROM events`;
 
@@ -166,6 +169,7 @@ function toRecord(row: EventRow): EventRecord {
     allDay,
     start: allDay ? (row.startDate ?? "") : formatInstant(row.startAt ?? 0),
     end: allDay ? (row.endDate ?? "") : formatInstant(row.endAt ?? 0),
+    reminderMinutes: row.reminderMinutes,
     tzid: row.tzid,
     rrule: row.rrule,
     exdates: JSON.parse(row.exdates) as string[],
@@ -188,11 +192,12 @@ function contentParams(content: EventContent): Record<string, unknown> {
     endAt: content.allDay ? null : parseInstant(content.end),
     startDate: content.allDay ? content.start : null,
     endDate: content.allDay ? content.end : null,
+    reminderMinutes: content.reminderMinutes,
     searchText: eventSearchText(content),
   };
 }
 
-const CONTENT_KEYS = ["calendarId", "title", "location", "notes", "allDay", "start", "end"] as const;
+const CONTENT_KEYS = ["calendarId", "title", "location", "notes", "allDay", "start", "end", "reminderMinutes"] as const;
 
 export function createEventStore(db: Db, now: () => Date = () => new Date()): EventStore {
   const getRow = db.prepare<[string, number], EventRow>(`${SELECT} WHERE user_id = ? AND id = ?`);
@@ -202,13 +207,14 @@ export function createEventStore(db: Db, now: () => Date = () => new Date()): Ev
 
   const insertRow = db.prepare<[Record<string, unknown>]>(`
     INSERT INTO events (user_id, calendar_id, title, location, notes, all_day, start_at, end_at, start_date, end_date,
-                        tzid, rrule, series_id, original_start, search_text, created_at, updated_at)
+                        reminder_minutes, tzid, rrule, series_id, original_start, search_text, created_at, updated_at)
     VALUES (@userId, @calendarId, @title, @location, @notes, @allDay, @startAt, @endAt, @startDate, @endDate,
-            @tzid, @rrule, @seriesId, @originalStart, @searchText, @at, @at)`);
+            @reminderMinutes, @tzid, @rrule, @seriesId, @originalStart, @searchText, @at, @at)`);
   const updateRow = db.prepare<[Record<string, unknown>]>(`
     UPDATE events SET calendar_id = @calendarId, title = @title, location = @location, notes = @notes,
                       all_day = @allDay, start_at = @startAt, end_at = @endAt, start_date = @startDate,
-                      end_date = @endDate, search_text = @searchText, updated_at = @updatedAt
+                      end_date = @endDate, reminder_minutes = @reminderMinutes, search_text = @searchText,
+                      updated_at = @updatedAt
     WHERE user_id = @userId AND id = @id`);
   const deleteRow = db.prepare<[string, number]>("DELETE FROM events WHERE user_id = ? AND id = ?");
   const updateExdates = db.prepare<[string, string, string, number]>(

@@ -78,6 +78,7 @@ describe("POST /api/events", () => {
       start: "2026-10-16T07:00:00Z",
       end: "2026-10-16T07:15:00Z",
       repeat: null,
+      reminderMinutes: null,
     });
   });
 
@@ -110,6 +111,7 @@ describe("POST /api/events", () => {
       start: "2026-10-16T07:00:00Z",
       end: "2026-10-16T07:15:00Z",
       repeat: { freq: "weekly", byDay: ["FR"], end: { type: "count", count: 10 } },
+      reminderMinutes: null,
     });
     expect(storedRow(series.eventId)).toMatchObject({ tzid: "Europe/Bucharest", rrule: "FREQ=WEEKLY;BYDAY=FR;COUNT=10" });
     expect((await create({ ...standup(), repeat: null })).repeat).toBeNull();
@@ -298,5 +300,71 @@ describe("another user", () => {
     expectError(await other.inject({ method: "DELETE", url }), 404, "not_found");
     const still = await t.inject({ method: "PATCH", url, payload: { changes: {} } });
     expect(still.json()).toEqual(event);
+  });
+});
+
+describe("reminders", () => {
+  const holiday = () => ({ calendarId, title: "Name day", allDay: true, start: "2026-10-16", end: "2026-10-17" });
+
+  /** The occurrences of October 2026 in Bucharest, as the views read them back. */
+  async function october(): Promise<Occurrence[]> {
+    const from = encodeURIComponent("2026-10-01T00:00:00+03:00");
+    const to = encodeURIComponent("2026-11-01T00:00:00+02:00");
+    const res = await t.inject({ method: "GET", url: `/api/occurrences?from=${from}&to=${to}` });
+    expect(res.statusCode).toBe(200);
+    return (res.json() as { occurrences: Occurrence[] }).occurrences.map((o) => occurrenceSchema.parse(o));
+  }
+
+  const edit = (id: number, payload: object) => t.inject({ method: "PATCH", url: `/api/events/${id}`, payload });
+
+  it("is none unless one is given", async () => {
+    expect((await create(standup())).reminderMinutes).toBeNull();
+  });
+
+  it("reads back 10 for a timed event saved with 10 minutes before, and 900 for an all-day one the day before at 09:00", async () => {
+    const timed = await create({ ...standup(), reminderMinutes: 10 });
+    const allDay = await create({ ...holiday(), reminderMinutes: 900 });
+    expect(timed.reminderMinutes).toBe(10);
+    expect(allDay.reminderMinutes).toBe(900);
+    const shown = await october();
+    expect(shown.find((o) => o.eventId === timed.eventId)?.reminderMinutes).toBe(10);
+    expect(shown.find((o) => o.eventId === allDay.eventId)?.reminderMinutes).toBe(900);
+  });
+
+  it("is a 400 outside the list, on a create and on an edit", async () => {
+    for (const payload of [
+      { ...standup(), reminderMinutes: 7 },
+      { ...standup(), reminderMinutes: 900 },
+      { ...holiday(), reminderMinutes: 10 },
+      { ...holiday(), reminderMinutes: "900" },
+    ]) {
+      const res = await t.inject({ method: "POST", url: "/api/events", payload });
+      expect(expectError(res, 400, "validation"), JSON.stringify(payload)).toMatch(/^reminderMinutes: /);
+    }
+    const event = await create(standup());
+    expect(expectError(await edit(event.eventId, { changes: { reminderMinutes: 45 } }), 400, "validation")).toMatch(/^reminderMinutes: /);
+  });
+
+  it("changes and clears on an edit", async () => {
+    const event = await create(standup());
+    const res = await edit(event.eventId, { changes: { reminderMinutes: 30 } });
+    expect(occurrenceSchema.parse(res.json()).reminderMinutes).toBe(30);
+    const cleared = await edit(event.eventId, { changes: { reminderMinutes: null } });
+    expect(occurrenceSchema.parse(cleared.json()).reminderMinutes).toBeNull();
+  });
+
+  it("resets to none when an event turns all-day or timed, unless the edit gives one of the new kind", async () => {
+    const event = await create({ ...standup(), reminderMinutes: 10 });
+    const allDay = await edit(event.eventId, { changes: { allDay: true, start: "2026-10-16", end: "2026-10-17" } });
+    expect(allDay.statusCode).toBe(200);
+    expect(occurrenceSchema.parse(allDay.json()).reminderMinutes).toBeNull();
+
+    const back = await edit(event.eventId, {
+      changes: { allDay: false, start: "2026-10-16T07:00:00Z", end: "2026-10-16T08:00:00Z", reminderMinutes: 5 },
+    });
+    expect(occurrenceSchema.parse(back.json()).reminderMinutes).toBe(5);
+
+    const wrongKind = await edit(event.eventId, { changes: { allDay: true, start: "2026-10-16", end: "2026-10-17", reminderMinutes: 5 } });
+    expect(expectError(wrongKind, 400, "validation")).toMatch(/^reminderMinutes: .* all-day event$/);
   });
 });

@@ -20,6 +20,9 @@ import {
   problemsOf,
   readLastCalendar,
   rememberCalendar,
+  reminderOfValue,
+  reminderOptions,
+  reminderValue,
   repeatDraftOf,
   repeatLabelDate,
   repeatOf,
@@ -60,6 +63,7 @@ function occurrence(extra: Partial<Occurrence> = {}): Occurrence {
     start: "2026-10-16T07:00:00Z",
     end: "2026-10-16T07:30:00Z",
     repeat: null,
+    reminderMinutes: null,
     ...extra,
   };
 }
@@ -373,6 +377,7 @@ describe("saving a new event", () => {
       start: "2026-10-20T07:00:00Z",
       end: "2026-10-20T08:30:00Z",
       repeat: null,
+      reminderMinutes: null,
     });
     // Winter time: Bucharest is UTC+2.
     expect(wireTimesOf(draft({ startDate: "2026-11-20", endDate: "2026-11-20" }), BUCHAREST)).toEqual({
@@ -396,6 +401,56 @@ describe("saving a new event", () => {
   it("sends the repeat", () => {
     const repeating = draft({ repeat: choosePreset(draft().repeat, "weekly", "2026-10-20"), repeatTouched: true });
     expect(eventInputOf(repeating, 2, BUCHAREST)?.repeat).toEqual({ freq: "weekly", byDay: ["TU"], end: { type: "never" } });
+  });
+});
+
+describe("the reminder", () => {
+  it("lists None first, then the choices for the event's kind", () => {
+    expect(reminderOptions(false)).toEqual([
+      { value: "none", label: "None" },
+      { value: "0", label: "At the start" },
+      { value: "5", label: "5 minutes before" },
+      { value: "10", label: "10 minutes before" },
+      { value: "15", label: "15 minutes before" },
+      { value: "30", label: "30 minutes before" },
+      { value: "60", label: "1 hour before" },
+      { value: "120", label: "2 hours before" },
+      { value: "1440", label: "1 day before" },
+    ]);
+    expect(reminderOptions(true)).toEqual([
+      { value: "none", label: "None" },
+      { value: "-540", label: "On the day at 09:00" },
+      { value: "900", label: "The day before at 09:00" },
+    ]);
+  });
+
+  it("reads and writes the select's value", () => {
+    expect(reminderValue(null)).toBe("none");
+    expect(reminderValue(-540)).toBe("-540");
+    expect(reminderOfValue("none")).toBeNull();
+    expect(reminderOfValue("10")).toBe(10);
+  });
+
+  it("starts at none for a new event and at the occurrence's for an edit", () => {
+    expect(draft().reminderMinutes).toBeNull();
+    expect(draftOfOccurrence(occurrence({ reminderMinutes: 30 }), BUCHAREST, NOW).reminderMinutes).toBe(30);
+  });
+
+  it("goes back to none when All day is switched either way", () => {
+    expect(withAllDay(draft({ reminderMinutes: 10 }), true).reminderMinutes).toBeNull();
+    expect(withAllDay(draft({ allDay: true, reminderMinutes: 900 }), false).reminderMinutes).toBeNull();
+    expect(withAllDay(draft({ reminderMinutes: 10 }), false).reminderMinutes).toBe(10);
+  });
+
+  it("is sent with a new event, and with an edit only when it changed", () => {
+    expect(eventInputOf(draft({ reminderMinutes: 10 }), 2, BUCHAREST)?.reminderMinutes).toBe(10);
+    const found = occurrence({ reminderMinutes: 10 });
+    const edit = (extra: Partial<EventDraft>) => changedFields({ ...draftOfOccurrence(found, BUCHAREST, NOW), ...extra }, found, BUCHAREST);
+    expect(edit({})).toEqual({});
+    expect(edit({ reminderMinutes: 60 })).toEqual({ reminderMinutes: 60 });
+    expect(edit({ reminderMinutes: null })).toEqual({ reminderMinutes: null });
+    const allDay = withAllDay(draftOfOccurrence(found, BUCHAREST, NOW), true);
+    expect(changedFields(allDay, found, BUCHAREST)).toMatchObject({ allDay: true, reminderMinutes: null });
   });
 });
 

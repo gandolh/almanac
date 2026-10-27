@@ -1,4 +1,4 @@
-import { describeRepeat, type Calendar, type Occurrence } from "@almanac/shared";
+import { describeReminder, describeRepeat, type Calendar, type Occurrence } from "@almanac/shared";
 import { useId, type CSSProperties, type ReactNode } from "react";
 import { displayTitle } from "../calendar/events";
 import { CalendarIcon, CloseIcon, DeleteIcon, EditIcon, NotesIcon, PlaceIcon } from "../components/icons";
@@ -15,8 +15,8 @@ import "./details.css";
 /**
  * What a click on an event shows, Google's details popover: Edit, Delete
  * and close along the top; the calendar's colour beside the title; when it
- * happens, how it repeats, where, the notes (links clickable) and which
- * calendar it is on. Esc or a press outside closes it.
+ * happens, how it repeats, its reminder (brief 15), where, the notes (links
+ * clickable) and which calendar it is on. Esc or a press outside closes it.
  */
 
 /** The popover's icons: 20 px, in the column details.css keeps for them. */
@@ -75,6 +75,7 @@ export interface EventDetailsProps {
 /** The popover's contents, without the popover (for tests). */
 export function EventDetails({ occurrence, calendar, timeZone, titleId, onEdit, onDelete, onClose }: EventDetailsProps) {
   const repeat = occurrence.repeat ? describeRepeat(occurrence.repeat, occurrence.originalStart ?? occurrence.start, timeZone) : null;
+  const reminder = occurrence.reminderMinutes === null ? null : `Reminder: ${describeReminder(occurrence.reminderMinutes, occurrence.allDay)}`;
   const swatch = calendar ? ({ "--calendar-color": calendarColor(calendar) } as CSSProperties) : undefined;
   return (
     // Focus lands on the details, not on Edit, as Google's popover does.
@@ -100,6 +101,7 @@ export function EventDetails({ occurrence, calendar, timeZone, titleId, onEdit, 
           </h2>
           <p className="details__when">{whenText(occurrence, timeZone)}</p>
           {repeat && <p className="details__repeat">{repeat}</p>}
+          {reminder && <p className="details__repeat">{reminder}</p>}
         </div>
       </div>
       {occurrence.location.trim() !== "" && (

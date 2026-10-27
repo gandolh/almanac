@@ -187,6 +187,7 @@ export function rowOccurrence(event: EventRecord, repeat: Repeat | null): Occurr
     start: event.start,
     end: event.end,
     repeat,
+    reminderMinutes: event.reminderMinutes,
   };
 }
 
@@ -205,6 +206,7 @@ export function seriesOccurrence(series: SeriesRecord, key: string, repeat: Repe
     start: key,
     end: occurrenceEnd(series, key),
     repeat,
+    reminderMinutes: series.reminderMinutes,
   };
 }
 
@@ -304,6 +306,6 @@ export function searchOccurrence(
 
 /** The content fields of an occurrence or a row, for comparing and copying. */
 export function contentOf(event: EventContent): EventContent {
-  const { calendarId, title, location, notes, allDay, start, end } = event;
-  return { calendarId, title, location, notes, allDay, start, end };
+  const { calendarId, title, location, notes, allDay, start, end, reminderMinutes } = event;
+  return { calendarId, title, location, notes, allDay, start, end, reminderMinutes };
 }

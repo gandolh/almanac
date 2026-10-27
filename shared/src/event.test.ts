@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  ALL_DAY_REMINDERS,
   EVENT_LENGTH_MAX_DAYS,
+  TIMED_REMINDERS,
+  describeReminder,
   REPEAT_UNTIL_MAX,
   compareOccurrences,
   eventChangesSchema,
@@ -41,6 +44,7 @@ describe("eventInputSchema", () => {
       start: "2026-10-16T07:00:00Z",
       end: "2026-10-16T07:15:00Z",
       repeat: null,
+      reminderMinutes: null,
     });
   });
 
@@ -88,6 +92,52 @@ describe("eventInputSchema", () => {
       byDay: ["MO", "FR"],
       end: { type: "count", count: 10 },
     });
+  });
+});
+
+describe("reminders", () => {
+  const allDay = { ...timed, allDay: true, start: "2026-10-16", end: "2026-10-17" };
+
+  it("offers phone calendars' choices for each kind", () => {
+    expect(TIMED_REMINDERS).toEqual([0, 5, 10, 15, 30, 60, 120, 1440]);
+    expect(ALL_DAY_REMINDERS).toEqual([-540, 900]);
+  });
+
+  it("takes a listed reminder for the event's kind, and none", () => {
+    expect(eventInputSchema.parse({ ...timed, reminderMinutes: 10 }).reminderMinutes).toBe(10);
+    expect(eventInputSchema.parse({ ...timed, reminderMinutes: 0 }).reminderMinutes).toBe(0);
+    expect(eventInputSchema.parse({ ...allDay, reminderMinutes: 900 }).reminderMinutes).toBe(900);
+    expect(eventInputSchema.parse({ ...allDay, reminderMinutes: -540 }).reminderMinutes).toBe(-540);
+    expect(eventInputSchema.parse({ ...timed, reminderMinutes: null }).reminderMinutes).toBeNull();
+  });
+
+  it("refuses anything else, and one of the other kind's", () => {
+    for (const reminderMinutes of [7, -5, 2880, 10.5, "10"]) {
+      expect(issue(eventInputSchema.safeParse({ ...timed, reminderMinutes }))).toMatch(/^reminderMinutes: /);
+    }
+    expect(issue(eventInputSchema.safeParse({ ...timed, reminderMinutes: 900 }))).toBe(
+      "reminderMinutes: must be null or one of 0, 5, 10, 15, 30, 60, 120, 1440 for a timed event",
+    );
+    expect(issue(eventInputSchema.safeParse({ ...allDay, reminderMinutes: 10 }))).toBe(
+      "reminderMinutes: must be null or one of -540, 900 for an all-day event",
+    );
+  });
+
+  it("says each in words", () => {
+    expect(TIMED_REMINDERS.map((minutes) => describeReminder(minutes, false))).toEqual([
+      "at the start",
+      "5 minutes before",
+      "10 minutes before",
+      "15 minutes before",
+      "30 minutes before",
+      "1 hour before",
+      "2 hours before",
+      "1 day before",
+    ]);
+    expect(ALL_DAY_REMINDERS.map((minutes) => describeReminder(minutes, true))).toEqual([
+      "on the day at 09:00",
+      "the day before at 09:00",
+    ]);
   });
 });
 
@@ -177,6 +227,7 @@ describe("compareOccurrences", () => {
     start: "2026-10-16T07:00:00Z",
     end: "2026-10-16T08:00:00Z",
     repeat: null,
+    reminderMinutes: null,
   };
   const make = (id: string, fields: Partial<Occurrence>): Occurrence => ({ ...base, id, ...fields });
 

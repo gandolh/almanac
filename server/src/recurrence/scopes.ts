@@ -162,15 +162,27 @@ function aim(events: EventStore, userId: string, id: number, scope?: EditScope, 
   };
 }
 
-/** `current` with `changes` on top, checked as a whole: a new end alone must still follow the start. */
+/**
+ * `current` with `changes` on top, checked as a whole: a new end alone must
+ * still follow the start. Turning the event all-day or timed without a new
+ * reminder drops the old one, which the other kind doesn't offer (brief 15).
+ */
 function apply(current: EventContent, changes: EventChanges, repeat: Repeat | null): EventInput {
-  return eventInputSchema.parse({ ...current, ...changes, repeat: changes.repeat === undefined ? repeat : changes.repeat });
+  const kindChanged = changes.allDay !== undefined && changes.allDay !== current.allDay;
+  const reminderMinutes = changes.reminderMinutes !== undefined ? changes.reminderMinutes : kindChanged ? null : current.reminderMinutes;
+  return eventInputSchema.parse({
+    ...current,
+    ...changes,
+    reminderMinutes,
+    repeat: changes.repeat === undefined ? repeat : changes.repeat,
+  });
 }
 
-const FIELDS = ["calendarId", "title", "location", "notes"] as const;
+/** The fields an edit carries as they are, which "all" spreads to the exceptions that still had the old value. */
+const FIELDS = ["calendarId", "title", "location", "notes", "reminderMinutes"] as const;
 type Fields = Partial<Pick<EventContent, (typeof FIELDS)[number]>>;
 
-/** The title, location, notes and calendar of `next` that differ from `current`. */
+/** The title, location, notes, calendar and reminder of `next` that differ from `current`. */
 function changedFields(current: EventContent, next: EventContent): Fields {
   const fields: Fields = {};
   for (const field of FIELDS) if (next[field] !== current[field]) Object.assign(fields, { [field]: next[field] });

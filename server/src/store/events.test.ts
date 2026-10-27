@@ -42,11 +42,11 @@ afterEach(() => {
 });
 
 function timed(start: string, end: string, fields: Partial<EventContent> = {}): EventContent {
-  return { calendarId: work, title: "Meeting", location: "", notes: "", allDay: false, start, end, ...fields };
+  return { calendarId: work, title: "Meeting", location: "", notes: "", allDay: false, start, end, reminderMinutes: null, ...fields };
 }
 
 function allDay(start: string, end: string, fields: Partial<EventContent> = {}): EventContent {
-  return { calendarId: work, title: "Holiday", location: "", notes: "", allDay: true, start, end, ...fields };
+  return { calendarId: work, title: "Holiday", location: "", notes: "", allDay: true, start, end, reminderMinutes: null, ...fields };
 }
 
 function range(fromIso: string, toIso: string): EventRange {
@@ -70,6 +70,7 @@ describe("create and get", () => {
       allDay: false,
       start: "2026-10-16T07:00:00Z",
       end: "2026-10-16T08:00:00Z",
+      reminderMinutes: null,
       tzid: ZONE,
       rrule: null,
       exdates: [],

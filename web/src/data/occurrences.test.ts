@@ -16,6 +16,7 @@ const standup: Occurrence = {
   start: "2026-10-16T07:00:00Z",
   end: "2026-10-16T07:15:00Z",
   repeat: null,
+  reminderMinutes: null,
 };
 
 function json(status: number, body: unknown): Response {
@@ -95,6 +96,7 @@ describe("the writes", () => {
       start: "2026-10-16T07:00:00Z",
       end: "2026-10-16T07:15:00Z",
       repeat: null,
+      reminderMinutes: null,
     });
     expect(changes).toBe(1);
   });

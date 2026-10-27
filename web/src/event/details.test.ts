@@ -34,6 +34,7 @@ const standup: Occurrence = {
   start: "2026-10-16T07:00:00Z",
   end: "2026-10-16T08:00:00Z",
   repeat: null,
+  reminderMinutes: null,
 };
 
 function details(props: Partial<EventDetailsProps> = {}): string {
@@ -77,6 +78,14 @@ describe("whenText", () => {
 });
 
 describe("EventDetails", () => {
+  it("shows the reminder in words, and nothing when there is none", () => {
+    expect(details()).not.toContain("Reminder");
+    expect(details({ occurrence: { ...standup, reminderMinutes: 10 } })).toContain(">Reminder: 10 minutes before</p>");
+    expect(details({ occurrence: { ...standup, reminderMinutes: 0 } })).toContain(">Reminder: at the start</p>");
+    const nameDay = { ...standup, allDay: true, start: "2026-10-16", end: "2026-10-17", reminderMinutes: 900 };
+    expect(details({ occurrence: nameDay })).toContain(">Reminder: the day before at 09:00</p>");
+  });
+
   it("shows the title, the time, the calendar and the actions", () => {
     const html = details();
     expect(html).toContain('<h2 id="title" class="details__title">Standup</h2>');

@@ -4,8 +4,10 @@ import {
   EVENT_TITLE_MAX,
   REPEAT_COUNT_MAX,
   WEEKDAYS,
+  describeReminder,
   describeRepeat,
   isDateKey,
+  remindersFor,
   startDate as seriesStartDate,
   type Calendar,
   type Occurrence,
@@ -68,6 +70,8 @@ export interface EventDraft {
   origin: { repeat: Repeat | null; anchor: string } | null;
   location: string;
   notes: string;
+  /** The reminder (brief 15): one of `remindersFor(allDay)`, or `null` for none. */
+  reminderMinutes: number | null;
 }
 
 /** What a new event's form starts from: `CreateInit`, and what quick create had typed. */
@@ -244,6 +248,7 @@ export function draftOfSeed(seed: FormSeed, timeZone: string, now: Temporal.Inst
     origin: null,
     location: "",
     notes: "",
+    reminderMinutes: null,
   };
 }
 
@@ -282,6 +287,7 @@ export function draftOfOccurrence(occurrence: Occurrence, timeZone: string, now:
     origin: { repeat: occurrence.repeat, anchor },
     location: occurrence.location,
     notes: occurrence.notes,
+    reminderMinutes: occurrence.reminderMinutes,
   };
 }
 
@@ -314,9 +320,15 @@ export function withEnd(draft: EventDraft, change: Partial<Pick<EventDraft, "end
  * The All day checkbox. Turning it on keeps the dates (an end at midnight
  * is the day before: 22:00 to 00:00 is one day); turning it off gives the
  * event its times back, an hour long if they would end before they start.
+ * Either way the reminder goes back to none: the two kinds have different
+ * choices, and the server drops the old one too.
  */
 export function withAllDay(draft: EventDraft, allDay: boolean): EventDraft {
   if (allDay === draft.allDay) return draft;
+  return { ...withAllDayTimes(draft, allDay), reminderMinutes: null };
+}
+
+function withAllDayTimes(draft: EventDraft, allDay: boolean): EventDraft {
   if (allDay) {
     const start = parseDateKey(draft.startDate);
     const end = parseDateKey(draft.endDate);
@@ -524,6 +536,37 @@ export function sameRepeat(a: Repeat | null, b: Repeat | null, anchor: string): 
   return JSON.stringify(normalized(a, anchor)) === JSON.stringify(normalized(b, anchor));
 }
 
+// --- The reminder -----------------------------------------------------------------------------------------------
+
+export interface ReminderOption {
+  /** The select's value: `"none"`, or the minutes as text. */
+  value: string;
+  label: string;
+}
+
+/** The select's value for a reminder. */
+export function reminderValue(minutes: number | null): string {
+  return minutes === null ? "none" : String(minutes);
+}
+
+/** The reminder a select value means. */
+export function reminderOfValue(value: string): number | null {
+  return value === "none" ? null : Number(value);
+}
+
+/** "10 minutes before" → "10 minutes before"; "at the start" → "At the start". */
+function sentenceCase(text: string): string {
+  return text.charAt(0).toLocaleUpperCase("en") + text.slice(1);
+}
+
+/** The reminder select's choices for an event of this kind, "None" first, as phone calendars list them. */
+export function reminderOptions(allDay: boolean): ReminderOption[] {
+  return [
+    { value: "none", label: "None" },
+    ...remindersFor(allDay).map((minutes) => ({ value: reminderValue(minutes), label: sentenceCase(describeReminder(minutes, allDay)) })),
+  ];
+}
+
 // --- What is sent ---------------------------------------------------------------------------------------------
 
 export interface WireTimes {
@@ -568,6 +611,7 @@ export function eventInputOf(draft: EventDraft, calendarId: number, timeZone: st
     start: times.start,
     end: times.end,
     repeat: currentRepeat(draft),
+    reminderMinutes: draft.reminderMinutes,
   };
 }
 
@@ -587,6 +631,7 @@ export function changedFields(draft: EventDraft, occurrence: Occurrence, timeZon
   if (input.location !== occurrence.location) changes.location = input.location;
   if (input.notes !== occurrence.notes) changes.notes = input.notes;
   if (input.allDay !== occurrence.allDay) changes.allDay = input.allDay;
+  if (input.reminderMinutes !== occurrence.reminderMinutes) changes.reminderMinutes = input.reminderMinutes;
   // Judged on the fields, not on the instants: an hour that happens twice
   // (clocks going back) would otherwise come out as a move nobody made.
   const before = draftOfOccurrence(occurrence, timeZone);

@@ -181,13 +181,15 @@ describe("EventForm", () => {
     expect(html).toContain('aria-label="End date"');
     expect(html).toContain("All day");
     expect(html).toContain('<option value="none" selected="">Does not repeat</option>');
+    expect(html).toContain('aria-label="Reminder"');
+    expect(html).toContain('<option value="none" selected="">None</option>');
     expect(html).toContain('aria-label="Location"');
     expect(html).toContain('aria-label="Notes"');
     expect(html).toContain(">Cancel</button>");
     expect(html).toContain(">Save</button>");
     expect(html).not.toContain(">Delete</button>");
     // The rows' icons at 20 px, the size editor.css lays the rows out for.
-    expect(html.match(/"editor-row__lead"><svg width="20"/g)).toHaveLength(5);
+    expect(html.match(/"editor-row__lead"><svg width="20"/g)).toHaveLength(6);
   });
 
   it("hides the times of an all-day event", () => {
@@ -220,6 +222,7 @@ describe("EventForm", () => {
       start: "2026-10-23T07:00:00Z",
       end: "2026-10-23T07:30:00Z",
       repeat: { freq: "weekly", byDay: ["MO", "FR"], end: { type: "count", count: 6 } },
+      reminderMinutes: null,
     };
     const html = form({ occurrence: found });
     expect(html).toContain("Edit event");

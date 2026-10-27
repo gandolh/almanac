@@ -147,6 +147,7 @@ describe("GET /api/occurrences for series", () => {
         start: "2026-10-19T07:00:00Z",
         end: "2026-10-19T08:00:00Z",
         repeat: { freq: "weekly", byDay: ["MO"], end: { type: "never" } },
+        reminderMinutes: null,
       },
       expect.objectContaining({
         id: `s${series.eventId}:2026-10-26T08:00:00Z`,
@@ -223,7 +224,7 @@ describe("GET /api/occurrences for series", () => {
     await create({ ...timed("Standup", "2026-10-05T10:00:00+03:00", "2026-10-05T11:00:00+03:00"), repeat: weekly });
     await create(timed("Dentist", "2026-10-20T09:00:00+03:00", "2026-10-20T10:00:00+03:00"));
     // All-day to the year 9999: no write takes it now (EVENT_LENGTH_MAX_DAYS), but a row from before may be there.
-    insertRow({ calendarId, title: "Forever", location: "", notes: "", allDay: true, start: "2026-10-01", end: "9999-12-31", tzid: "Europe/Bucharest", rrule: "FREQ=DAILY" });
+    insertRow({ calendarId, title: "Forever", location: "", notes: "", allDay: true, start: "2026-10-01", end: "9999-12-31", reminderMinutes: null, tzid: "Europe/Bucharest", rrule: "FREQ=DAILY" });
     expect(titles(await occurrences(...october))).toEqual(["Standup", "Standup", "Standup", "Dentist", "Standup"]);
   });
 

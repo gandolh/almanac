@@ -84,6 +84,42 @@ export const EVENT_NOTES_MAX = 20_000;
  */
 export const EVENT_LENGTH_MAX_DAYS = 3660;
 
+/**
+ * An event's reminder (brief 15): how many minutes before the event starts its
+ * notification goes, or null for none, the default. One per event. The
+ * choices are what phone calendars offer.
+ *
+ * - A timed event counts back from its start.
+ * - An all-day event counts back from 00:00 of its start date in the user's
+ *   display time zone: 900 is 09:00 the day before, and -540 is 09:00 on the day.
+ *
+ * A series' reminder is every occurrence's; an exception carries its own.
+ */
+export const TIMED_REMINDERS = [0, 5, 10, 15, 30, 60, 120, 1440] as const;
+export const ALL_DAY_REMINDERS = [-540, 900] as const;
+
+/** The reminders an event of this kind can have, in the order the form lists them. */
+export function remindersFor(allDay: boolean): readonly number[] {
+  return allDay ? ALL_DAY_REMINDERS : TIMED_REMINDERS;
+}
+
+/** A reminder in words, for the form and the details: "10 minutes before", "the day before at 09:00". */
+export function describeReminder(minutes: number, allDay: boolean): string {
+  if (allDay) {
+    // Minutes before 00:00 of the start date: whole days back, then the clock that day.
+    const days = Math.ceil(minutes / 1440);
+    const clock = days * 1440 - minutes;
+    const time = `${String(Math.floor(clock / 60)).padStart(2, "0")}:${String(clock % 60).padStart(2, "0")}`;
+    const day = days === 0 ? "on the day" : days === 1 ? "the day before" : `${days} days before`;
+    return `${day} at ${time}`;
+  }
+  if (minutes === 0) return "at the start";
+  const unit = (n: number, one: string) => `${n} ${one}${n === 1 ? "" : "s"} before`;
+  if (minutes % 1440 === 0) return unit(minutes / 1440, "day");
+  if (minutes % 60 === 0) return unit(minutes / 60, "hour");
+  return unit(minutes, "minute");
+}
+
 const titleSchema = z
   .string({ error: "an event needs a title" })
   .trim()
@@ -110,6 +146,7 @@ const eventFields = {
   start: z.string(),
   end: z.string(),
   repeat: repeatSchema.nullable(),
+  reminderMinutes: z.number({ error: "must be a number of minutes, or null for none" }).int().nullable(),
 };
 
 /**
@@ -119,7 +156,18 @@ const eventFields = {
  * least one day, the end being exclusive. And at most
  * `EVENT_LENGTH_MAX_DAYS` after it.
  */
-function settleTimes<T extends { allDay: boolean; start: string; end: string }>(value: T, ctx: z.RefinementCtx): T {
+function settleTimes<T extends { allDay: boolean; start: string; end: string; reminderMinutes: number | null }>(
+  value: T,
+  ctx: z.RefinementCtx,
+): T {
+  if (value.reminderMinutes !== null && !remindersFor(value.allDay).includes(value.reminderMinutes)) {
+    const choices = remindersFor(value.allDay).join(", ");
+    ctx.addIssue({
+      code: "custom",
+      path: ["reminderMinutes"],
+      message: `must be null or one of ${choices} for ${value.allDay ? "an all-day" : "a timed"} event`,
+    });
+  }
   const parser = value.allDay ? dateSchema : instantSchema;
   const what = value.allDay
     ? "must be a date as YYYY-MM-DD for an all-day event"
@@ -144,7 +192,9 @@ function settleTimes<T extends { allDay: boolean; start: string; end: string }>(
 
 /**
  * `POST /api/events`, and what a patch's changes must add up to. Left out,
- * `location` and `notes` are empty and `repeat` is null (does not repeat).
+ * `location` and `notes` are empty, `repeat` is null (does not repeat) and
+ * `reminderMinutes` is null (no reminder). A reminder must be one of
+ * `remindersFor` the event's kind.
  */
 export const eventInputSchema = z
   .strictObject({
@@ -152,6 +202,7 @@ export const eventInputSchema = z
     location: eventFields.location.default(""),
     notes: eventFields.notes.default(""),
     repeat: eventFields.repeat.default(null),
+    reminderMinutes: eventFields.reminderMinutes.default(null),
   })
   .transform(settleTimes);
 export type EventInput = z.infer<typeof eventInputSchema>;
@@ -160,7 +211,9 @@ export type EventInput = z.infer<typeof eventInputSchema>;
  * The changes of a patch: any of the input's fields. They are checked as a
  * whole once merged onto the stored event (`eventInputSchema`), so a new
  * `end` alone must still be after the stored start, and turning an event
- * all-day needs dates for both `start` and `end`.
+ * all-day needs dates for both `start` and `end`. Turning it all-day or timed
+ * without a `reminderMinutes` resets the reminder to none: the two kinds have
+ * different choices.
  */
 export const eventChangesSchema = z.strictObject(eventFields).partial();
 export type EventChanges = z.infer<typeof eventChangesSchema>;
@@ -213,6 +266,8 @@ export const occurrenceSchema = z.object({
   start: occurrenceKeySchema,
   end: occurrenceKeySchema,
   repeat: repeatSchema.nullable(),
+  /** The reminder (`TIMED_REMINDERS`, `ALL_DAY_REMINDERS`), or null for none. A generated occurrence has the series'. */
+  reminderMinutes: z.number().int().nullable(),
 });
 export type Occurrence = z.infer<typeof occurrenceSchema>;
 

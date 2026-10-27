@@ -36,6 +36,7 @@ function occurrence(id: string, extra: Partial<Occurrence> = {}): Occurrence {
     start: "2026-10-16T07:00:00Z",
     end: "2026-10-16T07:30:00Z",
     repeat: null,
+    reminderMinutes: null,
     ...extra,
   };
 }

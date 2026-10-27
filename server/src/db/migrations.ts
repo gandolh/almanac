@@ -92,6 +92,14 @@ export const migrations: readonly string[] = [
   );
   CREATE INDEX push_subscriptions_user ON push_subscriptions (user_id, id);
   `,
+  // Brief 15: an event's reminder, in minutes before it starts; NULL is none.
+  // An all-day event counts back from 00:00 of its start date in the user's
+  // display time zone (900 is 09:00 the day before, -540 is 09:00 on the day).
+  // The choices are checked by the schema (shared/src/event.ts), not here, so
+  // the list can change without rebuilding the table.
+  `
+  ALTER TABLE events ADD COLUMN reminder_minutes INTEGER;
+  `,
 ];
 
 /**

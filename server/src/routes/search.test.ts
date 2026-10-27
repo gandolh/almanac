@@ -64,7 +64,7 @@ describe("GET /api/search", () => {
       db.transaction(() => {
         for (let i = 0; i < count; i++) {
           const start = addDays(first, i);
-          events.create(userId, { calendarId, title, location: "", notes: "", allDay: true, start, end: addDays(start, 1), tzid: "Europe/Bucharest" });
+          events.create(userId, { calendarId, title, location: "", notes: "", allDay: true, start, end: addDays(start, 1), reminderMinutes: null, tzid: "Europe/Bucharest" });
         }
       })();
     } finally {
@@ -101,6 +101,7 @@ describe("GET /api/search", () => {
         allDay: true,
         start: "2026-10-01",
         end: "9999-12-31",
+        reminderMinutes: null,
         tzid: "Europe/Bucharest",
         rrule: "FREQ=DAILY",
       });
