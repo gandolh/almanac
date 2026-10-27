@@ -7,11 +7,14 @@ import { databasePath, openDb, type Db } from "./db/open.js";
 import { registerErrorHandling } from "./errors.js";
 import { calendarRoutes } from "./routes/calendars.js";
 import { eventRoutes } from "./routes/events.js";
+import { createPushService, type PushService } from "./push/push.js";
 import { occurrenceRoutes } from "./routes/occurrences.js";
+import { pushRoutes } from "./routes/push.js";
 import { searchRoutes } from "./routes/search.js";
 import { settingsRoutes } from "./routes/settings.js";
 import { createCalendarStore, type CalendarStore } from "./store/calendars.js";
 import { createEventStore, type EventStore } from "./store/events.js";
+import { createPushSubscriptionStore, type PushSubscriptionStore } from "./store/push-subscriptions.js";
 import { createSettingsStore, type SettingsStore } from "./store/settings.js";
 
 /** What every feature is handed. Add a field only when more than one feature needs it. */
@@ -25,6 +28,10 @@ export interface FeatureContext {
   events: EventStore;
   /** The display time zone (brief 03): the settings routes, and every route that turns times into dates. */
   settings: SettingsStore;
+  /** Browsers' push subscriptions (brief 14): the push routes, and whatever sends. */
+  pushSubscriptions: PushSubscriptionStore;
+  /** Sending a push to a user's browsers (brief 14); `undefined` when `config.push` is (no VAPID keys). */
+  push: PushService | undefined;
 }
 
 /** The session cookie's name. Unique in the estate: every app shares one origin. */
@@ -107,6 +114,7 @@ const FEATURES: Feature[] = [
   (app, ctx) => app.register(occurrenceRoutes, ctx),
   (app, ctx) => app.register(searchRoutes, ctx),
   (app, ctx) => app.register(settingsRoutes, ctx),
+  (app, ctx) => app.register(pushRoutes, ctx),
 ];
 
 export interface BuildAppOptions {
@@ -145,12 +153,16 @@ export async function buildApp(config: Config, options: BuildAppOptions = {}): P
 
   app.get("/api/health", async () => ({ status: "ok" }));
 
+  const pushSubscriptions = createPushSubscriptionStore(db);
+  if (config.push === undefined) app.log.info("VAPID_* are not set: push notifications are off.");
   const ctx: FeatureContext = {
     config,
     db,
     calendars: createCalendarStore(db),
     events: createEventStore(db),
     settings: createSettingsStore(db),
+    pushSubscriptions,
+    push: config.push && createPushService({ vapid: config.push, subscriptions: pushSubscriptions, log: app.log }),
   };
   for (const feature of FEATURES) await feature(app, ctx);
 

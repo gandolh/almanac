@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ConfigError, loadConfig } from "./config.js";
+import { makeVapidPair } from "./testing/vapid.js";
 
 function problems(env: NodeJS.ProcessEnv): string {
   try {
@@ -22,6 +23,7 @@ describe("loadConfig", () => {
       webBase: "/almanac/",
       ward: undefined,
       trustedProxies: [],
+      push: undefined,
     });
   });
 
@@ -93,6 +95,47 @@ describe("loadConfig", () => {
 
     it.each(["0.0.0.0/0", "172.19.0.3/16", "caddy"])("refuses %s", (value) => {
       expect(problems({ AUTH_TRUSTED_PROXIES: value })).toContain("AUTH_TRUSTED_PROXIES");
+    });
+  });
+
+  describe("Web Push", () => {
+    const pair = makeVapidPair();
+    const VAPID = {
+      VAPID_PUBLIC_KEY: pair.publicKey,
+      VAPID_PRIVATE_KEY: pair.privateKey,
+      VAPID_SUBJECT: "mailto:johndoe@example.com",
+    };
+
+    it("is on with all three settings", () => {
+      expect(loadConfig(VAPID).push).toEqual({ ...pair, subject: "mailto:johndoe@example.com" });
+      expect(loadConfig({ ...VAPID, VAPID_SUBJECT: "https://example.com/contact" }).push?.subject).toBe("https://example.com/contact");
+    });
+
+    it("is off with all three empty", () => {
+      expect(loadConfig({ VAPID_PUBLIC_KEY: "", VAPID_PRIVATE_KEY: "", VAPID_SUBJECT: "" }).push).toBeUndefined();
+    });
+
+    it("wants all three or none, and names the missing ones", () => {
+      const message = problems({ ...VAPID, VAPID_PRIVATE_KEY: "", VAPID_SUBJECT: "" });
+      expect(message).toContain("VAPID_PRIVATE_KEY, VAPID_SUBJECT are not set");
+      expect(message).not.toContain(pair.publicKey);
+      expect(problems({ VAPID_SUBJECT: "mailto:johndoe@example.com" })).toContain("VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY are not set");
+    });
+
+    it("checks each one's shape, and never repeats a key", () => {
+      const message = problems({ VAPID_PUBLIC_KEY: "short", VAPID_PRIVATE_KEY: `${pair.privateKey}x`, VAPID_SUBJECT: "mailto:" });
+      expect(message).toContain("VAPID_PUBLIC_KEY must be");
+      expect(message).toContain("VAPID_PRIVATE_KEY must be");
+      expect(message).toContain("VAPID_SUBJECT must be");
+      expect(message).not.toContain(pair.privateKey);
+      expect(problems({ ...VAPID, VAPID_SUBJECT: "http://example.com" })).toContain("VAPID_SUBJECT");
+    });
+
+    it("wants the two keys to be one pair", () => {
+      const other = makeVapidPair();
+      const message = problems({ ...VAPID, VAPID_PRIVATE_KEY: other.privateKey });
+      expect(message).toContain("are not one pair");
+      expect(message).not.toContain(other.privateKey);
     });
   });
 

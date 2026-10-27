@@ -1,3 +1,4 @@
+import { createECDH } from "node:crypto";
 import { z } from "zod";
 import { parseTrustedProxies, wardClientOptionsFromEnv, type WardClientOptions } from "../vendor/ward/ward-auth.js";
 
@@ -6,6 +7,19 @@ export const AUTH_ROUTE_PREFIX = "/auth";
 
 /** The Ward callback, under the API prefix: `WARD_OIDC_REDIRECT_URI` is the origin, the prefix, then this. */
 export const WARD_CALLBACK_PATH = `${AUTH_ROUTE_PREFIX}/ward/callback`;
+
+/** The server's Web Push identity (brief 14): `npm run vapid-keys -w @almanac/server` makes one. */
+export interface VapidKeys {
+  /** base64url, a 65-byte P-256 point. Browsers subscribe with it. */
+  publicKey: string;
+  /** base64url, 32 bytes. Signs every push; a secret that never leaves the server. Never log it. */
+  privateKey: string;
+  /** A `mailto:` or `https:` URL: who push services contact about this sender. */
+  subject: string;
+}
+
+/** The three settings push needs, all or none. */
+export const VAPID_KEYS = ["VAPID_PUBLIC_KEY", "VAPID_PRIVATE_KEY", "VAPID_SUBJECT"] as const;
 
 /** The server's settings, read once at startup from the environment (and the repo's `.env`). */
 export interface Config {
@@ -33,6 +47,12 @@ export interface Config {
    * reaches it from, or every client shares one lockout.
    */
   trustedProxies: string[];
+  /**
+   * Web Push (brief 14): the three `VAPID_*` settings, or `undefined` when all
+   * three are unset, and then push is off: the routes that need it answer 404
+   * and the Notifications dialog says it isn't set up on this server.
+   */
+  push: VapidKeys | undefined;
 }
 
 /** The environment cannot run the server. The message names every key at fault. */
@@ -98,6 +118,67 @@ function wardSettings(env: NodeJS.ProcessEnv, apiPrefix: string | undefined, pro
   return ward;
 }
 
+/** base64url without padding that decodes to exactly `bytes` bytes. */
+const base64urlOf = (value: string, bytes: number) =>
+  /^[A-Za-z0-9_-]+$/.test(value) && Buffer.from(value, "base64url").length === bytes;
+
+/**
+ * Who push services contact about this sender: a `mailto:` URL with an address
+ * (`local@domain`) or an `https:` URL with a host name. A bare `mailto:` parses
+ * as a URL but names nobody.
+ */
+function isVapidSubject(value: string): boolean {
+  if (!URL.canParse(value)) return false;
+  const url = new URL(value);
+  if (url.protocol === "mailto:") return /^[^@\s]+@[^@\s]+$/.test(url.pathname);
+  return url.protocol === "https:" && url.hostname !== "";
+}
+
+/** Whether the private key's public half is `publicKey`. A mismatched pair fails every push. */
+function isVapidPair(publicKey: string, privateKey: string): boolean {
+  const ecdh = createECDH("prime256v1");
+  try {
+    ecdh.setPrivateKey(Buffer.from(privateKey, "base64url"));
+  } catch {
+    return false;
+  }
+  return ecdh.getPublicKey().equals(Buffer.from(publicKey, "base64url"));
+}
+
+/**
+ * The `VAPID_*` settings: all three, or none and push is off. Each is checked
+ * for its shape and the two keys for being one pair. Messages never repeat a
+ * value: the private key is a secret, and the public one is no use in a log.
+ */
+function pushSettings(env: NodeJS.ProcessEnv, problems: string[]): VapidKeys | undefined {
+  const value = (key: (typeof VAPID_KEYS)[number]) => {
+    const raw = env[key]?.trim() ?? "";
+    return raw === "" ? undefined : raw;
+  };
+  const publicKey = value("VAPID_PUBLIC_KEY");
+  const privateKey = value("VAPID_PRIVATE_KEY");
+  const subject = value("VAPID_SUBJECT");
+  if (publicKey === undefined && privateKey === undefined && subject === undefined) return undefined;
+  if (publicKey === undefined || privateKey === undefined || subject === undefined) {
+    const missing = VAPID_KEYS.filter((key) => value(key) === undefined);
+    problems.push(
+      `${missing.join(", ")} ${missing.length === 1 ? "is" : "are"} not set. Set all three VAPID settings for push notifications, or leave all three empty for none.`,
+    );
+    return undefined;
+  }
+  const before = problems.length;
+  const fromRun = "the same `npm run vapid-keys -w @almanac/server` run";
+  if (!base64urlOf(publicKey, 65)) problems.push(`VAPID_PUBLIC_KEY must be the public key from ${fromRun} (87 base64url characters).`);
+  if (!base64urlOf(privateKey, 32)) problems.push(`VAPID_PRIVATE_KEY must be the private key from ${fromRun} (43 base64url characters).`);
+  if (!isVapidSubject(subject)) {
+    problems.push("VAPID_SUBJECT must be a mailto: URL with an address, such as mailto:johndoe@example.com, or an https: URL.");
+  }
+  if (problems.length === before && !isVapidPair(publicKey, privateKey)) {
+    problems.push(`VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY are not one pair. Copy both from ${fromRun}.`);
+  }
+  return problems.length === before ? { publicKey, privateKey, subject } : undefined;
+}
+
 /** `AUTH_TRUSTED_PROXIES` as a list, checked by the library's own parser (a malformed entry or a /0 is refused). */
 function trustedProxies(value: string, problems: string[]): string[] {
   const entries = value
@@ -120,6 +201,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const apiPrefix = envSchema.shape.ALMANAC_API_PREFIX.safeParse(env.ALMANAC_API_PREFIX);
   const ward = wardSettings(env, apiPrefix.success ? apiPrefix.data : undefined, problems);
   const proxies = trustedProxies(env.AUTH_TRUSTED_PROXIES ?? "", problems);
+  const push = pushSettings(env, problems);
   if (!parsed.success || problems.length > 0) {
     throw new ConfigError(problems.join("\n"));
   }
@@ -133,5 +215,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     webBase: values.ALMANAC_BASE,
     ward,
     trustedProxies: proxies,
+    push,
   };
 }

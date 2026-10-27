@@ -33,6 +33,7 @@ optional; an empty value counts as not set.
 | `SEED_USERNAME`, `SEED_PASSWORD` | The account the seed creates; it asks for whichever is empty | you choose |
 | `AUTH_TRUSTED_PROXIES` | Peers besides loopback whose `X-Forwarded-For` the login lockout believes. Empty is right locally | empty |
 | `WARD_OIDC_ISSUER`, `WARD_OIDC_CLIENT_ID`, `WARD_OIDC_CLIENT_KEY`, `WARD_OIDC_REDIRECT_URI`, `WARD_OIDC_POST_LOGOUT_REDIRECT_URI` | Optional. "Sign in with Ward". The key is a secret | Ward's local seed writes all five |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Optional. Push notifications: all three or none. The private key is a secret | `npm run vapid-keys -w @almanac/server` writes all three |
 
 ## Create an account
 
@@ -71,6 +72,27 @@ into this repo's `.env`. Restart `npm run dev` afterwards. The login page then
 shows the Ward button. Your Ward account needs a grant on the `almanac` app in
 the local Ward console, or Ward refuses the sign-in.
 
+## Try notifications
+
+The account menu's Notifications turns push notifications on in a browser.
+The server needs a VAPID key pair for that. Without one it starts as usual and
+the dialog says notifications aren't set up on this server. Make a pair once:
+
+```bash
+npm run vapid-keys -w @almanac/server
+```
+
+It writes `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` and `VAPID_SUBJECT` into
+`.env` and never prints the private key. It leaves a `.env` that already has a
+pair alone, because a new pair turns notifications off in every browser that
+had them on. Restart `npm run dev`, open Notifications, turn it on and press
+"Send a test".
+
+The service worker is `web/public/sw.js`. It handles pushes only and caches
+nothing. `npm run dev` serves it, so push works on `localhost` in a desktop
+browser. A phone needs the deployed app over HTTPS, and an iPhone needs it
+added to the Home Screen first.
+
 ## Test, typecheck, lint, build
 
 ```bash
@@ -89,6 +111,9 @@ npm run build       # tsc for shared and server, then the web app
   `.env` is malformed, such as a `PUBLIC_ORIGIN` with a path, or a
   `WARD_OIDC_*` value is missing while `WARD_OIDC_ISSUER` is set. The message
   says which.
+- **The server names a `VAPID_*` key.** Only some of the three are set, or the
+  two keys aren't one pair. Set all three from one `npm run vapid-keys` run,
+  or empty all three to run without notifications.
 - **Port 5177 is in use.** The dev server won't pick another port. Stop
   whatever holds it.
 - **The login page has no Ward button.** `WARD_OIDC_ISSUER` is not set in

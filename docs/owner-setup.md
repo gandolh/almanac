@@ -38,8 +38,9 @@ Create `~/projects/vps-deploy/secrets/almanac.env` with one line, then
 WARD_OIDC_CLIENT_KEY=<the private key from step 1>
 ```
 
-That is the only secret Almanac has. The deploy adds everything else (the
-origin, the other Ward settings, the trusted proxy range). Without the key the
+That is the only secret Almanac needs to start. Notifications add a second,
+optional one (step 8). The deploy adds everything else (the origin, the other
+Ward settings, the trusted proxy range). Without the key the
 `server` step stops and names it. The dry run in step 4 shows that before you
 deploy.
 
@@ -149,6 +150,51 @@ Open `<production origin>/almanac/` in the phone's browser and sign in. Then add
 it to the home screen: on Android Chrome use the menu, then Add to Home screen
 (or Install app, if the menu offers it); on iPhone Safari use Share, then Add to
 Home Screen. The icon opens Almanac without the browser's address bar.
+
+## 8. Turn on notifications
+
+Almanac can show a notification on a phone or a computer with the app closed:
+"Send a test" in the account menu's Notifications now, event reminders once
+those are built. The server signs every push with a VAPID key pair. Without
+the pair it starts with notifications off and says so once in its log;
+everything else works as before.
+
+1. **Make a pair,** once, from the repo root:
+
+   ```
+   npm run vapid-keys -w @almanac/server -- --print
+   ```
+
+   It prints three lines: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` and
+   `VAPID_SUBJECT`. The private key is a secret: keep it out of the repo, out
+   of chats and out of shell history. `VAPID_SUBJECT` comes out as the
+   placeholder `mailto:johndoe@example.com`. Replace it with an address push
+   services can reach you at, as a `mailto:` URL.
+
+2. **Pass them to the container.** The deploy doesn't do this yet:
+   `../vps-deploy/stacks/almanac.ts` sends the container no `VAPID_*` value.
+   Satchel's stack (`stacks/satchel.ts`) shows the three lines it needs, read
+   with `estate.secret("almanac", ...)`. Then add the three lines to
+   `~/projects/vps-deploy/secrets/almanac.env`, next to the Ward key.
+
+3. **Redeploy both halves:**
+
+   ```
+   cd ~/projects/vps-deploy && node cli.ts almanac all
+   ```
+
+   `server` restarts the API with the keys and `deploy` ships the web app with
+   its service worker, `sw.js`. The worker handles pushes only and caches
+   nothing, so the app still loads from the network every time.
+
+4. **Turn it on, per device:** the account menu, then Notifications. On an
+   iPhone, web push works only in the Home Screen app (iOS 16.4 or later), so
+   add Almanac to the Home Screen first (step 7), open it from the icon and
+   turn Notifications on there. Android and desktop browsers need no such
+   step. Press "Send a test" to check.
+
+Keep the pair. A new one turns notifications off on every device until each
+turns them on again.
 
 ## Local development
 

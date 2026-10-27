@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "../../vendor/ward/ward-auth-react.js";
 import { changePassword, linkWard, signOut, unlinkWard, useWardLink, useWardNotice } from "../account/actions";
+import { NotificationsDialog } from "../account/Notifications";
 import { TimeZoneDialog } from "../account/TimeZoneDialog";
 import { AlertIcon } from "../components/Field";
 import { Menu, type MenuSection } from "../components/Menu";
@@ -21,8 +22,8 @@ export function initialOf(username: string): string {
 /**
  * The account button and its menu, in place of a Settings page
  * (corpus/wiki/features.md "Account menu"): Change password, Sign in with
- * Ward (link or unlink), Time zone…, then Sign out. The button is a disc
- * with the username's initial, as Google's is with a photo.
+ * Ward (link or unlink), Time zone…, Notifications (brief 14), then Sign out.
+ * The button is a disc with the username's initial, as Google's is with a photo.
  */
 export function AccountMenu() {
   const session = useSession();
@@ -30,6 +31,7 @@ export function AccountMenu() {
   const ward = useWardLink();
   const { timeZone } = useSettings();
   const [zoneOpen, setZoneOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notice, setNotice] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   // A Ward link comes back to the app with its result; it shows here like an action's, then goes.
@@ -69,6 +71,7 @@ export function AccountMenu() {
             ]
           : []),
         { label: "Time zone…", detail: zoneCity(timeZone), onSelect: () => setZoneOpen(true) },
+        { label: "Notifications", onSelect: () => setNotificationsOpen(true) },
       ],
     },
     { items: [{ label: "Sign out", onSelect: run(signOut) }] },
@@ -97,6 +100,7 @@ export function AccountMenu() {
         {shown}
       </p>
       <TimeZoneDialog open={zoneOpen} onClose={() => setZoneOpen(false)} />
+      <NotificationsDialog open={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
     </div>
   );
 }

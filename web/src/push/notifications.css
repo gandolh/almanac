@@ -1,0 +1,114 @@
+/*
+ * The account menu's Notifications dialog (brief 14, account/Notifications.tsx):
+ * the switch row, the test button and the lines that say why it can't.
+ * Base UI's Switch is a role="switch" span over a hidden checkbox, with its
+ * state in data attributes.
+ */
+
+.notify {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.notify-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: var(--touch);
+}
+
+.notify-switch__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.notify-switch__label {
+  color: var(--ink);
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+}
+
+.notify-switch__state,
+.notify-text {
+  color: var(--ink-2);
+  font-size: var(--text-meta);
+  line-height: var(--leading-body);
+}
+
+/* A step to take first: on the notice tint, as the account notice is. */
+.notify-hint {
+  padding: 12px;
+  border-radius: var(--radius-control);
+  background: var(--accent-tint-soft);
+  color: var(--ink);
+  font-size: var(--text-meta);
+  line-height: var(--leading-body);
+}
+
+.notify-error {
+  color: var(--ink);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 36px;
+  height: 20px;
+  border-radius: var(--radius-pill);
+  background: var(--outline);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+/* A 44 px target round the 36 × 20 track on a touch screen. */
+.switch::before {
+  content: "";
+  position: absolute;
+  inset: -12px -4px;
+}
+
+.switch__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--surface);
+  transition: transform 0.15s ease;
+}
+
+.switch[data-checked] {
+  background: var(--accent);
+}
+
+.switch[data-checked] .switch__thumb {
+  transform: translateX(16px);
+}
+
+.switch[data-disabled] {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.switch:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.notify-test {
+  display: flex;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch,
+  .switch__thumb {
+    transition: none;
+  }
+}
