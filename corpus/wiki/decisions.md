@@ -67,6 +67,11 @@ reminders per event, email, and a timer of its own per reminder; the minute
 tick works from the rows as they are, so a deleted, moved or changed event
 needs no clean-up. The choices are a list in `shared/src/event.ts` the owner
 can change. On an iPhone it needs Almanac on the Home Screen.
+_2026-10-27_, owner, after the briefs: `DELETE /api/push/subscriptions` answers
+204 with push turned off, as Satchel's does, so a browser can always drop its
+subscription; brief 14's literal 404 for every push route was turned down.
+`VAPID_SUBJECT` stays the `.env.example` placeholder until the owner picks an
+address; production push is off anyway until the deploy passes the keys.
 
 ## One display time zone per user, Bucharest by default
 _2026-10-16_. All times show in the user's chosen time zone, a setting in the

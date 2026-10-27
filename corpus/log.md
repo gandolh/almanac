@@ -234,3 +234,13 @@ shelfmark and almanac read from their server configs. In `../shelfmark`
 local commits, not pushed. Flagged, not changed: Ward's console screenshot is
 from 2026-10-09, its README still calls the move to its own host pending, and
 the cutover table's satchel row predates Satchel's own host.
+
+## [2026-10-27] decision | Push: DELETE stays 204, VAPID_SUBJECT stays a placeholder
+
+The owner answered two questions from briefs 14-16. `DELETE
+/api/push/subscriptions` keeps answering 204 with push off, as Satchel's does,
+rather than brief 14's literal 404. `VAPID_SUBJECT` stays the placeholder until
+the owner picks an address; production push needs the deploy to pass the keys
+first (`docs/owner-setup.md` step 8). Recorded in
+[decisions.md](wiki/decisions.md). The comment in `web/index.html` that said "no
+service worker" now says the worker is for Web Push only.
