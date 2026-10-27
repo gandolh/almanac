@@ -32,6 +32,8 @@ export interface PushSubscriptionStore {
   remove(userId: string, endpoint: string): boolean;
   /** The user's subscriptions, oldest first. */
   list(userId: string): StoredPushSubscription[];
+  /** Every user with at least one subscription (brief 16's reminders look at them only). */
+  userIds(): string[];
   /** The push service says the endpoint is gone for good (404 or 410): delete it, whoever held it. */
   forget(endpoint: string): void;
   /** A push to the endpoint went through: note when. */
@@ -60,6 +62,7 @@ export function createPushSubscriptionStore(db: Db, now: () => Date = () => new 
   const listRows = db.prepare<[string], Row>(`
     SELECT endpoint, p256dh, auth, created_at AS createdAt, last_success_at AS lastSuccessAt
     FROM push_subscriptions WHERE user_id = ? ORDER BY id`);
+  const users = db.prepare<[], { userId: string }>("SELECT DISTINCT user_id AS userId FROM push_subscriptions ORDER BY user_id");
   const deleteOwn = db.prepare<[string, string]>("DELETE FROM push_subscriptions WHERE endpoint = ? AND user_id = ?");
   const deleteAny = db.prepare<[string]>("DELETE FROM push_subscriptions WHERE endpoint = ?");
   const delivered = db.prepare<[string, string]>("UPDATE push_subscriptions SET last_success_at = ? WHERE endpoint = ?");
@@ -83,6 +86,7 @@ export function createPushSubscriptionStore(db: Db, now: () => Date = () => new 
     },
     remove: (userId, endpoint) => deleteOwn.run(endpoint, userId).changes > 0,
     list: (userId) => listRows.all(userId),
+    userIds: () => users.all().map((row) => row.userId),
     forget(endpoint) {
       deleteAny.run(endpoint);
     },

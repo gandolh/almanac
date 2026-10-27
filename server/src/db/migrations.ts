@@ -100,6 +100,19 @@ export const migrations: readonly string[] = [
   `
   ALTER TABLE events ADD COLUMN reminder_minutes INTEGER;
   `,
+  // Brief 16: the reminders already sent, so each goes once. Keyed by the event
+  // row and the occurrence's start: for an occurrence a series generates, the
+  // series and its key; for a one-off or an exception, its own row and start.
+  // sent_at is epoch ms; the timer drops rows a few days old.
+  `
+  CREATE TABLE reminders_sent (
+    event_id          INTEGER NOT NULL REFERENCES events (id) ON DELETE CASCADE,
+    occurrence_start  TEXT    NOT NULL,
+    sent_at           INTEGER NOT NULL,
+    PRIMARY KEY (event_id, occurrence_start)
+  );
+  CREATE INDEX reminders_sent_at ON reminders_sent (sent_at);
+  `,
 ];
 
 /**

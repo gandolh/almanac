@@ -10,6 +10,8 @@ import { eventRoutes } from "./routes/events.js";
 import { createPushService, type PushService } from "./push/push.js";
 import { occurrenceRoutes } from "./routes/occurrences.js";
 import { pushRoutes } from "./routes/push.js";
+import { createReminders, startReminderTimer } from "./reminders/timer.js";
+import { createSentLog } from "./reminders/sent-log.js";
 import { searchRoutes } from "./routes/search.js";
 import { settingsRoutes } from "./routes/settings.js";
 import { createCalendarStore, type CalendarStore } from "./store/calendars.js";
@@ -117,6 +119,31 @@ const FEATURES: Feature[] = [
   (app, ctx) => app.register(pushRoutes, ctx),
 ];
 
+/**
+ * Due reminders (brief 16), once a minute, while push is on and
+ * `REMINDER_TIMER` isn't `off`. Stopped on close: the hook is added after the
+ * one that closes the database, and Fastify runs a closing app's hooks last
+ * added first, so a running tick finishes before the database goes.
+ */
+function startReminders(app: FastifyInstance, ctx: FeatureContext): void {
+  if (ctx.push === undefined) return;
+  if (!ctx.config.reminderTimer) {
+    app.log.info("REMINDER_TIMER is off: this process sends no reminders.");
+    return;
+  }
+  const reminders = createReminders({
+    events: ctx.events,
+    settings: ctx.settings,
+    subscriptions: ctx.pushSubscriptions,
+    sentLog: createSentLog(ctx.db),
+    push: ctx.push,
+    webBase: ctx.config.webBase,
+    log: app.log,
+  });
+  const timer = startReminderTimer(reminders, app.log);
+  app.addHook("onClose", () => timer.stop());
+}
+
 export interface BuildAppOptions {
   /** Fastify's logger option. Default off; `index.ts` turns it on. */
   logger?: FastifyServerOptions["logger"];
@@ -165,6 +192,7 @@ export async function buildApp(config: Config, options: BuildAppOptions = {}): P
     push: config.push && createPushService({ vapid: config.push, subscriptions: pushSubscriptions, log: app.log }),
   };
   for (const feature of FEATURES) await feature(app, ctx);
+  startReminders(app, ctx);
 
   return app;
 }

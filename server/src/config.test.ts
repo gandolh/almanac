@@ -24,6 +24,7 @@ describe("loadConfig", () => {
       ward: undefined,
       trustedProxies: [],
       push: undefined,
+      reminderTimer: true,
     });
   });
 
@@ -38,6 +39,13 @@ describe("loadConfig", () => {
     expect(message).toContain("PORT");
     expect(message).toContain("ALMANAC_API_PREFIX");
     expect(message).toContain("PUBLIC_ORIGIN");
+  });
+
+  it("turns the reminder timer off only with REMINDER_TIMER=off", () => {
+    expect(loadConfig({ REMINDER_TIMER: "off" }).reminderTimer).toBe(false);
+    expect(loadConfig({ REMINDER_TIMER: "on" }).reminderTimer).toBe(true);
+    expect(loadConfig({ REMINDER_TIMER: "" }).reminderTimer).toBe(true);
+    expect(problems({ REMINDER_TIMER: "no" })).toContain("REMINDER_TIMER must be on or off.");
   });
 
   it("wants a base with both slashes", () => {

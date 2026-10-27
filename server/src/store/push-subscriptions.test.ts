@@ -97,6 +97,16 @@ describe("push subscriptions", () => {
     expect(store.list(ana)).toEqual([{ ...sub(2), createdAt: "2026-10-27T10:00:02.000Z", lastSuccessAt: "2026-10-27T10:00:03.000Z" }]);
   });
 
+  it("lists every user with a subscription, once", () => {
+    const ana = addUser("ana");
+    const ion = addUser("ion");
+    addUser("eva");
+    store.save(ion, sub(1));
+    store.save(ana, sub(2));
+    store.save(ana, sub(3));
+    expect(store.userIds()).toEqual([ana, ion]);
+  });
+
   it("goes with the user", () => {
     const ana = addUser("ana");
     store.save(ana, sub(1));

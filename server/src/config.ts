@@ -53,6 +53,12 @@ export interface Config {
    * and the Notifications dialog says it isn't set up on this server.
    */
   push: VapidKeys | undefined;
+  /**
+   * `REMINDER_TIMER` (brief 16): whether this process sends due reminders,
+   * once a minute. On unless it is `off`: tests turn it off, and so would a
+   * second process on the same database. It runs only while push is on.
+   */
+  reminderTimer: boolean;
 }
 
 /** The environment cannot run the server. The message names every key at fault. */
@@ -88,6 +94,9 @@ const envSchema = z.object({
       message: "ALMANAC_BASE must be a path such as /almanac/: a leading and a trailing slash.",
     }),
   ).transform((value) => value ?? "/almanac/"),
+  REMINDER_TIMER: optional(z.enum(["on", "off"], { message: "REMINDER_TIMER must be on or off." })).transform(
+    (value) => value !== "off",
+  ),
 });
 
 function describe(issue: z.core.$ZodIssue): string {
@@ -216,5 +225,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     ward,
     trustedProxies: proxies,
     push,
+    reminderTimer: values.REMINDER_TIMER,
   };
 }
