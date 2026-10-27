@@ -1,6 +1,6 @@
 ---
-summary: Almanac's vocabulary, one word per concept with the synonyms it replaces. User, calendar, event, series, occurrence, exception, edit scope, view, display time zone, quick create and event form. Use these words in code, UI copy and briefs.
-updated: 2026-10-16
+summary: Almanac's vocabulary, one word per concept with the synonyms it replaces. User, calendar, event, series, occurrence, exception, edit scope, reminder, view, display time zone, quick create and event form. Use these words in code, UI copy and briefs.
+updated: 2026-10-27
 ---
 
 # Glossary
@@ -42,6 +42,11 @@ _Avoid_: override, modified instance, detached event
 Which occurrences an edit to a series applies to: this event, this and
 following events, or all events.
 _Avoid_: mode, edit type
+
+**Reminder**:
+When an event's notification is due: a number of minutes before it starts, or
+before 00:00 of an all-day event's first day. An event has at most one.
+_Avoid_: alert, alarm, notification (the notification is what a reminder shows)
 
 ## Screens
 

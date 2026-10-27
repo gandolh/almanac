@@ -1,5 +1,5 @@
 ---
-summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds. Pushed to gandolh/almanac on GitHub, not deployed. Brief 12 (Base UI under the overlays) built 2026-10-23; brief 14 (push worker and subscriptions) built 2026-10-27, local, 694 tests. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
+summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds. Pushed to gandolh/almanac on GitHub, not deployed. Brief 12 (Base UI under the overlays) built 2026-10-23; briefs 14 (push worker and subscriptions) and 15 (a reminder on each event) built 2026-10-27, local, 714 tests. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
 updated: 2026-10-27
 ---
 
@@ -27,6 +27,8 @@ subscriptions, and the account menu's Notifications dialog with a test
 notification. Local commits, not pushed, 694 tests. A real push to a browser
 or a phone has not been tried. Production push needs the `VAPID_*` values
 passed by `../vps-deploy`'s Almanac stack, which doesn't pass them yet.
+Brief 15 gave each event one reminder, stored and shown in the form and the
+details; nothing sends it until brief 16. 714 tests.
 
 ## Next (owner)
 
@@ -84,7 +86,7 @@ passed by `../vps-deploy`'s Almanac stack, which doesn't pass them yet.
 | 12 | [Base UI under Dialog, Popover, Menu and the drawer](../briefs/done/12-base-ui-primitives.md) | done 2026-10-23, local commits, not pushed |
 | 13 | [Fix the stale app lists in sibling repos](../briefs/todo/13-sibling-repo-listings.md) | todo (filed 2026-10-23) |
 | 14 | [Phone notifications 1: the worker and the push subscription](../briefs/done/14-push-subscription-and-worker.md) | done 2026-10-27, local commits, not pushed; no live push tried |
-| 15 | [Phone notifications 2: a reminder on each event](../briefs/todo/15-a-reminder-on-each-event.md) | todo (filed 2026-10-23); independent of 14 |
+| 15 | [Phone notifications 2: a reminder on each event](../briefs/done/15-a-reminder-on-each-event.md) | done 2026-10-27, local commits, not pushed |
 | 16 | [Phone notifications 3: send due reminders](../briefs/todo/16-send-due-reminders.md) | todo (filed 2026-10-23); after 14 and 15 |
 
 ## Todos

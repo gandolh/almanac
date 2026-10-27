@@ -172,7 +172,7 @@ and after screenshots at 1440 and 390 px match. The decision is in
 "redeploy Ward's UI" step), one commit per repo; the vps-deploy count was already right
 (39 stacks). Phone notifications split into three: [14](briefs/done/14-push-subscription-and-worker.md)
 a push-only service worker, VAPID keys and stored subscriptions, copied from Satchel's
-code; [15](briefs/todo/15-a-reminder-on-each-event.md) one reminder per event, off by
+code; [15](briefs/done/15-a-reminder-on-each-event.md) one reminder per event, off by
 default, with the choices phone calendars offer; [16](briefs/todo/16-send-due-reminders.md)
 a one-minute timer that sends due reminders once, expands series only over the window,
 and skips anything more than 15 minutes stale after a restart. 16 replaces the "No
@@ -193,3 +193,16 @@ in headless Chromium; no real push reached a browser or a phone. The
 "no service worker" line in [decisions.md](wiki/decisions.md) now says the
 worker is push-only. Production needs the `VAPID_*` values passed by
 `../vps-deploy`'s Almanac stack, an owner step.
+
+## [2026-10-27] done | Brief 15: a reminder on each event
+
+[Brief 15](briefs/done/15-a-reminder-on-each-event.md) is built. Each event has
+one `reminderMinutes`, none by default, from the choices phone calendars offer
+(`TIMED_REMINDERS`, `ALL_DAY_REMINDERS` in `shared/src/event.ts`), stored in
+`events.reminder_minutes` (migration 3). Anything else is a 400, and switching
+an event between timed and all-day resets it. The edit scopes carry it like
+the title. The event form has a Reminder select under the times, and the
+details popover shows it. 714 tests; the form and the details were checked in
+headless Chromium. Nothing is sent yet. [data-model.md](wiki/data-model.md)
+caught up with migrations 2 and 3 (brief 14 had left it out), and
+[glossary.md](wiki/glossary.md) has **Reminder**.
