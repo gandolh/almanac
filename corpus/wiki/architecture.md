@@ -70,6 +70,18 @@ own test fixtures).
 
 `data/almanac.db` in dev, a bind-mounted volume in the container.
 
+## Reminders
+
+Brief 16 (2026-10-27): `server/src/reminders/` runs inside the API process, a
+tick a minute from `buildApp` while push is on and `REMINDER_TIMER` isn't
+`off`, stopped on close. Each tick takes the window since the last one (at
+most 15 minutes back), finds the reminders due in it for every user with a
+push subscription, through the events store and `expandSeries` over a day's
+lookahead, claims each in `reminders_sent` and sends it with
+`PushService.sendToUser`. One process sends; a second one on the same
+database would set `REMINDER_TIMER=off`, though the claim keeps even two from
+sending a reminder twice.
+
 ## Secrets
 
 `.env` (gitignored) holds the seed user values, the `WARD_OIDC_*` values the

@@ -1,6 +1,6 @@
 ---
 summary: What Almanac v1 does, screen by screen, as settled with the owner on 2026-10-16. The Google-style layout (top bar, left column with mini-month and calendars), the four views with month as default, mouse interactions and keyboard shortcuts, event fields, search, the account menu, date and time format, and what is deliberately left out. Read before writing or promoting any brief.
-updated: 2026-10-16
+updated: 2026-10-27
 ---
 
 # Features
@@ -61,10 +61,12 @@ starts with one calendar.
 ## Account menu
 
 Change password, link or unlink Sign in with Ward, display time zone (starts
-at Europe/Bucharest), sign out. No Settings page.
+at Europe/Bucharest), sign out. No Settings page. After v1, brief 14 added
+Notifications (turn push on in this browser, send a test).
 
 ## Left out of v1
 
-Import of any kind, reminders (first follow-up), sharing, guests and
+Import of any kind, reminders (the first follow-up, built after v1 by briefs
+14-16 on 2026-10-27), sharing, guests and
 invitations, attachments, per-event time zones, a custom repeat editor, dark
 mode, offline use.

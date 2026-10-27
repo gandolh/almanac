@@ -1,6 +1,6 @@
 ---
 summary: What Almanac is in a paragraph. The owner's personal calendar, a Google Calendar look-alike with day, week, month and year views where they type in every meeting and event from everywhere they have a schedule. Private per user, no sharing, no import, light only, on the estate's Fastify + React + SQLite stack.
-updated: 2026-10-16
+updated: 2026-10-27
 ---
 
 # Overview
@@ -16,8 +16,9 @@ It is private. Each user sees only their own calendars, nothing is shared, and
 there is no sign-up: the owner is seeded and anyone else gets in through a Ward
 grant. Sign-in is the app's own login or "Sign in with Ward".
 
-It deliberately leaves out import, reminders (the first follow-up), guests,
-attachments, dark mode and offline use ([decisions.md](decisions.md)).
+It deliberately leaves out import, guests, attachments, dark mode and offline
+use ([decisions.md](decisions.md)). Reminders, left out of v1, came after it
+(2026-10-27): one per event, sent to the phone by Web Push.
 
 It is a sibling of Shelfmark (`../shelfmark`) and Satchel (`../satchel`): the
 same Fastify + SQLite + React stack, the same vendored Ward auth, the same VPS

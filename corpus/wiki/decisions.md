@@ -1,5 +1,5 @@
 ---
-summary: Locked calls for Almanac, each with date, rejected alternatives and reason. React + Fastify + SQLite on Shelfmark's layout; FullCalendar v7 for day, week and month with a year view of our own; several users, each with a private calendar and no sign-up; named calendars; Base UI under the dialogs, popovers and menus; common repeats with three edit scopes, expanded on the server; no import; no reminders in v1; one display time zone per user, Bucharest by default; phone browser without offline; deployed on the VPS; Google Calendar's layout, light only.
+summary: Locked calls for Almanac, each with date, rejected alternatives and reason. React + Fastify + SQLite on Shelfmark's layout; FullCalendar v7 for day, week and month with a year view of our own; several users, each with a private calendar and no sign-up; named calendars; Base UI under the dialogs, popovers and menus; common repeats with three edit scopes, expanded on the server; no import; one reminder per event by Web Push (since 2026-10-27, none in v1); one display time zone per user, Bucharest by default; phone browser without offline; deployed on the VPS; Google Calendar's layout, light only.
 updated: 2026-10-27
 ---
 
@@ -53,12 +53,20 @@ rrule.js (no release since 2023, time-zone quirks). Model: [recurrence.md](recur
 _2026-10-16_. The owner creates every event by hand. Rejected: one-off `.ics`
 import and subscribed ICS feeds, both offered and turned down.
 
-## No reminders in v1
-_2026-10-16_. Almanac sends no notifications in v1. Rejected for now: phone
-notifications through Web Push (Satchel's code), which need the home-screen
-install, push keys and a timer on the server. They are the first follow-up
-([todo](../todos/phone-notifications.md)). Until then, Almanac does not
-replace the phone's calendar for alerts.
+## Reminders by Web Push, one per event
+_2026-10-16_, v1: no reminders, to keep v1 small; Web Push (Satchel's code)
+was named the first follow-up.
+_2026-10-27_, briefs 14-16: each event has one reminder, none by default, from
+the choices phone calendars offer (at the start, 5, 10, 15 or 30 minutes, 1 or
+2 hours or a day before; an all-day event on the day or the day before at
+09:00 in the user's display time zone). The API process looks once a minute
+for what fell due, sends it once through Web Push to every browser the user
+turned notifications on in, and drops anything more than 15 minutes late, so a
+server down overnight sends no stack of stale alerts. Rejected: several
+reminders per event, email, and a timer of its own per reminder; the minute
+tick works from the rows as they are, so a deleted, moved or changed event
+needs no clean-up. The choices are a list in `shared/src/event.ts` the owner
+can change. On an iPhone it needs Almanac on the Home Screen.
 
 ## One display time zone per user, Bucharest by default
 _2026-10-16_. All times show in the user's chosen time zone, a setting in the

@@ -1,5 +1,5 @@
 ---
-summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds. Pushed to gandolh/almanac on GitHub, not deployed. Brief 12 (Base UI under the overlays) built 2026-10-23; briefs 14 (push worker and subscriptions) and 15 (a reminder on each event) built 2026-10-27, local, 714 tests. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
+summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds. Pushed to gandolh/almanac on GitHub, not deployed. Brief 12 (Base UI under the overlays) built 2026-10-23; briefs 14-16 (phone notifications: the push worker, a reminder on each event, sending them) built 2026-10-27, local, 745 tests. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
 updated: 2026-10-27
 ---
 
@@ -28,7 +28,9 @@ notification. Local commits, not pushed, 694 tests. A real push to a browser
 or a phone has not been tried. Production push needs the `VAPID_*` values
 passed by `../vps-deploy`'s Almanac stack, which doesn't pass them yet.
 Brief 15 gave each event one reminder, stored and shown in the form and the
-details; nothing sends it until brief 16. 714 tests.
+details. Brief 16 sends them: a tick a minute in the API process, each
+reminder once, nothing more than 15 minutes late. 745 tests. A real Web Push
+reached FCM from the built server on this machine; no phone has shown one yet.
 
 ## Next (owner)
 
@@ -49,7 +51,9 @@ details; nothing sends it until brief 16. 714 tests.
    with a real `VAPID_SUBJECT`, then deploy both halves, following
    [docs/owner-setup.md](../../docs/owner-setup.md) step 8. Then turn
    Notifications on in a desktop browser and on the iPhone's Home Screen app,
-   and press "Send a test".
+   and press "Send a test". Then give a real event two minutes out the
+   reminder "At the start" and check it shows on time (brief 16's last
+   acceptance line).
 
 ## Known and accepted
 
@@ -67,6 +71,9 @@ details; nothing sends it until brief 16. 714 tests.
   [docs/getting-started.md](../../docs/getting-started.md#common-problems).
 - The first quick-create event in the very first browser walk seemed to
   vanish once; it never reproduced in later runs.
+- A reminder already sent isn't sent again when only the reminder is changed
+  afterwards (the sent log is keyed by the occurrence); moving the event
+  sends it again at the new time.
 
 ## Briefs
 
@@ -87,7 +94,7 @@ details; nothing sends it until brief 16. 714 tests.
 | 13 | [Fix the stale app lists in sibling repos](../briefs/todo/13-sibling-repo-listings.md) | todo (filed 2026-10-23) |
 | 14 | [Phone notifications 1: the worker and the push subscription](../briefs/done/14-push-subscription-and-worker.md) | done 2026-10-27, local commits, not pushed; no live push tried |
 | 15 | [Phone notifications 2: a reminder on each event](../briefs/done/15-a-reminder-on-each-event.md) | done 2026-10-27, local commits, not pushed |
-| 16 | [Phone notifications 3: send due reminders](../briefs/todo/16-send-due-reminders.md) | todo (filed 2026-10-23); after 14 and 15 |
+| 16 | [Phone notifications 3: send due reminders](../briefs/done/16-send-due-reminders.md) | done 2026-10-27, local commits, not pushed; no phone tried |
 
 ## Todos
 

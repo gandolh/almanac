@@ -173,7 +173,7 @@ and after screenshots at 1440 and 390 px match. The decision is in
 (39 stacks). Phone notifications split into three: [14](briefs/done/14-push-subscription-and-worker.md)
 a push-only service worker, VAPID keys and stored subscriptions, copied from Satchel's
 code; [15](briefs/done/15-a-reminder-on-each-event.md) one reminder per event, off by
-default, with the choices phone calendars offer; [16](briefs/todo/16-send-due-reminders.md)
+default, with the choices phone calendars offer; [16](briefs/done/16-send-due-reminders.md)
 a one-minute timer that sends due reminders once, expands series only over the window,
 and skips anything more than 15 minutes stale after a restart. 16 replaces the "No
 reminders in v1" decision when it ships.
@@ -206,3 +206,18 @@ details popover shows it. 714 tests; the form and the details were checked in
 headless Chromium. Nothing is sent yet. [data-model.md](wiki/data-model.md)
 caught up with migrations 2 and 3 (brief 14 had left it out), and
 [glossary.md](wiki/glossary.md) has **Reminder**.
+
+## [2026-10-27] done | Brief 16: send due reminders
+
+[Brief 16](briefs/done/16-send-due-reminders.md) is built. `server/src/reminders/`
+runs a tick a minute in the API process while push is on (`REMINDER_TIMER`
+turns it off). Each tick finds the reminders due since the last one, at most 15
+minutes back, from the events store with series expanded over a day's
+lookahead. All-day ones are worked out on the wall clock in the user's zone.
+Each is claimed in `reminders_sent` (migration 4) before it is sent, so it goes
+once. 745 tests with a fake clock. Live, the built server sent a real Web Push
+to FCM in the tick after an event's "at the start" reminder fell due; no
+phone was tried. The decision "No reminders in v1" in
+[decisions.md](wiki/decisions.md) is replaced by "Reminders by Web Push, one
+per event", and [overview.md](wiki/overview.md), [features.md](wiki/features.md)
+and [architecture.md](wiki/architecture.md) caught up.
