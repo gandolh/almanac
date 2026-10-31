@@ -11,11 +11,11 @@ shows a different month with the same shape.
 
 | File | Shows | How to reach that state | Viewport | Taken |
 |---|---|---|---|---|
-| hero.webp | Month view with the four calendars | Fresh seed, sign in, `/almanac/` opens on the month | 1440×900 @2x, scaled to 1600 px wide | 2026-10-16 |
-| week.webp | Week view with the current-time line | Same, press `w` | 1440×900 @2x, scaled to 1600 px | 2026-10-16 |
-| year.webp | Year view with dots on days that have events | Same, press `y` | 1440×900 @2x, scaled to 1600 px | 2026-10-16 |
-| event-form.webp | The Edit event form for the Swimming series | Week view, click Tuesday's Swimming, then the pencil; cropped to the dialog | 1440×900 @2x, crop scaled to 900 px | 2026-10-16 |
-| phone-month.webp | Month view at phone size | `set device "iPhone 14"`, open `/almanac/month/<y>/<m>/<d>` | iPhone 14, 390×844 @3x, scaled to 780 px | 2026-10-16 |
+| hero.webp | Month view with the four calendars | Fresh seed, sign in, `/almanac/` opens on the month | 1440×900 @2x, scaled to 1600 px wide | 2026-10-31 |
+| week.webp | Week view with the current-time line | Same, press `w` | 1440×900 @2x, scaled to 1600 px | 2026-10-31 |
+| year.webp | Year view with dots on days that have events | Same, press `y` | 1440×900 @2x, scaled to 1600 px | 2026-10-31 |
+| event-form.webp | The Edit event form for the Swimming series, reminder set to 30 minutes before | Week view, click Tuesday's Swimming, then Edit event; pick "30 minutes before" in the bell field without saving; screenshot the dialog element | 1440×900 @2x, crop scaled to 900 px | 2026-10-31 |
+| phone-month.webp | Month view at phone size | `set device "iPhone 14"`, open `/almanac/month/<y>/<m>/<d>` | iPhone 14, 390×844 @3x, scaled to 780 px | 2026-10-31 |
 
 Take the week view in the evening if you want the current-time line inside
 the first screen; it scrolls to 08:00.
@@ -46,14 +46,13 @@ the first screen; it scrolls to 08:00.
 
 ## Capture method
 
-- Browser: `agent-browser --session almanac-readme`, `set viewport 1440 900 2`
-  for desktop, `set device "iPhone 14"` for the phone, then `screenshot` with
-  an absolute path. Sign in through the login page once; the session cookie
+- Browser: on 2026-10-31, Playwright with Chrome, a 1440×900 @2x context for
+  desktop and the `iPhone 14` device for the phone, time zone Europe/Bucharest;
+  earlier, `agent-browser --session almanac-readme` with the same sizes. Sign in through the login page once; the session cookie
   carries over.
 - Stills: PNG to WebP with
   `ffmpeg -i in.png -vf scale=1600:-1:flags=lanczos -c:v libwebp -quality 82 out.webp`
-  (780 for the phone). The form crop was
-  `-vf "crop=1440:1336:720:232,scale=900:-1:flags=lanczos"` on the 2880×1800
-  capture.
+  (780 for the phone). The form is a screenshot of the
+  `[role="dialog"]` element, scaled with `-vf scale=900:-1:flags=lanczos`.
 - Close the event form with Cancel or Escape after the capture, so nothing in
   the scratch data changes.

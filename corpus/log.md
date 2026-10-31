@@ -244,3 +244,7 @@ the owner picks an address; production push needs the deploy to pass the keys
 first (`docs/owner-setup.md` step 8). Recorded in
 [decisions.md](wiki/decisions.md). The comment in `web/index.html` that said "no
 service worker" now says the worker is for Web Push only.
+
+## [2026-10-31] maintenance | README images retaken; the README names reminders
+
+A README refresh pass with the readme-docs standard. The README still said version 1 has no reminders and that they were the first planned addition, though briefs 14-16 built them on 2026-10-27. It now lists push reminders in What it does and says they need the server's VAPID keys. All five images were taken again with `docs/images/demo-seed.mjs` on a scratch `DATA_DIR`: the event form now shows its bell field, set to 30 minutes before for the picture and not saved, and the overlays sit on Base UI since brief 12. `shots.md` records the Playwright capture. Checked: `npm ci`, the seed, `npm run dev` on port 5177 and the demo seed.

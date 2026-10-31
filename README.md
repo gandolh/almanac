@@ -15,19 +15,20 @@ A self-hosted calendar that works like Google Calendar, for one person or a few 
 - Repeats events daily, every weekday, weekly on the days you pick, monthly or yearly. Changing one occurrence asks whether the change is for this event, this and following, or all events.
 - Keeps events in named, coloured calendars you can show or hide one at a time, and finds them by title, location or notes.
 - Shows every time in one display time zone you choose (Europe/Bucharest to start), whatever zone the device is in.
+- Reminds you before an event with a push notification on your phone or desktop browser, from 1 day to the start time, once you turn Notifications on in the account menu.
 - Fits a phone screen and can be added to its home screen. The keyboard shortcuts are Google's: `c`, `t`, `d` `w` `m` `y`, the arrow keys and `/`.
 
-Google Calendar does all of this. Almanac keeps the layout and the habits but runs on your own server, and each user sees only their own calendars. There is no sharing and no sign-up page. The only accounts are the ones you create with the seed or let in through Ward. Version 1 has no import, reminders, guests, attachments, dark mode or offline use, so you type every event in. Reminders are the first planned addition.
+Google Calendar does all of this. Almanac keeps the layout and the habits but runs on your own server, and each user sees only their own calendars. There is no sharing and no sign-up page. The only accounts are the ones you create with the seed or let in through Ward. It has no import, guests, attachments, dark mode or offline use, so you type every event in. Reminders need the server's VAPID keys, made with one command.
 
 ## Screenshots
 
 | The week, with a line at the current time | The year, with a dot on each day that has events |
 |---|---|
-| ![Week view for 12 to 18 October: stand-ups, a product demo, swimming on Tuesday and Thursday, and a red line marking the current time on Friday evening](docs/images/week.webp) | ![Year view: twelve mini-months for 2026, with blue dots under the days that have events and today circled](docs/images/year.webp) |
+| ![Week view for 26 October to 1 November: stand-ups, a product demo, swimming on Tuesday and Thursday, a farmers' market on Saturday, and a red line marking the current time on Saturday evening](docs/images/week.webp) | ![Year view: twelve mini-months for 2026, with blue dots under the days that have events and today circled](docs/images/year.webp) |
 
-| Editing a repeating event | On a phone |
+| Editing a repeating event, with a reminder | On a phone |
 |---|---|
-| <img src="docs/images/event-form.webp" width="420" alt="The Edit event form for Swimming: date and time fields, a repeat set to custom days with Tuesday and Thursday picked, 'Weekly on Tuesday, Thursday' spelled out, the Sport calendar and the location City pool"> | <img src="docs/images/phone-month.webp" width="220" alt="The month view on a phone: a compact top bar with a view menu, the same October grid with shortened event names, and a round Create button in the corner"> |
+| <img src="docs/images/event-form.webp" width="420" alt="The Edit event form for Swimming: date and time fields, a repeat set to custom days with Tuesday and Thursday picked, 'Weekly on Tuesday, Thursday' spelled out, the Sport calendar and the location City pool, with a reminder 30 minutes before"> | <img src="docs/images/phone-month.webp" width="220" alt="The month view on a phone: a compact top bar with a view menu, the same October grid with shortened event names, and a round Create button in the corner"> |
 
 The screens show a made-up `demo` account. How each image was made: [docs/images/shots.md](docs/images/shots.md).
 
