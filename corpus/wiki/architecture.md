@@ -9,7 +9,7 @@ Built by briefs 01-11 on 2026-10-16. The code wins where this page and it disagr
 
 ## Pieces
 
-npm workspaces on Shelfmark's layout (`../shelfmark`), Node 24, exact versions,
+npm workspaces on Shelfmark's layout (`shelfmark`), Node 24, exact versions,
 TypeScript strict, Vitest, ESLint:
 
 - `shared`: zod schemas for every route, the repeat presets and their RRULEs,
@@ -18,7 +18,7 @@ TypeScript strict, Vitest, ESLint:
   SQL, apart from the vendored auth library), occurrence expansion with
   rrule-temporal ([recurrence.md](recurrence.md)), search, and the `/api/*`
   and `/auth/*` routes. The Ward auth library is vendored the way Shelfmark
-  does it (`../shelfmark/server/vendor/ward`).
+  does it (`shelfmark/server/vendor/ward`).
 - `web`: Vite + React. FullCalendar v7 (`daygrid`, `timegrid`, `interaction`)
   for day, week and month; our own year view; plain CSS with tokens, light
   only. A web manifest for the home-screen icon, and since brief 14
@@ -43,10 +43,10 @@ Every query is scoped to the signed-in user.
 
 As Shelfmark: Caddy on the VPS serves the web app at `/almanac/*` and forwards
 `/almanac-api/*` with `handle_path` to the API container on
-`127.0.0.1:8797`, deployed by `../vps-deploy`. In dev, Vite proxies
+`127.0.0.1:8797`, deployed by `vps-deploy`. In dev, Vite proxies
 `/almanac-api` to the API and strips the prefix, so paths match production.
 The Ward callback is `<origin>/almanac-api/auth/ward/callback`, registered by
-the local seed in `../wzd_auth`.
+the local seed in `wzd_auth`.
 
 ## Time zones
 

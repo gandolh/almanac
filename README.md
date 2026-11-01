@@ -34,7 +34,7 @@ The screens show a made-up `demo` account. How each image was made: [docs/images
 
 ## How it works
 
-Three npm workspaces. `shared` holds the zod schemas for every route, the repeat presets and the date helpers, and both other parts import it. `server` is a Fastify API on SQLite. It stores a repeating event once, as a series with an RRULE, and expands it into occurrences with rrule-temporal for whatever range a view asks for. `web` is the React app. FullCalendar v7 draws the day, week and month views, and the year view is Almanac's own. You sign in with a local account, or with [Ward](https://github.com/gandolh/ward-auth), the sign-in service the owner's other apps share.
+Three npm workspaces. `shared` holds the zod schemas for every route, the repeat presets and the date helpers, and both other parts import it. `server` is a Fastify API on SQLite. It stores a repeating event once, as a series with an RRULE, and expands it into occurrences with rrule-temporal for whatever range a view asks for. `web` is the React app. FullCalendar v7 draws the day, week and month views, and the year view is Almanac's own. You sign in with a local account, or with Ward, the sign-in service the owner's other apps share.
 
 ```mermaid
 flowchart LR

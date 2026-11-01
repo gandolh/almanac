@@ -15,7 +15,7 @@ Every row belongs to one user and every query is scoped by
 never 403, so ids don't leak.
 
 Depends on: 02. Patterns: Shelfmark's `server/src/store/books.ts`,
-`server/src/routes/books.ts`, `shared/src/book.ts` (`../shelfmark`).
+`server/src/routes/books.ts`, `shared/src/book.ts` (`shelfmark`).
 
 ## Files you OWN
 

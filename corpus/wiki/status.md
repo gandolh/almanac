@@ -1,5 +1,5 @@
 ---
-summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds. Pushed to gandolh/almanac on GitHub, not deployed. Brief 12 (Base UI under the overlays) built 2026-10-23; briefs 14-16 (phone notifications: the push worker, a reminder on each event, sending them) built 2026-10-27, local, 745 tests; brief 13 fixed the app lists in wzd_auth and shelfmark the same day. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
+summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds. Pushed to `<owner>/almanac` on GitHub, not deployed. Brief 12 (Base UI under the overlays) built 2026-10-23; briefs 14-16 (phone notifications: the push worker, a reminder on each event, sending them) built 2026-10-27, local, 745 tests; brief 13 fixed the app lists in wzd_auth and shelfmark the same day. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
 updated: 2026-10-27
 ---
 
@@ -12,8 +12,8 @@ were built the same day with `plan-split-dispatch`, one commit per brief on
 correctness, conventions) and a browser walkthrough of every flow, and the
 findings were fixed in three lanes, re-checked in the browser, and the last
 three leftovers fixed after a pause. 623 tests pass; typecheck, lint and
-build are clean. `main` is pushed to `https://github.com/gandolh/almanac.git`,
-and so is `../wzd_auth`'s local seed entry (`22e1fd2`). `../vps-deploy` has
+build are clean. `main` is pushed to `https://github.com/<owner>/almanac.git`,
+and so is `wzd_auth`'s local seed entry (`22e1fd2`). `vps-deploy` has
 no remote; its Almanac stack (`8e247a3`) is a local commit, which is where
 the deploy runs from. The README and `docs/` follow the readme-docs standard
 since the evening of 2026-10-16. Nothing is deployed.
@@ -26,18 +26,18 @@ _2026-10-27_. Brief 14 added Web Push: a push-only service worker, stored
 subscriptions, and the account menu's Notifications dialog with a test
 notification. Local commits, not pushed, 694 tests. A real push to a browser
 or a phone has not been tried. Production push needs the `VAPID_*` values
-passed by `../vps-deploy`'s Almanac stack, which doesn't pass them yet.
+passed by `vps-deploy`'s Almanac stack, which doesn't pass them yet.
 Brief 15 gave each event one reminder, stored and shown in the form and the
 details. Brief 16 sends them: a tick a minute in the API process, each
 reminder once, nothing more than 15 minutes late. 745 tests. A real Web Push
 reached FCM from the built server on this machine; no phone has shown one yet.
-Brief 13 fixed the stale app lists in `../wzd_auth` (`39ec172`) and
-`../shelfmark` (`4d48bd4`), one local commit each, not pushed. No brief is open.
+Brief 13 fixed the stale app lists in `wzd_auth` (`39ec172`) and
+`shelfmark` (`4d48bd4`), one local commit each, not pushed. No brief is open.
 
 ## Next (owner)
 
 1. Register Almanac in production Ward and write
-   `../vps-deploy/secrets/almanac.env` with `WARD_OIDC_CLIENT_KEY` (the only
+   `vps-deploy/secrets/almanac.env` with `WARD_OIDC_CLIENT_KEY` (the only
    key), then deploy, following [docs/owner-setup.md](../../docs/owner-setup.md).
 2. Create your account with the seed inside the container. Sign in locally
    first, then link Ward from the account menu, or Ward creates a second,
@@ -48,8 +48,8 @@ Brief 13 fixed the stale app lists in `../wzd_auth` (`39ec172`) and
    local Ward seed with Docker Desktop's WSL integration on) or in
    production; adding it to a phone's home screen.
 5. Notifications (brief 14): add the three `VAPID_*` values to
-   `../vps-deploy/stacks/almanac.ts` (as `../vps-deploy/stacks/satchel.ts`
-   has them), make a pair and put it in `../vps-deploy/secrets/almanac.env`
+   `vps-deploy/stacks/almanac.ts` (as `vps-deploy/stacks/satchel.ts`
+   has them), make a pair and put it in `vps-deploy/secrets/almanac.env`
    with a real `VAPID_SUBJECT`, then deploy both halves, following
    [docs/owner-setup.md](../../docs/owner-setup.md) step 8. Then turn
    Notifications on in a desktop browser and on the iPhone's Home Screen app,
@@ -93,7 +93,7 @@ Brief 13 fixed the stale app lists in `../wzd_auth` (`39ec172`) and
 | 10 | [Search](../briefs/done/10-search.md) | done |
 | 11 | [Deploy and docs](../briefs/done/11-deploy-and-docs.md) | done |
 | 12 | [Base UI under Dialog, Popover, Menu and the drawer](../briefs/done/12-base-ui-primitives.md) | done 2026-10-23, local commits, not pushed |
-| 13 | [Fix the stale app lists in sibling repos](../briefs/done/13-sibling-repo-listings.md) | done 2026-10-27: `../wzd_auth` `39ec172`, `../shelfmark` `4d48bd4`, local commits, not pushed |
+| 13 | [Fix the stale app lists in sibling repos](../briefs/done/13-sibling-repo-listings.md) | done 2026-10-27: `wzd_auth` `39ec172`, `shelfmark` `4d48bd4`, local commits, not pushed |
 | 14 | [Phone notifications 1: the worker and the push subscription](../briefs/done/14-push-subscription-and-worker.md) | done 2026-10-27, local commits, not pushed; no live push tried |
 | 15 | [Phone notifications 2: a reminder on each event](../briefs/done/15-a-reminder-on-each-event.md) | done 2026-10-27, local commits, not pushed |
 | 16 | [Phone notifications 3: send due reminders](../briefs/done/16-send-due-reminders.md) | done 2026-10-27, local commits, not pushed; no phone tried |

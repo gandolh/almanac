@@ -3,7 +3,7 @@
 ## Context
 
 Almanac is a personal calendar ([overview](../../wiki/overview.md)). It copies
-Shelfmark's layout (`../shelfmark`) file for file where it can: read
+Shelfmark's layout (`shelfmark`) file for file where it can: read
 [architecture.md](../../wiki/architecture.md) first. This brief lays the
 ground every later brief builds on: the three npm workspaces, the root
 configs, a Fastify app with a health route, the SQLite opener with an empty
@@ -43,7 +43,7 @@ web/src/main.tsx  web/src/App.tsx  web/src/base.ts
 ## Files you must NOT touch
 
 `corpus/` (except moving nothing; the controller closes briefs). Nothing in
-`../shelfmark`; read it, never edit it.
+`shelfmark`; read it, never edit it.
 
 ## What to do
 

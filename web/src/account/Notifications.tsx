@@ -23,7 +23,7 @@ import "../push/notifications.css";
  * when the switch is turned on, never when the dialog opens. Turning it on
  * subscribes this browser and saves the subscription on the server; turning
  * it off unsubscribes and deletes it there. Copied from Satchel's
- * (`../satchel/web/src/settings/Notifications.tsx`).
+ * (`satchel/web/src/settings/Notifications.tsx`).
  */
 
 /** What the dialog shows. `ready` is the only state with a switch. */

@@ -2,7 +2,7 @@
 
 ## [2026-10-16] maintenance | Corpus bootstrapped
 
-New repo at `~/projects/almanac`, local git on `main`, no remote (the owner
+New repo, local git on `main`, no remote (the owner
 creates it later). Corpus rules, lint and routing copied from Shelfmark's and
 adapted.
 
@@ -112,7 +112,7 @@ instead of a 500, calendar deletes keeping moved occurrences consistent,
 "all" and "following" measured from an exception's current start, search
 keeping the 50 closest to now, migrations in one immediate transaction.
 The DST-gap skip is accepted ([recurrence.md](wiki/recurrence.md)). The
-remote `gandolh/almanac` was added; nothing is pushed.
+remote `<owner>/almanac` was added; nothing is pushed.
 
 ## [2026-10-16] resume | Paused before fix round 2
 
@@ -142,7 +142,7 @@ index), `getting-started.md` (took over owner-setup's "Local development"
 section, which is now a pointer), `architecture.md`, and `images/` with
 `shots.md` and `demo-seed.mjs`. The images come from a throwaway clone with a
 made-up `demo` account. [status.md](wiki/status.md) caught up: `main` is
-pushed, `../wzd_auth`'s `22e1fd2` too, and `../vps-deploy` has no remote.
+pushed, `wzd_auth`'s `22e1fd2` too, and `vps-deploy` has no remote.
 
 ## [2026-10-23] todo | Brief 12 filed: Base UI under the primitives
 
@@ -168,7 +168,7 @@ and after screenshots at 1440 and 390 px match. The decision is in
 ## [2026-10-23] todo | Briefs 13–16 from the two open todos
 
 [13](briefs/done/13-sibling-repo-listings.md) fixes the stale app lists in
-`../wzd_auth` (README, the OIDC runbook's redirect table) and `../shelfmark` (the obsolete
+`wzd_auth` (README, the OIDC runbook's redirect table) and `shelfmark` (the obsolete
 "redeploy Ward's UI" step), one commit per repo; the vps-deploy count was already right
 (39 stacks). Phone notifications split into three: [14](briefs/done/14-push-subscription-and-worker.md)
 a push-only service worker, VAPID keys and stored subscriptions, copied from Satchel's
@@ -192,7 +192,7 @@ a pair into `.env`. 694 tests. The worker and the dialog's states were checked
 in headless Chromium; no real push reached a browser or a phone. The
 "no service worker" line in [decisions.md](wiki/decisions.md) now says the
 worker is push-only. Production needs the `VAPID_*` values passed by
-`../vps-deploy`'s Almanac stack, an owner step.
+`vps-deploy`'s Almanac stack, an owner step.
 
 ## [2026-10-27] done | Brief 15: a reminder on each event
 
@@ -225,11 +225,11 @@ and [architecture.md](wiki/architecture.md) caught up.
 ## [2026-10-27] done | Brief 13: the app lists in sibling repos
 
 [Brief 13](briefs/done/13-sibling-repo-listings.md) is built, once the agent
-working in `../wzd_auth` had finished. Its facts still held after Ward's briefs
-34-38. In `../wzd_auth` (`39ec172`), the README names shelfmark among the apps
+working in `wzd_auth` had finished. Its facts still held after Ward's briefs
+34-38. In `wzd_auth` (`39ec172`), the README names shelfmark among the apps
 with "Sign in with Ward" and almanac as registered for local development, the
 screenshot's alt text drops its count, and the cutover table has rows for
-shelfmark and almanac read from their server configs. In `../shelfmark`
+shelfmark and almanac read from their server configs. In `shelfmark`
 (`4d48bd4`), the obsolete "Redeploy Ward's UI" owner step is gone. Both are
 local commits, not pushed. Flagged, not changed: Ward's console screenshot is
 from 2026-10-09, its README still calls the move to its own host pending, and

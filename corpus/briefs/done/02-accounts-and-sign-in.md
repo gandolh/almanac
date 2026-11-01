@@ -3,7 +3,7 @@
 ## Context
 
 Almanac has its own login plus "Sign in with Ward", exactly like Shelfmark
-(`../shelfmark`), but with several users, each seeing only their own data
+(`shelfmark`), but with several users, each seeing only their own data
 ([decisions.md](../../wiki/decisions.md), "Several users"). The vendored Ward
 library (ward-auth 0.3.1) already supports this: `seedUsers`, auto-creating a
 user on the first Ward sign-in (`createUserWithWardLink`, needs a Ward grant),
@@ -15,7 +15,7 @@ Depends on: 01.
 ## Files you OWN
 
 ```
-server/vendor/ward/*          (copied byte for byte from ../shelfmark/server/vendor/ward)
+server/vendor/ward/*          (copied byte for byte from shelfmark/server/vendor/ward)
 web/vendor/ward/*             (same copy)
 server/src/auth/accounts.ts  server/src/auth/guard.ts  server/src/auth/*.test.ts
 server/src/seed.ts  server/src/seed.test.ts

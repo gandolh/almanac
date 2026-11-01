@@ -9,7 +9,7 @@ own machine is in [getting-started.md](getting-started.md).
 
 ## 1. Register Almanac in production Ward
 
-The adoption guide is `../wzd_auth/shared-library/README.md`. Shelfmark was
+The adoption guide is `wzd_auth/shared-library/README.md`. Shelfmark was
 registered the same way.
 
 1. Open `/ward/console` on the production site and sign in as the break-glass
@@ -19,7 +19,7 @@ registered the same way.
 3. Make the client's key pair, from Ward's repo root:
 
    ```
-   cd ~/projects/wzd_auth && npm run oidc-client-key --workspace=api -- almanac
+   cd path/to/wzd_auth && npm run oidc-client-key --workspace=api -- almanac
    ```
 
    It prints a private `WARD_OIDC_CLIENT_KEY=...` line and a public JWK. Keep
@@ -31,7 +31,7 @@ registered the same way.
 
 ## 2. Write the deploy secrets
 
-Create `~/projects/vps-deploy/secrets/almanac.env` with one line, then
+Create `vps-deploy/secrets/almanac.env` with one line, then
 `chmod 600` it:
 
 ```
@@ -70,7 +70,7 @@ Dry run first. It prints every action and runs none. If step 2 is not done,
 it stops at the missing key:
 
 ```
-cd ~/projects/vps-deploy
+cd path/to/vps-deploy
 node cli.ts almanac all --dry-run
 ```
 
@@ -172,15 +172,15 @@ everything else works as before.
    services can reach you at, as a `mailto:` URL.
 
 2. **Pass them to the container.** The deploy doesn't do this yet:
-   `../vps-deploy/stacks/almanac.ts` sends the container no `VAPID_*` value.
+   `vps-deploy/stacks/almanac.ts` sends the container no `VAPID_*` value.
    Satchel's stack (`stacks/satchel.ts`) shows the three lines it needs, read
    with `estate.secret("almanac", ...)`. Then add the three lines to
-   `~/projects/vps-deploy/secrets/almanac.env`, next to the Ward key.
+   `vps-deploy/secrets/almanac.env`, next to the Ward key.
 
 3. **Redeploy both halves:**
 
    ```
-   cd ~/projects/vps-deploy && node cli.ts almanac all
+   cd path/to/vps-deploy && node cli.ts almanac all
    ```
 
    `server` restarts the API with the keys and `deploy` ships the web app with

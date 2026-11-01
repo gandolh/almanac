@@ -28,7 +28,7 @@ Almanac's widgets are hand-built in `web/src/components/`:
 All four must move in one go. A Base UI modal dialog traps focus in its own
 tree, so a hand-built popover portalled to `body` would lose focus to it.
 
-The pattern to copy is `../newspapper/ui/src/components/ui/Modal.tsx`: Base UI
+The pattern to copy is `newspapper/ui/src/components/ui/Modal.tsx`: Base UI
 `Dialog`, the app's own stylesheet, and the component's props unchanged.
 
 ## Files you OWN

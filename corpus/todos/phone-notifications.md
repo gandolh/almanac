@@ -18,7 +18,7 @@ and named it the first follow-up.
 
 ## Context
 
-Web Push, reusing Satchel's push code (`../satchel`). It needs the app added to
+Web Push, reusing Satchel's push code (`satchel`). It needs the app added to
 the home screen (on iPhone, push works only for installed web apps), push
 keys in `.env`, a service worker, and a timer on the server that sends due
 reminders, including for occurrences of a series. See

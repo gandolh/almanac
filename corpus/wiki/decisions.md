@@ -11,7 +11,7 @@ All of these came out of the owner's grill on 2026-10-16.
 
 ## React + Fastify + SQLite, on Shelfmark's layout
 _2026-10-16_. The owner chose Fastify and React. The layout, the vendored Ward
-auth library and the deploy pattern come from Shelfmark (`../shelfmark`):
+auth library and the deploy pattern come from Shelfmark (`shelfmark`):
 `shared`, `server` and `web` npm workspaces, better-sqlite3, Vite. Rejected:
 Postgres, which none of the estate's small apps run, and a new layout, which
 would throw away a working auth and deploy setup.
@@ -91,8 +91,8 @@ no fetch handler and caches nothing, so there is still no offline mode.
 
 ## Deployed on the VPS like Shelfmark
 _2026-10-16_. Caddy serves the app at `/almanac/` and forwards `/almanac-api/`
-to the API container on port 8797, deployed by `../vps-deploy`. The stack and
-the Ward seed entry (`../wzd_auth`) are committed locally; the owner deploys.
+to the API container on port 8797, deployed by `vps-deploy`. The stack and
+the Ward seed entry (`wzd_auth`) are committed locally; the owner deploys.
 Rejected: local only.
 
 ## Google Calendar's layout, light only

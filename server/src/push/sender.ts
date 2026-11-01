@@ -25,7 +25,7 @@ export type SendPush = (target: PushTarget, payload: string) => Promise<void>;
 type SendNotification = (subscription: PushTarget, payload: string, options: RequestOptions) => Promise<SendResult>;
 
 /**
- * The real sender, copied from Satchel's (`../satchel/server/src/push/sender.ts`):
+ * The real sender, copied from Satchel's (`satchel/server/src/push/sender.ts`):
  * web-push with the VAPID keys passed on every call (no `setVapidDetails`, so
  * no module-wide state) and aes128gcm, web-push's default and the only
  * encoding Apple takes. Urgency is high, not Satchel's normal: a phone saving

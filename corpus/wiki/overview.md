@@ -20,6 +20,6 @@ It deliberately leaves out import, guests, attachments, dark mode and offline
 use ([decisions.md](decisions.md)). Reminders, left out of v1, came after it
 (2026-10-27): one per event, sent to the phone by Web Push.
 
-It is a sibling of Shelfmark (`../shelfmark`) and Satchel (`../satchel`): the
+It is a sibling of Shelfmark (`shelfmark`) and Satchel (`satchel`): the
 same Fastify + SQLite + React stack, the same vendored Ward auth, the same VPS
 deploy ([architecture.md](architecture.md)).

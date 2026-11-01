@@ -5,7 +5,7 @@ import { matchRoute, navigate } from "../router";
 /**
  * This browser's side of Web Push (brief 14): the service worker, whether push
  * can work here, and the browser's subscription. Copied from Satchel's
- * (`../satchel/web/src/push/subscription.ts`). The pure parts are exported
+ * (`satchel/web/src/push/subscription.ts`). The pure parts are exported
  * for tests; the rest touches `navigator`.
  */
 

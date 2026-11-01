@@ -6,7 +6,7 @@ The frame every web brief fills in: Google Calendar's layout played straight,
 light only ([features.md](../../wiki/features.md) "Layout", "Views",
 [decisions.md](../../wiki/decisions.md) last entry). Words from
 [glossary.md](../../wiki/glossary.md). Patterns: Shelfmark's `web/src/layout`,
-`router.ts`, `components/` and `styles/` (`../shelfmark`), plus what brief 02
+`router.ts`, `components/` and `styles/` (`shelfmark`), plus what brief 02
 already copied here.
 
 This brief also creates **stubs** that later briefs replace, so that briefs

@@ -66,7 +66,7 @@ server side by side. Open <http://localhost:5177/almanac/> and sign in.
 
 ## Try "Sign in with Ward"
 
-Start Ward locally and run its seed, as `../wzd_auth/infrastructure/local/README.md`
+Start Ward locally and run its seed, as `wzd_auth/infrastructure/local/README.md`
 describes. The seed registers Almanac and writes the five `WARD_OIDC_*` values
 into this repo's `.env`. Restart `npm run dev` afterwards. The login page then
 shows the Ward button. Your Ward account needs a grant on the `almanac` app in

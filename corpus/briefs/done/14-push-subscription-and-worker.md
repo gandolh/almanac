@@ -16,7 +16,7 @@ Almanac has a web manifest (`web/public/manifest.webmanifest`, linked from
 `web/index.html`) and **no service worker** (checked 2026-10-23). On iPhone, Web
 Push works only for a web app added to the home screen.
 
-Satchel already does all of this (`../satchel`), and its code is the reference
+Satchel already does all of this (`satchel`), and its code is the reference
 to copy, not a package to depend on:
 
 - server: `web-push` 3.6.7, `server/src/push/sender.ts` (`webPushSender`,
@@ -50,7 +50,7 @@ and has no `fetch` handler, so nothing about how Almanac loads changes.
 ## Files you must NOT touch
 
 - `server/src/routes/events.ts`, `occurrences.ts`, `recurrence/` (briefs 15 and 16).
-- `../satchel`: copy from it, never import it.
+- `satchel`: copy from it, never import it.
 
 ## What to do
 
@@ -144,7 +144,7 @@ no phone was used. The route tests cover the server's half.
 
 **Left for the owner:**
 
-- `../vps-deploy/stacks/almanac.ts` passes no `VAPID_*` value to the
+- `vps-deploy/stacks/almanac.ts` passes no `VAPID_*` value to the
   container, so production push stays off until the three lines are added
   there the way `stacks/satchel.ts` does it. That is another repo, so it
   wasn't touched.
