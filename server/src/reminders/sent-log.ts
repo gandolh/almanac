@@ -1,7 +1,7 @@
 import type { Db } from "../db/open.js";
 
 /**
- * The reminders already sent (brief 16): `reminders_sent`, keyed by the event
+ * The reminders already sent: `reminders_sent`, keyed by the event
  * row and the occurrence's start, so a reminder goes once whichever tick or
  * process sees it first. For an occurrence a series generates the row is the
  * series and the start its key; a one-off or an exception is its own row.

@@ -3,7 +3,7 @@ import { useCallback, useSyncExternalStore } from "react";
 /**
  * Phone or desktop, for the few components that lay out differently (the
  * login page's focus, the password dialog's sheet). Here rather than in
- * `layout/` (brief 05's) because the sign-in screens need it first; the
+ * `layout/` because the sign-in screens need it first; the
  * stylesheets use the same split as `max-width: 767.98px`.
  */
 

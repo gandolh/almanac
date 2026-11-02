@@ -10,9 +10,8 @@ import {
 import { ApiError, apiRequest, type RequestOptions } from "../api";
 
 /**
- * Occurrences and the event writes (briefs 03 and 04's routes), for every
- * view: day, week and month (brief 06), the year view (08), the event form
- * (07) and search (10).
+ * Occurrences and the event writes (the server's routes), for every
+ * view: day, week and month, the year view, the event form and search.
  *
  * - Reads are not cached here: a view asks for its own range and keeps what
  *   it got.

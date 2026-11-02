@@ -2,7 +2,7 @@ import { pushKeySchema, pushTestResultSchema, type PushSubscriptionInput, type P
 import { apiRequest, type RequestOptions } from "../api";
 
 /**
- * The push routes (brief 14, `server/src/routes/push.ts`). With push off on
+ * The push routes (`server/src/routes/push.ts`). With push off on
  * the server, the key, the save and the test reject with an `ApiError` whose
  * code is `not_found`.
  */

@@ -17,7 +17,7 @@ import {
 import "../push/notifications.css";
 
 /**
- * The account menu's "Notifications" (brief 14): a switch that turns
+ * The account menu's "Notifications": a switch that turns
  * notifications on in this browser, a "Send a test" button, and plain words
  * for every state the browser or the server can be in. Permission is asked
  * when the switch is turned on, never when the dialog opens. Turning it on

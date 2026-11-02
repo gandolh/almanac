@@ -1,11 +1,11 @@
 ---
-summary: How Almanac is put together, planned and then built on 2026-10-16. Shelfmark's three workspaces (shared, server, web), what each owns, the planned API routes, request paths behind Caddy, dev and production ports (API 8809, Vite 5177, VPS 8797), where data lives, and secrets.
-updated: 2026-10-27
+summary: How Almanac is put together, built on 2026-10-16. Shelfmark's three workspaces (shared, server, web), what each owns, the API routes, request paths behind Caddy, dev and production ports (API 8809, Vite 5177, VPS 8797), time zones on both sides, where data lives, where the reminder timer runs, and secrets.
+updated: 2026-11-01
 ---
 
 # Architecture
 
-Built by briefs 01-11 on 2026-10-16. The code wins where this page and it disagree. FullCalendar is lazy-loaded: `CalendarArea` is its own chunk, so the shell, year view and search load without it.
+Built on 2026-10-16. The code wins where this page and it disagree.
 
 ## Pieces
 
@@ -21,11 +21,11 @@ TypeScript strict, Vitest, ESLint:
   does it (`shelfmark/server/vendor/ward`).
 - `web`: Vite + React. FullCalendar v7 (`daygrid`, `timegrid`, `interaction`)
   for day, week and month; our own year view; plain CSS with tokens, light
-  only. A web manifest for the home-screen icon, and since brief 14
-  (2026-10-27) a push-only service worker, `web/public/sw.js`, that caches
-  nothing.
+  only. A web manifest for the home-screen icon, and since 2026-10-27 a
+  push-only service worker, `web/public/sw.js`, that caches nothing. How the
+  web app is wired: [web-app.md](web-app.md).
 
-## Planned routes
+## Routes
 
 | Route | Does |
 |---|---|
@@ -34,10 +34,15 @@ TypeScript strict, Vitest, ESLint:
 | `POST /api/events`, `PATCH /api/events/:id`, `DELETE /api/events/:id` | create, edit, delete, with an edit scope for series |
 | `GET /api/search?q` | the user's events matching title, location or notes |
 | `GET`, `PATCH /api/settings` | display time zone |
-| `GET /api/push/key`, `PUT`, `DELETE /api/push/subscriptions`, `POST /api/push/test` | Web Push: the server's key, this browser's subscription, a test notification (brief 14) |
+| `GET /api/push/key`, `PUT`, `DELETE /api/push/subscriptions`, `POST /api/push/test` | Web Push: the server's key, this browser's subscription, a test notification ([notifications.md](notifications.md)) |
 | `/auth/*` | the vendored Ward auth plugin: local login and Sign in with Ward |
 
-Every query is scoped to the signed-in user.
+Every query is scoped to the signed-in user. Every route but `GET
+/api/health` needs a session: the Ward plugin's root `onRequest` hook answers
+`401 unauthorized` first, so an unknown path without a session is a 401, not
+a 404. `server/src/auth/guard.ts` adds a 403 for a write sent from another
+origin (the `SameSite=Lax` cookie would still ride along from a sibling
+subdomain), and routes read the user with `currentUserId(request)`.
 
 ## Request paths
 
@@ -68,22 +73,24 @@ own test fixtures).
 
 ## Data
 
-`data/almanac.db` in dev, a bind-mounted volume in the container.
+`data/almanac.db` in dev, a bind-mounted volume in the container. The root
+`.gitignore` ignores `data/`, which would also hide `web/src/data/`, so it
+re-includes that folder with `!web/src/data/`.
+
+## Workspace gotchas
+
+- The root `pretest` runs `tsc -b shared`: server and web tests import the
+  shared package's built output.
 
 ## Reminders
 
-Brief 16 (2026-10-27): `server/src/reminders/` runs inside the API process, a
-tick a minute from `buildApp` while push is on and `REMINDER_TIMER` isn't
-`off`, stopped on close. Each tick takes the window since the last one (at
-most 15 minutes back), finds the reminders due in it for every user with a
-push subscription, through the events store and `expandSeries` over a day's
-lookahead, claims each in `reminders_sent` and sends it with
-`PushService.sendToUser`. One process sends; a second one on the same
-database would set `REMINDER_TIMER=off`, though the claim keeps even two from
-sending a reminder twice.
+Since 2026-10-27 a tick a minute inside the API process sends due reminders
+(`server/src/reminders/`), started by `buildApp` while push is on and
+`REMINDER_TIMER` isn't `off`. One process sends; a second on the same database
+sets `REMINDER_TIMER=off`. How it works: [notifications.md](notifications.md).
 
 ## Secrets
 
 `.env` (gitignored) holds the seed user values, the `WARD_OIDC_*` values the
-Ward seed writes, and the `VAPID_*` push keys `npm run vapid-keys` writes
-(brief 14). `.env.example` lists the keys with no values.
+Ward seed writes, and the `VAPID_*` push keys `npm run vapid-keys` writes.
+`.env.example` lists the keys with no values.

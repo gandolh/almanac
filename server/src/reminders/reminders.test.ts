@@ -12,7 +12,7 @@ import { createSentLog } from "./sent-log.js";
 import { SENT_KEEP_MS, createReminders, type Reminders } from "./timer.js";
 
 /**
- * The reminders with a fake clock (brief 16). Events are made through the API,
+ * The reminders with a fake clock. Events are made through the API,
  * as the event form makes them; the reminders run on a second connection to
  * the same database, with a stand-in push service that records what it was
  * asked to send. The app's own timer is off.

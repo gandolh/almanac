@@ -33,28 +33,28 @@ recorded in [architecture.md](wiki/architecture.md).
 Three workspaces on Shelfmark's layout, Fastify health route, SQLite opener
 with an empty migration list, Vite page through the `/almanac-api` proxy. The
 Ward library came over early for `config.ts`; `ERROR_STATUS` has
-`unauthorized`. See [the brief](briefs/done/01-workspace-scaffold.md).
+`unauthorized`. See brief 01.
 
 ## [2026-10-16] done | Brief 02: accounts and sign-in
 
 Ward auth plugin registered first, origin guard, `currentUserId` in
 `auth/guard.ts`, seed, multi-user test helpers (`signInAs`), and the web
 login, auth gate and change-password dialog copied from Shelfmark with a
-Google-like light palette. See [the brief](briefs/done/02-accounts-and-sign-in.md).
+Google-like light palette. See brief 02.
 
 ## [2026-10-16] done | Brief 03: calendars, events and settings API
 
 Migration 1, the calendar, event and settings stores, and every route shape,
 with repeats refused until brief 04. Per-user scoping with 404 for other
 users' ids. New wiki page [data-model.md](wiki/data-model.md). See
-[the brief](briefs/done/03-calendars-and-events-api.md).
+brief 03.
 
 ## [2026-10-16] done | Brief 04: repeating events
 
 Repeat presets as RRULEs, server-side expansion with rrule-temporal in the
 series' zone, and the three edit scopes for edit and delete. The as-built
 rules are in [recurrence.md](wiki/recurrence.md). See
-[the brief](briefs/done/04-repeating-events.md).
+brief 04.
 
 ## [2026-10-16] done | Brief 05: app shell, routes, dates and tokens
 
@@ -62,41 +62,41 @@ Google-style top bar, sidebar with mini-month, drawer on phones, view routes
 `/<view>/y/m/d`, `dates.ts` on Temporal, calendar and settings data hooks,
 shortcuts and commands, Popover, Dialog, Toast, MonthGrid, the home-screen
 icon, and stubs for briefs 06-10. `.gitignore` fixed so `web/src/data/` is
-tracked. See [the brief](briefs/done/05-app-shell.md).
+tracked. See brief 05.
 
 ## [2026-10-16] done | Brief 06: day, week and month views
 
 FullCalendar v7 with the Monarch theme on our tokens, the occurrences data
 layer, the details popover, linkify, the edit-scope dialog, drag, drop and
-resize. See [the brief](briefs/done/06-day-week-month-views.md).
+resize. See brief 06.
 
 ## [2026-10-16] done | Brief 08: year view
 
 Twelve mini-months with dots on days that have events, a day list in a
-popover, links to the day and month. See [the brief](briefs/done/08-year-view.md).
+popover, links to the day and month. See brief 08.
 
 ## [2026-10-16] done | Brief 11: container, VPS stack, Ward entry, owner docs
 
 Dockerfile and compose (port 8797), the vps-deploy stack (`8e247a3`) and the
 local Ward seed entry (`22e1fd2`), both unpushed, `docs/owner-setup.md` and
-the README. See [the brief](briefs/done/11-deploy-and-docs.md).
+the README. See brief 11.
 
 ## [2026-10-16] done | Brief 10: search
 
 Top-bar search field, `/` to focus, results grouped by date, a click opens
-the day. See [the brief](briefs/done/10-search.md).
+the day. See brief 10.
 
 ## [2026-10-16] done | Brief 09: managing calendars, and the time zone setting
 
 "My calendars" with show/hide, rename, colour and delete, a new-calendar
 dialog, and the time zone dialog in the account menu. See
-[the brief](briefs/done/09-calendars-and-time-zone.md).
+brief 09.
 
 ## [2026-10-16] done | Brief 07: creating and editing events
 
 Quick create, the event form, the repeat picker, the 24-hour time field, `c`
 to create, scope questions on series edits. See
-[the brief](briefs/done/07-creating-and-editing-events.md).
+brief 07.
 
 ## [2026-10-16] maintenance | Review round and fixes
 
@@ -147,14 +147,14 @@ pushed, `wzd_auth`'s `22e1fd2` too, and `vps-deploy` has no remote.
 ## [2026-10-23] todo | Brief 12 filed: Base UI under the primitives
 
 The owner asked for Base UI in the apps that still hand-build their widgets.
-[Brief 12](briefs/done/12-base-ui-primitives.md) rebuilds `Dialog`, `Popover`,
+Brief 12 rebuilds `Dialog`, `Popover`,
 `Menu` and the phone drawer on Base UI, keeping their props, and deletes
 `layer.ts`. They move together because a Base UI modal traps focus away from
 a hand-built popover. Native selects, checkboxes and radios stay.
 
 ## [2026-10-23] done | Brief 12: Base UI under the primitives
 
-[Brief 12](briefs/done/12-base-ui-primitives.md) is built. `Dialog`,
+Brief 12 is built. `Dialog`,
 `Popover`, `Menu` and the phone drawer (a modal Base UI `Dialog`) are on Base
 UI with their props unchanged. `layer.ts` and the hand-written focus, key and
 placement code are gone. Two fixes kept old behaviour: an Esc a control
@@ -167,20 +167,20 @@ and after screenshots at 1440 and 390 px match. The decision is in
 
 ## [2026-10-23] todo | Briefs 13–16 from the two open todos
 
-[13](briefs/done/13-sibling-repo-listings.md) fixes the stale app lists in
+Brief 13 fixes the stale app lists in
 `wzd_auth` (README, the OIDC runbook's redirect table) and `shelfmark` (the obsolete
 "redeploy Ward's UI" step), one commit per repo; the vps-deploy count was already right
-(39 stacks). Phone notifications split into three: [14](briefs/done/14-push-subscription-and-worker.md)
+(39 stacks). Phone notifications split into three: 14
 a push-only service worker, VAPID keys and stored subscriptions, copied from Satchel's
-code; [15](briefs/done/15-a-reminder-on-each-event.md) one reminder per event, off by
-default, with the choices phone calendars offer; [16](briefs/done/16-send-due-reminders.md)
+code; 15 one reminder per event, off by
+default, with the choices phone calendars offer; 16
 a one-minute timer that sends due reminders once, expands series only over the window,
 and skips anything more than 15 minutes stale after a restart. 16 replaces the "No
 reminders in v1" decision when it ships.
 
 ## [2026-10-27] done | Brief 14: the push worker and the subscriptions
 
-[Brief 14](briefs/done/14-push-subscription-and-worker.md) is built. The
+Brief 14 is built. The
 server takes three `VAPID_*` settings (all or none) and stores each browser's
 subscription in `push_subscriptions`. The routes are `/api/push/key`,
 `/api/push/subscriptions` (PUT, DELETE) and `/api/push/test`. With push off,
@@ -196,7 +196,7 @@ worker is push-only. Production needs the `VAPID_*` values passed by
 
 ## [2026-10-27] done | Brief 15: a reminder on each event
 
-[Brief 15](briefs/done/15-a-reminder-on-each-event.md) is built. Each event has
+Brief 15 is built. Each event has
 one `reminderMinutes`, none by default, from the choices phone calendars offer
 (`TIMED_REMINDERS`, `ALL_DAY_REMINDERS` in `shared/src/event.ts`), stored in
 `events.reminder_minutes` (migration 3). Anything else is a 400, and switching
@@ -209,7 +209,7 @@ caught up with migrations 2 and 3 (brief 14 had left it out), and
 
 ## [2026-10-27] done | Brief 16: send due reminders
 
-[Brief 16](briefs/done/16-send-due-reminders.md) is built. `server/src/reminders/`
+Brief 16 is built. `server/src/reminders/`
 runs a tick a minute in the API process while push is on (`REMINDER_TIMER`
 turns it off). Each tick finds the reminders due since the last one, at most 15
 minutes back, from the events store with series expanded over a day's
@@ -224,7 +224,7 @@ and [architecture.md](wiki/architecture.md) caught up.
 
 ## [2026-10-27] done | Brief 13: the app lists in sibling repos
 
-[Brief 13](briefs/done/13-sibling-repo-listings.md) is built, once the agent
+Brief 13 is built, once the agent
 working in `wzd_auth` had finished. Its facts still held after Ward's briefs
 34-38. In `wzd_auth` (`39ec172`), the README names shelfmark among the apps
 with "Sign in with Ward" and almanac as registered for local development, the
@@ -248,3 +248,22 @@ service worker" now says the worker is for Web Push only.
 ## [2026-10-31] maintenance | README images retaken; the README names reminders
 
 A README refresh pass with the readme-docs standard. The README still said version 1 has no reminders and that they were the first planned addition, though briefs 14-16 built them on 2026-10-27. It now lists push reminders in What it does and says they need the server's VAPID keys. All five images were taken again with `docs/images/demo-seed.mjs` on a scratch `DATA_DIR`: the event form now shows its bell field, set to 30 minutes before for the picture and not saved, and the overlays sit on Base UI since brief 12. `shots.md` records the Playwright capture. Checked: `npm ci`, the seed, `npm run dev` on port 5177 and the demo seed.
+
+## [2026-11-01] maintenance | Briefs reset
+
+Part of an estate-wide reset. The sixteen briefs in `briefs/done/` are folded
+into the wiki and deleted, and the two promoted todos with them; brief
+numbering restarts at 01. The old briefs read like the grilling that fed the
+first corpus. The last commit that held them is `6327b86`: read one with
+`git show 6327b86:corpus/briefs/done/04-repeating-events.md`. Brief numbers
+in the entries above refer to that set.
+
+New pages: [notifications.md](wiki/notifications.md) (briefs 14-16),
+[overlays.md](wiki/overlays.md) (brief 12) and [web-app.md](wiki/web-app.md)
+(the web side of briefs 05-10). [architecture.md](wiki/architecture.md) gained
+the session gating and two workspace gotchas,
+[recurrence.md](wiki/recurrence.md) the "following" on the first occurrence
+rule, and the other pages lost their brief citations.
+[status.md](wiki/status.md) is a per-area snapshot instead of a brief table,
+and gained the open bug that the phone search field leaves the top bar's
+buttons in tab order. Code comments no longer cite brief numbers.

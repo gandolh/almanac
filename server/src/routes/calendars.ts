@@ -19,7 +19,7 @@ function calendarId(raw: string): number {
 }
 
 /**
- * The calendar routes (brief 03), each scoped to the signed-in user. A list
+ * The calendar routes, each scoped to the signed-in user. A list
  * answers `{ calendars }`; one calendar answers the calendar itself. A user
  * always has a calendar: the list makes "Personal" for a new user, and the
  * last one cannot be deleted (409 `conflict`). Deleting one takes its events,

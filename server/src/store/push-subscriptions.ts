@@ -15,7 +15,7 @@ export interface StoredPushSubscription extends PushSubscriptionKeys {
 }
 
 /**
- * The push subscriptions store (brief 14): the only module that runs SQL on
+ * The push subscriptions store: the only module that runs SQL on
  * `push_subscriptions`. A subscription is keyed by its endpoint, which is one
  * browser's, and belongs to the user who saved it last.
  */
@@ -32,7 +32,7 @@ export interface PushSubscriptionStore {
   remove(userId: string, endpoint: string): boolean;
   /** The user's subscriptions, oldest first. */
   list(userId: string): StoredPushSubscription[];
-  /** Every user with at least one subscription (brief 16's reminders look at them only). */
+  /** Every user with at least one subscription (the reminders look at them only). */
   userIds(): string[];
   /** The push service says the endpoint is gone for good (404 or 410): delete it, whoever held it. */
   forget(endpoint: string): void;

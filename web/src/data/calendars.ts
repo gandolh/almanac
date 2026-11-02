@@ -13,7 +13,7 @@ import { authClient } from "../auth/session";
 import { createResource, resetWhenSignedOut, useStore, type LoadStatus } from "./store";
 
 /**
- * The user's calendars (brief 03's routes): `GET /api/calendars` once per
+ * The user's calendars: `GET /api/calendars` once per
  * session, kept in memory in the left column's order, and every change made
  * through `useCalendars()` applied in place so the left column and every view
  * re-render at once. A patch shows straight away and is undone if the server

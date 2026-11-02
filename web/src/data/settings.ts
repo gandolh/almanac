@@ -7,7 +7,7 @@ import { todayIn } from "../dates";
 import { createResource, resetWhenSignedOut, useStore, type LoadStatus } from "./store";
 
 /**
- * The user's settings (brief 03's `/api/settings`): v1 has one, the display
+ * The user's settings (`/api/settings`): v1 has one, the display
  * time zone. Until the first answer, and if it fails, the zone is
  * `DEFAULT_TIME_ZONE` (Europe/Bucharest), so nothing waits on it; the shell
  * holds only its `/` redirect until the answer is in. A change is saved

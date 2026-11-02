@@ -49,7 +49,7 @@ export type RepeatEnd = z.infer<typeof repeatEndSchema>;
 
 /**
  * A repeat preset. `byDay` is for `weekly` only: the days it repeats on, put
- * in week order without duplicates; left out, brief 04 repeats on the start's
+ * in week order without duplicates; left out, it repeats on the start's
  * weekday.
  */
 export const repeatSchema = z
@@ -85,7 +85,7 @@ export const EVENT_NOTES_MAX = 20_000;
 export const EVENT_LENGTH_MAX_DAYS = 3660;
 
 /**
- * An event's reminder (brief 15): how many minutes before the event starts its
+ * An event's reminder: how many minutes before the event starts its
  * notification goes, or null for none, the default. One per event. The
  * choices are what phone calendars offer.
  *
@@ -221,7 +221,7 @@ export type EventChanges = z.infer<typeof eventChangesSchema>;
 /**
  * `PATCH /api/events/:id`. `id` is the occurrence's `eventId`. For an
  * occurrence of a series, `scope` says which occurrences change and
- * `occurrence` (its `originalStart`) which one this is (brief 04). A one-off
+ * `occurrence` (its `originalStart`) which one this is. A one-off
  * event ignores both.
  */
 export const eventPatchSchema = z.strictObject({
@@ -243,7 +243,7 @@ export type EventDeleteQuery = z.infer<typeof eventDeleteQuerySchema>;
  *
  * - A stored row (a one-off event, or an exception of a series): `id` is
  *   `e<eventId>`.
- * - An occurrence generated from a series (brief 04): `id` is
+ * - An occurrence generated from a series: `id` is
  *   `s<seriesId>:<key>`, and `eventId` is the series' id.
  *
  * `seriesId` and `originalStart` (the occurrence key) are set for both kinds

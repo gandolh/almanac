@@ -19,5 +19,5 @@ createRoot(root).render(
   </StrictMode>,
 );
 
-// The push-only service worker (brief 14): nothing cached, nothing asked until Notifications is turned on.
+// The push-only service worker: nothing cached, nothing asked until Notifications is turned on.
 registerWorker();

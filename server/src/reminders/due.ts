@@ -4,7 +4,7 @@ import { expandSeries, isSeries, rowOccurrence } from "../recurrence/expand.js";
 import type { EventRange, EventStore } from "../store/events.js";
 
 /**
- * Which reminders fall due in a window (brief 16), worked out from the rows as
+ * Which reminders fall due in a window, worked out from the rows as
  * they are now: an event deleted, moved or given another reminder before its
  * reminder is due simply no longer has the old one.
  */

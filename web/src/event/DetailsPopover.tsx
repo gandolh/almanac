@@ -15,7 +15,7 @@ import "./details.css";
 /**
  * What a click on an event shows, Google's details popover: Edit, Delete
  * and close along the top; the calendar's colour beside the title; when it
- * happens, how it repeats, its reminder (brief 15), where, the notes (links
+ * happens, how it repeats, its reminder, where, the notes (links
  * clickable) and which calendar it is on. Esc or a press outside closes it.
  */
 

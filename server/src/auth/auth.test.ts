@@ -7,9 +7,9 @@ import { currentUserId } from "./guard.js";
 
 /**
  * Signing in and the guard, through the real app: the plugin's `/auth/*`
- * routes, its session guard, and Almanac's origin guard. Almanac has no
- * routes of its own yet (brief 03 adds them), so a test that needs one adds
- * it to the test app before the first request.
+ * routes, its session guard, and Almanac's origin guard. The tests don't
+ * rely on Almanac's own routes: a test that needs one adds it to the test
+ * app before the first request.
  */
 
 let t: TestApp | undefined;
@@ -24,7 +24,7 @@ async function signedIn(env: NodeJS.ProcessEnv = {}): Promise<SignedInTestApp> {
   return app;
 }
 
-/** A test app with two routes of a later brief's kind: a write, and one that says who is asking. */
+/** A test app with two routes of the kind the app's features add: a write, and one that says who is asking. */
 async function withRoutes(): Promise<TestApp> {
   t = await startTestApp();
   t.app.post("/api/test/write", async (_request, reply) => reply.code(201).send({ written: true }));
@@ -37,7 +37,7 @@ const AUTH_PUBLIC = ["POST /auth/login", "POST /auth/logout", "GET /auth/session
 
 /**
  * Every route the app serves, as `"METHOD /pattern"`, read from Fastify's own
- * listing, so a route a later brief adds is in it without touching this test.
+ * listing, so a route added later is in it without touching this test.
  * HEAD (GET's twin) and OPTIONS (always public, and never given a handler) are left out.
  */
 function routesOf(app: FastifyInstance): string[] {
@@ -85,7 +85,7 @@ describe("the guard", () => {
   it.each([
     ["without Ward", () => ({}), ["POST /auth/password"]],
     ["with Ward", wardSettings, ["POST /auth/password", "POST /auth/ward/link", "POST /auth/ward/unlink", "POST /auth/ward/set-password"]],
-  ])("refuses every other route without a session, whichever brief added it (%s)", async (_, env, authRoutes) => {
+  ])("refuses every other route without a session, whichever feature added it (%s)", async (_, env, authRoutes) => {
     t = await startTestApp(env());
     const routes = routesOf(t.app);
     const guarded = routes.filter((route) => !PUBLIC_ROUTES.includes(route) && !AUTH_PUBLIC.includes(route));

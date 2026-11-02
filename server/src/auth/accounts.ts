@@ -2,7 +2,7 @@ import { createAccounts, createSqliteStore, seedUsers, type Accounts } from "../
 import type { Db } from "../db/open.js";
 
 /**
- * Almanac's local accounts, on the vendored ward-auth library (brief 02).
+ * Almanac's local accounts, on the vendored ward-auth library.
  * Almanac has several users and no roles: each sees only what is theirs, and
  * nothing checks a role. The library keeps a role on every user, and this is
  * the only one. A user made by a first "Sign in with Ward" gets it too

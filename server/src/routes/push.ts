@@ -12,7 +12,7 @@ import { ApiError } from "../errors.js";
 import type { PushService } from "../push/push.js";
 
 /**
- * The push routes (brief 14), behind the session like every route; the writes
+ * The push routes, behind the session like every route; the writes
  * pass the origin guard like every other write.
  *
  * With push off (no `VAPID_*` settings) there is no key to hand out, nothing

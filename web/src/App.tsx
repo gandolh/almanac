@@ -5,7 +5,7 @@ import { AppShell } from "./layout/AppShell";
 
 /**
  * The app: signed out, the login page (the auth gate's); signed in, the
- * calendar's shell inside the event editor (brief 07's quick create and
+ * calendar's shell inside the event editor (quick create and the
  * event form, which any view opens through `useEventEditor()`), and the
  * password dialog, closed until the account menu asks for it.
  */

@@ -133,7 +133,7 @@
   --gutter-desktop: 8px; /* the top bar's ends */
   --gutter-phone: 16px;
 
-  /* --- Search (brief 10) -------------------------------------------------- */
+  /* --- Search ------------------------------------------------------------ */
 
   --search-dot: 10px; /* a result's (and a day list's) calendar colour dot */
   --day-popover-width: 320px; /* the year view's day list */
@@ -144,7 +144,7 @@
   --search-time-column: 120px; /* "10:00 – 11:00" */
   --search-content-max: 880px; /* the results' reading width */
 
-  /* --- The event editor (brief 07) ---------------------------------------- */
+  /* --- The event editor -------------------------------------------------- */
 
   --editor-field-height: 36px; /* a field on the desktop (a phone's is --touch) */
   --editor-lead: 44px; /* the icon column of a form row */

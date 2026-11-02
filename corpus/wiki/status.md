@@ -1,38 +1,46 @@
 ---
-summary: Snapshot as of 2026-10-16. v1 is built - all 11 briefs done and committed on main, then a review round (three code reviewers and two browser walkthroughs) with two fix rounds. Pushed to `<owner>/almanac` on GitHub, not deployed. Brief 12 (Base UI under the overlays) built 2026-10-23; briefs 14-16 (phone notifications: the push worker, a reminder on each event, sending them) built 2026-10-27, local, 745 tests; brief 13 fixed the app lists in wzd_auth and shelfmark the same day. What waits on the owner, one line per brief, accepted known issues, and the todos by tier.
-updated: 2026-10-27
+summary: Snapshot as of 2026-11-01, per area. v1 built 2026-10-16 and reviewed; Base UI under the overlays 2026-10-23; phone notifications (push worker, a reminder on each event, the minute sender) 2026-10-27. Pushed to GitHub through 2026-11-01, nothing deployed, no phone has shown a notification. What waits on the owner, open bugs, accepted known issues, and the todos.
+updated: 2026-11-01
 ---
 
 # Status
 
-_2026-10-16_. v1 is built. The owner settled the design in a grill
-([decisions.md](decisions.md), [features.md](features.md)); the 11 briefs
-were built the same day with `plan-split-dispatch`, one commit per brief on
-`main`, then reviewed by three code finders (web wiring, server
-correctness, conventions) and a browser walkthrough of every flow, and the
-findings were fixed in three lanes, re-checked in the browser, and the last
-three leftovers fixed after a pause. 623 tests pass; typecheck, lint and
-build are clean. `main` is pushed to `https://github.com/<owner>/almanac.git`,
-and so is `wzd_auth`'s local seed entry (`22e1fd2`). `vps-deploy` has
-no remote; its Almanac stack (`8e247a3`) is a local commit, which is where
-the deploy runs from. The README and `docs/` follow the readme-docs standard
-since the evening of 2026-10-16. Nothing is deployed.
+_2026-11-01_. Everything below is on `main` and pushed to
+`https://github.com/<owner>/almanac.git`. Nothing is deployed. No brief is
+open; brief numbering restarted at 01 on 2026-11-01 (see
+[log.md](../log.md)).
 
-_2026-10-23_. Brief 12 moved `Dialog`, `Popover`, `Menu` and the phone drawer
-onto Base UI ([decisions.md](decisions.md)). It is two local commits on `main`,
-not pushed; 618 tests pass (the five removed tested deleted code).
+## By area
 
-_2026-10-27_. Brief 14 added Web Push: a push-only service worker, stored
-subscriptions, and the account menu's Notifications dialog with a test
-notification. Local commits, not pushed, 694 tests. A real push to a browser
-or a phone has not been tried. Production push needs the `VAPID_*` values
-passed by `vps-deploy`'s Almanac stack, which doesn't pass them yet.
-Brief 15 gave each event one reminder, stored and shown in the form and the
-details. Brief 16 sends them: a tick a minute in the API process, each
-reminder once, nothing more than 15 minutes late. 745 tests. A real Web Push
-reached FCM from the built server on this machine; no phone has shown one yet.
-Brief 13 fixed the stale app lists in `wzd_auth` (`39ec172`) and
-`shelfmark` (`4d48bd4`), one local commit each, not pushed. No brief is open.
+- **Server and data** (2026-10-16, notifications tables 2026-10-27).
+  Fastify + SQLite, the vendored Ward library for local login and Sign in with
+  Ward, several private users, no sign-up. Schema in
+  [data-model.md](data-model.md), routes and gating in
+  [architecture.md](architecture.md).
+- **Repeating events** (2026-10-16). Presets, three edit scopes, expansion on
+  the server with rrule-temporal; the Bucharest DST weeks pass
+  ([recurrence.md](recurrence.md)).
+- **Web app** (2026-10-16). Day, week and month on FullCalendar v7, our own
+  year view, quick create and the event form, calendars, display time zone,
+  search, keyboard shortcuts, phone layout with drawer and swipe
+  ([web-app.md](web-app.md), [features.md](features.md)).
+- **Overlays** (2026-10-23). `Dialog`, `Popover`, `Menu` and the phone drawer
+  on Base UI 1.9.0 ([overlays.md](overlays.md)).
+- **Notifications** (2026-10-27). Web Push plumbing, a reminder on each event,
+  and the minute tick that sends them. A real push reached FCM from the built
+  server on this machine; no browser or phone has shown one yet
+  ([notifications.md](notifications.md)).
+- **Deploy and docs** (2026-10-16). Docker image and compose file here, the
+  stack in `vps-deploy` and the seed entry in `wzd_auth`, all committed; the
+  README and `docs/` follow the readme-docs standard (images retaken
+  2026-10-31). The stack doesn't pass the `VAPID_*` values yet.
+- **Sibling repos** (2026-10-27). The stale app lists in `wzd_auth` and
+  `shelfmark` that the deploy work left behind were fixed; both are pushed.
+
+Built with `plan-split-dispatch`, one commit per piece, then three code
+reviewers and browser walkthroughs on 2026-10-16, the findings fixed in
+three lanes.
+745 tests; typecheck, lint and build clean.
 
 ## Next (owner)
 
@@ -47,15 +55,21 @@ Brief 13 fixed the stale app lists in `wzd_auth` (`39ec172`) and
 4. Not tried here: the "Sign in with Ward" round trip, locally (needs the
    local Ward seed with Docker Desktop's WSL integration on) or in
    production; adding it to a phone's home screen.
-5. Notifications (brief 14): add the three `VAPID_*` values to
+5. Notifications: add the three `VAPID_*` values to
    `vps-deploy/stacks/almanac.ts` (as `vps-deploy/stacks/satchel.ts`
    has them), make a pair and put it in `vps-deploy/secrets/almanac.env`
    with a real `VAPID_SUBJECT`, then deploy both halves, following
    [docs/owner-setup.md](../../docs/owner-setup.md) step 8. Then turn
    Notifications on in a desktop browser and on the iPhone's Home Screen app,
    and press "Send a test". Then give a real event two minutes out the
-   reminder "At the start" and check it shows on time (brief 16's last
-   acceptance line).
+   reminder "At the start" and check it shows on time.
+
+## Open
+
+- On a phone the search field covers the top bar, but the bar's buttons
+  under it stay in tab order: `TopBar` has no `inert` while search is open.
+- The search field's width between 768 and 1200 px hasn't had a browser
+  look.
 
 ## Known and accepted
 
@@ -76,29 +90,9 @@ Brief 13 fixed the stale app lists in `wzd_auth` (`39ec172`) and
 - A reminder already sent isn't sent again when only the reminder is changed
   afterwards (the sent log is keyed by the occurrence); moving the event
   sends it again at the new time.
-
-## Briefs
-
-| # | Brief | State |
-|---|---|---|
-| 01 | [Workspace scaffold](../briefs/done/01-workspace-scaffold.md) | done |
-| 02 | [Accounts and sign-in](../briefs/done/02-accounts-and-sign-in.md) | done |
-| 03 | [Calendars, events and settings API](../briefs/done/03-calendars-and-events-api.md) | done |
-| 04 | [Repeating events](../briefs/done/04-repeating-events.md) | done |
-| 05 | [App shell, routes, dates, tokens](../briefs/done/05-app-shell.md) | done |
-| 06 | [Day, week and month views](../briefs/done/06-day-week-month-views.md) | done |
-| 07 | [Creating and editing events](../briefs/done/07-creating-and-editing-events.md) | done |
-| 08 | [Year view](../briefs/done/08-year-view.md) | done |
-| 09 | [Calendars and time zone](../briefs/done/09-calendars-and-time-zone.md) | done |
-| 10 | [Search](../briefs/done/10-search.md) | done |
-| 11 | [Deploy and docs](../briefs/done/11-deploy-and-docs.md) | done |
-| 12 | [Base UI under Dialog, Popover, Menu and the drawer](../briefs/done/12-base-ui-primitives.md) | done 2026-10-23, local commits, not pushed |
-| 13 | [Fix the stale app lists in sibling repos](../briefs/done/13-sibling-repo-listings.md) | done 2026-10-27: `wzd_auth` `39ec172`, `shelfmark` `4d48bd4`, local commits, not pushed |
-| 14 | [Phone notifications 1: the worker and the push subscription](../briefs/done/14-push-subscription-and-worker.md) | done 2026-10-27, local commits, not pushed; no live push tried |
-| 15 | [Phone notifications 2: a reminder on each event](../briefs/done/15-a-reminder-on-each-event.md) | done 2026-10-27, local commits, not pushed |
-| 16 | [Phone notifications 3: send due reminders](../briefs/done/16-send-due-reminders.md) | done 2026-10-27, local commits, not pushed; no phone tried |
+- Three small differences from the hand-built overlays were kept
+  ([overlays.md](overlays.md)).
 
 ## Todos
 
-- None open. Phone notifications became briefs 14–16 and the sibling-repo counts
-  brief 13 (2026-10-23); all four are done (2026-10-27).
+None open.

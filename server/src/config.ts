@@ -2,13 +2,13 @@ import { createECDH } from "node:crypto";
 import { z } from "zod";
 import { parseTrustedProxies, wardClientOptionsFromEnv, type WardClientOptions } from "../vendor/ward/ward-auth.js";
 
-/** Where the auth plugin's routes will sit as Fastify sees them (`app.ts`, brief 02); the browser reaches them under the API prefix. */
+/** Where the auth plugin's routes will sit as Fastify sees them (`app.ts`); the browser reaches them under the API prefix. */
 export const AUTH_ROUTE_PREFIX = "/auth";
 
 /** The Ward callback, under the API prefix: `WARD_OIDC_REDIRECT_URI` is the origin, the prefix, then this. */
 export const WARD_CALLBACK_PATH = `${AUTH_ROUTE_PREFIX}/ward/callback`;
 
-/** The server's Web Push identity (brief 14): `npm run vapid-keys -w @almanac/server` makes one. */
+/** The server's Web Push identity: `npm run vapid-keys -w @almanac/server` makes one. */
 export interface VapidKeys {
   /** base64url, a 65-byte P-256 point. Browsers subscribe with it. */
   publicKey: string;
@@ -48,13 +48,13 @@ export interface Config {
    */
   trustedProxies: string[];
   /**
-   * Web Push (brief 14): the three `VAPID_*` settings, or `undefined` when all
+   * Web Push: the three `VAPID_*` settings, or `undefined` when all
    * three are unset, and then push is off: the routes that need it answer 404
    * and the Notifications dialog says it isn't set up on this server.
    */
   push: VapidKeys | undefined;
   /**
-   * `REMINDER_TIMER` (brief 16): whether this process sends due reminders,
+   * `REMINDER_TIMER`: whether this process sends due reminders,
    * once a minute. On unless it is `off`: tests turn it off, and so would a
    * second process on the same database. It runs only while push is on.
    */

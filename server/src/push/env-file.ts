@@ -1,6 +1,6 @@
 /**
- * Writing a VAPID key pair into a `.env` file's text (`vapid-keys.ts`, brief
- * 14). Pure, so the rules are tested without touching a real `.env`.
+ * Writing a VAPID key pair into a `.env` file's text (`vapid-keys.ts`).
+ * Pure, so the rules are tested without touching a real `.env`.
  */
 
 export interface VapidLines {

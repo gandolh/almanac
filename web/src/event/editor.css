@@ -40,7 +40,7 @@
   padding-inline-end: 8px;
 }
 
-/* The reminder (brief 15): as wide as its longest choice, as the repeat's select is. */
+/* The reminder: as wide as its longest choice, as the repeat's select is. */
 .editor-reminder {
   width: fit-content;
   min-width: 240px;

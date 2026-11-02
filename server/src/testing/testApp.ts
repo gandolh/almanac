@@ -18,7 +18,7 @@ import { databasePath, openDb } from "../db/open.js";
  *
  * `close` stops the app and deletes the directory.
  *
- * Every route but `GET /api/health` needs a session (brief 02). A test that
+ * Every route but `GET /api/health` needs a session. A test that
  * is not about signing in starts a signed-in app and injects through it,
  * which adds the owner's session cookie:
  *

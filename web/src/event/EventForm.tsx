@@ -48,7 +48,7 @@ import "./editor.css";
 /**
  * The event form (glossary: event form), Google's full editor: a dialog,
  * the whole screen on a phone, with the title, when it starts and ends, All
- * day, the reminder (brief 15), how it repeats, which calendar, where, and notes. Save, Cancel and,
+ * day, the reminder, how it repeats, which calendar, where, and notes. Save, Cancel and,
  * when editing, Delete.
  *
  * - A new event starts as `seed` says (the next full hour for an hour when

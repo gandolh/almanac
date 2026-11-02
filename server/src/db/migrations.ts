@@ -2,14 +2,14 @@ import type { Database } from "better-sqlite3";
 
 /**
  * Applied in order on boot, tracked in `PRAGMA user_version` (`migrate`).
- * Never edit a shipped entry; append a new one with a comment naming its
- * brief.
+ * Never edit a shipped entry; append a new one with a comment saying
+ * what it adds.
  *
  * `openDb` runs the vendored auth library's own migrations first, so
  * `auth_users`, which every table here hangs off, exists before these run.
  */
 export const migrations: readonly string[] = [
-  // Brief 03: calendars, events (one-offs, series and their exceptions) and the display time zone.
+  // Calendars, events (one-offs, series and their exceptions) and the display time zone.
   `
   CREATE TABLE calendars (
     id          INTEGER PRIMARY KEY,
@@ -42,7 +42,7 @@ export const migrations: readonly string[] = [
     -- The user's display time zone when the row was created: a series'
     -- wall-clock times belong to it (corpus/wiki/recurrence.md).
     tzid            TEXT    NOT NULL,
-    -- Set on a series only (brief 04).
+    -- Set on a series only.
     rrule           TEXT,
     -- A series' deleted occurrences, as a JSON array of occurrence keys.
     exdates         TEXT    NOT NULL DEFAULT '[]' CHECK (json_valid(exdates) AND json_type(exdates) = 'array'),
@@ -77,7 +77,7 @@ export const migrations: readonly string[] = [
     time_zone  TEXT NOT NULL DEFAULT 'Europe/Bucharest'
   );
   `,
-  // Brief 14: a browser's Web Push subscription. The endpoint is the browser's
+  // A browser's Web Push subscription. The endpoint is the browser's
   // own address at its push service, so it is unique and belongs to whichever
   // user saved it last. A new row takes the highest id, so id order is save order.
   `
@@ -92,7 +92,7 @@ export const migrations: readonly string[] = [
   );
   CREATE INDEX push_subscriptions_user ON push_subscriptions (user_id, id);
   `,
-  // Brief 15: an event's reminder, in minutes before it starts; NULL is none.
+  // An event's reminder, in minutes before it starts; NULL is none.
   // An all-day event counts back from 00:00 of its start date in the user's
   // display time zone (900 is 09:00 the day before, -540 is 09:00 on the day).
   // The choices are checked by the schema (shared/src/event.ts), not here, so
@@ -100,7 +100,7 @@ export const migrations: readonly string[] = [
   `
   ALTER TABLE events ADD COLUMN reminder_minutes INTEGER;
   `,
-  // Brief 16: the reminders already sent, so each goes once. Keyed by the event
+  // The reminders already sent, so each goes once. Keyed by the event
   // row and the occurrence's start: for an occurrence a series generates, the
   // series and its key; for a one-off or an exception, its own row and start.
   // sent_at is epoch ms; the timer drops rows a few days old.

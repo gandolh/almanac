@@ -5,7 +5,7 @@ import { WEEKDAY_INITIALS, WEEKDAY_NAMES, dateKey, formatDayFull, monthWeeks, sa
 /**
  * One month as a small grid of days, Monday first, six weeks tall so every
  * month is the same height: the left column's mini-month (`size: "mini"`)
- * and each of the year view's twelve (`size: "year"`, brief 08).
+ * and each of the year view's twelve (`size: "year"`).
  *
  * - Today is a filled accent circle; `selected` (the date the main view is
  *   on) a light accent one.

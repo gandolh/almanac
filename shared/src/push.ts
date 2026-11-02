@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /**
- * Web Push (brief 14): a browser's subscription, the routes that store it, and
+ * Web Push: a browser's subscription, the routes that store it, and
  * what a push carries. One subscription per browser (its endpoint), kept for
  * the user who saved it last. The server signs every push with its VAPID key
  * pair; without one, push is off and the routes that need it answer 404.

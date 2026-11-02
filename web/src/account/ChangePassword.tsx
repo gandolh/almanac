@@ -15,7 +15,7 @@ import { AlertIcon, AuthField } from "../components/Field";
 import "./account.css";
 
 /**
- * The account menu's "Change password" (brief 02; brief 05's menu opens it):
+ * The account menu's "Change password":
  * a small `components/Dialog`, so focus stays in the form until it is done or
  * cancelled.
  *

@@ -11,12 +11,12 @@ export type { View } from "./dates";
  * segment is a parameter, handed to the page as a decoded string.
  *
  *   /almanac/                    home    goes on to this month (the shell's redirect)
- *   /almanac/login               login   signing in (brief 02)
+ *   /almanac/login               login   signing in
  *   /almanac/day/2026/10/16      day     the four views, each on a full date, kept
  *   /almanac/week/2026/10/16     week      when switching views, as Google does
  *   /almanac/month/2026/10/16    month
  *   /almanac/year/2026/10/16     year
- *   /almanac/search?q=sedinta    search  the results for `?q=` (brief 10)
+ *   /almanac/search?q=sedinta    search  the results for `?q=`
  *
  * Anything else is home. The view routes' dates are written unpadded
  * (`/month/2026/1/5`); a padded or otherwise loose address is rewritten to
@@ -62,7 +62,7 @@ export function route<N extends RouteName>(name: N, params: RouteParams<N>): Rou
 /** A view's route: `/month/2026/10/16`. */
 export type ViewRoute = RouteOf<View>;
 
-/** The route of `view` on `date`: how every brief moves between views and dates. */
+/** The route of `view` on `date`: how every screen moves between views and dates. */
 export function viewRoute(view: View, date: Temporal.PlainDate): ViewRoute {
   return { name: view, params: { y: String(date.year), m: String(date.month), d: String(date.day) } };
 }
@@ -197,7 +197,7 @@ export function navigate(to: Route, options: NavigateOptions = {}): void {
   window.dispatchEvent(new Event(NAVIGATE_EVENT));
 }
 
-/** Open the search results for `query` (brief 10's search box): `/search?q=…`. */
+/** Open the search results for `query` (the search box): `/search?q=…`. */
 export function navigateToSearch(query: string, options: { replace?: boolean } = {}): void {
   navigate(SEARCH, { ...options, query: { q: query } });
 }
@@ -235,7 +235,7 @@ export function rememberViewRoute(to: ViewRoute): void {
 
 /**
  * The last day, week, month or year view shown in this tab, or home (which
- * goes on to this month) before any. Brief 10's search box returns here:
+ * goes on to this month) before any. The search box returns here:
  * `goBack(lastViewRoute())`.
  */
 export function lastViewRoute(): ViewRoute | RouteOf<"home"> {

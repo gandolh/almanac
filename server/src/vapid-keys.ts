@@ -4,7 +4,7 @@ import webpush from "web-push";
 import { envValue, withVapidLines } from "./push/env-file.js";
 
 /**
- * Makes the server's Web Push key pair (brief 14) and writes it into the repo's
+ * Makes the server's Web Push key pair and writes it into the repo's
  * `.env`, which git ignores:
  *
  *     npm run vapid-keys -w @almanac/server            (fills VAPID_* in .env)

@@ -12,7 +12,7 @@ export default tseslint.config(
     rules: reactHooks.configs.recommended.rules,
   },
   {
-    // The push-only service worker (brief 14): plain JavaScript, run as a classic worker script.
+    // The push-only service worker: plain JavaScript, run as a classic worker script.
     files: ["web/public/sw.js"],
     languageOptions: { sourceType: "script", globals: { self: "readonly", URL: "readonly" } },
   },

@@ -15,7 +15,7 @@ describe("the app", () => {
     expect(res.json()).toEqual({ status: "ok" });
   });
 
-  it("answers an unknown route in the error shape, once signed in (brief 02's guard answers 401 before that)", async () => {
+  it("answers an unknown route in the error shape, once signed in (the session guard answers 401 before that)", async () => {
     const app = await startSignedInApp();
     t = app;
     const res = await app.inject({ method: "GET", url: "/api/nothing" });

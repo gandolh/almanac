@@ -1,5 +1,5 @@
 /*
- * The account menu's Notifications dialog (brief 14, account/Notifications.tsx):
+ * The account menu's Notifications dialog (account/Notifications.tsx):
  * the switch row, the test button and the lines that say why it can't.
  * Base UI's Switch is a role="switch" span over a hidden checkbox, with its
  * state in data attributes.

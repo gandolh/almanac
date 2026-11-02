@@ -24,15 +24,15 @@ export interface FeatureContext {
   config: Config;
   /** The one connection, migrated, closed with the app. */
   db: Db;
-  /** The user's calendars (brief 03): the calendar routes. */
+  /** The user's calendars: the calendar routes. */
   calendars: CalendarStore;
-  /** Events, series and exceptions (brief 03): the event, occurrence and search routes. */
+  /** Events, series and exceptions: the event, occurrence and search routes. */
   events: EventStore;
-  /** The display time zone (brief 03): the settings routes, and every route that turns times into dates. */
+  /** The display time zone: the settings routes, and every route that turns times into dates. */
   settings: SettingsStore;
-  /** Browsers' push subscriptions (brief 14): the push routes, and whatever sends. */
+  /** Browsers' push subscriptions: the push routes, and whatever sends. */
   pushSubscriptions: PushSubscriptionStore;
-  /** Sending a push to a user's browsers (brief 14); `undefined` when `config.push` is (no VAPID keys). */
+  /** Sending a push to a user's browsers; `undefined` when `config.push` is (no VAPID keys). */
   push: PushService | undefined;
 }
 
@@ -50,7 +50,7 @@ export { AUTH_ROUTE_PREFIX };
 export const PUBLIC_ROUTES: readonly string[] = ["GET /api/health"];
 
 /**
- * Accounts and the guard (brief 02). The vendored `wardAuth` plugin keeps the
+ * Accounts and the guard. The vendored `wardAuth` plugin keeps the
  * local accounts in this database and serves `/auth/*`: login, logout, the
  * session, the password, and "Sign in with Ward" when `config.ward` is set,
  * which also lets in anyone the owner grants Almanac in Ward, as a new user
@@ -98,14 +98,14 @@ const signIn: Feature = async (app, { config, db }) => {
 /**
  * A feature sets itself up on the root app. Usually that is registering its
  * route plugin with the context, which keeps the plugin's hooks to itself:
- * `(app, ctx) => app.register(calendarRoutes, ctx)`. A root guard (brief 02's
- * `wardAuth`) registers on `app` directly and goes first, because Fastify
+ * `(app, ctx) => app.register(calendarRoutes, ctx)`. A root guard (the
+ * `wardAuth` plugin) registers on `app` directly and goes first, because Fastify
  * copies root hooks into a plugin's context when the plugin is created.
  */
 export type Feature = (app: FastifyInstance, ctx: FeatureContext) => PromiseLike<unknown>;
 
 /**
- * Every feature, set up in this order. A later brief adds its entry here and
+ * Every feature, set up in this order. A new feature adds its entry here and
  * nowhere else in this file. `signIn` stays first: a route set up before it
  * would have no guard.
  */
@@ -120,7 +120,7 @@ const FEATURES: Feature[] = [
 ];
 
 /**
- * Due reminders (brief 16), once a minute, while push is on and
+ * Due reminders, once a minute, while push is on and
  * `REMINDER_TIMER` isn't `off`. Stopped on close: the hook is added after the
  * one that closes the database, and Fastify runs a closing app's hooks last
  * added first, so a running tick finishes before the database goes.

@@ -2,7 +2,7 @@ import { SEARCH_QUERY_MAX, searchResponseSchema, type Occurrence } from "@almana
 import { apiRequest, type RequestOptions } from "../api";
 
 /**
- * `GET /api/search?q` (brief 03): the user's events whose title, location or
+ * `GET /api/search?q`: the user's events whose title, location or
  * notes contain the words, case and diacritics folded on the server, so
  * "sedinta" finds "Ședință". A series answers once, at its next occurrence.
  */

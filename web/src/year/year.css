@@ -1,5 +1,5 @@
 /*
- * The year view (brief 08): twelve months on one page, and the popover that
+ * The year view: twelve months on one page, and the popover that
  * lists a day's events. The month grids themselves are components.css's
  * `.month-grid--year`; this sheet lays them out. Colours and sizes from
  * tokens.css.

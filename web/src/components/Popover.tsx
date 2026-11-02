@@ -3,8 +3,8 @@ import { useMemo, useRef, type ReactNode } from "react";
 
 /**
  * A white floating panel anchored to an element or a rectangle: quick create
- * and the event details beside an event (briefs 06, 07), a day's list in the
- * year view (brief 08). Mounted means open: render it to show it, stop
+ * and the event details beside an event, a day's list in the
+ * year view. Mounted means open: render it to show it, stop
  * rendering it to hide it.
  *
  * - `placement: "below"` hangs under the anchor, lined up with its start;

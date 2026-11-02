@@ -10,7 +10,7 @@ import { eventSearchText, foldSearchText } from "./search-text.js";
  *
  * It stores one-off events, series (a row with `rrule`) and exceptions (a row
  * with `seriesId` and `originalStart`), but knows nothing about repeating:
- * expanding and the edit scopes are `recurrence/` (brief 04), built on the
+ * expanding and the edit scopes are `recurrence/`, built on the
  * low-level writes at the end of the interface. Inputs are already validated
  * (`eventInputSchema`); the store sets `search_text` and the times on every
  * write.
@@ -62,7 +62,7 @@ export interface EventStore {
   insertException(userId: string, seriesId: number, originalStart: string, content: EventContent): EventRecord | undefined;
   /**
    * Points an exception at another of the user's series and occurrence key
-   * (brief 04: "this and following" moves the exceptions after the split to
+   * ("this and following" moves the exceptions after the split to
    * the new series). `undefined` when the user has no such exception or no
    * such series. Throws the database's unique error when that series already
    * has an exception for the key.
@@ -92,7 +92,7 @@ export interface EventContent {
   start: string;
   /** As `start`. Exclusive for an all-day event: a one-day event on the 16th ends on the 17th. */
   end: string;
-  /** The reminder (brief 15): minutes before the start, or before 00:00 of the start date for an all-day event. Null is none. */
+  /** The reminder: minutes before the start, or before 00:00 of the start date for an all-day event. Null is none. */
   reminderMinutes: number | null;
 }
 

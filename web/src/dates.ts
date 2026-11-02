@@ -21,7 +21,7 @@ export { Temporal };
 /** The four ways to look at time (glossary: view). */
 export type View = "day" | "week" | "month" | "year";
 
-/** The views FullCalendar draws (brief 06); the year view is our own. */
+/** The views FullCalendar draws; the year view is our own. */
 export type CalendarView = Exclude<View, "year">;
 
 export const VIEWS: readonly View[] = ["day", "week", "month", "year"];

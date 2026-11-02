@@ -16,8 +16,8 @@
 }
 
 /*
- * The account notice (brief 05's shell.css) when it reports a failure: the app's error,
- * ink and semibold with the drawn mark (brief 05's layout/AccountMenu.tsx). Its place,
+ * The account notice (shell.css) when it reports a failure: the app's error,
+ * ink and semibold with the drawn mark (layout/AccountMenu.tsx). Its place,
  * surface and timing stay the notice's own.
  */
 .account__notice--error[data-shown] {

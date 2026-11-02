@@ -133,7 +133,7 @@ export function ClockIcon(props: IconProps) {
   );
 }
 
-/** A bell: the event's reminder (brief 15). */
+/** A bell: the event's reminder. */
 export function BellIcon(props: IconProps) {
   return (
     <Icon {...props}>

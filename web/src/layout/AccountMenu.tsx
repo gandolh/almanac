@@ -22,7 +22,7 @@ export function initialOf(username: string): string {
 /**
  * The account button and its menu, in place of a Settings page
  * (corpus/wiki/features.md "Account menu"): Change password, Sign in with
- * Ward (link or unlink), Time zone…, Notifications (brief 14), then Sign out.
+ * Ward (link or unlink), Time zone…, Notifications, then Sign out.
  * The button is a disc with the username's initial, as Google's is with a photo.
  */
 export function AccountMenu() {

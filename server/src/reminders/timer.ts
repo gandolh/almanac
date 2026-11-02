@@ -38,10 +38,10 @@ export interface Reminders {
 }
 
 /**
- * Due reminders (brief 16). Only users with a push subscription are looked
+ * Due reminders. Only users with a push subscription are looked
  * at: nobody else could be told. Each reminder is claimed in the sent log
- * before it goes out, so a failed push is not retried, as brief 14's pushes
- * aren't.
+ * before it goes out, so a failed push is not retried, as no other push
+ * is either.
  */
 export function createReminders(deps: ReminderDeps): Reminders {
   const now = deps.now ?? Date.now;

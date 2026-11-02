@@ -3,7 +3,7 @@ import type { FastifyPluginAsync } from "fastify";
 import type { FeatureContext } from "../app.js";
 import { currentUserId } from "../auth/guard.js";
 
-/** The settings routes (brief 03): the signed-in user's display time zone. Both answer the settings. */
+/** The settings routes: the signed-in user's display time zone. Both answer the settings. */
 export const settingsRoutes: FastifyPluginAsync<FeatureContext> = async (app, { settings }) => {
   app.get("/api/settings", (request): Settings => settings.get(currentUserId(request)));
 

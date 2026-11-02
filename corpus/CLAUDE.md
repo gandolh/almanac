@@ -24,9 +24,9 @@ corpus/
 1. Read `index.md` first and triage on the `summary:` lines.
 2. Open at most 2-3 wiki pages. Needing a fourth means a page straddles two
    topics or a summary is vague. Fix that instead of reading more.
-3. Don't read `briefs/` or `todos/` wholesale. `wiki/status.md` has one line
-   per brief and the todo catalog. Open a brief only for the spec behind a
-   specific piece of work.
+3. Don't read `briefs/` or `todos/` wholesale. `wiki/status.md` has the
+   per-area snapshot and the todo catalog. Open a brief only for the spec
+   behind a specific piece of work.
 
 ## The corpus is the why, the code is the what
 
@@ -59,7 +59,11 @@ updated: <YYYY-MM-DD>
   outcome note added at move time. After that the file is immutable.
 - Work later undone moves to `briefs/superseded/` with a one-line note on top.
   Never renumber, never rewrite a done brief.
-- The order briefs run in is in `wiki/status.md`.
+- Briefs run in number order. `wiki/status.md` doesn't list them; it gives a
+  dated snapshot per area.
+- Numbering restarted at 01 on 2026-11-01. The sixteen briefs before that
+  were folded into the wiki and deleted; the last commit holding them is
+  `6327b86` ([log.md](log.md), "Briefs reset").
 
 ## Source of truth, when things disagree
 
@@ -90,6 +94,8 @@ updated: <YYYY-MM-DD>
 - One concept per page. Split a page past 200 body lines.
 - Never write the production domain in the corpus or the docs.
 - Never commit corpus changes unless the owner asks.
+- Code comments don't cite brief numbers ("brief 07", "(brief 14)"). Say what
+  the code does and why; the history belongs in `log.md`.
 
 ## Hard rules
 

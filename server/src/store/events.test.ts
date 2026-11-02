@@ -211,7 +211,7 @@ describe("listInRange", () => {
   });
 });
 
-describe("the writes brief 04 builds on", () => {
+describe("the low-level writes the edit scopes build on", () => {
   function weekly() {
     return store.create(ana, { ...timed("2026-10-19T07:00:00Z", "2026-10-19T08:00:00Z"), tzid: ZONE, rrule: "FREQ=WEEKLY" });
   }

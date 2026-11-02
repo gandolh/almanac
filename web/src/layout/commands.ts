@@ -1,6 +1,6 @@
 /**
- * Commands a key or a button can run without knowing who answers: brief 07's
- * editor registers "create" (the `c` key), brief 10's search box
+ * Commands a key or a button can run without knowing who answers: the event
+ * editor registers "create" (the `c` key), the search box
  * "focusSearch" (the `/` key). The newest registration of a name answers;
  * when it goes, the one before it answers again.
  */

@@ -1,12 +1,12 @@
 ---
-summary: How repeating events work in Almanac, as built by brief 04 on 2026-10-16. The repeat presets, storing a series as one row with an RRULE plus exception rows, expanding occurrences on the server with rrule-temporal in the zone each series was created in, and what each edit scope (this, this and following, all) does to the stored rows.
-updated: 2026-10-16
+summary: How repeating events work in Almanac, as built on 2026-10-16. The repeat presets, storing a series as one row with an RRULE plus exception rows, expanding occurrences on the server with rrule-temporal in the zone each series was created in, and what each edit scope (this, this and following, all) does to the stored rows.
+updated: 2026-11-01
 ---
 
 # Recurrence
 
-Built by brief 04 (`shared/src/repeat.ts`, `server/src/recurrence/`). The decision is in [decisions.md](decisions.md); the words
-are in [glossary.md](glossary.md). This is the RFC 5545 model that Google's API
+Built on 2026-10-16 (`shared/src/repeat.ts`, `server/src/recurrence/`). The
+decision is in [decisions.md](decisions.md); the words are in [glossary.md](glossary.md). This is the RFC 5545 model that Google's API
 and ilamy-calendar also use ([research.md](research.md)).
 
 ## Presets
@@ -55,6 +55,9 @@ way back. FullCalendar only ever sees concrete occurrences.
 - Writes need a `scope` for series and exceptions (400 without one), and
   "this" and "following" need the occurrence key. A key that isn't a live
   occurrence is 404.
+- "This and following" when no occurrence before this one is left is the
+  whole series, so it acts as "all". A change to the repeat can't use "this"
+  (400 naming the other two).
 - Search shows a series once, at its first occurrence that hasn't ended
   (or its last one), and a matching exception as itself. With more than 50
   matches it keeps the 50 closest to now (those not over yet, soonest first,

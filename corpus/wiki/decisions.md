@@ -1,6 +1,6 @@
 ---
 summary: Locked calls for Almanac, each with date, rejected alternatives and reason. React + Fastify + SQLite on Shelfmark's layout; FullCalendar v7 for day, week and month with a year view of our own; several users, each with a private calendar and no sign-up; named calendars; Base UI under the dialogs, popovers and menus; common repeats with three edit scopes, expanded on the server; no import; one reminder per event by Web Push (since 2026-10-27, none in v1); one display time zone per user, Bucharest by default; phone browser without offline; deployed on the VPS; Google Calendar's layout, light only.
-updated: 2026-10-27
+updated: 2026-11-01
 ---
 
 # Decisions
@@ -56,7 +56,7 @@ import and subscribed ICS feeds, both offered and turned down.
 ## Reminders by Web Push, one per event
 _2026-10-16_, v1: no reminders, to keep v1 small; Web Push (Satchel's code)
 was named the first follow-up.
-_2026-10-27_, briefs 14-16: each event has one reminder, none by default, from
+_2026-10-27_: each event has one reminder, none by default, from
 the choices phone calendars offer (at the start, 5, 10, 15 or 30 minutes, 1 or
 2 hours or a day before; an all-day event on the day or the day before at
 09:00 in the user's display time zone). The API process looks once a minute
@@ -67,9 +67,9 @@ reminders per event, email, and a timer of its own per reminder; the minute
 tick works from the rows as they are, so a deleted, moved or changed event
 needs no clean-up. The choices are a list in `shared/src/event.ts` the owner
 can change. On an iPhone it needs Almanac on the Home Screen.
-_2026-10-27_, owner, after the briefs: `DELETE /api/push/subscriptions` answers
+_2026-10-27_, owner, after the build: `DELETE /api/push/subscriptions` answers
 204 with push turned off, as Satchel's does, so a browser can always drop its
-subscription; brief 14's literal 404 for every push route was turned down.
+subscription; the spec's literal 404 for every push route was turned down.
 `VAPID_SUBJECT` stays the `.env.example` placeholder until the owner picks an
 address; production push is off anyway until the deploy passes the keys.
 
@@ -86,7 +86,7 @@ _2026-10-16_. The layout works on a phone and a web manifest gives it a
 home-screen icon. There is no service worker and no offline mode. Rejected:
 desktop only; a full offline PWA like Shelfmark's, which would need caching and
 syncing edits made offline.
-_2026-10-27_, brief 14: a service worker now exists for Web Push only. It has
+_2026-10-27_: a service worker now exists for Web Push only. It has
 no fetch handler and caches nothing, so there is still no offline mode.
 
 ## Deployed on the VPS like Shelfmark
@@ -105,7 +105,7 @@ turned down for showcase and Shelfmark. Layout: [features.md](features.md).
 _2026-10-23_, the owner's call, to match their other apps (atrium,
 imbatranimOS, sports-app, trips and others). `Dialog`, `Popover`, `Menu` and
 the phone drawer sit on `@base-ui/react` (pinned 1.9.0), styled by Almanac's
-own CSS; their props didn't change ([brief 12](../briefs/done/12-base-ui-primitives.md)).
+own CSS; their props didn't change ([overlays.md](overlays.md)).
 Base UI owns focus, keys, placement and nesting, which `layer.ts` and the
 hand-written key handling did before. It costs about 50 kB gzip on the main
 chunk. Native selects, checkboxes and radios stay native, and so does the

@@ -70,7 +70,7 @@ export interface EventDraft {
   origin: { repeat: Repeat | null; anchor: string } | null;
   location: string;
   notes: string;
-  /** The reminder (brief 15): one of `remindersFor(allDay)`, or `null` for none. */
+  /** The reminder: one of `remindersFor(allDay)`, or `null` for none. */
   reminderMinutes: number | null;
 }
 

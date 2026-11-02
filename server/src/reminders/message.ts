@@ -1,7 +1,7 @@
 import { addDays, occurrenceDate, parseInstant, dateInZone, type Occurrence, type PushPayload } from "@almanac/shared";
 
 /**
- * What a reminder says (brief 16): the event's title and when, judged from
+ * What a reminder says: the event's title and when, judged from
  * the moment it is due in the user's display time zone. "Dentist, 14:30",
  * "Dentist, tomorrow at 09:00", "Name day, today", "Name day, tomorrow".
  * The location, if any, is the body. Pressing it opens the event's day.

@@ -165,7 +165,7 @@ function aim(events: EventStore, userId: string, id: number, scope?: EditScope, 
 /**
  * `current` with `changes` on top, checked as a whole: a new end alone must
  * still follow the start. Turning the event all-day or timed without a new
- * reminder drops the old one, which the other kind doesn't offer (brief 15).
+ * reminder drops the old one, which the other kind doesn't offer.
  */
 function apply(current: EventContent, changes: EventChanges, repeat: Repeat | null): EventInput {
   const kindChanged = changes.allDay !== undefined && changes.allDay !== current.allDay;

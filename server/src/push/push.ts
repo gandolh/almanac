@@ -5,8 +5,8 @@ import type { PushSubscriptionStore, StoredPushSubscription } from "../store/pus
 import { webPushSender, type SendPush } from "./sender.js";
 
 /**
- * Web Push for one user's browsers (brief 14). The test route calls
- * `sendToUser`; so does brief 16's reminder timer.
+ * Web Push for one user's browsers. The test route calls
+ * `sendToUser`; so does the reminder timer.
  */
 export interface PushService {
   /** The VAPID public key browsers subscribe with. */

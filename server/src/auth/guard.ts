@@ -8,7 +8,7 @@ import { ApiError, sendError } from "../errors.js";
  * registered before any route) is the other half: one root `onRequest` hook
  * that answers `401 { error: "unauthorized" }` to every route without a live
  * session except `GET /api/health`, judged by route pattern, and its own
- * `/auth/*` routes. Every route a later brief adds is behind it without doing
+ * `/auth/*` routes. Every route added later is behind it without doing
  * anything; `request.auth` is the signed-in user there, and `currentUserId`
  * below is how a route asks for it.
  *

@@ -1,5 +1,5 @@
 /*
- * Almanac's service worker (brief 14): push only. It shows a push as a
+ * Almanac's service worker: push only. It shows a push as a
  * notification and opens Almanac when the notification is pressed. It has no
  * fetch handler, so it caches nothing and how the app loads doesn't change:
  * still no offline (corpus/wiki/decisions.md).

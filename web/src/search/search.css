@@ -1,5 +1,5 @@
 /*
- * Search (brief 10): the top bar's field and Google's results list, each date
+ * Search: the top bar's field and Google's results list, each date
  * at the left with its events beside it. Colours, type sizes and radii come
  * from tokens.css. Below 768 px is the phone: the open field covers the whole
  * top bar, and each date sits over its events.
