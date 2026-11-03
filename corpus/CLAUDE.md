@@ -110,3 +110,8 @@ updated: <YYYY-MM-DD>
   creates the repo and pushes.
 - **Deploys, git hooks and `npm link` are owner steps.** Write the exact
   commands down and hand them over.
+
+## brief-board
+
+Brief progress goes on brief-board. Run `brief-board guide` before you
+start or resume a brief, and follow it.
