@@ -1,2 +1,4 @@
 # Directories the briefs will create. lint.sh skips backticked paths under
 # these roots until they exist; remove a line once its directory lands.
+.claude   # briefs 01-04: .claude/rules/web.md and server.md
+scripts   # briefs 01-04: scripts/conventions.json, the checkers' exceptions
