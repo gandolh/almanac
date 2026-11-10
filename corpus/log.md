@@ -267,3 +267,24 @@ rule, and the other pages lost their brief citations.
 [status.md](wiki/status.md) is a per-area snapshot instead of a brief table,
 and gained the open bug that the phone search field leaves the top bar's
 buttons in tab order. Code comments no longer cite brief numbers.
+
+## [2026-11-09] todo | Briefs 01-04: house style, Base UI conventions, Tailwind, server structure
+
+The owner's calls of 2026-11-09 for every web app (Base UI 1.9.0 everywhere,
+whole apps on Tailwind v4, the researched conventions enforced in each repo)
+are filed as four briefs, in run order. 01 adopts the house style and the
+quality harness: Prettier at Almanac's least-churn width (130: 333 lines in
+70 files), `verbatimModuleSyntax` and `erasableSyntaxOnly` (one error, the
+parameter property in `server/src/errors.ts`), the typed lint rules, `npm run
+check` and `check:fast`, `.claude/rules/`, and a root `CLAUDE.md`. 02 brings
+Base UI to the base-ui skill's rules: five imports outside a `ui/` folder,
+the drawer without a title or `initialFocus`, and five hand-built widgets
+(toast, two radio groups, the weekday toggles, the delete confirm). 03 moves
+the fourteen stylesheets (3,412 lines) to Tailwind, with FullCalendar's CSS in
+a cascade layer so its overrides can be utilities. 04 puts the server in
+feature folders with zod route and response schemas; `occurrenceSchema`'s
+`repeat.byDay` transform makes zod's encode throw, so the output needs a
+transform-free shape first. No bump brief: `@base-ui/react` is pinned at
+1.9.0 and the lockfile resolves it. Corrections to the skills library's
+Almanac draft: 117 tokens in `tokens.css`, not 159; no dark selector is live.
+`.planned-roots` gained `.claude` and `scripts`.

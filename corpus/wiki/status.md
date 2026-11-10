@@ -1,14 +1,14 @@
 ---
-summary: Snapshot as of 2026-11-01, per area. v1 built 2026-10-16 and reviewed; Base UI under the overlays 2026-10-23; phone notifications (push worker, a reminder on each event, the minute sender) 2026-10-27. Pushed to GitHub through 2026-11-01, nothing deployed, no phone has shown a notification. What waits on the owner, open bugs, accepted known issues, and the todos.
-updated: 2026-11-01
+summary: Snapshot as of 2026-11-09, per area. v1 built 2026-10-16 and reviewed; Base UI under the overlays 2026-10-23; phone notifications (push worker, a reminder on each event, the minute sender) 2026-10-27; the estate's conventions (house style, Base UI rules, Tailwind, the server structure) filed as briefs 01-04 on 2026-11-09, none built. Pushed to GitHub through 2026-11-01, nothing deployed, no phone has shown a notification. What waits on the owner, open bugs, accepted known issues, and the todos.
+updated: 2026-11-09
 ---
 
 # Status
 
-_2026-11-01_. Everything below is on `main` and pushed to
-`https://github.com/<owner>/almanac.git`. Nothing is deployed. No brief is
-open; brief numbering restarted at 01 on 2026-11-01 (see
-[log.md](../log.md)).
+_2026-11-09_. Everything below is on `main` and pushed to
+`https://github.com/<owner>/almanac.git` as of 2026-11-01. Nothing is
+deployed. Briefs 01-04 are open (2026-11-09); brief numbering restarted at
+01 on 2026-11-01 (see [log.md](../log.md)).
 
 ## By area
 
@@ -34,6 +34,12 @@ open; brief numbering restarted at 01 on 2026-11-01 (see
   stack in `vps-deploy` and the seed entry in `wzd_auth`, all committed; the
   README and `docs/` follow the readme-docs standard (images retaken
   2026-10-31). The stack doesn't pass the `VAPID_*` values yet.
+- **Conventions** (2026-11-09, filed, not built). The owner's estate-wide
+  calls of 2026-11-09 (Base UI 1.9.0 by the base-ui skill's rules, the whole
+  web app on Tailwind v4, the code-structure skill's server layout, the
+  house style and its harness) are briefs 01-04, in run order. They wait on
+  the skills library's skills and the owner's grilling of 2026-11-10. Base
+  UI is already pinned at 1.9.0, so no bump is needed.
 - **Sibling repos** (2026-10-27). The stale app lists in `wzd_auth` and
   `shelfmark` that the deploy work left behind were fixed; both are pushed.
 
