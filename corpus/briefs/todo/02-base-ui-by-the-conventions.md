@@ -6,7 +6,7 @@
 - In the owner's skills library:
   - brief 02, *A base-ui skill, styled with Tailwind*: rules 1-13, the references and `check-base-ui.mjs`;
   - brief 15, *Enforce the base-ui and code-structure skills in every repo*: the checker runs `--warn-only` until brief 03 here is done.
-- The owner's grilling of 2026-11-10: Q15 (Base UI only under `ui/`) and Q16 (where native controls stay), plus the two new questions below.
+- The owner's grilling of 2026-11-10: Q15 (Base UI only under `ui/`), Q16 (where native controls stay), Q19 (parity), Q40 (the Drawer), Q41 and Q57 (pickers), Q58 (dialogs), Q59-Q62.
 
 **Runs before:** 03. This brief changes structure and behaviour. Brief 03 then changes only the styling, so its before and after screenshots compare like with like.
 
@@ -44,7 +44,7 @@ The owner's call of 2026-11-09 is Base UI everywhere at 1.9.0, with the base-ui 
 
 1. **The toast**, `web/src/components/Toast.tsx`: a hand-built snackbar with a store, a timer and a live region (`role="status"`, line 62). It becomes Base UI `Toast`. `Toast.createToastManager()` keeps `showToast()` callable from outside React, as `CalendarArea.tsx`'s fetch failure needs, and `Toast.Provider limit={1}` keeps one toast at a time.
 2. **The time zone list**, `web/src/account/TimeZoneDialog.tsx:141-212` (`ZoneList`): a hand-built `role="radiogroup"` with a roving `tabIndex` and its own arrow keys (153-178). Its arrows choose, which is what Base UI's `RadioGroup` does, so it becomes `RadioGroup` + `Radio`.
-3. **The colour palette**, `web/src/calendars/ColorPicker.tsx:56-77`: the same hand-built pattern (keys at lines 28-52), but on purpose its arrows **move without choosing**, because each choice saves at once (its doc comment, lines 20-26). Base UI's radio clicks its input when keyboard focus lands on it (`RadioRoot`'s `onFocus`, read in 1.9.0), so a `RadioGroup` would save on every arrow press. See decision 3.
+3. **The colour palette**, `web/src/calendars/ColorPicker.tsx:56-77`: the same hand-built pattern (keys at lines 28-52), but on purpose its arrows **move without choosing**, because each choice saves at once (its doc comment, lines 20-26). Base UI's radio clicks its input when keyboard focus lands on it (`RadioRoot`'s `onFocus`, read in 1.9.0), so a `RadioGroup` would save on every arrow press. It becomes a guarded `ToggleGroup` (decision 3).
 4. **The weekday toggles** in "Custom days…", `web/src/event/RepeatPicker.tsx:61-78`: seven `aria-pressed` buttons in a `role="group"`. They become `ToggleGroup multiple` + `Toggle`, which gives one Tab stop and arrow keys instead of seven Tab stops.
 5. **The delete-calendar confirm**, `web/src/calendars/CalendarRow.tsx:160-187` (`DeleteCalendarDialog`): a confirm on the generic `Dialog`. While `busy`, its buttons are disabled, but Esc and the ✕ still close it. It becomes the skill's confirm pattern, an `AlertDialog` that can't be dismissed while its action runs, with a "Deleting…" label.
 
@@ -65,7 +65,7 @@ The owner's call of 2026-11-09 is Base UI everywhere at 1.9.0, with the base-ui 
 
 **A styling class used as a behaviour hook:** `web/src/components/Dialog.tsx:54` finds the footer's first button with `.dialog__footer button:not(:disabled)`. Brief 03 removes that class, so this brief replaces the query with a ref.
 
-### The drawer and Base UI 1.9.0's `Drawer`
+### The drawer and Base UI 1.9.0's `Drawer` (decision 2)
 
 1.9.0 ships `@base-ui/react/drawer`. It has:
 
@@ -74,17 +74,19 @@ The owner's call of 2026-11-09 is Base UI everywhere at 1.9.0, with the base-ui 
 - `initialFocus` and `finalFocus` on the `Popup`;
 - the CSS variables `--drawer-swipe-movement-x` and `--drawer-swipe-progress`.
 
-Its docs still say: "A panel that slides in from the edge of the screen and doesn't need gesture support is a positioned Dialog", which is why the drawer was built on `Dialog` on 2026-10-23.
+Its docs say: "A panel that slides in from the edge of the screen and doesn't need gesture support is a positioned Dialog", which is why the drawer was built on `Dialog` on 2026-10-23. The owner chose the swipe (Q40, 2026-11-10), so the drawer moves to `Drawer` with `swipeDirection="left"`. A `SwipeArea`, swipe-from-the-edge to open, would fight `web/src/layout/swipe.ts`, which turns a sideways swipe on the view into the next or previous range, so it is left out.
 
-What `Drawer` would add is swipe-to-close (`swipeDirection="left"`). A `SwipeArea`, swipe-from-the-edge to open, would fight `web/src/layout/swipe.ts`, which turns a sideways swipe on the view into the next or previous range. So it would be left out. See decision 2.
+## Owner decisions
 
-## Owner decisions (defaults this brief builds)
-
-1. **Base UI only under `ui/`** (Q15). Default: yes. The three wrappers move to `web/src/components/ui/`, and the drawer and the switch get wrappers there.
-2. **The phone drawer: `Dialog` or `Drawer`?** Default: it stays a Base UI `Dialog`, which is Base UI's own advice for a panel without gestures, and keeps today's behaviour. If the owner wants swipe-to-close, the `Drawer` wrapper uses `Drawer.Root swipeDirection="left"`, no `SwipeArea`, and the same `finalFocus` to the menu button. *New question for the grilling.*
-3. **The colour palette's arrow keys.** Default: `ColorPicker` stays hand-built, recorded as an exception in `scripts/conventions.json` with the reason (each choice saves, and Base UI radios choose on arrow keys). The alternative is `ToggleGroup`, whose arrows move without pressing, but which announces "pressed" instead of "selected". *New question for the grilling.* The answer applies to any picker in the estate that saves on each choice.
-4. **The optional two** (Base UI `Button`, `Tooltip`s). Default: neither in this brief. A tooltip is a visual change, touch screens have no hover, and the Delete reason can be reached another way.
-5. **Native controls** (Q16). Default: as [wiki/decisions.md](../../wiki/decisions.md) has them, so the list above stays native.
+1. **Base UI only under `ui/`** (Q15, technical call). Decided 2026-11-10. The three wrappers move to `web/src/components/ui/`, and the drawer and the switch get wrappers there. Wrappers stay in `components/ui/`, the feature-folder layout (Q59).
+2. **The phone drawer is Base UI's `Drawer`** (Q40, decided 2026-11-10, owner). The phone navigation panel moves to `@base-ui/react/drawer` with `swipeDirection="left"`, closed by a swipe as well as a tap outside, the X or Esc. No `SwipeArea` (swipe-from-the-edge to open), because it would fight `web/src/layout/swipe.ts`, which turns a sideways swipe on the view into the next or previous range. The `finalFocus` to the menu button stays.
+3. **The colour palette** (Q41 and Q57, decided 2026-11-10, technical call). A picker that saves on each choice uses a guarded `ToggleGroup`: arrow keys move focus without saving, and one item always stays pressed. `ColorPicker` moves onto the `ToggleGroup` wrapper, so it is no longer an exception. It announces "pressed" rather than "selected", which is accepted. The time zone list and any filter that switches what a list shows use `RadioGroup`, where arrows may choose.
+4. **The optional two** (Base UI `Button`, `Tooltip`s). Still a default: neither in this brief. A tooltip is a visual change, touch screens have no hover, and the Delete reason can be reached another way.
+5. **Native controls** (Q16, decided 2026-11-10, technical call). Native text, date and time inputs and native `<select>`s stay native, as [wiki/decisions.md](../../wiki/decisions.md) has them, so the list above stays native.
+6. **Dialogs** (Q58, decided 2026-11-10, owner). A dialog that holds a form sets `disablePointerDismissal`: it closes with Cancel, the X or Esc, not an outside tap. The `Dialog` wrapper already does this through `dismissOnBackdrop={false}`, and the five form dialogs keep it. The delete-calendar confirm is a dialog today, not an inline "Delete? Yes / No", so it moves to `AlertDialog` as planned (the inline confirms are Satchel's and Shelfmark's).
+7. **Visual parity** (Q19, decided 2026-11-10, owner). Close enough: no visible change to layout or colour at 1280 and 390 px. A few pixels of drift needn't be fixed or listed.
+8. **Tests** (Q60 and Q62, decided 2026-11-10, technical calls). jsdom only for wrappers that hold logic; Almanac's static-markup tests stay, and flows stay in Playwright. Tests select by role, and `data-testid` only where no role fits.
+9. **The theme switch** is not here. Light / Dark / System (Q18) is brief 03's, where the tokens move; the wrappers built here read tokens only, so they follow it.
 
 ## The wrapper set: `web/src/components/ui/`
 
@@ -93,12 +95,12 @@ What `Drawer` would add is swipe-to-close (`swipeDirection="left"`). A `SwipeAre
 | `Dialog.tsx` | Base UI `Dialog`, props unchanged; the footer query becomes a ref | `web/src/components/Dialog.tsx`, moved |
 | `Popover.tsx` | Base UI `Popover`, props unchanged | `web/src/components/Popover.tsx`, moved |
 | `Menu.tsx` | Base UI `Menu`, props unchanged (`finalFocus` running the chosen item stays) | `web/src/components/Menu.tsx`, moved |
-| `Drawer.tsx` | the phone drawer: `open`, `onClose`, `returnFocus`, `children`; a visually hidden `Title` "Calendars"; `initialFocus` in the house order; on `Dialog` or `Drawer` per decision 2 | `Drawer` in `web/src/layout/AppShell.tsx:232-258`, moved out |
+| `Drawer.tsx` | the phone drawer on Base UI `Drawer`: `open`, `onClose`, `returnFocus`, `children`; `swipeDirection="left"`; a visually hidden `Title` "Calendars"; `initialFocus` in the house order | `Drawer` in `web/src/layout/AppShell.tsx:232-258`, moved out |
 | `Switch.tsx` | Base UI `Switch`: `checked`, `onCheckedChange`, `disabled`, the ARIA props | `web/src/account/Notifications.tsx:89-99` |
 | `Toast.tsx` | Base UI `Toast` with a module-level `createToastManager()`; `showToast(message, { action, duration })` keeps its signature and its return value (a dismiss function); `<Toaster/>` renders `Toast.Provider` + `Portal` + `Viewport` | `web/src/components/Toast.tsx`, rebuilt |
 | `ConfirmDialog.tsx` | Base UI `AlertDialog`: `title`, `message`, `confirmLabel`, `pendingLabel`, `onConfirm` returning a promise; can't be dismissed while it runs | new; `DeleteCalendarDialog` uses it |
-| `RadioGroup.tsx` | Base UI `RadioGroup` + `Radio.Root` + `Radio.Indicator` | new; `ZoneList` uses it (and `ColorPicker`, if decision 3 changes) |
-| `ToggleGroup.tsx` | Base UI `ToggleGroup` + `Toggle`, `multiple` | new; the weekday toggles use it |
+| `RadioGroup.tsx` | Base UI `RadioGroup` + `Radio.Root` + `Radio.Indicator` | new; `ZoneList` uses it |
+| `ToggleGroup.tsx` | Base UI `ToggleGroup` + `Toggle`: `multiple` for the weekdays, and a guarded single mode (one item always pressed, arrows only move focus) for the palette | new; the weekday toggles and `ColorPicker` use it |
 | `dialog-stub.ts` | the test stub for `@base-ui/react/dialog`, extended for `alert-dialog` if the static tests need it | `web/src/components/dialog-stub.ts`, moved |
 
 `Button.tsx`, `Field.tsx`, `Link.tsx`, `MonthGrid.tsx`, `icons.tsx` and `viewport.ts` stay in `web/src/components/`. None wraps Base UI. `Button` moves to `ui/` only if decision 4 changes.
@@ -107,7 +109,7 @@ What `Drawer` would add is swipe-to-close (`swipeDirection="left"`). A `SwipeAre
 
 - `web/src/components/ui/**` (new), the files moved out of `web/src/components/`, and every import of them.
 - `web/src/layout/AppShell.tsx`: the drawer moves out.
-- `web/src/account/Notifications.tsx`, `web/src/account/TimeZoneDialog.tsx`, `web/src/event/RepeatPicker.tsx`, `web/src/calendars/CalendarRow.tsx`: the widgets above. `web/src/calendars/ColorPicker.tsx`, only if decision 3 changes.
+- `web/src/account/Notifications.tsx`, `web/src/account/TimeZoneDialog.tsx`, `web/src/event/RepeatPicker.tsx`, `web/src/calendars/CalendarRow.tsx`, `web/src/calendars/ColorPicker.tsx`: the widgets above.
 - The existing CSS rules for markup this brief changes. Rename or move a class rule to the new part; don't restyle. Brief 03 turns them into utilities.
 - The tests for all of the above, including the five `vi.mock("@base-ui/react/dialog", …)` paths:
   - `web/src/components/components.test.ts`;
@@ -115,7 +117,6 @@ What `Drawer` would add is swipe-to-close (`swipeDirection="left"`). A `SwipeAre
   - `web/src/event/details.test.ts`;
   - `web/src/calendars/calendars.test.ts`;
   - `web/src/account/notifications.test.ts`.
-- `scripts/conventions.json`: the `ColorPicker` exception.
 - Corpus:
   - [wiki/overlays.md](../../wiki/overlays.md): what maps to what, the new wrappers, the stub's path;
   - [wiki/decisions.md](../../wiki/decisions.md): the Base UI entry gains the 2026-11-09 conventions line, and the drawer line if decision 2 changes;
@@ -149,7 +150,7 @@ One commit per numbered step. After each, `npm run check` passes, with `check-ba
    - else Create, the first button in the column;
    - else `true`.
 
-   Keep `finalFocus` on the menu button and the Escape guard. Under decision 2's `Drawer` branch, also check that a sideways swipe on the open drawer closes it, and that one on the view still steps the range.
+   Keep `finalFocus` on the menu button and the Escape guard. Check that a sideways swipe on the open drawer closes it, and that one on the view still steps the range.
 4. **`Switch.tsx`.** `Notifications.tsx` uses it. Rule 3 reaches 0.
 5. **The toast on Base UI.** Keep:
    - the 5 s timeout, 8 s with an action;
@@ -169,21 +170,22 @@ One commit per numbered step. After each, `npm run check` passes, with `check-ba
    - Home and End;
    - the empty "No time zone matches that." line.
 8. **`ToggleGroup.tsx`**, and the weekday toggles on it. Keep the week order (`toggleDay`) and the full weekday names as accessible names.
-9. **The exception.** Write `scripts/conventions.json` with the `ColorPicker` entry and its reason (decision 3).
+9. **`ColorPicker` on the guarded `ToggleGroup`.** Keep: each choice saving at once; arrow keys moving focus without saving; one swatch always pressed; the swatch's `--swatch` colour. Delete the hand-built key handling and rewrite its doc comment.
 10. **After.**
-    - Take the screenshots again. The new markup may move a pixel; list every difference with its reason.
+    - Take the screenshots again and compare them (decision 7: no visible change to layout or colour; a few pixels of drift needn't be fixed or listed).
     - Run `check-base-ui` strict: rules 1-3 and 8-11 report 0.
     - Update [wiki/overlays.md](../../wiki/overlays.md), [wiki/decisions.md](../../wiki/decisions.md), [wiki/status.md](../../wiki/status.md) and [log.md](../../log.md).
 
 ## Acceptance
 
 - [ ] `grep -rn "@base-ui/react" web/src --include=*.tsx --include=*.ts | grep -v "components/ui/" | grep -v "vi.mock"` prints nothing.
-- [ ] `check-base-ui` strict reports 0 for rules 1, 2, 3, 9, 10 and 11. Rules 4-7 are left for brief 03, and their counts are in the outcome note.
-- [ ] The drawer has a `Title` and `initialFocus`, and its Escape guard still lets Esc close a rename field inside it without closing the drawer. That is a test, not a manual check.
+- [ ] `check-base-ui` strict reports 0 for rules 1, 2, 3, 9, 10 and 11, with no `ColorPicker` exception. Rules 4-7 are left for brief 03, and their counts are in the outcome note.
+- [ ] The drawer is on Base UI `Drawer`, has a `Title` and `initialFocus`, and its Escape guard still lets Esc close a rename field inside it without closing the drawer. That is a test, not a manual check. A swipe left closes it (a Playwright test at 390 px), and a swipe on the view still steps the range.
+- [ ] Every dialog that holds a form closes with Cancel, the X or Esc, and not on an outside tap. That is a test per form dialog.
 - [ ] `showToast()`'s signature is unchanged and every caller is untouched. A test shows a second toast replacing the first.
 - [ ] Delete calendar can't be closed by Esc or ✕ while its request runs. That is a test.
-- [ ] The time zone list and the weekday toggles work from the keyboard as listed in steps 7 and 8. Those are tests.
-- [ ] The before and after screenshots match, with any difference listed and explained.
+- [ ] The time zone list and the weekday toggles work from the keyboard as listed in steps 7 and 8. The palette's arrows move focus without saving, a choice saves once, and one swatch stays pressed (step 9). Those are tests, selected by role.
+- [ ] The before and after screenshots at 1280 and 390 px show no visible change to layout or colour.
 - [ ] `npm run check` passes, and `bash corpus/lint.sh` ends clean.
 
 ## Interplay

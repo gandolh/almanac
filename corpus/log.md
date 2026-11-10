@@ -288,3 +288,22 @@ transform-free shape first. No bump brief: `@base-ui/react` is pinned at
 1.9.0 and the lockfile resolves it. Corrections to the skills library's
 Almanac draft: 117 tokens in `tokens.css`, not 159; no dark selector is live.
 `.planned-roots` gained `.claude` and `scripts`.
+
+## [2026-11-10] revise | Briefs 01-05 follow the owner's grilling
+
+The owner's answers and the technical calls of 2026-11-10 are folded into the
+briefs. 01: `house-style` is vendored (a copy with a version header and a
+`house-style:sync` script), so no git dependency and no Dockerfile change;
+Prettier width 120 (502 lines in 93 files, from the table already measured)
+instead of 130; `!` is a warning in tests; `considerDefaultExhaustiveForUnions`
+on. 02: the phone drawer moves to Base UI's `Drawer` with a swipe to close
+(Q40); the colour palette becomes a guarded `ToggleGroup`, so no
+`ColorPicker` exception; form dialogs keep `disablePointerDismissal` (Q58);
+parity is "close enough" (Q19). 03: a Light / Dark / System switch, light on a
+first visit, `dark:` off `data-theme`, kept in `localStorage` beside the
+sidebar's key (Q18); FullCalendar's CSS stays in the lazy chunk in its own
+stylesheet (Q42); the 15 px root moves onto `body` (Q44); tests select by role
+(Q62). 04: the entry rename changes the Dockerfile's `CMD` and needs no
+vps-deploy edit (Q1); the error handler keeps Almanac's body (Q43);
+`healthSchema` and `idParamsSchema` live server-side (Q55). New brief 05, a
+redesign with Hallmark on the estate board (Q39). No measurement changed.

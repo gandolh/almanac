@@ -10,11 +10,8 @@
   - brief 27, *A house style, and a quality harness that enforces it*: the `better-tailwindcss` lint;
   - brief 06, *Almanac's web app to Tailwind*, the estate draft this brief replaces.
 - The owner's grilling of 2026-11-10:
-  - Q17 (token names);
-  - Q18 (dark mode);
-  - Q19 (visual parity);
-  - Q20 (the order of the migrations);
-  - the new questions in decisions 4 and 5.
+  - Q17 (token names), Q18 (dark mode), Q19 (visual parity), Q20 (the order of the migrations);
+  - Q42 (FullCalendar's CSS), Q44 (the root font size), Q60 and Q62 (tests).
 
 **Before you start:** run `brief-board guide` ([corpus/CLAUDE.md](../../CLAUDE.md)).
 
@@ -25,11 +22,11 @@ The owner's call of 2026-11-09: Base UI is styled with Tailwind v4, and whole ap
 ### Corrections to the estate draft
 
 - **Tokens.** `tokens.css` has **117** custom properties (120 definitions, three of them redefined under 768 px), not 159. The 159 counted definitions across every stylesheet: `tokens.css`'s 120, `calendar.css`'s 35 Monarch variables, `components.css`'s four and `year.css`'s two (161 by a strict count). All 117 are read somewhere.
-- **Dark mode.** No dark or theme selector is live. The draft's hit was `color-scheme: light` in `web/src/styles/base.css:7`, which forces light, and the word "theme" in a comment in `calendar.css`. `web/index.html` sets `<meta name="color-scheme" content="light">`, and FullCalendar gets `colorScheme: "light"`. So there is no `@custom-variant dark`, as [wiki/decisions.md](../../wiki/decisions.md), "Google Calendar's layout, light only", says.
+- **Dark mode.** No dark or theme selector is live. The draft's hit was `color-scheme: light` in `web/src/styles/base.css:7`, which forces light, and the word "theme" in a comment in `calendar.css`. `web/index.html` sets `<meta name="color-scheme" content="light">`, and FullCalendar gets `colorScheme: "light"`. So today there is no `@custom-variant dark`, as [wiki/decisions.md](../../wiki/decisions.md), "Google Calendar's layout, light only", says. The owner's call of 2026-11-10 (Q18) adds a Light / Dark / System switch, built in step 7.
 - **FullCalendar's overrides can become utilities.** Every selector in `calendar.css` but the Monarch palette targets a class Almanac hands FullCalendar itself, through v7's class-name options (`className`, `slotHeaderInnerClass`, `eventClass`…), or Almanac's own markup in `web/src/calendar/content.tsx`. None aims at FullCalendar's internal `.fc-*` classes. The catch is the cascade:
   - FullCalendar's `skeleton.css` and `@fullcalendar/react/themes/monarch/theme.css` are **unlayered**, read from the 7.1.3 package, and unlayered CSS beats any rule in a cascade layer whatever its specificity.
   - So a utility, or the draft's `@layer components`, would lose to Monarch where both set a property. Monarch gives the slot label `margin-block: 8px` and `font-size: 14px`, and Almanac overrides those today with `.calendar-area .cal-slot-label`.
-  - The fix is to import FullCalendar's CSS **into a layer below `utilities`** (decision 6). Then the overrides become utilities passed through the same options, and only the palette stays as CSS.
+  - The fix is to import FullCalendar's CSS **into a layer below `utilities`** (decision 6), in the calendar's own stylesheet (decision 4). Then the overrides become utilities passed through the same options, and only the palette stays as CSS.
 
 ### The stylesheets today
 
@@ -71,7 +68,7 @@ FullCalendar's own CSS is imported in `web/src/calendar/CalendarArea.tsx:19-20`:
 - `@fullcalendar/react/skeleton.css`: 8.9 kB, 2.4 kB gzip;
 - `@fullcalendar/react/themes/monarch/theme.css`: 15.3 kB, 3.0 kB gzip.
 
-Both load only with the lazy chunk.
+Both load only with the lazy chunk, and keep doing so (decision 4).
 
 ### The token mapping plan
 
@@ -107,7 +104,7 @@ The names that change are referenced in these places beyond the CSS files being 
 
 | Lines | Selector | Where the class comes from | Overrides Monarch? | Becomes |
 |---|---|---|---|---|
-| 9-56 | `:root { --fc-monarch-* }` (35) | FullCalendar's theme variables, set on `:root` because a dragged event leaves the view | sets the palette | **stays CSS**, in `index.css`'s `@layer base`, reading the renamed tokens |
+| 9-56 | `:root { --fc-monarch-* }` (35) | FullCalendar's theme variables, set on `:root` because a dragged event leaves the view | sets the palette | **stays CSS**, in `fullcalendar.css`'s `@layer base`, reading the renamed tokens |
 | 59 | `.calendar-area` | Almanac's `<section>` (`CalendarArea.tsx:197`) | no | utilities |
 | 68 | `.calendar-area .cal` | the `className: "cal"` option (`CalendarArea.tsx:236`) | type and colour on the root | utilities in `className` |
 | 79-127 | `.cal-head`, `__weekday`, `__day`, `:hover`, `--today`, the phone size | Almanac's spans in `web/src/calendar/content.tsx:52-54` (`dayHeaderContent`) | no | utilities, `group-hover:`, `max-md:` |
@@ -146,7 +143,7 @@ The names that change are referenced in these places beyond the CSS files being 
 
 ### Gotchas Tailwind brings to this app
 
-- **The 15 px root.** `base.css` sets `font-size: var(--text-body)` (15 px) on `:root`. So every rem-based Tailwind default would come out 15/16 of its size: `p-4` would be 15 px. Decision 5.
+- **The 15 px root.** `base.css` sets `font-size: var(--text-body)` (15 px) on `:root`. So every rem-based Tailwind default would come out 15/16 of its size: `p-4` would be 15 px. Decision 5 moves the 15 px onto `body`.
 - **Default names that collide:**
   - `--font-sans`, `--ease-out` and `--leading-tight` exist in Tailwind's theme with other values;
   - and Tailwind's palette, text scale, radii and shadows would be usable beside Almanac's.
@@ -157,28 +154,25 @@ The names that change are referenced in these places beyond the CSS files being 
 - **Breakpoints.** `max-md:` is `@media (width < 48rem)`. Media queries ignore the root font size, so that is exactly today's `max-width: 767.98px`, and `md:` matches `DESKTOP_QUERY`. The two search widths are `max-[1200px]:` and `max-[900px]:`.
 - **Container queries.** `year.css`'s `@container year (…)` becomes `@container/year` with `@min-[472px]/year:`, `@min-[720px]/year:`, `@min-[968px]/year:` and `@max-[472px]/year:`.
 
-## Owner decisions (defaults this brief builds)
+## Owner decisions
 
-1. **Token names** (Q17). Default: Almanac's names, put in Tailwind's namespaces (`--surface` becomes `--color-surface`, used as `bg-surface`). No estate vocabulary.
-2. **Dark mode** (Q18). Default: none. Light only stays.
-3. **Visual parity** (Q19). Default: screenshots at 1280 and 390 px, plus 1024 px for the top bar's search field. That width is still unchecked ([wiki/status.md](../../wiki/status.md), "Open"). Every difference is fixed or listed with its reason.
-4. **FullCalendar's CSS on the first paint.** Rule 5's one stylesheet moves FullCalendar's 5.4 kB gzip out of the lazy chunk and onto every page, sign-in included. Default: accept it; month is the home view, so most visits load it anyway. The alternative is a second stylesheet for the lazy chunk, as an exception. *New question for the grilling.*
-5. **Tailwind's scale against the 15 px root.** Default: `--spacing: 4px`, with the default text, radius, shadow and colour scales cleared, so every utility is in Almanac's pixels. The alternative is to move the 15 px from `:root` to `body` and keep rem-based defaults. No rule anywhere uses `rem`, so it would change nothing visible, but it leaves Tailwind's defaults usable. *New question for the grilling*: any estate app with a non-16 px root meets it.
-6. **FullCalendar's CSS in a cascade layer.** Default:
-   - `@layer theme, base, fullcalendar, components, utilities;` first in `index.css`;
-   - then `@import "@fullcalendar/react/skeleton.css" layer(fullcalendar);` and the same for the Monarch theme.
-
-   The fallback, if a screenshot says the layer breaks something: keep the four overriding rules unlayered after the imports, with a comment. Not a grilling question; the screenshots decide.
+1. **Token names** (Q17, decided 2026-11-10, technical call). Almanac's names, put in Tailwind's namespaces (`--surface` becomes `--color-surface`, used as `bg-surface`). The small-tools family's `surface`, `ink`, `accent`, `line`, `danger` set is not forced here; Almanac keeps its names until its redesign (brief 05).
+2. **Dark mode: a Light / Dark / System switch, light by default** (Q18, decided 2026-11-10, owner). A first visit shows the light theme, not the system's. `dark:` keys off a `data-theme` attribute through `@custom-variant dark`, not `prefers-color-scheme`. The choice is kept on the device, in `localStorage` beside the sidebar's `COLUMN_KEY` (`web/src/layout/AppShell.tsx:59-67`), because that is where Almanac keeps its UI preferences; it is not a server setting, since `user_settings` holds only the time zone. Step 7 builds it. This revisits "Google Calendar's layout, light only".
+3. **Visual parity** (Q19, decided 2026-11-10, owner). Close enough: screenshots at 1280 and 390 px, plus 1024 px for the top bar's search field (still unchecked, [wiki/status.md](../../wiki/status.md), "Open"), show no visible change to layout or colour in the light theme. A few pixels of drift in spacing or rounding needn't be fixed or listed. The dark theme has no "before".
+4. **FullCalendar's CSS loads with the calendar only** (Q42, decided 2026-11-10, technical call). It stays out of the main stylesheet: a second stylesheet, `web/src/calendar/fullcalendar.css`, holds the two imports and the Monarch palette, and is imported by `CalendarArea.tsx` as today, so it loads with the lazy chunk. That is the one exception to "one stylesheet". Sign-in and the other pages don't pay for its 5.4 kB gzip.
+5. **The 15 px root** (Q44, decided 2026-11-10, technical call). The root font size goes back to the browser's default, and the app's 15 px (`--text-body`) moves onto `body`. A pixel size on `html` overrides the reader's own font setting and skews every `rem` utility. Tailwind's rem-based spacing then stays as it is (`--spacing` default, 4 px at a 16 px root). The default colour, text, radius and shadow scales are still cleared, so only Almanac's tokens exist. Check that FullCalendar's two CSS files use no `rem` that the root change would shift; the screenshots decide.
+6. **FullCalendar's CSS in a cascade layer** (technical call; the screenshots decide). `index.css` opens with `@layer theme, base, fullcalendar, components, utilities;`, which fixes the order for the lazy stylesheet too. `fullcalendar.css` then has `@import "@fullcalendar/react/skeleton.css" layer(fullcalendar);` and the same for the Monarch theme. The fallback, if a screenshot says the layer breaks something: keep the four overriding rules unlayered after the imports, with a comment.
 7. **Preflight.** Default: Tailwind's preflight, with what `base.css` adds beyond it ported to `@layer base`. The fallback, if FullCalendar or the native controls shift: import Tailwind's `theme.css` and `utilities.css` without its preflight, and keep `base.css`'s resets.
 8. **Motion** (rule 7). Default: parity. The seven enter animations become `--animate-*` keyframes in `@theme`, under `motion-safe:`, and there are no new exit animations. Exit animations through `data-ending-style` change what people see, so they are a later call.
-9. **Where Almanac falls in the estate's order** (Q20). Default: seventh, after the small apps. This brief doesn't depend on any other app's migration.
+9. **Order** (Q20, decided 2026-11-10, technical call). Seventh, after the todo app, wicket, the-board, lantern, Satchel and ward-auth. This brief doesn't depend on any other app's migration.
+10. **Tests** (Q60 and Q62, decided 2026-11-10, technical calls). The 31 class-name assertions become role, text or `data-` assertions, and `data-testid` only where no role fits. jsdom only for wrappers that hold logic.
 
 ## Files you OWN
 
 - `web/src/**/*.css`: all fourteen go.
-- `web/src/styles/index.css` and `web/src/lib/cn.ts`, new, with a `cn` test.
+- `web/src/styles/index.css`, `web/src/calendar/fullcalendar.css` and `web/src/lib/cn.ts`, new, with a `cn` test.
 - The `className` values in `web/src/**/*.tsx`, including FullCalendar's class-name options in `web/src/calendar/CalendarArea.tsx:236-279`.
-- The FullCalendar CSS imports, which move from `CalendarArea.tsx:19-20` to `index.css`.
+- The FullCalendar CSS imports, which move from `CalendarArea.tsx:19-20` to `fullcalendar.css` (decision 4).
 - The style imports in `web/src/main.tsx`.
 - `web/src/calendar/events.ts`: `eventInk()`'s token names, and its tests.
 - The ref replacing `.calendar-row__input` in `web/src/calendars/CalendarRow.tsx`.
@@ -189,7 +183,8 @@ The names that change are referenced in these places beyond the CSS files being 
   - `package-lock.json`.
 - `web/vite.config.ts`: the plugin.
 - `eslint.config.js`: the `better-tailwindcss` block only, with `entryPoint: "web/src/styles/index.css"`.
-- `web/index.html`: the `theme-color` comment, which names `tokens.css`.
+- `web/index.html`: the `theme-color` comment, which names `tokens.css`, and the theme script (step 7).
+- The theme switch (step 7): `web/src/layout/AccountMenu.tsx`, a small theme module beside `AppShell.tsx`'s stored `COLUMN_KEY`, and their tests.
 - `scripts/conventions.json`: the calendar-colour exception.
 - `.claude/rules/web.md`: the Tailwind lines.
 - Corpus:
@@ -250,12 +245,11 @@ Follow the skill's `migrating-from-plain-css.md`. One commit per numbered step; 
    - Write `web/src/styles/index.css`:
      - the layer order (decision 6);
      - `@import "tailwindcss"`;
-     - the FullCalendar imports in `layer(fullcalendar)`;
      - `@theme` with the default namespaces cleared and the 117 tokens mapped;
-     - `--spacing: 4px` (decision 5).
+     - the root font size back to the default, and `font-size: var(--text-body)` on `body` (decision 5).
    - Keep `tokens.css`, but **as aliases only**, such as `--surface: var(--color-surface)`, so the files not yet migrated keep working.
    - Add `web/src/lib/cn.ts`.
-   - Move the two FullCalendar imports out of `CalendarArea.tsx`.
+   - Write `web/src/calendar/fullcalendar.css`: the two FullCalendar imports in `layer(fullcalendar)` and the palette in `@layer base`. `CalendarArea.tsx` imports it where it imported the two files.
 3. **Migrate one stylesheet at a time**, in this order, deleting each when it is empty:
    1. `web/src/styles/base.css`: preflight plus `@layer base` (decision 7). `.visually-hidden` becomes `sr-only`.
    2. `web/src/styles/components.css`, together with `web/src/auth/auth.css`'s field and error sections and `web/src/components/Field.tsx`:
@@ -272,42 +266,51 @@ Follow the skill's `migrating-from-plain-css.md`. One commit per numbered step; 
    7. `web/src/search/search.css`.
    8. `web/src/event/details.css` and `web/src/event/editor.css`. The editor's phone sizes go here.
    9. `web/src/year/year.css`.
-   10. `web/src/calendar/calendar.css`, last: the options' utilities, the markers kept, the palette into `@layer base`.
+   10. `web/src/calendar/calendar.css`, last: the options' utilities, the markers kept, the palette into `fullcalendar.css`'s `@layer base`.
    11. `web/src/styles/tokens.css`, the aliases: delete it once nothing reads an old name (`grep -rn "var(--" web/src` shows only `--color-*`-style names, `--calendar-color`, `--swatch`, the positioner variables and `--fc-monarch-*`).
 4. **Lint.** Turn on `better-tailwindcss`'s correctness rules and its class order as errors, and fix what they find.
 5. **Screenshots after.**
    - Take the same states again from the copied data folder and the same frozen clock.
-   - Compare each pair pixel by pixel, with Playwright's comparison or pixelmatch at its default threshold.
-   - Fix every difference, or list it in the outcome note with its reason.
+   - Compare each pair with Playwright's comparison or pixelmatch.
+   - Fix any difference a person would see in layout or colour (decision 3). Drift of a few pixels needn't be fixed or listed.
    - Expected: hover not sticking after a tap on a phone. Record the CSS sizes.
 6. **Corpus.**
    - In [wiki/decisions.md](../../wiki/decisions.md), revisit these by heading, each with a dated line and a `log.md` entry:
      - **"Base UI under the dialogs, popovers, menus and drawer"**: it says "styled by Almanac's own CSS", and rejected shadcn "which brings Tailwind, which Almanac doesn't use". Both change. The wrappers are now styled with Tailwind, by the owner's call of 2026-11-09. shadcn stays rejected, for a reason of its own to record: Base UI is used directly, without a styled kit on top.
      - **"FullCalendar v7 draws day, week and month; the year view is our own"**: it rejected ilamy-calendar as needing Tailwind and having one maintainer. Note that the Tailwind half no longer applies and the choice stands on the other half. The choice itself isn't reopened.
-     - **"Google Calendar's layout, light only"**: unchanged. Add that the Tailwind setup has no dark variant because of it.
+     - **"Google Calendar's layout, light only"**: revisit it. The layout stays; "light only" ends with the owner's call of 2026-11-10 (Q18): a Light / Dark / System switch, light on a first visit. Rename the entry.
      - The page's `summary:` line, which says "Base UI under the dialogs, popovers and menus".
    - Update [wiki/architecture.md](../../wiki/architecture.md), [wiki/overlays.md](../../wiki/overlays.md), [wiki/web-app.md](../../wiki/web-app.md) (the palette is in `index.css`, the overrides are utilities through the class-name options, the markers stay), [wiki/status.md](../../wiki/status.md) and [log.md](../../log.md).
    - Add to `.claude/rules/web.md`:
      - tokens only from `@theme`;
      - no arbitrary colours;
      - calendar colours through `--calendar-color`;
-     - FullCalendar styled through its options;
+     - FullCalendar styled through its options, its CSS loading with the calendar only;
+     - `dark:` keys off `data-theme`;
      - the two markers kept.
    - Run `bash corpus/lint.sh --index`, then `bash corpus/lint.sh`, until it is clean.
-7. **The gate.** Drop `check-base-ui`'s `--warn-only` from `check:conventions`.
+7. **The theme switch** (decision 2), in its own commit after the screenshots:
+   1. In `index.css`, `@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));`.
+   2. A second set of colour values for the 19 colour tokens, the 11 derived ones and the Monarch palette, under `[data-theme="dark"]`, with `color-scheme: dark` there. The values are a first pass that the redesign (brief 05) refines; each text and icon pair clears 4.5:1.
+   3. A small inline script in `web/index.html`'s `<head>` sets `data-theme` on `<html>` before first paint: the stored choice, else `light`. With "System" it follows `prefers-color-scheme` and listens for changes. The `color-scheme` meta and `theme-color` change with the theme, and FullCalendar's `colorScheme` option follows it.
+   4. A Light / Dark / System control in the account menu (`web/src/layout/AccountMenu.tsx`), on the `RadioGroup` wrapper from brief 02, with a stored key beside `COLUMN_KEY`, read inside a `try` since storage can be blocked.
+   5. Tests: the stored value maps to the attribute for each of the three choices; "System" follows a changed media query.
+8. **The gate.** Drop `check-base-ui`'s `--warn-only` from `check:conventions`.
 
 ## Acceptance
 
-- [ ] `find web/src -name '*.css'` prints only `web/src/styles/index.css`, and it holds the FullCalendar imports. `CalendarArea.tsx` imports no CSS.
-- [ ] `check-base-ui` passes **strict**, with only the calendar-colour exception and brief 02's `ColorPicker` one in `scripts/conventions.json`.
+- [ ] `find web/src -name '*.css'` prints only `web/src/styles/index.css` and `web/src/calendar/fullcalendar.css`. The FullCalendar imports are only in the second, which `CalendarArea.tsx` imports, so the built main stylesheet holds none of FullCalendar's CSS.
+- [ ] `check-base-ui` passes **strict**, with only the calendar-colour exception in `scripts/conventions.json`.
 - [ ] `grep -rnE "(bg|text|border|fill|stroke|ring|outline|shadow)-\[(#|rgb|hsl)" web/src` prints nothing.
 - [ ] `index.css`'s `@theme` defines exactly the mapped tokens. The default colour, text, radius and shadow scales are cleared: `bg-red-500` or `text-sm` in a component produces no CSS.
 - [ ] A `cn` test proves `cn("text-ink", "text-body")` keeps both classes.
-- [ ] The screenshot pairs match, with every difference listed and explained in the outcome note, alongside the before and after CSS sizes.
-- [ ] `npm run check` (with `better-tailwindcss`) and `npm run build` pass, and so do the 31 rewritten assertions.
+- [ ] The light screenshot pairs at 1280 and 390 px show no visible change to layout or colour, and the before and after CSS sizes are in the outcome note.
+- [ ] The switch has three choices. A first visit with no stored choice is light even when the system is dark; "Dark" and "System" (with a dark system) set `data-theme="dark"` before first paint, with no flash; the choice survives a reload. A Playwright test covers all three, and a dark screenshot of each main screen shows no unreadable text.
+- [ ] `npm run check` (with `better-tailwindcss`) and `npm run build` pass, and so do the 31 rewritten assertions, selected by role.
 - [ ] The three decisions are revisited in [wiki/decisions.md](../../wiki/decisions.md), with a `log.md` entry. `bash corpus/lint.sh` ends clean.
 
 ## Interplay
 
 - Brief 02's renamed CSS rules for the new wrappers (toast, radio group, toggle group, confirm, switch) are migrated here like any other.
+- Brief 05 (the redesign) builds on this brief's tokens and the theme switch.
 - Brief 04 doesn't touch `web/`. If both are open at once, they conflict only in `package-lock.json`, so don't run them at the same time.

@@ -8,12 +8,9 @@
   - brief 16, *The Fastify servers adopt the code structure*: Almanac's row and the method;
   - brief 15, *Enforce the base-ui and code-structure skills in every repo*: `check-structure` runs `--warn-only` until this brief is done.
 - The owner's grilling of 2026-11-10:
-  - Q1 (how vps-deploy starts the service);
-  - Q23 (`server/src/features/`);
-  - Q24 (plugin options, explicit registration);
-  - Q25 (response schemas everywhere);
-  - Q27 (the test runner);
-  - the new question in decision 4.
+  - Q1 (how services start: the Dockerfile's `CMD`);
+  - Q23 (`server/src/features/`), Q24 (plugin options, explicit registration), Q25 (response schemas everywhere), Q27 (the test runner);
+  - Q43 (the error handler), Q53 (streams exempt), Q55 (where a schema lives), Q56 (`ApiError`, no decorator seam).
 
 **Order:** after 01. It touches no file that 02 or 03 touch except `package-lock.json`, so it may run before them, but never at the same time as either.
 
@@ -132,10 +129,10 @@ The vendored `wardAuth` plugin's `/auth/*` routes are generated code and out of 
 
 | Feature | Method and path | params | querystring | body | response |
 |---|---|---|---|---|---|
-| health (1) | `GET /api/health` | | | | `200`: **new** `healthSchema` (`{ status: "ok" }`) |
+| health (1) | `GET /api/health` | | | | `200`: **new** `healthSchema` (`{ status: "ok" }`), in `server/src/features/health/` |
 | calendars (4) | `GET /api/calendars` | | | | `200`: `calendarListSchema` |
 | | `POST /api/calendars` | | | `calendarCreateSchema` | `201`: `calendarSchema` |
-| | `PATCH /api/calendars/:id` | **new** `idParamsSchema` | | `calendarPatchSchema` | `200`: `calendarSchema` |
+| | `PATCH /api/calendars/:id` | **new** `idParamsSchema`, in `server/src/lib/` | | `calendarPatchSchema` | `200`: `calendarSchema` |
 | | `DELETE /api/calendars/:id` | `idParamsSchema` | | | `204` |
 | events (3) | `POST /api/events` | | | `eventInputSchema` | `201`: `occurrenceSchema` (output-safe) |
 | | `PATCH /api/events/:id` | `idParamsSchema` | | `eventPatchSchema` | `200`: `occurrenceSchema` |
@@ -209,7 +206,7 @@ The `.js` import suffixes stay.
 
 No code imports `@almanac/server` by any of its `exports`. Point them at the new paths, or drop them if knip (brief 01) calls them unused, and record which.
 
-vps-deploy builds and runs this image, so the `CMD` is the likely start command, but its Almanac stack may also name the file. That is Q1; vps-deploy wasn't readable here. See decision 5.
+The container starts that file path, so the `CMD` is the one place that names it (Q1; decision 5).
 
 ### Test impact
 
@@ -223,33 +220,37 @@ vps-deploy builds and runs this image, so the `CMD` is the likely start command,
   - a reply that fails its response schema is a 500 `internal` with no detail;
   - the health route.
 
-## Owner decisions (defaults this brief builds)
+## Owner decisions
 
-1. **`server/src/features/<name>/`** (Q23). Default: yes, as in the move map.
-2. **Typed plugin options and explicit registration** (Q24). Default: keep `FeatureContext` and `FEATURES`, which Almanac already has. Decorators only for request-scoped values; there are none yet, since `currentUserId(request)` reads the session.
-3. **A response schema on every route** (Q25). Default: yes. No Almanac route sends pass-through JSON.
-4. **The error body.** The code-structure skill's rule 8 names `{ error, message, issues? }`, and Almanac sends `{ error: { code, message } }`, which its web parses. Default: keep Almanac's shape; the rule's substance (one handler, no 5xx detail, a validation code) holds. *New question for the grilling*: does the skill prescribe a shape or only the handler?
-5. **The entry file** (Q1). Default: rename to `server.ts`, and change the Dockerfile, the scripts and `exports` in the same commit. If vps-deploy's Almanac stack names `dist/index.js`, change it there in the same session as an owner step (the exact edit handed over), or keep `index.ts` and record the exception in `scripts/conventions.json`.
-6. **The test runner** (Q27). Default: vitest stays. Shelfmark's "nothing boots the app" (Q26) doesn't apply: Almanac's decisions allow `inject()`.
-7. **The test helper's name.** Default: keep `server/src/testing/testApp.ts` and `startTestApp`. Renaming to the skill's `buildTestApp` would touch 12 files for nothing. Record it in `conventions.json` if the checker looks for the name.
-8. **Timeouts and proxy.** Defaults:
-   - `connectionTimeout: 10_000`;
-   - `requestTimeout: 30_000`; no route runs long, and the push test's fan-out is the longest;
-   - `keepAliveTimeout: 125_000`, above Caddy's default two-minute idle keep-alive to its upstreams, so the API never closes a connection Caddy is about to reuse. Check the deploy's Caddy snippet for its own `keepalive`.
-   - `trustProxy`: loopback plus `AUTH_TRUSTED_PROXIES`, one list, so `request.ip` in logs is the client. Ward's login lockout reads the socket itself (`server/vendor/ward/ward-auth.js:4884`), so this doesn't change it.
-9. **Logging.** Default: JSON as today, no `pino-pretty`. That is one dependency less, and the deploy reads JSON.
-10. **Fastify 5.12.8.** Default: not in this brief. The bump goes with the estate's next one.
+All decided 2026-11-10 as technical calls (the owner may overrule); the numbers are the skills library's open questions.
+
+1. **`server/src/features/<name>/`** (Q23). As in the move map.
+2. **Typed plugin options and explicit registration** (Q24). Keep `FeatureContext` and `FEATURES`, which Almanac already has. Decorators only for request-scoped values; there are none yet, since `currentUserId(request)` reads the session. No decorators as a test seam (Q56): tests pass dependencies as plugin options, as `startTestApp` does.
+3. **A response schema on every route** (Q25). No Almanac route sends pass-through JSON, and none streams or serves binary, so nothing needs a `conventions.json` exemption (Q53).
+4. **The error handler** (Q43). One handler, keeping Almanac's body shape `{ error: { code, message } }`, which `web/src/api.ts` parses. It passes Fastify's own 4xx through and never echoes a thrown message to the client. One `ApiError` class stays (Q56).
+5. **The entry file and the deploy** (Q1, fact). Services run in a container built from `infrastructure/Dockerfile`, which starts a file path. Rename `index.ts` to `server.ts`, and change the Dockerfile's `CMD`, the scripts and `exports` in the same commit. The repo owns that file, and the build runs `npm ci` and `tsc -b` only, so there is no vps-deploy edit and the deploy is left alone.
+6. **The test runner** (Q27). vitest stays (only atrium stays on `node:test`). Shelfmark's "nothing boots the app" (Q26) doesn't apply: Almanac's decisions allow `inject()`.
+7. **The test helper's name.** Keep `server/src/testing/testApp.ts` and `startTestApp`. Renaming to the skill's `buildTestApp` would touch 12 files for nothing. Record it in `conventions.json` if the checker looks for the name.
+8. **Where a schema lives** (Q55). In `shared/` when the web imports it, otherwise in its feature folder. So `healthSchema` goes in `server/src/features/health/`, `idParamsSchema` (used by two features) in `server/src/lib/`, and the stored repeat in `shared/` beside `occurrenceSchema`.
+9. **The checkers read the roots from `conventions.json`** (technical call): `server/src` and `shared/src` here. Config read at import time is allowed.
+10. **Timeouts and proxy.** Defaults, still open for the owner:
+    - `connectionTimeout: 10_000`;
+    - `requestTimeout: 30_000`; no route runs long, and the push test's fan-out is the longest;
+    - `keepAliveTimeout: 125_000`, above Caddy's default two-minute idle keep-alive to its upstreams, so the API never closes a connection Caddy is about to reuse. Check the deploy's Caddy snippet for its own `keepalive`.
+    - `trustProxy`: loopback plus `AUTH_TRUSTED_PROXIES`, one list, so `request.ip` in logs is the client. Ward's login lockout reads the socket itself (`server/vendor/ward/ward-auth.js:4884`), so this doesn't change it.
+11. **Logging.** Default: JSON as today, no `pino-pretty`.
+12. **Fastify 5.12.8.** Default: not in this brief.
 
 ## Files you OWN
 
 - `server/src/**`: the moves, the new plugins, the schemas wired in.
 - `server/package.json` (scripts, `main`, `exports`, the new dependencies pinned) and `package-lock.json`.
-- `shared/src/**`, only to add `healthSchema`, `idParamsSchema` and the transform-free stored repeat used by `occurrenceSchema`, with their tests. Input schemas don't change.
+- `shared/src/**`, only to add the transform-free stored repeat used by `occurrenceSchema`, with its test. Input schemas don't change. `healthSchema` and `idParamsSchema` are server-side (decision 8).
 - `infrastructure/Dockerfile`: the `CMD` line.
 - The root `package.json`: `start`, and `check:conventions` (dependency-cruiser added, `check-structure`'s `--warn-only` dropped).
 - `.dependency-cruiser.cjs` (new, from the skill's preset).
 - `eslint.config.js`: `eslint-plugin-n`'s `no-process-env`, from warning to error.
-- `scripts/conventions.json`, for any exception from decisions 5 or 7.
+- `scripts/conventions.json`, for any exception from decision 7 (and the roots, decision 9).
 - `.claude/rules/server.md`: the structure lines.
 - `docs/architecture.md:64-65`: its links to `server/src/recurrence/` and `server/src/routes/`.
 - Corpus:
@@ -266,7 +267,7 @@ vps-deploy builds and runs this image, so the `CMD` is the likely start command,
 - `web/`. A response schema that drops a field the web reads is a finding: fix the schema, not the web.
 - `shared/` input schemas and their behaviour.
 - `server/vendor/`: generated.
-- The deploy beyond the `CMD` line. vps-deploy edits are handed to the owner.
+- The deploy beyond the Dockerfile's `CMD` line. There is no vps-deploy edit (decision 5).
 - Behaviour: status codes, error codes and messages, and every route's JSON apart from fields the comparison shows were leaks.
 
 ## What to do
@@ -300,11 +301,11 @@ Follow `migrating-a-server.md`. One commit per step; after each, `npm run check`
 - [ ] `grep -rn "process\.env" server/src --include=*.ts | grep -v "\.test\.ts"` prints only `config.ts`, and ESLint's `no-process-env` (from `eslint-plugin-n`) is an error.
 - [ ] The weekly-`byDay` round trip, the stripped-field test, the serialization-500 test and the health test pass, along with every existing test unchanged.
 - [ ] The before and after JSON comparison is in `log.md`, with every dropped field named.
-- [ ] `npm run build` writes `server/dist/server.js`. `docker build -f infrastructure/Dockerfile .` succeeds, and the container answers its health check. The vps-deploy step, if any, is handed to the owner as exact commands.
+- [ ] `npm run build` writes `server/dist/server.js`. `docker build -f infrastructure/Dockerfile .` succeeds with its `CMD` on `server/dist/server.js`, and the container answers its health check.
 - [ ] dependency-cruiser fails on a deliberate cross-feature import and passes clean.
 - [ ] `npm run check` passes, and `bash corpus/lint.sh` ends clean.
 
 ## Interplay
 
 - If brief 01 has dropped `server/package.json`'s `exports` as unused, step 2 has two fewer lines to change.
-- The skills library should hear about the transform trap and the error-body question before the other servers run brief 16. Both apply to any repo whose shared schemas transform, or whose web parses its own error shape.
+- The skills library should hear about the transform trap before the other servers run brief 16. It applies to any repo whose shared schemas transform. The error-body question is settled (decision 4).
