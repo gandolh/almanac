@@ -1,17 +1,7 @@
-import { Dialog } from "@base-ui/react/dialog";
-import {
-  lazy,
-  Suspense,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-  type RefObject,
-} from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Temporal } from "temporal-polyfill";
 import { PlusIcon } from "../components/icons";
+import { Drawer } from "../components/ui/Drawer";
 import { Toaster } from "../components/Toast";
 import { useSettings, useToday } from "../data/settings";
 import { DEFAULT_VIEW, rangeTitle, rangeTitleShort, stepDate, type View } from "../dates";
@@ -223,7 +213,7 @@ export function AppShell() {
           {main}
         </main>
       </div>
-      <Drawer open={drawerShown} onClose={closeDrawer} menuButton={menuButton}>
+      <Drawer open={drawerShown} onClose={closeDrawer} returnFocus={menuButton}>
         {sidebar}
       </Drawer>
       {!desktop && !drawerShown && (
@@ -233,41 +223,5 @@ export function AppShell() {
       )}
       <Toaster />
     </div>
-  );
-}
-
-/**
- * The phone's left column: over the view from the left, with the page dimmed
- * behind it. A modal Base UI `Dialog`: Esc or a press on the dim closes it,
- * the rest of the shell is inert meanwhile, and focus goes back to the menu
- * button. The menus and popovers the calendars open from inside it nest in
- * it, so Esc closes the innermost first.
- */
-function Drawer({
-  open,
-  onClose,
-  menuButton,
-  children,
-}: {
-  open: boolean;
-  onClose: () => void;
-  menuButton: RefObject<HTMLButtonElement | null>;
-  children: ReactNode;
-}) {
-  return (
-    <Dialog.Root
-      open={open}
-      onOpenChange={(next, details) => {
-        // An Esc a control inside already used (renaming a calendar) isn't the drawer's.
-        if (!next && !(details.reason === "escape-key" && details.event.defaultPrevented)) onClose();
-      }}
-    >
-      <Dialog.Portal>
-        <Dialog.Backdrop className="drawer__scrim" />
-        <Dialog.Popup id="sidebar" className="drawer__panel" aria-label="Calendars" finalFocus={menuButton}>
-          {children}
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
   );
 }

@@ -455,6 +455,12 @@
   }
 }
 
+.drawer__viewport {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-drawer);
+}
+
 .drawer__panel {
   position: fixed;
   top: 0;
@@ -468,6 +474,11 @@
   background: var(--surface);
   box-shadow: var(--shadow-dialog);
   animation: drawer-in var(--duration-sheet) var(--ease-out);
+  transform: translateX(var(--drawer-swipe-movement-x, 0px));
+}
+
+.drawer__panel[data-swiping] {
+  user-select: none;
 }
 
 .drawer__panel:focus {
