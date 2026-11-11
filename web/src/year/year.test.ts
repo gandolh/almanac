@@ -268,20 +268,20 @@ describe("DayList", () => {
 
   /** The `time` and `name` text of each row, in order. */
   function rows(html: string): string[] {
-    return [...html.matchAll(/day-list__time">([^<]*)<\/span><span class="day-list__name">([^<]*)</g)].map(
+    return [...html.matchAll(/<span class="[^"]*">([^<]*)<\/span><span class="[^"]*">([^<]*)<\/span><\/button>/g)].map(
       (m) => `${m[1]} ${m[2]}`,
     );
   }
 
   it("heads the list with the day, and names the popover by it", () => {
     const html = list([]);
-    expect(html).toContain('<h2 id="day-title" class="day-list__title">Friday, 16 October</h2>');
+    expect(html).toMatch(/<h2 id="day-title"[^>]*>Friday, 16 October<\/h2>/);
   });
 
   it("says 'No events' for an empty day, and still offers the day", () => {
     const html = list([occurrence("e1", { calendarId: 3 })]);
     expect(html).toContain("No events");
-    expect(html).not.toContain("day-list__event");
+    expect(html).not.toContain("<button");
     expect(html).toContain('href="/almanac/day/2026/10/16"');
     expect(html).toContain(">Open day</a>");
   });
@@ -318,7 +318,7 @@ describe("YearView", () => {
   );
 
   it("draws the twelve months, named by buttons, in the year's order", () => {
-    const names = [...html.matchAll(/<button[^>]*class="year-month__title"[^>]*>([^<]+)<\/button>/g)].map((m) => m[1]);
+    const names = [...html.matchAll(/<button[^>]*>([^<]+)<\/button>/g)].map((m) => m[1]);
     expect(names).toEqual([
       "January",
       "February",

@@ -38,31 +38,42 @@ export function DayList({ date, occurrences, calendars, timeZone, titleId, onOpe
 
   return (
     // Focus lands on the panel, not on a button, as the event details' popover does.
-    <div className="day-list" tabIndex={-1} data-autofocus="">
-      <h2 id={titleId} className="day-list__title">
+    <div className="flex flex-col px-2 pt-3 pb-2 focus:outline-none" tabIndex={-1} data-autofocus="">
+      <h2 id={titleId} className="px-2 pb-2 text-body leading-tight font-medium text-ink">
         {formatDayLong(date)}
       </h2>
       {events.length === 0 ? (
-        <p className="day-list__empty">No events</p>
+        <p className="px-2 pt-1 pb-3 text-meta text-muted">No events</p>
       ) : (
-        <ul className="day-list__events">
+        <ul className="flex flex-col">
           {events.map((occurrence) => (
             <li key={occurrence.id}>
               <button
                 type="button"
-                className="day-list__event"
+                className="flex min-h-8 w-full items-center gap-2.5 rounded-small bg-transparent px-2 py-1 text-left text-meta text-ink transition-[background-color] duration-(--duration-fast) ease-out hover:bg-hover"
                 style={{ "--calendar-color": colors.get(occurrence.calendarId) } as CSSProperties}
                 onClick={() => onOpenDay(date)}
               >
-                <span className="day-list__dot" aria-hidden="true" />
-                <span className="day-list__time">{timeLabel(occurrence, timeZone)}</span>
-                <span className="day-list__name">{displayTitle(occurrence.title)}</span>
+                <span
+                  className="size-search-dot flex-none rounded-pill bg-[var(--calendar-color,var(--color-accent))]"
+                  aria-hidden="true"
+                />
+                <span className="min-w-[52px] flex-none text-ink-2 tabular-nums">
+                  {timeLabel(occurrence, timeZone)}
+                </span>
+                <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
+                  {displayTitle(occurrence.title)}
+                </span>
               </button>
             </li>
           ))}
         </ul>
       )}
-      <a className="day-list__open" href={hrefFor(viewRoute("day", date))} onClick={openDay}>
+      <a
+        className="mt-2 self-start rounded-small px-2 py-1.5 text-meta font-medium text-accent no-underline hover:bg-accent-tint-soft"
+        href={hrefFor(viewRoute("day", date))}
+        onClick={openDay}
+      >
         Open day
       </a>
     </div>

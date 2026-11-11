@@ -12,7 +12,6 @@
 
 @import "tailwindcss";
 @import "./tokens.css" layer(legacy);
-@import "../year/year.css" layer(legacy);
 
 /* Only Almanac's own scales exist: no Tailwind palette, text scale, radii or shadows. */
 @theme {

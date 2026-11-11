@@ -33,7 +33,7 @@ export interface MonthGridProps {
 /** The cell and the day circle are variables, so a container query in the year view can resize them. */
 const GRID: Record<MonthGridProps["size"], string> = {
   mini: "w-[calc(var(--cell)*7)] text-mini [--cell:var(--size-mini-cell)] [--day:var(--size-mini-day)]",
-  year: "w-[calc(var(--cell)*7)] text-label [--cell:var(--size-year-cell)] [--day:var(--size-year-day)]",
+  year: "w-[calc(var(--cell)*7)] text-label @max-[472px]/year:text-meta [--cell:var(--size-year-cell)] [--day:var(--size-year-day)]",
 };
 
 const cellClass = (size: MonthGridProps["size"]) =>

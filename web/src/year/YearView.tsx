@@ -11,6 +11,19 @@ import { Temporal, dateKey, instantRange, monthName, sameDate, visibleRange, typ
 import { DayList } from "./DayList";
 import { markedDays } from "./days";
 
+/**
+ * The columns follow the width of the view, not the window's, so they keep up when the left column is hidden
+ * or shown. A year-size month is 7 x --size-year-cell (224 px) wide; the widths below add the column gap
+ * (24 px) to that: 2 x 224 + 24, 3 x 224 + 2 x 24, 4 x 224 + 3 x 24. A container query can't read a token,
+ * so they are written out. Under 472 px (one column, a phone) the cell is a deliberate override of the
+ * token: the months grow to fill the width, up to 44 px a day, so the days are easy to hit.
+ */
+const MONTHS_CLASS = [
+  "grid grid-cols-[minmax(0,1fr)] justify-items-center gap-x-6 gap-y-5",
+  "@min-[472px]/year:grid-cols-[repeat(2,minmax(0,1fr))] @min-[720px]/year:grid-cols-[repeat(3,minmax(0,1fr))] @min-[968px]/year:grid-cols-[repeat(4,minmax(0,1fr))]",
+  "@max-[472px]/year:[--size-year-cell:min(44px,calc(100cqw/7))] @max-[472px]/year:[--size-year-day:calc(var(--size-year-cell)-4px)]",
+].join(" ");
+
 export interface YearViewProps {
   year: number;
   /** A day was chosen: the shell opens the day view on it. */
@@ -71,8 +84,8 @@ export function YearView({ year, onOpenDay, onOpenMonth }: YearViewProps) {
   };
 
   return (
-    <section ref={rootRef} className="year" aria-label="Year view">
-      <div className="year__months">
+    <section ref={rootRef} className="@container/year px-6 pt-3 pb-4" aria-label="Year view">
+      <div className={MONTHS_CLASS}>
         {Array.from({ length: 12 }, (_, index) => (
           <YearMonth
             key={index}
@@ -85,7 +98,12 @@ export function YearView({ year, onOpenDay, onOpenMonth }: YearViewProps) {
         ))}
       </div>
       {picked && (
-        <Popover anchor={picked.anchor} onClose={() => setPicked(null)} labelledBy={titleId} className="day-popover">
+        <Popover
+          anchor={picked.anchor}
+          onClose={() => setPicked(null)}
+          labelledBy={titleId}
+          className="w-(--width-day-popover)"
+        >
           <DayList
             date={picked.date}
             occurrences={occurrences}
@@ -112,11 +130,11 @@ interface YearMonthProps {
 function YearMonth({ month, today, marked, onPickDay, onOpenMonth }: YearMonthProps) {
   const titleId = useId();
   return (
-    <div className="year-month">
+    <div className="flex w-[calc(var(--size-year-cell)*7)] flex-col gap-1">
       <button
         type="button"
         id={titleId}
-        className="year-month__title"
+        className="h-7 self-stretch rounded-control bg-transparent px-1.5 text-left text-meta font-medium text-ink transition-[background-color] duration-(--duration-fast) ease-out hover:bg-hover"
         onClick={() => onOpenMonth(month.toPlainDate({ day: 1 }))}
       >
         {monthName(month.month)}
