@@ -3,7 +3,7 @@ import { useLogin, useSession, useWardSignIn, type AuthError } from "../../vendo
 import { Button } from "../components/Button";
 import { useIsDesktop } from "../components/viewport";
 import { AlertIcon, AuthField } from "../components/Field";
-import { ERROR_NOTE, ERROR_NOTE_TEXT } from "../components/looks";
+import { ERROR_NOTE, ERROR_NOTE_TEXT, GATE_CLASS } from "../components/looks";
 import { loginMessage, sessionReasonMessage, wardSignInMessage } from "./messages";
 import { wardReturnTo } from "./session";
 
@@ -74,21 +74,23 @@ export function LoginView({
   };
 
   return (
-    <main className="gate" aria-busy={pending || wardPending || undefined}>
-      <div className="gate__column">
-        <header className="gate__head">
-          <h1 className="gate__wordmark">Almanac</h1>
-          <p className="gate__lede">Sign in to your calendar.</p>
+    <main className={GATE_CLASS} aria-busy={pending || wardPending || undefined}>
+      <div className="flex w-full max-w-[380px] flex-col gap-6">
+        <header className="flex flex-col gap-1.5 px-1">
+          <h1 className="text-title leading-tight font-bold tracking-title text-ink max-md:text-title-phone">
+            Almanac
+          </h1>
+          <p className="text-body leading-tight text-muted">Sign in to your calendar.</p>
         </header>
 
         {notice !== null && (
-          <p className="gate__notice" role="status">
+          <p className="rounded-control bg-accent-tint-soft px-3.5 py-3 text-meta leading-tight text-ink" role="status">
             {notice}
           </p>
         )}
 
-        <div className="login__panel">
-          <form className="login__form" onSubmit={submit} noValidate aria-label="Sign in">
+        <div className="flex flex-col gap-[18px] rounded-container border border-hairline bg-surface p-6 max-md:px-4 max-md:py-5">
+          <form className="flex flex-col gap-4" onSubmit={submit} noValidate aria-label="Sign in">
             <AuthField
               ref={usernameRef}
               label="Username"
@@ -126,14 +128,17 @@ export function LoginView({
                 <span className={ERROR_NOTE_TEXT}>{loginMessage(error)}</span>
               </p>
             )}
-            <Button type="submit" variant="primary" size="large" block className="login__submit" disabled={pending}>
+            <Button type="submit" variant="primary" size="large" block className="mt-1" disabled={pending}>
               {pending ? "Signing in…" : "Sign in"}
             </Button>
           </form>
 
           {wardEnabled && (
-            <div className="login__ward">
-              <p className="login__or" aria-hidden="true">
+            <div className="flex flex-col gap-3">
+              <p
+                className="flex items-center gap-3 text-small leading-none text-muted before:h-px before:flex-1 before:bg-divider before:content-[''] after:h-px after:flex-1 after:bg-divider after:content-['']"
+                aria-hidden="true"
+              >
                 or
               </p>
               <Button variant="secondary" pill size="large" block disabled={wardPending} onClick={onWard}>

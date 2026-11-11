@@ -12,7 +12,6 @@
 
 @import "tailwindcss";
 @import "./tokens.css" layer(legacy);
-@import "../auth/auth.css" layer(legacy);
 @import "../account/time-zone.css" layer(legacy);
 @import "../push/notifications.css" layer(legacy);
 @import "../calendars/calendars.css" layer(legacy);

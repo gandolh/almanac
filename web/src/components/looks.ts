@@ -48,3 +48,10 @@ export const DIALOG = {
     "max-md:border-t max-md:border-divider max-md:px-gutter-phone max-md:pt-3 max-md:pb-[max(12px,env(safe-area-inset-bottom))]",
   ].join(" "),
 } as const;
+
+/**
+ * Pinned to the top, not centred: an error appearing must not move the form
+ * under the pointer. Outside the shell, so the phone/desktop split is the media query.
+ */
+export const GATE_CLASS =
+  "grid min-h-dvh items-start justify-items-center bg-ground px-gutter-phone pt-[max(14vh,64px)] pb-12 max-md:pt-[calc(env(safe-area-inset-top)+max(7vh,80px))] max-md:leading-phone";

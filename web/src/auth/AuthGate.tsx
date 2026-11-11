@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from "react";
 import { useSession } from "../../vendor/ward/ward-auth-react.js";
 import { Button } from "../components/Button";
+import { GATE_CLASS } from "../components/looks";
 import { LOGIN, navigate, useMatchedRoute } from "../router";
 import { LoginPage } from "./LoginPage";
 import { afterSignIn, forgetReturnPath, rememberReturnPath } from "./session";
@@ -63,20 +64,22 @@ export interface GateScreenProps {
 /** What the gate shows instead of the app or the login page. Pure, so a test can render it. */
 export function GateScreen({ state, onRetry }: GateScreenProps) {
   return (
-    <main className="gate" aria-busy={state === "loading" || undefined}>
-      <div className="gate__column">
-        <header className="gate__head">
-          <h1 className="gate__wordmark">Almanac</h1>
+    <main className={GATE_CLASS} aria-busy={state === "loading" || undefined}>
+      <div className="flex w-full max-w-[380px] flex-col gap-6">
+        <header className="flex flex-col gap-1.5 px-1">
+          <h1 className="text-title leading-tight font-bold tracking-title text-ink max-md:text-title-phone">
+            Almanac
+          </h1>
           {state === "loading" ? (
-            <p className="gate__wait">Loading…</p>
+            <p className="animate-gate-wait-in text-meta text-muted">Loading…</p>
           ) : (
-            <p className="gate__lede" role="alert">
+            <p className="text-body leading-tight text-muted" role="alert">
               Almanac can't be reached. Check your connection and try again.
             </p>
           )}
         </header>
         {state === "unreachable" && (
-          <div className="gate__actions">
+          <div className="flex flex-wrap gap-3">
             <Button variant="secondary" pill onClick={onRetry}>
               Try again
             </Button>
