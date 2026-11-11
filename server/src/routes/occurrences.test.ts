@@ -100,7 +100,7 @@ describe("GET /api/occurrences", () => {
     const bad = async (query: string) => {
       const res = await t.inject({ method: "GET", url: `/api/occurrences?${query}` });
       expect(res.statusCode, query).toBe(400);
-      return (res.json() as { error: { code: string; message: string } }).error;
+      return res.json<{ error: { code: string; message: string } }>().error;
     };
     expect(await bad("from=2026-10-16T00:00:00Z")).toMatchObject({ code: "validation" });
     expect(await bad("from=2026-10-16&to=2026-10-17")).toMatchObject({ code: "validation" });

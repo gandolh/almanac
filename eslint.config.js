@@ -1,15 +1,27 @@
-import js from "@eslint/js";
-import reactHooks from "eslint-plugin-react-hooks";
-import tseslint from "typescript-eslint";
+import { houseStyle } from "./vendor/house-style/eslint.config.js";
 
-export default tseslint.config(
-  { ignores: ["**/dist/**", "**/dev-dist/**", "**/node_modules/**", "data/**", "**/vendor/**"] },
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
+/**
+ * The house config from the vendored house-style copy, given Almanac's folders. Thin on purpose: the
+ * compiler is the first gate, and the house adds only what it cannot see. The rules and the reason
+ * for each are in the copy.
+ */
+export default [
+  ...houseStyle({
+    root: import.meta.dirname,
+    web: "web/src",
+    server: "server/src",
+    // The docs capture helper, run by hand: it prints and reads the environment directly.
+    scripts: ["scripts", "docs/images"],
+    // Allowed to print: the server entry logs before its logger exists, and the seed and key CLIs talk
+    // to the person running them.
+    console: ["server/src/index.ts", "server/src/seed.ts", "server/src/vapid-keys.ts"],
+    ignores: ["data/**"],
+  }),
   {
-    files: ["web/src/**/*.{ts,tsx}"],
-    plugins: { "react-hooks": reactHooks },
-    rules: reactHooks.configs.recommended.rules,
+    // `expectError` is the tests' own assertion helper, so a test that calls it asserts.
+    name: "almanac/expect-helpers",
+    files: ["**/*.test.{ts,tsx}"],
+    rules: { "vitest/expect-expect": ["error", { assertFunctionNames: ["expect", "expectError"] }] },
   },
   {
     // The push-only service worker: plain JavaScript, run as a classic worker script.
@@ -17,11 +29,10 @@ export default tseslint.config(
     languageOptions: { sourceType: "script", globals: { self: "readonly", URL: "readonly" } },
   },
   {
-    rules: {
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        { argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" },
-      ],
-    },
+    // A warning for now (2026-11-11): these files still read the environment themselves. When the
+    // server takes its settings from config.ts, this block goes and the rule is an error again.
+    name: "almanac/process-env-warns",
+    files: ["server/src/index.ts", "server/src/seed.ts", "server/src/vapid-keys.ts"],
+    rules: { "n/no-process-env": "warn" },
   },
-);
+];

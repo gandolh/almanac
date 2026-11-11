@@ -13,7 +13,6 @@
 // current week, so the month, week and year views look lived-in on any day
 // you run it. Times are wall-clock times in the display zone, Europe/Bucharest.
 // To start over, stop the server and delete the scratch folder.
-/* global process, console, fetch */
 
 const api = process.argv[2] ?? "http://127.0.0.1:8809";
 const { ALMANAC_USER: username, ALMANAC_PASSWORD: password } = process.env;

@@ -125,7 +125,7 @@ describe("GET /api/search", () => {
     for (const url of ["/api/search", "/api/search?q=", "/api/search?q=%20%20", `/api/search?q=${"x".repeat(101)}`]) {
       const res = await t.inject({ method: "GET", url });
       expect(res.statusCode, url).toBe(400);
-      expect((res.json() as { error: { code: string } }).error.code).toBe("validation");
+      expect(res.json<{ error: { code: string } }>().error.code).toBe("validation");
     }
   });
 

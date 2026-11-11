@@ -24,7 +24,7 @@ type Response = Awaited<ReturnType<SignedInTestApp["inject"]>>;
 
 function expectError(res: Response, status: number, code: string): string {
   expect(res.statusCode).toBe(status);
-  const body = res.json() as { error: { code: string; message: string } };
+  const body = res.json<{ error: { code: string; message: string } }>();
   expect(Object.keys(body)).toEqual(["error"]);
   expect(body.error.code).toBe(code);
   expect(typeof body.error.message).toBe("string");
@@ -134,7 +134,7 @@ describe("DELETE /api/calendars/:id", () => {
       },
     });
     expect(event.statusCode).toBe(201);
-    const eventId = (event.json() as { eventId: number }).eventId;
+    const eventId = event.json<{ eventId: number }>().eventId;
 
     const res = await t.inject({ method: "DELETE", url: `/api/calendars/${work.id}` });
     expect(res.statusCode).toBe(204);

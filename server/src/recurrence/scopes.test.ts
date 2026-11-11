@@ -27,7 +27,7 @@ type Response = Awaited<ReturnType<SignedInTestApp["inject"]>>;
 
 function expectError(res: Response, status: number, code: string): string {
   expect(res.statusCode, res.body).toBe(status);
-  const body = res.json() as { error: { code: string; message: string } };
+  const body = res.json<{ error: { code: string; message: string } }>();
   expect(body.error.code).toBe(code);
   return body.error.message;
 }

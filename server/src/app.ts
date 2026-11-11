@@ -175,7 +175,7 @@ export async function buildApp(config: Config, options: BuildAppOptions = {}): P
       done(null, undefined);
       return;
     }
-    parseJson(request, body as string, done);
+    void parseJson(request, body as string, done);
   });
 
   registerErrorHandling(app);

@@ -171,11 +171,14 @@ describe("a weekly series", () => {
     repeat: { freq: "weekly", end: { type: "never" } },
     reminderMinutes: 15,
   };
-  const dues = [at("2026-10-19T06:45:00Z"), at("2026-10-26T07:45:00Z"), at("2026-11-02T07:45:00Z")];
+  const firstDue = at("2026-10-19T06:45:00Z");
+  const secondDue = at("2026-10-26T07:45:00Z");
+  const thirdDue = at("2026-11-02T07:45:00Z");
+  const dues = [firstDue, secondDue, thirdDue];
 
   it("sends once per occurrence, at the same wall-clock time either side of the clock change", async () => {
     await create(standup);
-    clock = dues[0]! - 20 * MINUTE;
+    clock = firstDue - 20 * MINUTE;
     const reminders = start();
     for (const due of dues) await tickAt(reminders, due - 5 * MINUTE, due, due + MINUTE, due + 5 * MINUTE);
     expect(titles()).toEqual(["Standup, 10:00", "Standup, 10:00", "Standup, 10:00"]);
@@ -198,10 +201,10 @@ describe("a weekly series", () => {
       occurrence: "2026-11-02T08:00:00Z",
       changes: { reminderMinutes: null },
     });
-    clock = dues[0]! - 20 * MINUTE;
+    clock = firstDue - 20 * MINUTE;
     const reminders = start();
     const ownDue = at("2026-10-26T07:00:00Z");
-    for (const due of [dues[0]!, ownDue, dues[1]!, dues[2]!])
+    for (const due of [firstDue, ownDue, secondDue, thirdDue])
       await tickAt(reminders, due - 5 * MINUTE, due, due + 5 * MINUTE);
     expect(sent.map((each) => each.payload.tag.split(":").slice(2).join(":"))).toEqual([
       "2026-10-19T07:00:00Z",
@@ -216,9 +219,9 @@ describe("a weekly series", () => {
       occurrence: "2026-10-26T08:00:00Z",
       changes: { start: "2026-10-27T16:00:00+02:00", end: "2026-10-27T16:30:00+02:00" },
     });
-    clock = dues[1]! - 20 * MINUTE;
+    clock = secondDue - 20 * MINUTE;
     const reminders = start();
-    await tickAt(reminders, dues[1]! - 5 * MINUTE, dues[1]!, dues[1]! + 5 * MINUTE);
+    await tickAt(reminders, secondDue - 5 * MINUTE, secondDue, secondDue + 5 * MINUTE);
     expect(sent).toEqual([]);
     const moved = at("2026-10-27T13:45:00Z");
     await tickAt(reminders, moved - 5 * MINUTE, moved, moved + 5 * MINUTE);

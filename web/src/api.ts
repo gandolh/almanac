@@ -154,7 +154,7 @@ async function failure(response: Response): Promise<ApiError> {
 
 function isErrorBody(body: unknown): body is { error: { code: string; message: string } } {
   if (typeof body !== "object" || body === null || !("error" in body)) return false;
-  const error = (body as { error: unknown }).error;
+  const error = body.error;
   return (
     typeof error === "object" &&
     error !== null &&

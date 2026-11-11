@@ -45,7 +45,7 @@ describe("/api/settings", () => {
     ]) {
       const res = await t.inject({ method: "PATCH", url: "/api/settings", payload });
       expect(res.statusCode, JSON.stringify(payload)).toBe(400);
-      expect((res.json() as { error: { code: string; message: string } }).error).toMatchObject({ code: "validation" });
+      expect(res.json<{ error: { code: string; message: string } }>().error).toMatchObject({ code: "validation" });
     }
     expect((await t.inject({ method: "GET", url: "/api/settings" })).json()).toEqual({ timeZone: "Europe/Bucharest" });
   });

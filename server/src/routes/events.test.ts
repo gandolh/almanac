@@ -26,7 +26,7 @@ type Response = Awaited<ReturnType<SignedInTestApp["inject"]>>;
 
 function expectError(res: Response, status: number, code: string): string {
   expect(res.statusCode).toBe(status);
-  const body = res.json() as { error: { code: string; message: string } };
+  const body = res.json<{ error: { code: string; message: string } }>();
   expect(body.error.code).toBe(code);
   return body.error.message;
 }
@@ -257,7 +257,7 @@ describe("PATCH /api/events/:id", () => {
   it("moves an event to another of the user's calendars, never to someone else's", async () => {
     const event = await create(standup());
     const work = await t.inject({ method: "POST", url: "/api/calendars", payload: { name: "Work" } });
-    const workId = (work.json() as { id: number }).id;
+    const workId = work.json<{ id: number }>().id;
     const moved = await t.inject({
       method: "PATCH",
       url: `/api/events/${event.eventId}`,
@@ -327,7 +327,7 @@ describe("PATCH /api/events/:id", () => {
       method: "GET",
       url: "/api/occurrences?from=2026-11-02T00:00:00Z&to=2026-11-09T00:00:00Z",
     });
-    expect((after.json() as { occurrences: Occurrence[] }).occurrences.map((o) => o.start)).toEqual([
+    expect(after.json<{ occurrences: Occurrence[] }>().occurrences.map((o) => o.start)).toEqual([
       "2026-11-06T03:00:00Z",
     ]);
   });
@@ -397,7 +397,7 @@ describe("reminders", () => {
     const to = encodeURIComponent("2026-11-01T00:00:00+02:00");
     const res = await t.inject({ method: "GET", url: `/api/occurrences?from=${from}&to=${to}` });
     expect(res.statusCode).toBe(200);
-    return (res.json() as { occurrences: Occurrence[] }).occurrences.map((o) => occurrenceSchema.parse(o));
+    return res.json<{ occurrences: Occurrence[] }>().occurrences.map((o) => occurrenceSchema.parse(o));
   }
 
   const edit = (id: number, payload: object) => t.inject({ method: "PATCH", url: `/api/events/${id}`, payload });

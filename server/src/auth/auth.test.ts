@@ -117,7 +117,7 @@ describe("the guard", () => {
         url,
         payload: method === "GET" || method === "DELETE" ? undefined : {},
       });
-      expect({ route, status: res.statusCode, body: res.json() as unknown }).toEqual({
+      expect({ route, status: res.statusCode, body: res.json<unknown>() }).toEqual({
         route,
         status: 401,
         body: { error: "unauthorized" },

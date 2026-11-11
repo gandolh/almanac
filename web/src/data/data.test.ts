@@ -57,7 +57,7 @@ function fakeSource(initial: Calendar[]) {
       }
       const row = rows.find((c) => c.id === id);
       if (!row) throw new ApiError(404, "not_found", "No such calendar.");
-      const saved = { ...row, ...patch, updatedAt: "2026-10-16T10:00:00Z" } as Calendar;
+      const saved = { ...row, ...patch, updatedAt: "2026-10-16T10:00:00Z" };
       rows = rows.map((c) => (c.id === id ? saved : c));
       return saved;
     }),
