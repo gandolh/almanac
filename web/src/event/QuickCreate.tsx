@@ -18,6 +18,7 @@ import {
 import { CalendarSelect } from "./EventForm";
 import { whenText } from "./occurrence-text";
 import { ICON_BUTTON } from "../components/looks";
+import { ERROR, TITLE } from "./looks";
 
 /**
  * Quick create (glossary: quick create), Google's small popover beside a
@@ -40,8 +41,11 @@ export interface QuickCreateProps {
   onMoreOptions: (seed: FormSeed) => void;
 }
 
-/** Quick create's icons: 20 px, in the column editor.css keeps for them. */
+/** Quick create's icons: 20 px, in the 20 px column the rows keep for them. */
 const ICON = 20;
+
+const ROW_CLASS = "m-0 flex items-center gap-3 text-meta leading-body text-ink";
+const LEAD_CLASS = "flex w-5 flex-none justify-center text-ink-2";
 
 export function QuickCreate(props: QuickCreateProps) {
   return (
@@ -50,7 +54,7 @@ export function QuickCreate(props: QuickCreateProps) {
       onClose={props.onClose}
       placement="side"
       label="New event"
-      className="quick-create"
+      className="w-(--width-popover)"
     >
       <QuickCreateForm {...props} />
     </Popover>
@@ -105,8 +109,8 @@ export function QuickCreateForm({ init, onClose, onSaved, onMoreOptions }: Quick
   };
 
   return (
-    <form className="quick-create__form" onSubmit={onSubmit} noValidate>
-      <div className="quick-create__head">
+    <form className="flex flex-col gap-3 px-5 pt-1 pb-4" onSubmit={onSubmit} noValidate>
+      <div className="-mx-3 flex justify-end">
         <button type="button" className={ICON_BUTTON} aria-label="Close" title="Close" onClick={onClose}>
           <CloseIcon size={ICON} />
         </button>
@@ -114,7 +118,7 @@ export function QuickCreateForm({ init, onClose, onSaved, onMoreOptions }: Quick
       <input
         ref={titleRef}
         type="text"
-        className="editor-title"
+        className={TITLE}
         aria-label="Title"
         placeholder="Add title"
         value={title}
@@ -123,24 +127,24 @@ export function QuickCreateForm({ init, onClose, onSaved, onMoreOptions }: Quick
         data-autofocus=""
         onChange={(event) => setTitle(event.target.value)}
       />
-      <p className="quick-create__row">
-        <span className="quick-create__lead">
+      <p className={ROW_CLASS}>
+        <span className={LEAD_CLASS}>
           <ClockIcon size={ICON} />
         </span>
         <span>{whenText({ allDay: init.allDay, start: init.start, end: init.end }, timeZone)}</span>
       </p>
-      <div className="quick-create__row">
-        <span className="quick-create__lead">
+      <div className={ROW_CLASS}>
+        <span className={LEAD_CLASS}>
           <CalendarIcon size={ICON} />
         </span>
         <CalendarSelect calendars={calendars} value={calendarId} onChange={setChosen} />
       </div>
       {failure !== null && (
-        <p id={failureId} className="editor-error" role="alert">
+        <p id={failureId} className={ERROR} role="alert">
           {failure}
         </p>
       )}
-      <div className="quick-create__actions">
+      <div className="flex items-center justify-end gap-2">
         <Button
           variant="quiet"
           onClick={() => onMoreOptions({ start: init.start, end: init.end, allDay: init.allDay, title, calendarId })}

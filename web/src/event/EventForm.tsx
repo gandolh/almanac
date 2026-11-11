@@ -52,6 +52,8 @@ import {
 import { RepeatPicker } from "./RepeatPicker";
 import { askScope } from "./scope";
 import { TimeField } from "./TimeField";
+import { cn } from "../lib/cn";
+import { CHECK, CHECK_BOX, ERROR, INPUT, NOTES, SELECT_CALENDAR, SELECT_WIDE, TITLE } from "./looks";
 
 /**
  * The event form (glossary: event form), Google's full editor: a dialog,
@@ -214,13 +216,7 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
       footer={
         <>
           {occurrence && (
-            <Button
-              id={deleteId}
-              variant="quiet"
-              className="event-form__delete"
-              onClick={() => void remove()}
-              disabled={busy}
-            >
+            <Button id={deleteId} variant="quiet" className="me-auto" onClick={() => void remove()} disabled={busy}>
               Delete
             </Button>
           )}
@@ -233,10 +229,10 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
         </>
       }
     >
-      <form id={formId} ref={formRef} className="event-form" onSubmit={onSubmit} noValidate>
+      <form id={formId} ref={formRef} className="flex flex-col gap-4" onSubmit={onSubmit} noValidate>
         <input
           type="text"
-          className="editor-title"
+          className={TITLE}
           aria-label="Title"
           placeholder="Add title"
           value={draft.title}
@@ -247,10 +243,10 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
         />
 
         <Row icon={<ClockIcon size={ICON} />} label="When">
-          <div className="editor-when">
+          <div className="flex flex-wrap items-center gap-2 max-md:grid max-md:grid-cols-[minmax(0,1fr)_var(--width-time-field)]">
             <input
               type="date"
-              className="editor-input editor-date editor-when__start-date"
+              className={cn(INPUT, DATE, "max-md:col-start-1 max-md:row-start-1")}
               aria-label="Start date"
               aria-invalid={shown.start !== undefined || undefined}
               aria-describedby={whenError ? whenErrorId : undefined}
@@ -258,7 +254,7 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
               onChange={(event) => setDraft((current) => withStart(current, { startDate: event.target.value }))}
             />
             {!draft.allDay && (
-              <div className="editor-when__start-time">
+              <div className="max-md:col-start-2 max-md:row-start-1">
                 <TimeField
                   label="Start time"
                   value={draft.startTime}
@@ -268,11 +264,11 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
                 />
               </div>
             )}
-            <span className="editor-when__dash" aria-hidden="true">
+            <span className="text-ink-2 max-md:hidden" aria-hidden="true">
               –
             </span>
             {!draft.allDay && (
-              <div className="editor-when__end-time">
+              <div className="max-md:col-start-2 max-md:row-start-2">
                 <TimeField
                   label="End time"
                   value={draft.endTime}
@@ -285,7 +281,7 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
             )}
             <input
               type="date"
-              className="editor-input editor-date editor-when__end-date"
+              className={cn(INPUT, DATE, "max-md:col-start-1 max-md:row-start-2")}
               aria-label="End date"
               aria-invalid={shown.end !== undefined || undefined}
               aria-describedby={whenError ? whenErrorId : undefined}
@@ -293,16 +289,17 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
               onChange={(event) => setDraft((current) => withEnd(current, { endDate: event.target.value }))}
             />
           </div>
-          <label className="editor-check">
+          <label className={CHECK}>
             <input
               type="checkbox"
+              className={CHECK_BOX}
               checked={draft.allDay}
               onChange={(event) => setDraft((current) => withAllDay(current, event.target.checked))}
             />
             <span>All day</span>
           </label>
           {whenError && (
-            <p id={whenErrorId} className="editor-error" role="alert">
+            <p id={whenErrorId} className={ERROR} role="alert">
               {whenError}
             </p>
           )}
@@ -310,7 +307,7 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
 
         <Row icon={<BellIcon size={ICON} />} label="Reminder">
           <select
-            className="editor-input editor-select editor-reminder"
+            className={SELECT_WIDE}
             aria-label="Reminder"
             value={reminderValue(draft.reminderMinutes)}
             onChange={(event) =>
@@ -348,7 +345,7 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
         <Row icon={<PlaceIcon size={ICON} />} label="Location">
           <input
             type="text"
-            className="editor-input"
+            className={INPUT}
             aria-label="Location"
             placeholder="Add location"
             value={draft.location}
@@ -360,7 +357,7 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
 
         <Row icon={<NotesIcon size={ICON} />} label="Notes">
           <textarea
-            className="editor-input editor-notes"
+            className={NOTES}
             aria-label="Notes"
             placeholder="Add notes"
             rows={4}
@@ -371,12 +368,12 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
         </Row>
 
         {failure !== null && place === "general" && (
-          <p ref={showError} className="editor-error editor-error--form" role="alert">
+          <p ref={showError} className={cn(ERROR, "ps-editor-lead max-md:ps-9")} role="alert">
             {failure}
           </p>
         )}
         {deleteFailure !== null && (
-          <p ref={showError} className="editor-error editor-error--form" role="alert">
+          <p ref={showError} className={cn(ERROR, "ps-editor-lead max-md:ps-9")} role="alert">
             {deleteFailure}
           </p>
         )}
@@ -385,22 +382,25 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
   );
 }
 
-/** The rows' icons: 20 px, in the column editor.css keeps for them. */
+/** The rows' icons: 20 px, in the column the rows keep for them (44 px, 36 on a phone). */
 const ICON = 20;
 
 function Row({ icon, label, children }: { icon: ReactNode; label: string; children: ReactNode }) {
   return (
-    <div className="editor-row">
-      <span className="editor-row__lead">
+    <div className="grid grid-cols-[var(--spacing-editor-lead)_minmax(0,1fr)] items-start max-md:grid-cols-[36px_minmax(0,1fr)]">
+      <span className="flex pt-[calc((var(--height-editor-field)-20px)/2)] text-ink-2 max-md:pt-[calc((var(--size-touch)-20px)/2)]">
         {icon}
         <span className="sr-only">{label}</span>
       </span>
-      <div className="editor-row__body">{children}</div>
+      <div className="flex min-w-0 flex-col gap-2">{children}</div>
     </div>
   );
 }
 
 // --- The calendar picker (quick create has it too) -------------------------------------------------
+
+/** The date fields beside their times: a fixed width on the desktop, the column on a phone. */
+const DATE = "w-date-field max-md:w-full";
 
 export interface CalendarSelectProps {
   calendars: readonly Calendar[];
@@ -415,10 +415,14 @@ export function CalendarSelect({ calendars, value, onChange, label = "Calendar" 
   const current = calendars.find((calendar) => calendar.id === value);
   const swatch = current ? ({ "--calendar-color": calendarColor(current) } as CSSProperties) : undefined;
   return (
-    <div className="calendar-select">
-      <span className="calendar-select__swatch" style={swatch} aria-hidden="true" />
+    <div className="flex min-w-0 items-center gap-2.5">
+      <span
+        className="size-swatch flex-none rounded-small bg-[var(--calendar-color,var(--color-accent))]"
+        style={swatch}
+        aria-hidden="true"
+      />
       <select
-        className="editor-input editor-select"
+        className={SELECT_CALENDAR}
         aria-label={label}
         value={value ?? ""}
         disabled={calendars.length === 0}

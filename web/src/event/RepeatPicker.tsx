@@ -11,6 +11,8 @@ import {
   type RepeatEndKind,
   type RepeatPreset,
 } from "./editor-state";
+import { cn } from "../lib/cn";
+import { ERROR, HINT, INPUT, SELECT, SELECT_WIDE } from "./looks";
 
 /**
  * How an event repeats (glossary: series), Google's way: a list of presets
@@ -42,9 +44,9 @@ export function RepeatPicker({ repeat, labelDate, startDate, timeZone, summary, 
   const detail = summary && (repeat.preset === "custom" || repeat.end !== "never") ? summary : null;
   const note = error ?? detail;
   return (
-    <div className="repeat-picker">
+    <div className="flex flex-col gap-2">
       <select
-        className="editor-input editor-select"
+        className={SELECT_WIDE}
         aria-label="Repeat"
         aria-describedby={note ? noteId : undefined}
         value={repeat.preset}
@@ -61,7 +63,7 @@ export function RepeatPicker({ repeat, labelDate, startDate, timeZone, summary, 
         <ToggleGroup<Weekday>
           multiple
           label="Repeat on"
-          className="repeat-picker__days"
+          className="flex flex-wrap gap-1"
           value={repeat.days}
           onValueChange={(days) => {
             // Base UI says which days are pressed now; `toggleDay` keeps the week order and the last day.
@@ -73,7 +75,7 @@ export function RepeatPicker({ repeat, labelDate, startDate, timeZone, summary, 
             <ToggleItem
               key={day}
               value={day}
-              className="repeat-picker__day"
+              className="flex size-day-toggle items-center justify-center rounded-pill bg-field p-0 text-label font-semibold text-ink-2 hover:bg-control-hover data-pressed:bg-accent data-pressed:text-on-accent data-pressed:hover:bg-accent"
               aria-label={WEEKDAY_NAMES[index]}
               title={WEEKDAY_NAMES[index]}
             >
@@ -84,10 +86,10 @@ export function RepeatPicker({ repeat, labelDate, startDate, timeZone, summary, 
       )}
 
       {repeating && (
-        <div className="repeat-picker__end">
-          <span className="repeat-picker__end-label">Ends</span>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-meta text-ink-2">Ends</span>
           <select
-            className="editor-input editor-select repeat-picker__end-kind"
+            className={cn(SELECT, "w-24")}
             aria-label="Repeat ends"
             value={repeat.end}
             onChange={(event) => onChange(chooseEnd(repeat, event.target.value as RepeatEndKind, startDate))}
@@ -101,7 +103,7 @@ export function RepeatPicker({ repeat, labelDate, startDate, timeZone, summary, 
           {repeat.end === "until" && (
             <input
               type="date"
-              className="editor-input editor-date"
+              className={cn(INPUT, "w-date-field")}
               aria-label="Repeat ends on"
               aria-invalid={error !== undefined || undefined}
               value={repeat.until}
@@ -112,7 +114,7 @@ export function RepeatPicker({ repeat, labelDate, startDate, timeZone, summary, 
             <>
               <input
                 type="number"
-                className="editor-input editor-count"
+                className={cn(INPUT, "w-count-field")}
                 aria-label="Number of occurrences"
                 aria-invalid={error !== undefined || undefined}
                 min={1}
@@ -122,7 +124,7 @@ export function RepeatPicker({ repeat, labelDate, startDate, timeZone, summary, 
                 value={repeat.count}
                 onChange={(event) => onChange({ ...repeat, count: event.target.value })}
               />
-              <span className="repeat-picker__times" aria-hidden="true">
+              <span className="text-meta text-ink-2" aria-hidden="true">
                 occurrences
               </span>
             </>
@@ -131,7 +133,7 @@ export function RepeatPicker({ repeat, labelDate, startDate, timeZone, summary, 
       )}
 
       {note !== null && (
-        <p id={noteId} className={error ? "editor-error" : "editor-hint"} role={error ? "alert" : undefined}>
+        <p id={noteId} className={error ? ERROR : HINT} role={error ? "alert" : undefined}>
           {note}
         </p>
       )}

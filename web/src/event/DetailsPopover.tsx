@@ -19,8 +19,13 @@ import { ICON_BUTTON } from "../components/looks";
  * clickable) and which calendar it is on. Esc or a press outside closes it.
  */
 
-/** The popover's icons: 20 px, in the column details.css keeps for them. */
+/** The popover's icons: 20 px, in the 52 px column the rows keep for them. */
 const ICON = 20;
+
+/** A row: the icon (or the calendar's colour square) in a fixed column, the text beside it. */
+const ROW_CLASS = "grid grid-cols-[52px_minmax(0,1fr)] items-start pe-5 text-ink-2";
+/** Links in a location or in notes underline a little further out than the page's default. */
+const TEXT_CLASS = "text-meta leading-body wrap-anywhere text-ink [&_a]:underline-offset-2";
 
 export interface DetailsPopoverProps {
   occurrence: Occurrence;
@@ -37,7 +42,7 @@ export function DetailsPopover({ occurrence, anchor, onClose }: DetailsPopoverPr
   const titleId = useId();
   const calendar = calendars.find((each) => each.id === occurrence.calendarId) ?? null;
   return (
-    <Popover anchor={anchor} onClose={onClose} placement="side" labelledBy={titleId} className="details-popover">
+    <Popover anchor={anchor} onClose={onClose} placement="side" labelledBy={titleId} className="w-(--width-popover)">
       <EventDetails
         occurrence={occurrence}
         calendar={calendar}
@@ -92,8 +97,8 @@ export function EventDetails({
   const swatch = calendar ? ({ "--calendar-color": calendarColor(calendar) } as CSSProperties) : undefined;
   return (
     // Focus lands on the details, not on Edit, as Google's popover does.
-    <div className="details" tabIndex={-1} data-autofocus="">
-      <div className="details__actions">
+    <div className="flex flex-col gap-3 px-2 pt-2 pb-5 focus:outline-none" tabIndex={-1} data-autofocus="">
+      <div className="flex justify-end gap-0.5">
         <button type="button" className={ICON_BUTTON} aria-label="Edit event" title="Edit event" onClick={onEdit}>
           <EditIcon size={ICON} />
         </button>
@@ -104,32 +109,36 @@ export function EventDetails({
           <CloseIcon size={ICON} />
         </button>
       </div>
-      <div className="details__row details__row--head">
-        <span className="details__lead">
-          <span className="details__swatch" style={swatch} aria-hidden="true" />
+      <div className={ROW_CLASS}>
+        <span className="flex justify-center pt-[7px]">
+          <span
+            className="size-swatch rounded-small bg-[var(--calendar-color,var(--color-accent))]"
+            style={swatch}
+            aria-hidden="true"
+          />
         </span>
-        <div className="details__body">
-          <h2 id={titleId} className="details__title">
+        <div className="min-w-0">
+          <h2 id={titleId} className="text-range leading-[1.3] font-regular wrap-anywhere text-ink">
             {displayTitle(occurrence.title)}
           </h2>
-          <p className="details__when">{whenText(occurrence, timeZone)}</p>
-          {repeat && <p className="details__repeat">{repeat}</p>}
-          {reminder && <p className="details__repeat">{reminder}</p>}
+          <p className="mt-1 text-meta leading-body text-ink">{whenText(occurrence, timeZone)}</p>
+          {repeat && <p className="text-meta leading-body">{repeat}</p>}
+          {reminder && <p className="text-meta leading-body">{reminder}</p>}
         </div>
       </div>
       {occurrence.location.trim() !== "" && (
         <DetailRow icon={<PlaceIcon size={ICON} />} label="Location">
-          <p className="details__text">{linkify(occurrence.location)}</p>
+          <p className={TEXT_CLASS}>{linkify(occurrence.location)}</p>
         </DetailRow>
       )}
       {occurrence.notes.trim() !== "" && (
         <DetailRow icon={<NotesIcon size={ICON} />} label="Notes">
-          <p className="details__text details__notes">{linkify(occurrence.notes)}</p>
+          <p className={`${TEXT_CLASS} whitespace-pre-wrap`}>{linkify(occurrence.notes)}</p>
         </DetailRow>
       )}
       {calendar && (
         <DetailRow icon={<CalendarIcon size={ICON} />} label="Calendar">
-          <p className="details__text">{calendar.name}</p>
+          <p className={TEXT_CLASS}>{calendar.name}</p>
         </DetailRow>
       )}
     </div>
@@ -138,12 +147,12 @@ export function EventDetails({
 
 function DetailRow({ icon, label, children }: { icon: ReactNode; label: string; children: ReactNode }) {
   return (
-    <div className="details__row">
-      <span className="details__lead">
+    <div className={ROW_CLASS}>
+      <span className="flex justify-center pt-px">
         {icon}
         <span className="sr-only">{label}</span>
       </span>
-      <div className="details__body">{children}</div>
+      <div className="min-w-0">{children}</div>
     </div>
   );
 }

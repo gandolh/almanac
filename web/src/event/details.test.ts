@@ -90,14 +90,14 @@ describe("EventDetails", () => {
 
   it("shows the title, the time, the calendar and the actions", () => {
     const html = details();
-    expect(html).toContain('<h2 id="title" class="details__title">Standup</h2>');
+    expect(html).toMatch(/<h2 id="title"[^>]*>Standup<\/h2>/);
     expect(html).toContain("Friday, 16 October · 10:00 – 11:00");
     expect(html).toContain('style="--calendar-color:#009688"');
-    expect(html).toContain('<p class="details__text">Work</p>');
+    expect(html).toMatch(/<p[^>]*>Work<\/p>/);
     for (const label of ["Edit event", "Delete event", "Close"]) expect(html).toContain(`aria-label="${label}"`);
     // Every icon at 20 px, the size details.css lays the rows out for.
     expect(html.match(/<svg width="(\d+)"/g)).toEqual(Array(4).fill('<svg width="20"'));
-    expect(html).not.toContain("details__repeat");
+    expect(html).not.toContain("Weekly");
     expect(html).not.toContain("Location");
   });
 
@@ -112,9 +112,7 @@ describe("EventDetails", () => {
       end: "2026-10-20T08:00:00Z",
       repeat: { freq: "weekly", byDay: ["MO", "WE"], end: { type: "until", date: "2026-12-01" } },
     };
-    expect(details({ occurrence })).toContain(
-      '<p class="details__repeat">Weekly on Monday, Wednesday, until 1 Dec 2026</p>',
-    );
+    expect(details({ occurrence })).toMatch(/<p[^>]*>Weekly on Monday, Wednesday, until 1 Dec 2026<\/p>/);
   });
 
   it("makes links in the location and notes clickable and keeps the notes' lines", () => {
@@ -126,17 +124,17 @@ describe("EventDetails", () => {
       },
     });
     expect(html).toContain(
-      '<p class="details__text"><a href="https://meet.example.com/abc" target="_blank" rel="noopener noreferrer">https://meet.example.com/abc</a></p>',
+      '><a href="https://meet.example.com/abc" target="_blank" rel="noopener noreferrer">https://meet.example.com/abc</a></p>',
     );
     expect(html).toContain(
-      '<p class="details__text details__notes">Agenda:\n&lt;b&gt;<a href="https://example.com/doc" target="_blank" rel="noopener noreferrer">https://example.com/doc</a>&lt;/b&gt;</p>',
+      '>Agenda:\n&lt;b&gt;<a href="https://example.com/doc" target="_blank" rel="noopener noreferrer">https://example.com/doc</a>&lt;/b&gt;</p>',
     );
   });
 
   it("writes an empty title as Google does, and leaves out a calendar not yet loaded", () => {
     const html = details({ occurrence: { ...standup, title: "" }, calendar: null });
     expect(html).toContain("(No title)");
-    expect(html).not.toContain("--calendar-color");
+    expect(html).not.toContain("--calendar-color:");
     expect(html).not.toContain(">Calendar<");
   });
 });

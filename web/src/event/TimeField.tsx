@@ -1,6 +1,8 @@
 import { useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import { parseTimeText, type TimeOption } from "./editor-state";
 import { placeTimeList, roomAround } from "./time-list";
+import { cn } from "../lib/cn";
+import { INPUT } from "./looks";
 
 /**
  * A time of day, 24-hour always: type "14:30" or "1430", or pick from a
@@ -143,11 +145,11 @@ export function TimeField({ value, options: getOptions, onChange, label, invalid
 
   const activeId = open && active >= 0 ? `${listId}-${active}` : undefined;
   return (
-    <div ref={fieldRef} className="time-field">
+    <div ref={fieldRef} className="relative w-time-field">
       <input
         type="text"
         role="combobox"
-        className="editor-input time-field__input"
+        className={cn(INPUT, "text-center tabular-nums")}
         value={typed ?? value}
         aria-label={label}
         aria-invalid={invalid || undefined}
@@ -183,7 +185,7 @@ export function TimeField({ value, options: getOptions, onChange, label, invalid
           id={listId}
           role="listbox"
           aria-label={label}
-          className="time-field__list"
+          className="absolute top-[calc(100%+4px)] left-0 z-[1] m-0 box-border max-h-time-list w-max min-w-full list-none overflow-y-auto overscroll-contain rounded-control bg-surface py-2 shadow-float data-[align=end]:right-0 data-[align=end]:left-auto data-[side=above]:top-auto data-[side=above]:bottom-[calc(100%+4px)]"
           onMouseDown={(event) => event.preventDefault()}
         >
           {options.map((option, index) => (
@@ -193,7 +195,7 @@ export function TimeField({ value, options: getOptions, onChange, label, invalid
               role="option"
               aria-selected={index === selected}
               data-active={index === active || undefined}
-              className="time-field__option"
+              className="flex min-h-9 cursor-pointer items-center px-4 text-meta whitespace-nowrap text-ink tabular-nums hover:bg-hover data-active:bg-hover aria-selected:bg-accent-tint-soft aria-selected:text-accent-ink aria-selected:hover:bg-accent-tint-soft max-md:min-h-touch max-md:text-body"
               onClick={() => pick(option)}
             >
               {option.label}

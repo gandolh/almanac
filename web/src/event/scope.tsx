@@ -75,12 +75,13 @@ export function ScopeDialog({ action, allowThis, onDone }: ScopeDialogProps) {
           onDone(chosen);
         }}
       >
-        <fieldset className="scope-choices">
+        <fieldset className="flex flex-col gap-1">
           <legend className="sr-only">Apply to</legend>
           {choices.map((scope) => (
-            <label key={scope} className="scope-choice">
+            <label key={scope} className="flex min-h-touch cursor-pointer items-center gap-3 text-body text-ink">
               <input
                 type="radio"
+                className="m-0 size-[18px] accent-accent"
                 name={name}
                 value={scope}
                 checked={chosen === scope}

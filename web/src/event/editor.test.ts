@@ -70,10 +70,10 @@ describe("RepeatPicker", () => {
     expect(never).toContain('aria-label="Repeat ends"');
     expect(never).toContain('<option value="never" selected="">Never</option>');
     expect(never).not.toContain('aria-label="Repeat ends on"');
-    expect(never).not.toContain("editor-hint");
+    expect(never).not.toContain("<p ");
 
     const until = picker({ ...daily, end: "until", until: "2026-12-01" }, { summary: "Daily, until 1 Dec 2026" });
-    expect(until).toContain('<input type="date" class="editor-input editor-date" aria-label="Repeat ends on"');
+    expect(until).toMatch(/<input type="date"[^>]*aria-label="Repeat ends on"/);
     expect(until).toContain('value="2026-12-01"');
     expect(until).toContain("Daily, until 1 Dec 2026");
 
@@ -161,7 +161,8 @@ describe("QuickCreateForm", () => {
     expect(page).toContain('aria-label="Calendar"');
     expect(page).toContain("More options");
     expect(page).toContain(">Save</button>");
-    expect(page.match(/"quick-create__lead"><svg width="20"/g)).toHaveLength(2);
+    // The ✕, the clock and the calendar, each at 20 px.
+    expect(page.match(/<svg width="20"/g)).toHaveLength(3);
   });
 
   it("says All day for an all-day selection", () => {
@@ -209,8 +210,8 @@ describe("EventForm", () => {
     expect(html).toContain(">Cancel</button>");
     expect(html).toContain(">Save</button>");
     expect(html).not.toContain(">Delete</button>");
-    // The rows' icons at 20 px, the size editor.css lays the rows out for.
-    expect(html.match(/"editor-row__lead"><svg width="20"/g)).toHaveLength(6);
+    // The dialog's ✕ and the six rows' icons, all at 20 px, the size the rows are laid out for.
+    expect(html.match(/<svg width="20"/g)).toHaveLength(7);
   });
 
   it("hides the times of an all-day event", () => {
