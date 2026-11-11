@@ -89,7 +89,8 @@ describe("RepeatPicker", () => {
     expect(html.match(/aria-pressed="true"/g)).toHaveLength(2);
     expect(html.match(/aria-pressed="false"/g)).toHaveLength(5);
     expect(html).toContain('aria-label="Monday"');
-    expect(html).toContain('aria-pressed="true" aria-label="Monday" title="Monday">M<');
+    expect(html).toMatch(/<button[^>]*aria-pressed="true"[^>]*aria-label="Monday"[^>]*>M</);
+    expect(html).toContain('role="group" aria-label="Repeat on"');
     expect(html).toContain("Weekly on Monday, Wednesday");
   });
 

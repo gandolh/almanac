@@ -1,5 +1,6 @@
-import { REPEAT_COUNT_MAX, WEEKDAYS } from "@almanac/shared";
+import { REPEAT_COUNT_MAX, WEEKDAYS, type Weekday } from "@almanac/shared";
 import { useId } from "react";
+import { ToggleGroup, ToggleItem } from "../components/ui/ToggleGroup";
 import { WEEKDAY_INITIALS, WEEKDAY_NAMES } from "../dates";
 import {
   chooseEnd,
@@ -58,24 +59,29 @@ export function RepeatPicker({ repeat, labelDate, startDate, timeZone, summary, 
       </select>
 
       {repeat.preset === "custom" && (
-        <div role="group" aria-label="Repeat on" className="repeat-picker__days">
-          {WEEKDAYS.map((day, index) => {
-            const on = repeat.days.includes(day);
-            return (
-              <button
-                key={day}
-                type="button"
-                className="repeat-picker__day"
-                aria-pressed={on}
-                aria-label={WEEKDAY_NAMES[index]}
-                title={WEEKDAY_NAMES[index]}
-                onClick={() => onChange(toggleDay(repeat, day))}
-              >
-                {WEEKDAY_INITIALS[index]}
-              </button>
-            );
-          })}
-        </div>
+        <ToggleGroup<Weekday>
+          multiple
+          label="Repeat on"
+          className="repeat-picker__days"
+          value={repeat.days}
+          onValueChange={(days) => {
+            // Base UI says which days are pressed now; `toggleDay` keeps the week order and the last day.
+            const changed = WEEKDAYS.find((day) => days.includes(day) !== repeat.days.includes(day));
+            if (changed) onChange(toggleDay(repeat, changed));
+          }}
+        >
+          {WEEKDAYS.map((day, index) => (
+            <ToggleItem
+              key={day}
+              value={day}
+              className="repeat-picker__day"
+              aria-label={WEEKDAY_NAMES[index]}
+              title={WEEKDAY_NAMES[index]}
+            >
+              {WEEKDAY_INITIALS[index]}
+            </ToggleItem>
+          ))}
+        </ToggleGroup>
       )}
 
       {repeating && (
