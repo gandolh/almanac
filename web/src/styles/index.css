@@ -12,7 +12,6 @@
 
 @import "tailwindcss";
 @import "./tokens.css" layer(legacy);
-@import "./base.css" layer(legacy);
 @import "./components.css" layer(legacy);
 @import "./shell.css" layer(legacy);
 @import "../auth/auth.css" layer(legacy);
@@ -200,4 +199,123 @@
   --duration-fast: 120ms;
   --duration: 180ms;
   --duration-sheet: 240ms;
+}
+
+/*
+ * The page itself and the parts of the browser nobody draws: Tailwind's
+ * preflight is the reset, and this puts back what the app relied on beyond
+ * it: the app's type on body, selection, the caret, one focus ring, accent
+ * links, tabular numerals and thin scrollbars.
+ */
+@layer base {
+  :root {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    scrollbar-color: var(--color-scrollbar-thumb) transparent;
+  }
+
+  /* The app's 15 px lives on body; html keeps the reader's own size. */
+  body {
+    min-height: 100dvh;
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Preflight leaves the cursor alone; a button is a pointer unless it is off. */
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: default;
+  }
+
+  input,
+  textarea {
+    caret-color: var(--color-accent);
+  }
+
+  /* Preflight fades the placeholder to half the text colour; the app's is a token. */
+  ::placeholder {
+    color: var(--color-field-placeholder);
+    opacity: 1;
+  }
+
+  ::selection {
+    background: var(--color-selection);
+    color: var(--color-ink);
+  }
+
+  /* One focus ring everywhere, in the accent, only for the keyboard. */
+  :focus {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* Preflight makes a link its parent's colour with no underline; the app's are accent. */
+  a {
+    color: var(--color-accent);
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+
+  a:hover {
+    color: var(--color-accent-press);
+  }
+
+  /* Times, dates and counts line up in columns. */
+  time {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Thin scrollbars where the engine draws them (Chromium and Firefox take
+     \`scrollbar-color\` above; WebKit's legacy pseudo-elements cover Safari). */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: var(--radius-pill);
+    background: var(--color-scrollbar-thumb) padding-box;
+  }
+
+  /* The one place !important is the point: it must beat every utility's transition and animation. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 1ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }

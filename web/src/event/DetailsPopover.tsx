@@ -140,7 +140,7 @@ function DetailRow({ icon, label, children }: { icon: ReactNode; label: string; 
     <div className="details__row">
       <span className="details__lead">
         {icon}
-        <span className="visually-hidden">{label}</span>
+        <span className="sr-only">{label}</span>
       </span>
       <div className="details__body">{children}</div>
     </div>

@@ -46,7 +46,7 @@ export function Drawer({ open, onClose, returnFocus, children }: DrawerProps) {
               true
             }
           >
-            <BaseDrawer.Title className="visually-hidden">Calendars</BaseDrawer.Title>
+            <BaseDrawer.Title className="sr-only">Calendars</BaseDrawer.Title>
             <BaseDrawer.Content>{children}</BaseDrawer.Content>
           </BaseDrawer.Popup>
         </BaseDrawer.Viewport>

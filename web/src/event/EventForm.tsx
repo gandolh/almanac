@@ -393,7 +393,7 @@ function Row({ icon, label, children }: { icon: ReactNode; label: string; childr
     <div className="editor-row">
       <span className="editor-row__lead">
         {icon}
-        <span className="visually-hidden">{label}</span>
+        <span className="sr-only">{label}</span>
       </span>
       <div className="editor-row__body">{children}</div>
     </div>

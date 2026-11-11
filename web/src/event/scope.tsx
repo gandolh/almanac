@@ -76,7 +76,7 @@ export function ScopeDialog({ action, allowThis, onDone }: ScopeDialogProps) {
         }}
       >
         <fieldset className="scope-choices">
-          <legend className="visually-hidden">Apply to</legend>
+          <legend className="sr-only">Apply to</legend>
           {choices.map((scope) => (
             <label key={scope} className="scope-choice">
               <input

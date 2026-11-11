@@ -255,7 +255,7 @@ function PasswordForm(props: PasswordFormProps) {
     <form id={id} className="password-form" onSubmit={submit} noValidate>
       {intro && <p className="password-text">{intro}</p>}
       <input
-        className="visually-hidden"
+        className="sr-only"
         type="text"
         name="username"
         autoComplete="username"

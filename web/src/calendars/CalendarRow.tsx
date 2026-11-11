@@ -238,10 +238,7 @@ export function CalendarRow({ calendar, isOnly, onVisibleChange, onRename, onRec
         <span className="calendar-row__box" aria-hidden="true">
           <CheckIcon size={12} strokeWidth={3.5} />
         </span>
-        <span
-          className={renaming ? "visually-hidden" : "calendar-row__name"}
-          title={renaming ? undefined : calendar.name}
-        >
+        <span className={renaming ? "sr-only" : "calendar-row__name"} title={renaming ? undefined : calendar.name}>
           {calendar.name}
         </span>
       </label>
