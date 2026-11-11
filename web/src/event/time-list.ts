@@ -24,7 +24,7 @@ export interface TimeListPlacement {
   maxHeight: number | null;
 }
 
-/** Between the field and the list: editor.css's `calc(100% + 4px)`. */
+/** Between the field and the list: TimeField's `calc(100% + 4px)`. */
 const GAP = 4;
 /** The list keeps this far from the edge of its room. */
 const MARGIN = 8;

@@ -45,7 +45,7 @@ function systemDark(): boolean {
 /** Puts a choice on the page: `data-theme`, the `color-scheme` meta and the browser bar's colour. */
 export function applyTheme(theme: Theme): void {
   const root = document.documentElement;
-  root.dataset.theme = theme;
+  if (root.dataset.theme !== theme) root.dataset.theme = theme;
   const scheme = document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]');
   if (scheme) scheme.content = theme === "system" ? "light dark" : theme;
   const bar = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');

@@ -95,7 +95,7 @@ describe("EventDetails", () => {
     expect(html).toContain('style="--calendar-color:#009688"');
     expect(html).toMatch(/<p[^>]*>Work<\/p>/);
     for (const label of ["Edit event", "Delete event", "Close"]) expect(html).toContain(`aria-label="${label}"`);
-    // Every icon at 20 px, the size details.css lays the rows out for.
+    // Every icon at 20 px, the size the rows are laid out for.
     expect(html.match(/<svg width="(\d+)"/g)).toEqual(Array(4).fill('<svg width="20"'));
     expect(html).not.toContain("Weekly");
     expect(html).not.toContain("Location");

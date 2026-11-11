@@ -1,5 +1,6 @@
 import { CALENDAR_COLORS, CALENDAR_COLOR_KEYS, type CalendarColor } from "@almanac/shared";
 import type { CSSProperties } from "react";
+import { eventInk } from "../calendar/events";
 import { CheckIcon } from "../components/icons";
 import { ToggleGroup, ToggleItem } from "../components/ui/ToggleGroup";
 
@@ -40,8 +41,10 @@ export function ColorPicker({ value, onChange, label = "Colour", autoFocus = fal
             aria-label={colorName(color)}
             title={colorName(color)}
             data-autofocus={autoFocus && chosen ? "" : undefined}
-            className="flex size-8 items-center justify-center rounded-pill bg-(color:--swatch) p-0 text-on-accent transition-[box-shadow] duration-(--duration-fast) ease-out hover:shadow-[0_0_0_4px_color-mix(in_srgb,var(--swatch)_24%,transparent)] focus-visible:outline-offset-3 max-md:size-touch"
-            style={{ "--swatch": CALENDAR_COLORS[color] } as CSSProperties}
+            className="flex size-8 items-center justify-center rounded-pill bg-(color:--swatch) p-0 text-(color:--on-calendar) transition-[box-shadow] duration-(--duration-fast) ease-out hover:shadow-[0_0_0_4px_color-mix(in_srgb,var(--swatch)_24%,transparent)] focus-visible:outline-offset-3 max-md:size-touch"
+            style={
+              { "--swatch": CALENDAR_COLORS[color], "--on-calendar": eventInk(CALENDAR_COLORS[color]) } as CSSProperties
+            }
           >
             {chosen && <CheckIcon size={18} strokeWidth={3} />}
           </ToggleItem>

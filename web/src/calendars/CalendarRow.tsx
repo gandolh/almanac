@@ -5,6 +5,7 @@ import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { CheckIcon } from "../components/icons";
 import { Menu, type MenuSection } from "../components/ui/Menu";
 import { Popover } from "../components/ui/Popover";
+import { eventInk } from "../calendar/events";
 import { calendarColor } from "../data/calendars";
 import { cn } from "../lib/cn";
 import { ColorPicker, colorName } from "./ColorPicker";
@@ -223,6 +224,7 @@ export function CalendarRow({ calendar, isOnly, onVisibleChange, onRename, onRec
   const [deleting, setDeleting] = useState(false);
   // After Enter or Esc in the name field, focus goes back to the row's checkbox, not to the page.
   const restoreFocus = useRef(false);
+  const color = calendarColor(calendar);
   const checkboxRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -246,7 +248,7 @@ export function CalendarRow({ calendar, isOnly, onVisibleChange, onRename, onRec
     <li
       ref={setRowElement}
       className="group flex min-h-9 items-center gap-1 rounded-control pr-1 focus-within:bg-hover hover:bg-hover max-md:min-h-(--size-touch)"
-      style={{ "--calendar-color": calendarColor(calendar) } as CSSProperties}
+      style={{ "--calendar-color": color, "--on-calendar": eventInk(color) } as CSSProperties}
       data-renaming={renaming || undefined}
     >
       <label className="relative flex min-w-0 flex-1 cursor-pointer items-center gap-3 self-stretch pl-1 text-meta text-ink group-data-renaming:flex-none max-md:text-body">
@@ -258,7 +260,7 @@ export function CalendarRow({ calendar, isOnly, onVisibleChange, onRename, onRec
           onChange={(event) => onVisibleChange(event.currentTarget.checked)}
         />
         <span
-          className="flex size-swatch flex-none items-center justify-center rounded-small border-2 border-(color:--calendar-color) text-on-accent peer-checked:bg-(color:--calendar-color) peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus-ring [&>svg]:opacity-0 peer-checked:[&>svg]:opacity-100"
+          className="flex size-swatch flex-none items-center justify-center rounded-small border-2 border-(color:--calendar-color) text-(color:--on-calendar) peer-checked:bg-(color:--calendar-color) peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus-ring [&>svg]:opacity-0 peer-checked:[&>svg]:opacity-100"
           aria-hidden="true"
         >
           <CheckIcon size={12} strokeWidth={3.5} />
