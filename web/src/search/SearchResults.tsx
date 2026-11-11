@@ -177,17 +177,17 @@ function ResultRow({ occurrence, day, calendar, timeZone }: ResultRowProps) {
   return (
     <Link
       to={viewRoute("day", day)}
-      className="grid grid-cols-[var(--size-search-dot)_var(--search-time-column)_minmax(0,1fr)] items-start gap-x-3 rounded-control px-3 py-2 text-meta leading-tight text-ink no-underline transition-[background-color] duration-(--duration-fast) ease-out hover:bg-hover hover:text-ink focus-visible:-outline-offset-2 active:bg-press max-md:min-h-touch max-md:grid-cols-[var(--size-search-dot)_minmax(0,1fr)] max-md:gap-y-0.5 max-md:rounded-none max-md:px-0"
+      className="grid grid-cols-[var(--size-search-dot)_var(--search-time-column)_minmax(0,1fr)] items-start gap-x-3 rounded-control px-3 py-2 text-meta leading-tight text-ink no-underline transition-[background-color] duration-(--duration-fast) ease-out hover:bg-hover hover:text-ink focus-visible:-outline-offset-2 active:bg-press max-md:min-h-(--size-touch) max-md:grid-cols-[var(--size-search-dot)_minmax(0,1fr)] max-md:gap-y-0.5 max-md:rounded-none max-md:px-0"
     >
       <span
-        className="mt-1 size-search-dot [grid-area:1/1] rounded-pill bg-[var(--calendar-color,var(--color-muted))] max-md:mt-[3px] max-md:[grid-area:1/1/3/2]"
+        className="mt-1 size-search-dot rounded-pill bg-[var(--calendar-color,var(--color-muted))] [grid-area:1/1] max-md:mt-[3px] max-md:[grid-area:1/1/3/2]"
         style={dot}
         aria-hidden="true"
       />
-      <span className="[grid-area:1/2] whitespace-nowrap text-ink-2 tabular-nums">
+      <span className="whitespace-nowrap text-ink-2 tabular-nums [grid-area:1/2]">
         {timeText(occurrence, timeZone)}
       </span>
-      <span className="flex min-w-0 [grid-area:1/3] flex-col gap-0.5 max-md:[grid-area:2/2]">
+      <span className="flex min-w-0 flex-col gap-0.5 [grid-area:1/3] max-md:[grid-area:2/2]">
         <span className="flex flex-wrap gap-x-3">
           <span className="font-medium wrap-anywhere">{displayTitle(occurrence.title)}</span>
           {occurrence.location !== "" && <span className="wrap-anywhere text-muted">{occurrence.location}</span>}

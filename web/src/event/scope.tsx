@@ -78,7 +78,10 @@ export function ScopeDialog({ action, allowThis, onDone }: ScopeDialogProps) {
         <fieldset className="flex flex-col gap-1">
           <legend className="sr-only">Apply to</legend>
           {choices.map((scope) => (
-            <label key={scope} className="flex min-h-touch cursor-pointer items-center gap-3 text-body text-ink">
+            <label
+              key={scope}
+              className="flex min-h-(--size-touch) cursor-pointer items-center gap-3 text-body text-ink"
+            >
               <input
                 type="radio"
                 className="m-0 size-[18px] accent-accent"

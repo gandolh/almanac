@@ -245,7 +245,7 @@ export function CalendarRow({ calendar, isOnly, onVisibleChange, onRename, onRec
   return (
     <li
       ref={setRowElement}
-      className="group flex min-h-9 items-center gap-1 rounded-control pr-1 focus-within:bg-hover hover:bg-hover max-md:min-h-touch"
+      className="group flex min-h-9 items-center gap-1 rounded-control pr-1 focus-within:bg-hover hover:bg-hover max-md:min-h-(--size-touch)"
       style={{ "--calendar-color": calendarColor(calendar) } as CSSProperties}
       data-renaming={renaming || undefined}
     >

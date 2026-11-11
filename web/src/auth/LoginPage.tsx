@@ -151,7 +151,7 @@ export function LoginView({
                   <Button
                     variant="quiet"
                     size="compact"
-                    className="-mr-1 -my-0.5 min-h-0 flex-none text-meta font-semibold"
+                    className="-my-0.5 -mr-1 min-h-0 flex-none text-meta font-semibold"
                     onClick={onDismissWard}
                   >
                     Dismiss

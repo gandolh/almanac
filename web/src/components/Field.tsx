@@ -29,7 +29,7 @@ export function AlertIcon({ size = 18 }: { size?: number }) {
 
 /** One field height with the event editor; 16 px type, so iOS doesn't zoom into it. */
 const INPUT_CLASS = [
-  "h-editor-field w-full appearance-none rounded-field bg-field px-3 text-input-phone text-ink max-md:h-touch",
+  "h-editor-field w-full appearance-none rounded-field bg-field px-3 text-input-phone text-ink max-md:h-(--size-touch)",
   "focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-focus-ring",
   "aria-invalid:outline-[1.5px] aria-invalid:-outline-offset-[1.5px] aria-invalid:outline-ink-2",
   "aria-invalid:focus-visible:outline-2 aria-invalid:focus-visible:outline-offset-0 aria-invalid:focus-visible:outline-focus-ring",

@@ -195,7 +195,7 @@ export function TimeField({ value, options: getOptions, onChange, label, invalid
               role="option"
               aria-selected={index === selected}
               data-active={index === active || undefined}
-              className="flex min-h-9 cursor-pointer items-center px-4 text-meta whitespace-nowrap text-ink tabular-nums hover:bg-hover data-active:bg-hover aria-selected:bg-accent-tint-soft aria-selected:text-accent-ink aria-selected:hover:bg-accent-tint-soft max-md:min-h-touch max-md:text-body"
+              className="flex min-h-9 cursor-pointer items-center px-4 text-meta whitespace-nowrap text-ink tabular-nums hover:bg-hover aria-selected:bg-accent-tint-soft aria-selected:text-accent-ink aria-selected:hover:bg-accent-tint-soft data-active:bg-hover max-md:min-h-(--size-touch) max-md:text-body"
               onClick={() => pick(option)}
             >
               {option.label}

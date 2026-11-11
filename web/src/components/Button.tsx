@@ -47,7 +47,7 @@ const VARIANTS: Record<ButtonVariant, string> = {
 const SIZES: Record<ButtonSize, string> = {
   compact:
     "max-md:before:absolute max-md:before:inset-x-0 max-md:before:inset-y-[calc((var(--height-control)-var(--size-touch))/2)]",
-  regular: "max-md:min-h-touch max-md:px-[18px] max-md:text-body",
+  regular: "max-md:min-h-(--size-touch) max-md:px-[18px] max-md:text-body",
   large: "min-h-control-large px-6 text-action-large font-semibold",
 };
 

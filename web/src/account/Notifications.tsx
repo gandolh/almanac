@@ -84,7 +84,7 @@ export function NotificationsPanel({
     <div className="flex flex-col gap-4" aria-busy={view.kind === "loading" || busy}>
       {view.kind === "ready" ? (
         <>
-          <div className="flex min-h-touch items-center justify-between gap-4">
+          <div className="flex min-h-(--size-touch) items-center justify-between gap-4">
             <span className="grid min-w-0 gap-0.5">
               <span className="text-body font-medium text-ink" id={labelId}>
                 Notifications in this browser

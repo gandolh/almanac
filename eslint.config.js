@@ -9,6 +9,8 @@ export default [
   ...houseStyle({
     root: import.meta.dirname,
     web: "web/src",
+    // The one stylesheet (its @theme names the classes that exist); the class order is enforced.
+    tailwind: { css: "web/src/styles/index.css", order: true },
     server: "server/src",
     // The docs capture helper, run by hand: it prints and reads the environment directly.
     scripts: ["scripts", "docs/images"],

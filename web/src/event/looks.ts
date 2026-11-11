@@ -9,7 +9,7 @@ import { cn } from "../lib/cn";
 
 /** A filled field: text, select, date and the time field's input. An invalid one is marked by an outline as well as the text under it, never by colour alone. */
 export const INPUT = [
-  "box-border h-editor-field w-full min-w-0 rounded-field bg-field px-3 text-meta text-ink max-md:h-touch",
+  "box-border h-editor-field w-full min-w-0 rounded-field bg-field px-3 text-meta text-ink max-md:h-(--size-touch)",
   "focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-focus-ring",
   "aria-invalid:outline-[1.5px] aria-invalid:-outline-offset-[1.5px] aria-invalid:outline-ink-2",
   "aria-invalid:focus-visible:outline-2 aria-invalid:focus-visible:outline-offset-0 aria-invalid:focus-visible:outline-focus-ring",
@@ -35,5 +35,5 @@ export const ERROR = "text-small leading-tight font-semibold text-ink";
 export const HINT = "text-small leading-tight text-muted";
 
 /** A checkbox with its label. */
-export const CHECK = "inline-flex min-h-8 w-fit items-center gap-2 text-meta text-ink max-md:min-h-touch";
+export const CHECK = "inline-flex min-h-8 w-fit items-center gap-2 text-meta text-ink max-md:min-h-(--size-touch)";
 export const CHECK_BOX = "m-0 size-[18px] accent-accent";
