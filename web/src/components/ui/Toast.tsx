@@ -74,7 +74,7 @@ function ToastList() {
   const { toasts } = Toast.useToastManager();
   return toasts.map((toast) => (
     <Toast.Root key={toast.id} toast={toast} className="toast">
-      <Toast.Title className="toast__message" />
+      <Toast.Title render={<span />} className="toast__message" />
       <Toast.Action className="toast__action" />
       <Toast.Close className="toast__close" aria-label="Dismiss">
         <CloseIcon size={18} />
