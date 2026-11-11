@@ -194,25 +194,27 @@ describe("ZoneList", () => {
   const render = (selected: string, shown = entries) =>
     renderToStaticMarkup(createElement(ZoneList, { entries: shown, selected, onSelect: () => undefined }));
 
-  it("shows each zone as its label over its name, the chosen one ticked and in the Tab order", () => {
+  // The radios are Base UI's: `<span role="radio">` over a hidden input. Their Tab stop and arrow keys are set once mounted, and are checked in the browser.
+  const radios = (html: string) => [...html.matchAll(/<span[^>]*role="radio"[^>]*>/g)].map((match) => match[0]);
+
+  it("shows each zone as its label over its name, the chosen one ticked", () => {
     const html = render("Europe/Bucharest");
+    expect(html).toContain('role="radiogroup" aria-label="Time zones"');
     expect(html).toContain("(GMT+02:00) Bucharest");
     expect(html).toContain("Europe/Bucharest");
     expect(html).toContain("(GMT+00:00) London");
-    const tags = [...html.matchAll(/<button[^>]*role="radio"[^>]*>/g)].map((match) => match[0]);
+    const tags = radios(html);
     expect(tags).toHaveLength(3);
     const chosen = tags.filter((tag) => tag.includes('aria-checked="true"'));
     expect(chosen).toHaveLength(1);
     expect(chosen[0]).toContain('data-zone="Europe/Bucharest"');
-    expect(chosen[0]).toContain('tabindex="0"');
-    expect(tags.filter((tag) => tag.includes('tabindex="0"'))).toHaveLength(1);
+    expect(html.match(/<path /g)).toHaveLength(1);
   });
 
-  it("puts the first row in the Tab order when the chosen zone is not shown", () => {
+  it("ticks nothing when the chosen zone is not shown", () => {
     const html = render("Asia/Tokyo");
     expect(html).not.toContain('aria-checked="true"');
-    const first = [...html.matchAll(/<button[^>]*role="radio"[^>]*>/g)][0]?.[0] ?? "";
-    expect(first).toContain('tabindex="0"');
+    expect(radios(html)).toHaveLength(3);
   });
 
   it("says so when the search leaves nothing", () => {

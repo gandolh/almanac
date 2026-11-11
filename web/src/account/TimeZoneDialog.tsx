@@ -3,6 +3,7 @@ import { isApiError } from "../api";
 import { AuthField } from "../components/Field";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/ui/Dialog";
+import { RadioGroup, RadioIndicator, RadioItem } from "../components/ui/RadioGroup";
 import { CheckIcon } from "../components/icons";
 import { useSettings } from "../data/settings";
 import { listTimeZones, matchesZone, zoneEntry, type ZoneEntry } from "./time-zones";
@@ -141,7 +142,6 @@ export interface ZoneListProps {
 export function ZoneList({ entries, selected, onSelect, listRef }: ZoneListProps) {
   const ownRef = useRef<HTMLDivElement>(null);
   const ref = listRef ?? ownRef;
-  const tabbable = entries.some((entry) => entry.zone === selected) ? selected : entries[0]?.zone;
 
   // A passive effect, not a layout one: the dialog is shown (and so measurable) in its own layout effect, which runs after this child's.
   useEffect(() => {
@@ -149,33 +149,6 @@ export function ZoneList({ entries, selected, onSelect, listRef }: ZoneListProps
     const chosen = list?.querySelector<HTMLElement>('[aria-checked="true"]');
     if (list && chosen) list.scrollTop = chosen.offsetTop - (list.clientHeight - chosen.offsetHeight) / 2;
   }, [ref]);
-
-  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const rows = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="radio"]'));
-    const index = rows.indexOf(document.activeElement as HTMLButtonElement);
-    if (index < 0) return;
-    let next: number;
-    switch (event.key) {
-      case "ArrowDown":
-        next = Math.min(index + 1, rows.length - 1);
-        break;
-      case "ArrowUp":
-        next = Math.max(index - 1, 0);
-        break;
-      case "Home":
-        next = 0;
-        break;
-      case "End":
-        next = rows.length - 1;
-        break;
-      default:
-        return;
-    }
-    event.preventDefault();
-    const row = rows[next];
-    row?.focus();
-    if (row?.dataset.zone) onSelect(row.dataset.zone);
-  };
 
   if (entries.length === 0) {
     return (
@@ -186,28 +159,26 @@ export function ZoneList({ entries, selected, onSelect, listRef }: ZoneListProps
   }
 
   return (
-    <div ref={ref} className="zone-list" role="radiogroup" aria-label="Time zones" onKeyDown={onKeyDown}>
-      {entries.map((entry) => {
-        const chosen = entry.zone === selected;
-        return (
-          <button
-            key={entry.zone}
-            type="button"
-            role="radio"
-            aria-checked={chosen}
-            tabIndex={entry.zone === tabbable ? 0 : -1}
-            data-zone={entry.zone}
-            className="zone-option"
-            onClick={() => onSelect(entry.zone)}
-          >
-            <span className="zone-option__tick">{chosen && <CheckIcon size={18} />}</span>
-            <span className="zone-option__text">
-              <span className="zone-option__label">{entry.label}</span>
-              <span className="zone-option__zone">{entry.zone}</span>
-            </span>
-          </button>
-        );
-      })}
-    </div>
+    <RadioGroup<string>
+      ref={ref}
+      className="zone-list"
+      aria-label="Time zones"
+      value={selected}
+      onValueChange={onSelect}
+    >
+      {entries.map((entry) => (
+        <RadioItem key={entry.zone} value={entry.zone} data-zone={entry.zone} className="zone-option">
+          <span className="zone-option__tick">
+            <RadioIndicator>
+              <CheckIcon size={18} />
+            </RadioIndicator>
+          </span>
+          <span className="zone-option__text">
+            <span className="zone-option__label">{entry.label}</span>
+            <span className="zone-option__zone">{entry.zone}</span>
+          </span>
+        </RadioItem>
+      ))}
+    </RadioGroup>
   );
 }
