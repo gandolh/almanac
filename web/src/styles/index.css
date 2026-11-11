@@ -5,13 +5,13 @@
  */
 
 /* The first @layer statement fixes the order for the whole page, the lazy
-   FullCalendar sheet included. `fullcalendar` sits under `components` and
-   `utilities`, so a utility passed through FullCalendar's class-name options
-   beats Monarch's unlayered-by-nature rules once they are imported into it. */
-@layer theme, base, fullcalendar, legacy, components, utilities;
+   FullCalendar sheet included. FullCalendar's own CSS is unlayered, and an
+   unlayered rule beats every layered one, so it is imported into the
+   `fullcalendar` layer; that sits under `components` and `utilities`, so the
+   utilities passed through its class-name options win. */
+@layer theme, base, fullcalendar, components, utilities;
 
 @import "tailwindcss";
-@import "./tokens.css" layer(legacy);
 
 /* Only Almanac's own scales exist: no Tailwind palette, text scale, radii or shadows. */
 @theme {

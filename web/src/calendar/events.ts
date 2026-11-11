@@ -50,7 +50,7 @@ function luminance(hex: string): number {
  * read and the ink is used. A token, never a new colour.
  */
 export function eventInk(hex: string): string {
-  return luminance(hex) > 0.5 ? "var(--ink)" : "var(--on-accent)";
+  return luminance(hex) > 0.5 ? "var(--color-ink)" : "var(--color-on-accent)";
 }
 
 // --- Occurrences in ------------------------------------------------------------------------------

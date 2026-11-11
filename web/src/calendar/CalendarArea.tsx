@@ -39,7 +39,6 @@ import {
   wireSpan,
 } from "./events";
 import { holdSelection } from "./selection";
-import "./calendar.css";
 
 export interface CalendarAreaProps {
   view: CalendarView;
@@ -50,7 +49,7 @@ export interface CalendarAreaProps {
 
 /**
  * Day, week and month: FullCalendar v7 with its Monarch theme (Material,
- * the closest to Google Calendar) in Almanac's colours (calendar.css).
+ * the closest to Google Calendar) in Almanac's colours (fullcalendar.css).
  *
  * - The address is the truth: the view and date come from the props and the
  *   calendar follows them; a day number or "2 more" asks the shell to move
@@ -193,7 +192,12 @@ export function CalendarArea({ view, date, onNavigate }: CalendarAreaProps) {
   const fetchFailed = useCallback((error: unknown) => fetchFailure(error, () => api()?.refetchEvents()), [api]);
 
   return (
-    <section ref={rootRef} className="calendar-area" aria-label={`${VIEW_LABELS[view]} view`} data-view={view}>
+    <section
+      ref={rootRef}
+      className="flex min-h-0 min-w-0 flex-1 flex-col bg-ground"
+      aria-label={`${VIEW_LABELS[view]} view`}
+      data-view={view}
+    >
       <FullCalendar
         ref={calendarRef}
         plugins={PLUGINS}
@@ -232,7 +236,7 @@ const OPTIONS: CalendarOptions = {
   headerToolbar: false,
   height: "100%",
   colorScheme: "light",
-  className: "cal",
+  className: "min-h-0 flex-1 font-sans text-event leading-tight text-ink",
   // Flush with the page, as Google's grid is: no frame round the view.
   borderless: true,
   // Time: 30-minute rows labelled each hour, 15-minute snapping, a line at now.
@@ -240,21 +244,22 @@ const OPTIONS: CalendarOptions = {
   snapDuration: "00:15:00",
   slotHeaderInterval: "01:00:00",
   slotHeaderFormat: slotLabel,
-  slotHeaderInnerClass: "cal-slot-label",
+  // The label sits across its hour's line, small and muted; Monarch's own margin and size lose to these.
+  slotHeaderInnerClass: "top-[-0.5em] my-0 text-mini leading-none text-muted",
   // Lines on the hours only, as Google draws them.
-  slotLaneClass: (info) => (info.isMinor ? "cal-half-hour" : undefined),
-  slotHeaderClass: (info) => (info.isMinor ? "cal-half-hour" : undefined),
+  slotLaneClass: (info) => (info.isMinor ? "border-transparent" : undefined),
+  slotHeaderClass: (info) => (info.isMinor ? "border-transparent" : undefined),
   // Google's 48 px an hour, the same at every width. (FullCalendar measures the
   // labels first; rows that change height later would leave 08:00 scrolled wrong.)
   slotMinHeight: 24,
   // Opened at 08:00 with its label whole: the label sits across its hour's
-  // line (calendar.css), so the top is 15 minutes (12 px) above the line.
+  // line (the label's -0.5em), so the top is 15 minutes (12 px) above the line.
   scrollTime: "07:45:00",
   scrollTimeReset: false,
   nowIndicator: true,
-  // Events: titles and times end in "…" when they don't fit (calendar.css).
-  eventTitleClass: "cal-event-title",
-  eventTimeClass: "cal-event-time",
+  // Events: titles and times end in "…" when they don't fit, as Google's do.
+  eventTitleClass: "min-w-0 overflow-hidden text-ellipsis whitespace-nowrap",
+  eventTimeClass: "min-w-0 overflow-hidden text-ellipsis whitespace-nowrap",
   // Day and week: Monarch keeps an event under 50 px to one line, title then
   // time. Google gives an hour (48 px) two, the title over the time, and two
   // lines take 44 px; from 45 minutes (36 px) down, one line.
@@ -262,7 +267,8 @@ const OPTIONS: CalendarOptions = {
   eventContent,
   eventTimeFormat: eventTimeText,
   allDayText: "All day",
-  allDayHeaderInnerClass: "cal-all-day",
+  // The all-day row's label, quiet as Google's gutter.
+  allDayHeaderInnerClass: "text-mini text-muted",
   dayHeaderContent,
   // Month: only the weeks the month touches, "2 more" when a day is full.
   fixedWeekCount: false,
@@ -274,8 +280,9 @@ const OPTIONS: CalendarOptions = {
   selectMirror: true,
   forceEventDuration: true,
   unselectCancel: "[role=dialog], dialog",
+  // Both classes are markers the selection code looks for (`selectionElement`); the mirror also carries its shadow.
   highlightClass: "cal-highlight",
-  eventClass: (info) => (info.isMirror ? "cal-mirror" : undefined),
+  eventClass: (info) => (info.isMirror ? "cal-mirror shadow-raised" : undefined),
   eventDidMount: (info) => {
     info.el.dataset.noSwipe = "";
   },

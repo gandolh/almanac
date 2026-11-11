@@ -66,7 +66,7 @@ describe("toEventInputs", () => {
       end: "2026-10-16T07:30:00Z",
       allDay: false,
       color: "#009688",
-      contrastColor: "var(--on-accent)",
+      contrastColor: "var(--color-on-accent)",
       extendedProps: { occurrence: timed },
     });
     expect(occurrenceOf(event as { extendedProps: Record<string, unknown> })).toBe(timed);
@@ -82,7 +82,7 @@ describe("toEventInputs", () => {
       start: "2026-10-16",
       end: "2026-10-18",
       color: "#F6BF26",
-      contrastColor: "var(--ink)",
+      contrastColor: "var(--color-ink)",
     });
   });
 
@@ -124,9 +124,9 @@ describe("eventInk", () => {
       "#8E24AA",
       "#616161",
     ]) {
-      expect(eventInk(hex), hex).toBe("var(--on-accent)");
+      expect(eventInk(hex), hex).toBe("var(--color-on-accent)");
     }
-    expect(eventInk("#F6BF26")).toBe("var(--ink)");
+    expect(eventInk("#F6BF26")).toBe("var(--color-ink)");
   });
 });
 
@@ -242,12 +242,14 @@ describe("the views' words", () => {
   it("heads the columns MON to SUN, with today's date marked", () => {
     expect([1, 2, 3, 4, 5, 6, 0].map(weekdayHead)).toEqual(["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]);
     const html = renderToStaticMarkup(createElement(DayHead, { dow: 1, dayNumber: "19", today: true }));
-    expect(html).toBe(
-      '<span class="cal-head cal-head--today"><span class="cal-head__weekday">MON</span><span class="cal-head__day">19</span></span>',
-    );
-    expect(renderToStaticMarkup(createElement(DayHead, { dow: 0, dayNumber: "", today: false }))).toBe(
-      '<span class="cal-head"><span class="cal-head__weekday">SUN</span></span>',
-    );
+    expect(html).toContain('data-today="true"');
+    expect(html).toMatch(/>MON<\/span>/);
+    expect(html).toMatch(/>19<\/span>/);
+    // Month's heads name the weekday only, and a day that isn't today carries no mark.
+    const sunday = renderToStaticMarkup(createElement(DayHead, { dow: 0, dayNumber: "", today: false }));
+    expect(sunday).toMatch(/>SUN<\/span>/);
+    expect(sunday).not.toContain("data-today=");
+    expect(sunday.match(/<span/g)).toHaveLength(2);
   });
 });
 

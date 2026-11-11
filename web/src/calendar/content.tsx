@@ -49,9 +49,15 @@ export interface DayHeadProps {
 /** A column's head: the weekday, and in day and week the date's number under it, today's in the accent disc. */
 export function DayHead({ dow, dayNumber, today }: DayHeadProps) {
   return (
-    <span className={today ? "cal-head cal-head--today" : "cal-head"}>
-      <span className="cal-head__weekday">{weekdayHead(dow)}</span>
-      {dayNumber !== "" && <span className="cal-head__day">{dayNumber}</span>}
+    <span className="group inline-flex flex-col items-center gap-1 pt-1 pb-1.5" data-today={today || undefined}>
+      <span className="text-mini font-medium tracking-[0.08em] text-muted group-data-today:text-accent">
+        {weekdayHead(dow)}
+      </span>
+      {dayNumber !== "" && (
+        <span className="inline-flex size-day-disc items-center justify-center rounded-pill text-day-number leading-none text-ink-2 transition-[background-color] duration-(--duration-fast) ease-out group-hover:bg-hover group-data-today:bg-accent group-data-today:text-on-accent group-data-today:group-hover:bg-accent max-md:size-day-disc-phone max-md:text-day-number-phone">
+          {dayNumber}
+        </span>
+      )}
     </span>
   );
 }
