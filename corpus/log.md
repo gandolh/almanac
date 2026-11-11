@@ -372,6 +372,8 @@ the first paint by a script in `web/index.html`. Revisited in
 menus and drawer", "FullCalendar v7 draws day, week and month; the year view is
 our own" (the Tailwind half no longer applies), and "Google Calendar's layout,
 light only", now "…with a Light / Dark / System switch". Light screenshots at
-1280, 390 and 1024 px match the old ones but for the clock and the hover state a
-tap no longer leaves; built CSS 45.3 kB (8.6 gzip) to 57.2 kB (11.1 gzip) main,
-20.6 kB (4.5 gzip) to 19.3 kB (4.1 gzip) for the calendar's sheet.
+1280, 390 and 1024 px (95 states): 84 are identical; the rest differ by the new
+Theme… row in the account menu, the hover state a tap no longer leaves, and two
+pixels under a link. Built, main CSS 45.28 kB (8.61 gzip) to 57.29 kB (11.31
+gzip), the calendar's CSS 20.59 kB (4.52 gzip) to 19.34 kB (4.14 gzip), main JS
+666.39 kB (214.20 gzip) to 717.71 kB (230.70 gzip).

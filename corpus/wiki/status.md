@@ -7,8 +7,8 @@ updated: 2026-11-11
 
 _2026-11-09_. Everything below is on `main` and pushed to
 `https://github.com/<owner>/almanac.git` as of 2026-11-01. Nothing is
-deployed. Briefs 01-04 are open (2026-11-09); brief numbering restarted at
-01 on 2026-11-01 (see [log.md](../log.md)).
+deployed. Briefs 01-03 are built (2026-11-11) and brief 04 is open; brief numbering
+restarted at 01 on 2026-11-01 (see [log.md](../log.md)).
 
 ## By area
 
