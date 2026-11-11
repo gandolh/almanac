@@ -131,7 +131,7 @@ function PasswordDialog({ onClose }: { onClose: () => void }) {
   if (change.done || local.done) {
     title = local.done ? "Password set" : "Password changed";
     body = (
-      <p className="password-text" role="status">
+      <p className="text-body leading-body text-ink-2" role="status">
         You're still signed in here. Almanac signed you out everywhere else; use the new password there.
       </p>
     );
@@ -253,8 +253,8 @@ function PasswordForm(props: PasswordFormProps) {
   const blockFailure = failure !== null && !wrongCurrent ? accountMessage(failure) : null;
 
   return (
-    <form id={id} className="password-form" onSubmit={submit} noValidate>
-      {intro && <p className="password-text">{intro}</p>}
+    <form id={id} className="flex flex-col gap-4" onSubmit={submit} noValidate>
+      {intro && <p className="text-body leading-body text-ink-2">{intro}</p>}
       <input
         className="sr-only"
         type="text"
@@ -309,8 +309,8 @@ function PasswordForm(props: PasswordFormProps) {
 
 function ConfirmWithWard({ failure }: { failure: AuthError | null }) {
   return (
-    <div className="password-form">
-      <p className="password-text">
+    <div className="flex flex-col gap-4">
+      <p className="text-body leading-body text-ink-2">
         You sign in with Ward, and Almanac has no password for you yet. Confirm it's you with your Ward password, then
         choose one here, so you can still sign in while Ward is down.
       </p>

@@ -21,9 +21,14 @@ export interface SidebarProps {
 export function Sidebar({ date, today, onPickDate }: SidebarProps) {
   const editor = useEventEditor();
   return (
-    <div className="sidebar">
-      <button type="button" className="create-button" onClick={() => editor.openCreate()} aria-keyshortcuts="c">
-        <PlusIcon size={24} className="create-button__icon" />
+    <div className="flex flex-col gap-4 pt-2 pb-6">
+      <button
+        type="button"
+        className="ml-2 inline-flex min-h-create items-center gap-3 self-start rounded-pill bg-surface pr-6 pl-4 text-meta font-medium text-ink shadow-raised transition-[box-shadow,background-color] duration-(--duration-fast) ease-out hover:bg-accent-tint-soft hover:shadow-raised-hover active:bg-accent-tint"
+        onClick={() => editor.openCreate()}
+        aria-keyshortcuts="c"
+      >
+        <PlusIcon size={24} className="text-accent" />
         <span>Create</span>
       </button>
       <MiniMonth key={dateKey(date)} date={date} today={today} onPick={onPickDate} />

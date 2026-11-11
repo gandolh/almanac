@@ -193,21 +193,28 @@ export function DeleteIcon(props: IconProps) {
 /**
  * Almanac's mark, the home-screen icon's calendar page without its square
  * ground (public/icon.svg draws the same page): a header band with two rings
- * and a grid of days, one of them today. Coloured by shell.css's
- * `.app-mark__*` rules from the tokens.
+ * and a grid of days, one of them today. Coloured from the tokens by
+ * utilities.
  */
 export function AppMark({ size = 40 }: { size?: number }) {
   return (
-    <svg className="app-mark" width={size} height={size} viewBox="120 106 272 286" aria-hidden="true" focusable="false">
-      <rect className="app-mark__page" x="136" y="150" width="240" height="226" rx="28" />
-      <path className="app-mark__band" d="M136 214v-36a28 28 0 0 1 28-28h184a28 28 0 0 1 28 28v36z" />
-      <rect className="app-mark__ring" x="190" y="122" width="28" height="60" rx="14" />
-      <rect className="app-mark__ring" x="294" y="122" width="28" height="60" rx="14" />
+    <svg
+      className="flex-none"
+      width={size}
+      height={size}
+      viewBox="120 106 272 286"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect className="fill-surface stroke-accent stroke-[14px]" x="136" y="150" width="240" height="226" rx="28" />
+      <path className="fill-accent" d="M136 214v-36a28 28 0 0 1 28-28h184a28 28 0 0 1 28 28v36z" />
+      <rect className="fill-surface stroke-accent stroke-[12px]" x="190" y="122" width="28" height="60" rx="14" />
+      <rect className="fill-surface stroke-accent stroke-[12px]" x="294" y="122" width="28" height="60" rx="14" />
       {[231, 279, 327].map((y) =>
         [165, 215, 265, 315].map((x) => (
           <rect
             key={`${x}-${y}`}
-            className={x === 265 && y === 279 ? "app-mark__today" : "app-mark__day"}
+            className={x === 265 && y === 279 ? "fill-accent" : "fill-accent-tint"}
             x={x}
             y={y}
             width="32"

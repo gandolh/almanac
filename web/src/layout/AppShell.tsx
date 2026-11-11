@@ -29,6 +29,7 @@ import { useSwipe } from "./swipe";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 import { useIsDesktop } from "../components/viewport";
+import { cn } from "../lib/cn";
 
 // FullCalendar is most of the bundle: the views load on first use, the year view and search don't need it.
 const CalendarArea = lazy(() => import("../calendar/CalendarArea").then((m) => ({ default: m.CalendarArea })));
@@ -167,18 +168,26 @@ export function AppShell() {
           onOpenMonth={(first) => go("month", first)}
         />
       ) : (
-        <Suspense fallback={<div className="calendar-area" />}>
+        <Suspense fallback={<div />}>
           <CalendarArea view={shown} date={place.date} onNavigate={go} />
         </Suspense>
       );
   }
 
   return (
-    <div className={desktop ? "shell shell--desktop" : "shell shell--phone"}>
-      <a className="skip-link" href="#main">
+    <div
+      className={cn(
+        "flex h-dvh flex-col overflow-hidden bg-ground",
+        !desktop && "pt-[env(safe-area-inset-top)] leading-phone",
+      )}
+    >
+      <a
+        className="fixed top-3 left-3 z-[calc(var(--z-index-toast)+1)] translate-y-[calc(-100%-24px)] rounded-control bg-surface px-3.5 py-2.5 font-semibold no-underline focus-visible:translate-y-0 focus-visible:shadow-float"
+        href="#main"
+      >
         Skip to the calendar
       </a>
-      <div className="shell__bar">
+      <div className="flex-none">
         <TopBar
           view={place.kind === "view" ? place.view : null}
           date={date}
@@ -203,13 +212,23 @@ export function AppShell() {
           onStep={(by) => go(view, stepDate(view, date, by))}
         />
       </div>
-      <div className="shell__body">
+      <div className="flex min-h-0 flex-1">
         {desktop && (
-          <aside id="sidebar" className="shell__column" aria-label="Calendars" hidden={!columnOpen}>
+          <aside
+            id="sidebar"
+            className="flex w-sidebar flex-none flex-col overflow-y-auto overscroll-contain"
+            aria-label="Calendars"
+            hidden={!columnOpen}
+          >
             {sidebar}
           </aside>
         )}
-        <main ref={mainRef} id="main" className="shell__main" tabIndex={-1}>
+        <main
+          ref={mainRef}
+          id="main"
+          className="flex min-w-0 flex-1 flex-col overflow-auto focus:outline-none"
+          tabIndex={-1}
+        >
           {main}
         </main>
       </div>
@@ -217,7 +236,12 @@ export function AppShell() {
         {sidebar}
       </Drawer>
       {!desktop && !drawerShown && (
-        <button type="button" className="fab" aria-label="Create" onClick={() => editor.openCreate()}>
+        <button
+          type="button"
+          className="fixed right-[max(16px,env(safe-area-inset-right))] bottom-[max(16px,env(safe-area-inset-bottom))] z-bar flex size-fab items-center justify-center rounded-container bg-surface p-0 text-accent shadow-raised-hover active:bg-accent-tint-soft"
+          aria-label="Create"
+          onClick={() => editor.openCreate()}
+        >
           <PlusIcon size={26} />
         </button>
       )}

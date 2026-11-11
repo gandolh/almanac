@@ -6,8 +6,13 @@ import { TimeZoneDialog } from "../account/TimeZoneDialog";
 import { AlertIcon } from "../components/Field";
 import { Menu, type MenuSection } from "../components/ui/Menu";
 import { useSettings } from "../data/settings";
+import { cn } from "../lib/cn";
 
 const NOTICE_MS = 6000;
+
+/** What an account action had to say. It takes no room while empty. */
+const NOTICE_CLASS =
+  "absolute top-[calc(100%+8px)] right-0 z-float w-max max-w-[min(300px,calc(100vw-32px))] text-meta leading-tight text-ink data-shown:rounded-control data-shown:bg-surface data-shown:px-3 data-shown:py-2.5 data-shown:shadow-float data-shown:motion-safe:animate-float-in";
 
 /** "Europe/Bucharest" → "Bucharest", "America/Argentina/Buenos_Aires" → "Buenos Aires". */
 export function zoneCity(timeZone: string): string {
@@ -78,21 +83,27 @@ export function AccountMenu() {
   ];
 
   return (
-    <div className="account">
+    <div className="relative flex flex-none">
       <Menu
         label="Account"
         triggerLabel={username ? `Account: ${username}` : "Account"}
-        triggerClassName="account__button"
+        triggerClassName="flex size-icon-button items-center justify-center rounded-pill bg-transparent p-0 transition-[background-color] duration-(--duration-fast) ease-out hover:bg-hover aria-expanded:bg-hover"
         align="end"
         trigger={
-          <span className="account__disc" aria-hidden="true">
+          <span
+            className="flex size-account-disc items-center justify-center rounded-pill bg-accent text-meta leading-none font-medium text-on-accent select-none"
+            aria-hidden="true"
+          >
             {initialOf(username)}
           </span>
         }
         sections={sections}
       />
       <p
-        className={failed ? "account__notice account__notice--error" : "account__notice"}
+        className={cn(
+          NOTICE_CLASS,
+          failed && "data-shown:flex data-shown:items-start data-shown:gap-2 data-shown:font-semibold",
+        )}
         role="status"
         data-shown={shown !== "" || undefined}
       >

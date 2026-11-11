@@ -24,12 +24,12 @@ export function MiniMonth({ date, today, onPick }: MiniMonthProps) {
   const [month, setMonth] = useState(() => date.toPlainYearMonth());
   const titleId = useId();
   return (
-    <section className="mini-month" aria-labelledby={titleId}>
-      <header className="mini-month__head">
-        <h2 id={titleId} className="mini-month__title" aria-live="polite">
+    <section className="flex flex-col gap-1 px-4" aria-labelledby={titleId}>
+      <header className="flex items-center justify-between pl-1">
+        <h2 id={titleId} className="text-meta leading-tight font-medium text-ink" aria-live="polite">
           {monthTitle(month)}
         </h2>
-        <div className="mini-month__nav">
+        <div className="flex gap-1">
           <button
             type="button"
             className={ICON_BUTTON_SMALL}

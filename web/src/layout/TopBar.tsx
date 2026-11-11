@@ -7,6 +7,7 @@ import { HOME } from "../router";
 import { SearchBox } from "../search/SearchBox";
 import { AccountMenu } from "./AccountMenu";
 import { ViewSwitcher } from "./ViewSwitcher";
+import { cn } from "../lib/cn";
 import { ICON_BUTTON } from "../components/looks";
 
 export interface TopBarProps {
@@ -35,8 +36,18 @@ export function TopBar(props: TopBarProps) {
   const { view, date, today, title, compact, sidebarOpen, onMenu, onToday, onStep, menuButtonRef } = props;
   const unit = view ?? "month";
   return (
-    <header className={compact ? "topbar topbar--compact" : "topbar"}>
-      <div className="topbar__start">
+    <header
+      className={cn(
+        "relative z-bar flex h-topbar items-center gap-2 border-b border-hairline bg-ground px-gutter-desktop",
+        compact && "gap-1 px-1",
+      )}
+    >
+      <div
+        className={cn(
+          "flex w-[calc(var(--width-sidebar)-var(--spacing-gutter-desktop)-8px)] flex-none items-center gap-1",
+          compact && "w-auto",
+        )}
+      >
         <button
           ref={menuButtonRef}
           type="button"
@@ -49,18 +60,22 @@ export function TopBar(props: TopBarProps) {
           <MenuIcon />
         </button>
         {!compact && (
-          <Link to={HOME} className="topbar__brand" aria-label="Almanac, today">
+          <Link
+            to={HOME}
+            className="flex min-w-0 items-center gap-2 rounded-control px-1 text-ink-2 no-underline hover:text-ink"
+            aria-label="Almanac, today"
+          >
             <AppMark size={40} />
-            <span className="topbar__name">Almanac</span>
+            <span className="text-brand leading-tight font-regular whitespace-nowrap">Almanac</span>
           </Link>
         )}
       </div>
 
-      <div className="topbar__nav">
+      <div className={cn("flex min-w-0 flex-1 items-center gap-2", compact && "gap-0")}>
         {!compact && (
           <button
             type="button"
-            className="today-button"
+            className="mr-2 min-h-outlined flex-none rounded-pill border border-outline bg-transparent px-4 text-meta font-medium text-ink transition-[background-color] duration-(--duration-fast) ease-out hover:bg-hover active:bg-press"
             title={formatDayLong(today)}
             aria-keyshortcuts="t"
             onClick={onToday}
@@ -69,7 +84,7 @@ export function TopBar(props: TopBarProps) {
           </button>
         )}
         {view !== null && !compact && (
-          <div className="topbar__steps">
+          <div className="flex flex-none items-center">
             <button
               type="button"
               className={ICON_BUTTON}
@@ -90,17 +105,26 @@ export function TopBar(props: TopBarProps) {
             </button>
           </div>
         )}
-        <h1 className="topbar__title" aria-live="polite">
+        <h1
+          className={cn(
+            "ml-1 min-w-0 overflow-hidden text-range leading-tight font-regular text-ellipsis whitespace-nowrap text-ink tabular-nums",
+            compact && "ml-0.5 text-range-phone",
+          )}
+          aria-live="polite"
+        >
           {title}
         </h1>
       </div>
 
-      <div className="topbar__end">
+      <div className={cn("flex flex-none items-center gap-2", compact && "gap-0.5")}>
         <SearchBox />
         {compact && (
           <button type="button" className={ICON_BUTTON} aria-label={`Today, ${formatDayLong(today)}`} onClick={onToday}>
             <CalendarPageIcon />
-            <span className="today-icon__number" aria-hidden="true">
+            <span
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[12%] text-badge leading-none font-bold tabular-nums"
+              aria-hidden="true"
+            >
               {today.day}
             </span>
           </button>

@@ -28,7 +28,7 @@ export function ViewSwitcher({ view, date, compact }: ViewSwitcherProps) {
       <Menu
         label="View"
         triggerLabel={view ? `View: ${VIEW_LABELS[view]}` : "View"}
-        triggerClassName="view-menu"
+        triggerClassName="inline-flex min-h-outlined flex-none items-center gap-0.5 rounded-pill border border-outline bg-transparent py-0 pr-1.5 pl-3 text-meta font-medium text-ink hover:bg-hover aria-expanded:bg-accent-tint aria-expanded:text-accent-ink aria-expanded:hover:bg-accent-tint"
         align="end"
         trigger={
           <>
@@ -49,12 +49,12 @@ export function ViewSwitcher({ view, date, compact }: ViewSwitcherProps) {
     );
   }
   return (
-    <nav className="view-switcher" aria-label="View">
+    <nav className="flex flex-none overflow-hidden rounded-pill border border-outline" aria-label="View">
       {VIEWS.map((each) => (
         <Link
           key={each}
           to={viewRoute(each, date)}
-          className="view-switcher__item"
+          className="inline-flex min-h-[calc(var(--height-outlined)-2px)] flex-col items-center justify-center px-4 text-meta leading-tight font-medium text-ink no-underline transition-[background-color] duration-(--duration-fast) ease-out not-first:border-l not-first:border-outline hover:bg-hover hover:text-ink focus-visible:-outline-offset-[3px] aria-[current]:bg-accent-tint aria-[current]:text-accent-ink aria-[current]:hover:bg-accent-tint"
           aria-current={each === view ? "page" : undefined}
           aria-keyshortcuts={KEY_OF[each].toLowerCase()}
           title={`${VIEW_LABELS[each]} (${KEY_OF[each]})`}
