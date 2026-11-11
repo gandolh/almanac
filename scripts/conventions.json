@@ -2,5 +2,20 @@
   "$schema": "../vendor/house-style/conventions.schema.json",
   "web": ["web/src"],
   "server": ["server/src"],
-  "shared": ["shared/src"]
+  "shared": ["shared/src"],
+  "exceptions": [
+    {
+      "check": "base-ui",
+      "rule": 5,
+      "path": "web/src/calendar/fullcalendar.css",
+      "reason": "FullCalendar's own CSS and the Monarch palette load with the calendar's lazy chunk only, so sign-in and the other pages don't pay for its 5.4 kB gzipped."
+    },
+    {
+      "check": "base-ui",
+      "rule": 5,
+      "path": "web/src",
+      "match": "--calendar-color",
+      "reason": "A calendar's colour and a palette swatch's arrive from data as the inline --calendar-color and --swatch properties (EventForm, DetailsPopover, SearchResults, DayList, ColorPicker, CalendarRow); utilities read them with bg-(color:--calendar-color). It is data, not a design colour."
+    }
+  ]
 }
