@@ -1,8 +1,7 @@
 import { CALENDAR_NAME_MAX, calendarCreateSchema, type Calendar, type CalendarColor } from "@almanac/shared";
 import { useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { AlertIcon } from "../components/Field";
-import { Button } from "../components/Button";
-import { Dialog } from "../components/ui/Dialog";
+import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { CheckIcon } from "../components/icons";
 import { Menu, type MenuSection } from "../components/ui/Menu";
 import { Popover } from "../components/ui/Popover";
@@ -154,45 +153,27 @@ export interface DeleteCalendarDialogProps {
   calendar: Pick<Calendar, "name">;
   /** The user's only calendar: Delete stays disabled and says why. */
   isOnly: boolean;
-  busy?: boolean;
-  onConfirm: () => void;
+  /** Resolves when the delete is over, done or refused; the dialog can't be closed meanwhile. */
+  onConfirm: () => Promise<void>;
   onClose: () => void;
 }
 
 /** Google's confirm: the calendar's events go with it. */
-export function DeleteCalendarDialog({
-  calendar,
-  isOnly,
-  busy = false,
-  onConfirm,
-  onClose,
-}: DeleteCalendarDialogProps) {
+export function DeleteCalendarDialog({ calendar, isOnly, onConfirm, onClose }: DeleteCalendarDialogProps) {
   return (
-    <Dialog
+    <ConfirmDialog
       open
       onClose={onClose}
       title="Delete calendar"
-      size="small"
-      dismissOnBackdrop={false}
-      footer={
-        <>
-          <Button variant="quiet" onClick={onClose} disabled={busy}>
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={onConfirm}
-            disabled={isOnly || busy}
-            title={isOnly ? LAST_CALENDAR_REASON : undefined}
-          >
-            Delete
-          </Button>
-        </>
-      }
+      message={<p className="calendar-dialog__text">{`Delete "${calendar.name}"? Its events will be deleted too.`}</p>}
+      confirmLabel="Delete"
+      pendingLabel="Deleting…"
+      onConfirm={onConfirm}
+      confirmDisabled={isOnly}
+      confirmTitle={LAST_CALENDAR_REASON}
     >
-      <p className="calendar-dialog__text">{`Delete "${calendar.name}"? Its events will be deleted too.`}</p>
       {isOnly && <p className="calendar-dialog__text calendar-dialog__text--note">{LAST_CALENDAR_REASON}</p>}
-    </Dialog>
+    </ConfirmDialog>
   );
 }
 
@@ -221,7 +202,6 @@ export function CalendarRow({ calendar, isOnly, onVisibleChange, onRename, onRec
   const [renaming, setRenaming] = useState(false);
   const [choosingColor, setChoosingColor] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [busy, setBusy] = useState(false);
   // After Enter or Esc in the name field, focus goes back to the row's checkbox, not to the page.
   const restoreFocus = useRef(false);
 
@@ -234,16 +214,6 @@ export function CalendarRow({ calendar, isOnly, onVisibleChange, onRename, onRec
   const stopRenaming = (viaKeyboard: boolean) => {
     restoreFocus.current = viaKeyboard;
     setRenaming(false);
-  };
-
-  const confirmDelete = async () => {
-    setBusy(true);
-    try {
-      await onDelete();
-    } finally {
-      setBusy(false);
-      setDeleting(false);
-    }
   };
 
   const sections = rowMenuSections(calendar, isOnly, {
@@ -316,11 +286,8 @@ export function CalendarRow({ calendar, isOnly, onVisibleChange, onRename, onRec
         <DeleteCalendarDialog
           calendar={calendar}
           isOnly={isOnly}
-          busy={busy}
-          onConfirm={() => void confirmDelete()}
-          onClose={() => {
-            if (!busy) setDeleting(false);
-          }}
+          onConfirm={onDelete}
+          onClose={() => setDeleting(false)}
         />
       )}
     </li>

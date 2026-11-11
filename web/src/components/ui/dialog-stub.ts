@@ -37,3 +37,10 @@ export const Dialog = {
   Title: part("h2"),
   Close: part("button", { type: "button" }),
 };
+
+/** The same parts for `@base-ui/react/alert-dialog`: `vi.mock("@base-ui/react/alert-dialog", () => import("../components/ui/dialog-stub"))`. */
+export const AlertDialog = {
+  ...Dialog,
+  Popup: part("div", { role: "alertdialog" }),
+  Description: part("div"),
+};
