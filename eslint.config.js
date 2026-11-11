@@ -16,13 +16,9 @@ export default [
     // to the person running them.
     console: ["server/src/index.ts", "server/src/seed.ts", "server/src/vapid-keys.ts"],
     ignores: ["data/**"],
-  }),
-  {
     // `expectError` is the tests' own assertion helper, so a test that calls it asserts.
-    name: "almanac/expect-helpers",
-    files: ["**/*.test.{ts,tsx}"],
-    rules: { "vitest/expect-expect": ["error", { assertFunctionNames: ["expect", "expectError"] }] },
-  },
+    assertFunctionNames: ["expect", "expectTypeOf", "expectError"],
+  }),
   {
     // The push-only service worker: plain JavaScript, run as a classic worker script.
     files: ["web/public/sw.js"],
