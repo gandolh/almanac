@@ -52,7 +52,7 @@ export function DetailsPopover({ occurrence, anchor, onClose }: DetailsPopoverPr
           onClose();
           void deleteOccurrence(occurrence).then((result) => {
             if (result.outcome === "deleted") showToast("Event deleted");
-            else if (result.outcome === "failed") showToast(result.message);
+            else if (result.outcome === "failed") showToast(result.message, { type: "error" });
           });
         }}
         onClose={onClose}

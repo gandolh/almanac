@@ -36,7 +36,7 @@ export function CalendarList() {
   const headingId = useId();
 
   const change = (calendar: Calendar, patch: Parameters<typeof update>[1], failure: string) => {
-    update(calendar.id, patch).catch((error: unknown) => showToast(reason(error, failure)));
+    update(calendar.id, patch).catch((error: unknown) => showToast(reason(error, failure), { type: "error" }));
   };
 
   const deleteCalendar = async (calendar: Calendar) => {
@@ -48,7 +48,9 @@ export function CalendarList() {
     } catch (error) {
       // The server refuses the last calendar (409 conflict): the same words as the disabled Delete.
       const isLast = isApiError(error) && (error.code === "conflict" || error.status === 409);
-      showToast(isLast ? LAST_CALENDAR_REASON : reason(error, "Couldn't delete the calendar. Try again."));
+      showToast(isLast ? LAST_CALENDAR_REASON : reason(error, "Couldn't delete the calendar. Try again."), {
+        type: "error",
+      });
     }
   };
 

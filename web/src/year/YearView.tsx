@@ -150,6 +150,7 @@ function useYearOccurrences(year: number, timeZone: string): readonly Occurrence
         // Superseded by a newer request, or signed out (the login page takes over).
         if (controller.signal.aborted || isApiError(error, "signed_out")) return;
         showToast(isApiError(error) ? error.message : "Your events couldn't be loaded.", {
+          type: "error",
           action: { label: "Retry", onAction: () => setVersion((current) => current + 1) },
         });
       },

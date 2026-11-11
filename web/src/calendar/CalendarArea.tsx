@@ -345,7 +345,7 @@ async function saveMove(info: EventChangeInfo, timeZone: string): Promise<void> 
   } catch (error) {
     info.revert();
     if (!isApiError(error, "signed_out")) {
-      showToast(isApiError(error) ? error.message : "The event couldn't be moved. Try again.");
+      showToast(isApiError(error) ? error.message : "The event couldn't be moved. Try again.", { type: "error" });
     }
   }
 }
@@ -354,6 +354,7 @@ function fetchFailure(error: unknown, retry: () => void): void {
   // Signed out: the login page takes over.
   if (isApiError(error, "signed_out")) return;
   showToast(isApiError(error) ? error.message : "Your events couldn't be loaded.", {
+    type: "error",
     action: { label: "Retry", onAction: retry },
   });
 }
