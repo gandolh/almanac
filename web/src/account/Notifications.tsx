@@ -1,8 +1,8 @@
-import { Switch } from "@base-ui/react/switch";
 import { useEffect, useId, useState } from "react";
 import { isApiError } from "../api";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/ui/Dialog";
+import { Switch } from "../components/ui/Switch";
 import { deletePushSubscription, getPushKey, savePushSubscription, sendTestPush } from "../push/push-api";
 import {
   base64UrlToBytes,
@@ -94,17 +94,14 @@ export function NotificationsPanel({
                 {view.permission === "denied" ? "Blocked in this browser." : view.on ? MESSAGES.on : MESSAGES.off}
               </span>
             </span>
-            <Switch.Root
-              className="switch"
+            <Switch
               checked={view.on}
               aria-labelledby={labelId}
               aria-describedby={stateId}
               disabled={busy || view.permission === "denied"}
               onCheckedChange={(checked) => onToggle?.(checked)}
               data-autofocus=""
-            >
-              <Switch.Thumb className="switch__thumb" />
-            </Switch.Root>
+            />
           </div>
           {view.permission === "denied" && <p className="notify-hint">{blockedHelp(view.ios)}</p>}
           {view.on && (
