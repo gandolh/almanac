@@ -20,7 +20,7 @@ import "@fullcalendar/react/skeleton.css";
 import "@fullcalendar/react/themes/monarch/theme.css";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { isApiError } from "../api";
-import { showToast } from "../components/Toast";
+import { showToast } from "../components/ui/Toast";
 import { currentCalendars, useCalendars } from "../data/calendars";
 import { fetchOccurrences, onOccurrencesChanged, updateEvent } from "../data/occurrences";
 import { useSettings } from "../data/settings";

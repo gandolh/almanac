@@ -11,7 +11,7 @@ import { AuthField } from "../components/Field";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/ui/Dialog";
 import { PlusIcon } from "../components/icons";
-import { showToast } from "../components/Toast";
+import { showToast } from "../components/ui/Toast";
 import { useCalendars } from "../data/calendars";
 import { notifyOccurrencesChanged } from "../data/occurrences";
 import { CalendarRow, checkCalendarName, LAST_CALENDAR_REASON } from "./CalendarRow";

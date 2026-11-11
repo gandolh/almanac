@@ -450,6 +450,7 @@
 }
 
 .toast {
+  translate: var(--toast-swipe-movement-x, 0) var(--toast-swipe-movement-y, 0);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -463,6 +464,10 @@
   line-height: var(--leading-tight);
   pointer-events: auto;
   animation: toast-in var(--duration-sheet) var(--ease-out);
+}
+
+.toast[data-limited] {
+  display: none;
 }
 
 @keyframes toast-in {

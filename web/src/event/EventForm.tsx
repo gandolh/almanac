@@ -14,7 +14,7 @@ import { occurrencePatch } from "../calendar/events";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/ui/Dialog";
 import { BellIcon, CalendarIcon, ClockIcon, NotesIcon, PlaceIcon, RepeatIcon } from "../components/icons";
-import { showToast } from "../components/Toast";
+import { showToast } from "../components/ui/Toast";
 import { calendarColor, useCalendars } from "../data/calendars";
 import { createEvent, updateEvent } from "../data/occurrences";
 import { useSettings } from "../data/settings";

@@ -4,7 +4,7 @@ import { Temporal } from "temporal-polyfill";
 import { describe, expect, it, vi } from "vitest";
 import { Dialog } from "./ui/Dialog";
 import { MonthGrid, type MonthGridProps } from "./MonthGrid";
-import { ToastView } from "./Toast";
+import { Toaster, toastTiming } from "./ui/Toast";
 
 // Base UI's dialog portal needs a DOM; this renders the dialog in place.
 vi.mock("@base-ui/react/dialog", () => import("./ui/dialog-stub"));
@@ -92,22 +92,18 @@ describe("MonthGrid", () => {
 });
 
 describe("Toast", () => {
-  it("is an empty live region with nothing to say", () => {
-    expect(renderToStaticMarkup(createElement(ToastView, { toast: null, onDismiss: () => undefined }))).toBe(
-      '<div class="toaster" role="status" aria-live="polite"></div>',
-    );
+  it("stays 5 s, or 8 s with an action, at the caller's duration otherwise", () => {
+    expect(toastTiming({})).toEqual({ timeout: 5000, priority: "low" });
+    expect(toastTiming({ action: { label: "Undo", onAction: () => undefined } }).timeout).toBe(8000);
+    expect(toastTiming({ duration: 2000 }).timeout).toBe(2000);
   });
 
-  it("shows the message, the action and a dismiss button", () => {
-    const html = renderToStaticMarkup(
-      createElement(ToastView, {
-        toast: { id: 1, message: "Event deleted", action: { label: "Undo", onAction: () => undefined } },
-        onDismiss: () => undefined,
-      }),
-    );
-    expect(html).toContain(">Event deleted</span>");
-    expect(html).toContain('class="toast__action">Undo</button>');
-    expect(html).toContain('aria-label="Dismiss"');
+  it("keeps an error until it is dismissed, whatever duration the caller gave", () => {
+    expect(toastTiming({ type: "error", duration: 2000 })).toEqual({ timeout: 0, priority: "high" });
+  });
+
+  it("renders nothing until the browser has a node for its portal", () => {
+    expect(renderToStaticMarkup(createElement(Toaster))).toBe("");
   });
 });
 

@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type
 import type { Temporal } from "temporal-polyfill";
 import { PlusIcon } from "../components/icons";
 import { Drawer } from "../components/ui/Drawer";
-import { Toaster } from "../components/Toast";
+import { Toaster } from "../components/ui/Toast";
 import { useSettings, useToday } from "../data/settings";
 import { DEFAULT_VIEW, rangeTitle, rangeTitleShort, stepDate, type View } from "../dates";
 import { useEventEditor } from "../event/EventEditor";
