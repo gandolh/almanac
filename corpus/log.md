@@ -341,3 +341,15 @@ errors (rule-3 4, rule-6 26, rule-1 1) and 7 warnings (rule-11).
 Timings, warm: `check:fast` 4.9-5.6 s with one server file changed, 12 s with
 one web file, 3 s with none; `npm run check` 41.8 s.
 
+## [2026-11-11] build | Brief 02: Base UI by the conventions
+
+Built on `main`. Every Base UI import is under `web/src/components/ui/`: `Dialog`,
+`Menu` and `Popover` moved there, and `Drawer` (Base UI's, swipe left closes it),
+`Switch`, `Toast` (a module-level manager, `showToast` unchanged), `ConfirmDialog`
+(`AlertDialog`, shut while its action runs), `RadioGroup` (the time zone list,
+with Home and End added), and `ToggleGroup` (the weekday toggles, and the guarded
+palette) were added. `check-base-ui` went 19 to 14 errors, all rule 5 (brief 03);
+rules 1-4, 6, 7 and 9-11 are 0. jsdom and Testing Library were added as root
+devDependencies for the wrapper tests (745 to 771 tests). Before and after
+screenshots at 1280 and 390 px show no change. See the brief's outcome note.
+

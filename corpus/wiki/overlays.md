@@ -1,14 +1,15 @@
 ---
-summary: How Almanac's dialogs, popovers, menus and phone drawer sit on Base UI since 2026-10-23. What each wrapper maps to, the three behaviours that needed explicit code (Esc a control already handled, rename from a menu via finalFocus, a press on a popover's anchor), why the drawer is a modal Dialog, the dialog stub the static tests use, what stayed native, and the three visual differences that were kept.
-updated: 2026-11-01
+summary: How Almanac's dialogs, popovers, menus, phone drawer, toast, switch, confirm, time zone list, weekday toggles and colour palette sit on Base UI (overlays since 2026-10-23, the rest since 2026-11-11). Every wrapper lives in web/src/components/ui/. What each maps to, the behaviours that needed explicit code (Esc a control already handled, rename from a menu via finalFocus, a press on a popover's anchor, Home and End in the radio group, the guarded toggle group), the dialog stub and the jsdom tests, what stayed native, and the visual differences that were kept.
+updated: 2026-11-11
 ---
 
 # Overlays
 
 The decision is in [decisions.md](decisions.md), "Base UI under the dialogs,
 popovers, menus and drawer". `@base-ui/react` is pinned at 1.9.0 and Almanac
-keeps its own CSS. The wrappers in `web/src/components/` kept their props, so
-no call site changed when they moved. Base UI now owns focus, keys, placement
+keeps its own CSS. The wrappers live in `web/src/components/ui/`, the only
+place that imports `@base-ui/react` (base-ui rule 3); the first three kept
+their props when they moved there, so no call site changed. Base UI now owns focus, keys, placement
 and nesting; the old `layer.ts`, `placePopover` and `escapeClosesDrawer` are
 gone.
 
@@ -25,9 +26,35 @@ gone.
 - **`Menu`**: Base UI `Menu`. Sections are `Menu.Group` + `GroupLabel`, or a
   separator when unlabelled; items with `selected` are a `RadioGroup` with the
   tick in `RadioItemIndicator`.
-- **The phone drawer** (`layout/AppShell.tsx`) is a modal `Dialog`, not Base
-  UI's `Drawer`: Base UI's docs say a side panel without swipe gestures is a
-  positioned Dialog, and Almanac's drawer has none. Its scrim is the backdrop.
+- **The phone drawer** (`ui/Drawer.tsx`, used by `layout/AppShell.tsx`):
+  Base UI's `Drawer` with `swipeDirection="left"`, so a swipe to the left
+  closes it as well as a press on the dim, Esc and Android's back
+  gesture. It is named "Calendars" by a visually hidden `Title`, starts focus
+  on the first `[data-autofocus]` or Create, and returns it to the menu button
+  (`returnFocus`). There is no `SwipeArea` (swipe from the edge to open): it
+  would fight `layout/swipe.ts`, which turns a sideways swipe on the view into
+  the next or previous range. The drawer is portalled, outside `main`, so that
+  hook never sees a swipe on the open drawer.
+- **`Toast`** (`ui/Toast.tsx`): Base UI `Toast` with one module-level
+  `createToastManager()`, so `showToast(message, { action, duration })` still
+  works from anywhere and returns a dismiss function. `<Toaster/>` (mounted by
+  the shell) is `Toast.Provider limit={1}` + `Portal` + `Viewport`, a labelled
+  region that is there before the first toast. A new toast closes the last. 5 s,
+  8 s with an action; `type: "error"` stays until dismissed.
+- **`Switch`** (`ui/Switch.tsx`): the notifications dialog's switch.
+- **`ConfirmDialog`** (`ui/ConfirmDialog.tsx`): Base UI `AlertDialog`; Cancel has
+  focus, an outside press doesn't close it, and while its promise runs nothing
+  closes it and the action says its `pendingLabel`. `DeleteCalendarDialog` uses it.
+- **`RadioGroup`** (`ui/RadioGroup.tsx`): Base UI `RadioGroup` + `Radio.Root`
+  (`RadioItem`) + `Radio.Indicator`; the time zone list. Arrows move and
+  choose; Home and End are added in the wrapper, which Base UI's group leaves out.
+- **`ToggleGroup`** (`ui/ToggleGroup.tsx`): Base UI `ToggleGroup` + `Toggle`
+  with ↑ ↓ added for a group over two rows. `multiple` for the weekdays of
+  "Custom days…" (one Tab stop and arrow keys, in place of seven Tab stops);
+  the default is the guarded group for the colour palette, which saves on each
+  choice: arrows only move focus, one swatch stays pressed, and pressing the
+  pressed one again reports it again (the popover closes on it) instead of
+  clearing it.
 
 Native selects, checkboxes and radios stay native. So does `TimeField`'s list:
 it renders inline, not portalled, so it already works inside a Base UI dialog,
@@ -50,9 +77,18 @@ and its commit-on-blur and Esc rules are tested.
 ## Tests
 
 Base UI's portal renders nothing without a DOM. The static-markup tests that
-render a dialog (`components`, `editor`, `details`, `calendars`) mock
-`@base-ui/react/dialog` with `components/dialog-stub.ts`, which renders the
-parts in place.
+render a dialog (`components`, `editor`, `details`, `calendars`, `notifications`)
+mock `@base-ui/react/dialog`, and for the confirm `@base-ui/react/alert-dialog`,
+with `components/ui/dialog-stub.ts`, which renders the parts in place.
+
+What the wrappers promise (focus, Esc, a pending action, one Tab stop, the
+guarded group, a second toast replacing the first) is tested in jsdom, with
+`// @vitest-environment jsdom` on top of the file, Testing Library and
+`user-event`, selecting by role. They sit beside the wrappers
+(`ui/*.test.tsx`), `ColorPicker.test.tsx` and `RepeatPicker.test.tsx`.
+jsdom has no touch events or layout, so the swipe on the drawer and the
+scroll of the time zone list to the chosen zone were checked in a browser, not
+by a committed test (Almanac has no Playwright setup).
 
 ## Differences kept from the hand-built version
 
@@ -64,4 +100,4 @@ parts in place.
   room; Base UI moves it to the other axis. Kept: the event stays visible, and
   copying the centring would mean offset maths on top of Base UI.
 
-The move cost about 50 kB gzip on the main chunk (137.79 to 187.92 kB).
+The first move cost about 50 kB gzip on the main chunk (137.79 to 187.92 kB).

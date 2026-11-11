@@ -24,8 +24,11 @@ deployed. Briefs 01-04 are open (2026-11-09); brief numbering restarted at
   year view, quick create and the event form, calendars, display time zone,
   search, keyboard shortcuts, phone layout with drawer and swipe
   ([web-app.md](web-app.md), [features.md](features.md)).
-- **Overlays** (2026-10-23). `Dialog`, `Popover`, `Menu` and the phone drawer
-  on Base UI 1.9.0 ([overlays.md](overlays.md)).
+- **Overlays** (2026-10-23, widened 2026-11-11). `Dialog`, `Popover`, `Menu`
+  and the phone drawer on Base UI 1.9.0; since 2026-11-11 also the toast, the
+  delete-calendar confirm, the time zone list, the weekday toggles, the colour
+  palette and the notifications switch, all wrapped under
+  `web/src/components/ui/` ([overlays.md](overlays.md)).
 - **Notifications** (2026-10-27). Web Push plumbing, a reminder on each event,
   and the minute tick that sends them. A real push reached FCM from the built
   server on this machine; no browser or phone has shown one yet
@@ -37,7 +40,7 @@ deployed. Briefs 01-04 are open (2026-11-09); brief numbering restarted at
 - **Conventions** (2026-11-11). The house style and its harness are built
   (brief 01): vendored `house-style` 1.0.0, Prettier at 120, the typed ESLint
   rules, `npm run check` and `check:fast`, a root `CLAUDE.md` and
-  `.claude/rules/`. Briefs 02-04 (Base UI by the base-ui skill's rules, the
+  `.claude/rules/`. Brief 02 (Base UI by the base-ui skill's rules) is built; briefs 03-04 (the
   whole web app on Tailwind v4, the server layout) are open and run inside it.
   Base UI is already pinned at 1.9.0, so no bump is needed.
 - **Sibling repos** (2026-10-27). The stale app lists in `wzd_auth` and

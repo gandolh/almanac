@@ -112,6 +112,19 @@ chunk. Native selects, checkboxes and radios stay native, and so does the
 time field's list. Rejected: keeping the hand-built components, and shadcn,
 which brings Tailwind, which Almanac doesn't use.
 
+_2026-11-11_, the base-ui skill's conventions (the owner's grilling of
+2026-11-10): Base UI is imported only under `web/src/components/ui/`, and the
+widgets Almanac had built by hand moved onto it: the toast (`Toast`), the
+delete-calendar confirm (`AlertDialog`), the time zone list (`RadioGroup`), the
+weekday toggles and the colour palette (`ToggleGroup`, guarded for the
+palette because it saves on each choice), and the notifications switch. The
+phone drawer is Base UI's `Drawer` (Q40), closed by a swipe too; it replaces
+the "a side panel without swipe is a positioned Dialog" call above. No
+`SwipeArea`, which would fight the swipe on the view. Native text, date and
+time inputs and selects stay native (Q16). `Button` and tooltips stay as
+they were (decision 4 of the brief). Styling is still Almanac's own CSS; the
+move to Tailwind is the next brief.
+
 ## The house style, formatted and checked
 _2026-11-11_, the owner's grilling of 2026-11-10. Almanac holds a copy of the
 skills library's `house-style` folder in `vendor/house-style/` (version

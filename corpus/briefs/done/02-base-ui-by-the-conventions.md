@@ -192,3 +192,19 @@ One commit per numbered step. After each, `npm run check` passes, with `check-ba
 
 - Brief 03 styles `web/src/components/ui/` with Tailwind on the parts, and removes the CSS rules this brief renamed.
 - The skills library's `check-base-ui` heuristic for rule 9 may flag `Dialog.Close` around an icon. That is a false positive, to report to the skill rather than to except here.
+
+## Outcome (2026-11-11)
+
+Built in ten commits on `main`.
+- **Wrappers**, all under `web/src/components/ui/`: `Dialog`, `Menu`, `Popover` (moved), `Drawer`, `Switch`, `Toast`, `ConfirmDialog`, `RadioGroup`, `ToggleGroup`, `dialog-stub.ts` (also stubs `alert-dialog`). The drawer is Base UI's `Drawer` (swipe left closes it, no `SwipeArea`); the toast, the delete-calendar confirm, the time zone list, the weekday toggles and the colour palette sit on Base UI parts.
+- **`check-base-ui`:** before 19 errors (rule-3 5, rule-5 14). After 14 (rule-5 14): rules 1-4, 6, 7 and 9-11 report 0, no `ColorPicker` exception. It stays `--warn-only` until brief 03 removes the other stylesheets. The grep for `@base-ui/react` outside `components/ui/` prints nothing.
+- **Tests:** 745 to 771. jsdom tests per wrapper that holds logic (ToggleGroup, RadioGroup, ConfirmDialog, Drawer, Toast), `ColorPicker.test.tsx`, `RepeatPicker.test.tsx`; static-markup tests kept for the rest. `npm run check` exits 0.
+- **Browser walk** (two throwaway clones, a made-up local account, scratch data; Playwright scripts in the scratch folder, not committed): drawer Esc guard, swipe left closes, swipe on the view steps the range, focus returns to the menu button; a second toast replaces the first; delete-calendar can't be closed by Esc, the X or an outside press while its request runs, says "Deleting…", and Cancel returns focus to the row's options button; the time zone list scrolls to the chosen zone, ↓ from the search field enters it, arrows, Home and End choose; the palette's arrows move focus without a request, Enter saves once and closes the popover; custom days press by click.
+- **Screenshots** at 1280 and 390 px of the seven states, before and after, compared pixel by pixel: no layout or colour change; the only differing pixels (0.07%) are the current-time line moving between runs. One find on the way: Base UI's toast title is an `h2`, which showed in a larger bold face; it renders as a `span` now.
+- **Deviations.**
+  - `jsdom`, `@testing-library/react`, `@testing-library/dom` and `@testing-library/user-event` were added as exact-pinned devDependencies in the root `package.json` (versions as in `lantern`), because the brief asks for behaviour tests and Almanac had no DOM. `web/package.json` is untouched.
+  - `showToast` gained an optional `type: "error"` (stays until dismissed). No caller passes it, since the brief leaves every caller untouched, so today's failure toasts still time out; marking them is one line each (`CalendarArea.tsx`, `YearView.tsx`, `DetailsPopover.tsx`, `CalendarList.tsx`) and is left to the owner's call.
+  - The guarded `ToggleGroup` reports the pressed swatch again when it is pressed again (the colour popover closes on it) instead of dropping the change.
+  - Base UI's `RadioGroup` leaves out Home and End; the wrapper adds them. It also wraps at the ends where the hand-built list stopped.
+  - The palette's Tab stop is its first swatch, not the chosen one (Base UI's `Toggle` doesn't mark the pressed item active); focus still starts on the chosen swatch when the popover opens.
+  - The swipe on the drawer and the zone list's scroll are browser-checked, not committed tests: jsdom has no touch or layout, and Almanac has no Playwright setup.
