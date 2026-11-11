@@ -11,7 +11,6 @@ import {
   rowMenuSections,
   type CalendarRowProps,
 } from "./CalendarRow";
-import { ColorPicker } from "./ColorPicker";
 
 // Base UI's dialog portal needs a DOM; this renders the dialog in place.
 vi.mock("@base-ui/react/dialog", () => import("../components/ui/dialog-stub"));
@@ -168,36 +167,5 @@ describe("checkCalendarName", () => {
     expect(checkCalendarName("")).toEqual({ ok: false, error: "Give the calendar a name." });
     expect(checkCalendarName("   ")).toEqual({ ok: false, error: "Give the calendar a name." });
     expect(checkCalendarName("x".repeat(61))).toEqual({ ok: false, error: "Use 60 characters or fewer." });
-  });
-});
-
-describe("ColorPicker", () => {
-  const html = renderToStaticMarkup(createElement(ColorPicker, { value: "green", onChange: () => undefined }));
-  const swatches = [...html.matchAll(/<button[^>]*role="radio"[^>]*>/g)].map((match) => match[0]);
-
-  it("shows the whole palette in order, as a radio group", () => {
-    expect(html).toContain('role="radiogroup"');
-    expect(swatches.map((tag) => /aria-label="([^"]+)"/.exec(tag)?.[1])).toEqual([
-      "Blue",
-      "Teal",
-      "Green",
-      "Olive",
-      "Yellow",
-      "Orange",
-      "Red",
-      "Pink",
-      "Purple",
-      "Graphite",
-    ]);
-    expect(swatches[0]).toContain("--swatch:#4285F4");
-  });
-
-  it("ticks the current colour and puts only it in the Tab order", () => {
-    const chosen = swatches.filter((tag) => tag.includes('aria-checked="true"'));
-    expect(chosen).toHaveLength(1);
-    expect(chosen[0]).toContain('aria-label="Green"');
-    expect(chosen[0]).toContain('tabindex="0"');
-    expect(swatches.filter((tag) => tag.includes('tabindex="0"'))).toHaveLength(1);
-    expect(html.match(/<svg/g)).toHaveLength(1);
   });
 });

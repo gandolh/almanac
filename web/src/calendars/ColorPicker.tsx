@@ -1,6 +1,7 @@
 import { CALENDAR_COLORS, CALENDAR_COLOR_KEYS, type CalendarColor } from "@almanac/shared";
-import type { CSSProperties, KeyboardEvent } from "react";
+import type { CSSProperties } from "react";
 import { CheckIcon } from "../components/icons";
+import { ToggleGroup, ToggleItem } from "../components/ui/ToggleGroup";
 import "./calendars.css";
 
 /** "blue" → "Blue": a colour's name for the screen reader and the tooltip. */
@@ -19,61 +20,29 @@ export interface ColorPickerProps {
 
 /**
  * The calendar palette (`CALENDAR_COLORS`, in its order) as two rows of
- * round swatches, the chosen one ticked. A radio group: one swatch is in the
- * Tab order, the arrow keys move between swatches, Enter, Space or a click
- * chooses (the arrows only move, so a picker that saves at once is not
- * flooded).
+ * round swatches, the chosen one ticked. A guarded toggle group: one swatch
+ * stays pressed, the arrow keys only move focus between swatches, and Enter,
+ * Space or a click chooses (so a picker that saves at once is not flooded).
  */
 export function ColorPicker({ value, onChange, label = "Colour", autoFocus = false }: ColorPickerProps) {
-  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const swatches = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>("[role=radio]"));
-    const index = swatches.indexOf(document.activeElement as HTMLButtonElement);
-    if (index < 0) return;
-    let next: number;
-    switch (event.key) {
-      case "ArrowRight":
-      case "ArrowDown":
-        next = index + 1;
-        break;
-      case "ArrowLeft":
-      case "ArrowUp":
-        next = index - 1;
-        break;
-      case "Home":
-        next = 0;
-        break;
-      case "End":
-        next = swatches.length - 1;
-        break;
-      default:
-        return;
-    }
-    event.preventDefault();
-    swatches[(next + swatches.length) % swatches.length]?.focus();
-  };
-
   return (
-    <div className="color-picker" role="radiogroup" aria-label={label} onKeyDown={onKeyDown}>
+    <ToggleGroup<CalendarColor> label={label} value={value} onValueChange={onChange} className="color-picker">
       {CALENDAR_COLOR_KEYS.map((color) => {
         const chosen = color === value;
         return (
-          <button
+          <ToggleItem
             key={color}
-            type="button"
-            role="radio"
-            aria-checked={chosen}
+            value={color}
             aria-label={colorName(color)}
             title={colorName(color)}
-            tabIndex={chosen ? 0 : -1}
             data-autofocus={autoFocus && chosen ? "" : undefined}
             className="color-picker__swatch"
             style={{ "--swatch": CALENDAR_COLORS[color] } as CSSProperties}
-            onClick={() => onChange(color)}
           >
             {chosen && <CheckIcon size={18} strokeWidth={3} />}
-          </button>
+          </ToggleItem>
         );
       })}
-    </div>
+    </ToggleGroup>
   );
 }
