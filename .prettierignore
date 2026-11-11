@@ -1,0 +1,17 @@
+# Markdown stays out of Prettier (decided 2026-11-10).
+*.md
+
+# Generated or vendored copies.
+server/vendor/
+web/vendor/
+vendor/house-style/
+
+# Lockfile, build output, local data.
+package-lock.json
+dist/
+dev-dist/
+data/
+coverage/
+
+# Generated home-screen icons.
+web/public/icons/
