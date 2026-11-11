@@ -25,7 +25,12 @@ export interface ColorPickerProps {
  */
 export function ColorPicker({ value, onChange, label = "Colour", autoFocus = false }: ColorPickerProps) {
   return (
-    <ToggleGroup<CalendarColor> label={label} value={value} onValueChange={onChange} className="color-picker">
+    <ToggleGroup<CalendarColor>
+      label={label}
+      value={value}
+      onValueChange={onChange}
+      className="grid grid-cols-[repeat(5,32px)] gap-2 max-md:grid-cols-[repeat(5,var(--size-touch))]"
+    >
       {CALENDAR_COLOR_KEYS.map((color) => {
         const chosen = color === value;
         return (
@@ -35,7 +40,7 @@ export function ColorPicker({ value, onChange, label = "Colour", autoFocus = fal
             aria-label={colorName(color)}
             title={colorName(color)}
             data-autofocus={autoFocus && chosen ? "" : undefined}
-            className="color-picker__swatch"
+            className="flex size-8 items-center justify-center rounded-pill bg-(color:--swatch) p-0 text-on-accent transition-[box-shadow] duration-(--duration-fast) ease-out hover:shadow-[0_0_0_4px_color-mix(in_srgb,var(--swatch)_24%,transparent)] focus-visible:outline-offset-3 max-md:size-touch"
             style={{ "--swatch": CALENDAR_COLORS[color] } as CSSProperties}
           >
             {chosen && <CheckIcon size={18} strokeWidth={3} />}

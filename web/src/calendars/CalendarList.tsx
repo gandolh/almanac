@@ -54,9 +54,13 @@ export function CalendarList() {
   };
 
   return (
-    <section className="calendar-list" aria-labelledby={headingId} aria-busy={status === "loading" || undefined}>
-      <header className="calendar-list__head">
-        <h2 id={headingId} className="calendar-list__title">
+    <section
+      className="flex flex-col gap-0.5 pr-2 pl-4"
+      aria-labelledby={headingId}
+      aria-busy={status === "loading" || undefined}
+    >
+      <header className="flex min-h-9 items-center justify-between pl-1">
+        <h2 id={headingId} className="text-meta leading-tight font-medium text-ink">
           My calendars
         </h2>
         <button type="button" className={ICON_BUTTON_SMALL} aria-label="New calendar" onClick={() => setCreating(true)}>
@@ -64,14 +68,14 @@ export function CalendarList() {
         </button>
       </header>
       {status === "error" && (
-        <div className="calendar-list__note" role="status">
+        <div className="flex items-center justify-between gap-2 px-1 text-small text-muted" role="status">
           <span>Your calendars couldn't be loaded.</span>
           <Button variant="quiet" size="compact" onClick={() => void refresh()}>
             Try again
           </Button>
         </div>
       )}
-      <ul className="calendar-list__rows">
+      <ul className="flex flex-col p-0">
         {calendars.map((calendar) => (
           <CalendarRow
             key={calendar.id}
@@ -147,7 +151,7 @@ function NewCalendarDialog({ usedColors, onCreate, onClose }: NewCalendarDialogP
         </>
       }
     >
-      <form id={formId} className="calendar-form" onSubmit={(event) => void submit(event)} noValidate>
+      <form id={formId} className="flex flex-col gap-5 pt-1" onSubmit={(event) => void submit(event)} noValidate>
         <AuthField
           label="Name"
           value={name}
@@ -160,8 +164,8 @@ function NewCalendarDialog({ usedColors, onCreate, onClose }: NewCalendarDialogP
           autoComplete="off"
           data-autofocus=""
         />
-        <div className="calendar-form__group">
-          <span className="calendar-form__label" aria-hidden="true">
+        <div className="flex flex-col gap-2">
+          <span className="text-label leading-tight font-semibold text-muted" aria-hidden="true">
             Colour
           </span>
           <ColorPicker value={color} onChange={setColor} label="Colour" />

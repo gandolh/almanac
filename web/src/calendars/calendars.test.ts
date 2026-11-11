@@ -40,7 +40,7 @@ function row(props: Partial<CalendarRowProps> = {}): string {
   );
 }
 
-/** The opening tag of the first element whose tag contains `marker`. */
+/** The opening tag of the first element whose tag contains `marker` (an attribute, not a class). */
 function tagWith(html: string, element: string, marker: string): string {
   return (
     [...html.matchAll(new RegExp(`<${element}[^>]*>`, "g"))]
@@ -52,20 +52,20 @@ function tagWith(html: string, element: string, marker: string): string {
 describe("CalendarRow", () => {
   it("draws a visible calendar's checkbox checked, in its colour, with its name", () => {
     const html = row();
-    expect(tagWith(html, "input", "calendar-row__input")).toContain('type="checkbox"');
-    expect(tagWith(html, "input", "calendar-row__input")).toContain('checked=""');
+    expect(tagWith(html, "input", 'type="checkbox"')).toContain('type="checkbox"');
+    expect(tagWith(html, "input", 'type="checkbox"')).toContain('checked=""');
     expect(html).toContain("--calendar-color:#33B679");
     expect(html).toContain(">Work</span>");
   });
 
   it("leaves a hidden calendar's checkbox unchecked", () => {
     const html = row({ calendar: { ...work, visible: false } });
-    expect(tagWith(html, "input", "calendar-row__input")).not.toContain("checked");
+    expect(tagWith(html, "input", 'type="checkbox"')).not.toContain("checked=");
     expect(html).toContain(">Work</span>");
   });
 
   it("has a ⋮ button that opens a menu, named for the calendar", () => {
-    const trigger = tagWith(row(), "button", "calendar-row__more");
+    const trigger = tagWith(row(), "button", 'aria-label="Options for Work"');
     expect(trigger).toContain('aria-haspopup="menu"');
     expect(trigger).toContain('aria-label="Options for Work"');
     expect(trigger).toContain('aria-expanded="false"');
@@ -152,7 +152,7 @@ describe("RenameField", () => {
     expect(html).toContain('value="Work"');
     expect(html).toMatch(/maxlength="60"/i);
     expect(html).toContain('aria-label="Calendar name"');
-    expect(html).not.toContain("aria-invalid");
+    expect(html).not.toContain("aria-invalid=");
   });
 });
 

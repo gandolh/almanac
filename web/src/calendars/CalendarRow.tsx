@@ -6,6 +6,7 @@ import { CheckIcon } from "../components/icons";
 import { Menu, type MenuSection } from "../components/ui/Menu";
 import { Popover } from "../components/ui/Popover";
 import { calendarColor } from "../data/calendars";
+import { cn } from "../lib/cn";
 import { ColorPicker, colorName } from "./ColorPicker";
 import { ICON_BUTTON_SMALL } from "../components/looks";
 
@@ -64,6 +65,18 @@ function MoreIcon() {
   );
 }
 
+/** The ⋮ shows under the pointer, with the keyboard, and while its menu is open; a touch screen always has it. */
+const MORE_CLASS =
+  "opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 aria-expanded:opacity-100 [@media(hover:none)]:opacity-100";
+
+/** A filled field where the name was. 16 px on a phone: iOS doesn't zoom into it. */
+const RENAME_CLASS = [
+  "h-[30px] w-full rounded-small bg-field px-2 text-meta text-ink max-md:h-9 max-md:text-input-phone",
+  "focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-focus-ring",
+  "aria-invalid:outline-[1.5px] aria-invalid:-outline-offset-[1.5px] aria-invalid:outline-ink-2",
+  "aria-invalid:focus-visible:outline-2 aria-invalid:focus-visible:outline-offset-0 aria-invalid:focus-visible:outline-focus-ring",
+].join(" ");
+
 // --- Renaming in place -------------------------------------------------------------------
 
 export interface RenameFieldProps {
@@ -118,11 +131,11 @@ export function RenameField({ name, onCommit, onCancel }: RenameFieldProps) {
   };
 
   return (
-    <div className="calendar-row__edit">
+    <div className="flex min-w-0 flex-1 flex-col gap-1 py-0.5">
       <input
         ref={inputRef}
         type="text"
-        className="calendar-row__rename"
+        className={RENAME_CLASS}
         value={value}
         maxLength={CALENDAR_NAME_MAX}
         aria-label="Calendar name"
@@ -138,7 +151,11 @@ export function RenameField({ name, onCommit, onCancel }: RenameFieldProps) {
         onBlur={() => finish(false)}
       />
       {error !== undefined && (
-        <p id={errorId} className="calendar-row__error" role="alert">
+        <p
+          id={errorId}
+          className="flex items-start gap-1.5 text-small leading-tight font-semibold text-ink"
+          role="alert"
+        >
           <AlertIcon size={16} />
           {error}
         </p>
@@ -165,14 +182,16 @@ export function DeleteCalendarDialog({ calendar, isOnly, onConfirm, onClose }: D
       open
       onClose={onClose}
       title="Delete calendar"
-      message={<p className="calendar-dialog__text">{`Delete "${calendar.name}"? Its events will be deleted too.`}</p>}
+      message={
+        <p className="text-body leading-body text-ink">{`Delete "${calendar.name}"? Its events will be deleted too.`}</p>
+      }
       confirmLabel="Delete"
       pendingLabel="Deleting…"
       onConfirm={onConfirm}
       confirmDisabled={isOnly}
       confirmTitle={LAST_CALENDAR_REASON}
     >
-      {isOnly && <p className="calendar-dialog__text calendar-dialog__text--note">{LAST_CALENDAR_REASON}</p>}
+      {isOnly && <p className="mt-3 text-meta leading-body text-muted">{LAST_CALENDAR_REASON}</p>}
     </ConfirmDialog>
   );
 }
@@ -204,12 +223,13 @@ export function CalendarRow({ calendar, isOnly, onVisibleChange, onRename, onRec
   const [deleting, setDeleting] = useState(false);
   // After Enter or Esc in the name field, focus goes back to the row's checkbox, not to the page.
   const restoreFocus = useRef(false);
+  const checkboxRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (renaming || !restoreFocus.current) return;
     restoreFocus.current = false;
-    rowElement?.querySelector<HTMLElement>(".calendar-row__input")?.focus();
-  }, [renaming, rowElement]);
+    checkboxRef.current?.focus();
+  }, [renaming]);
 
   const stopRenaming = (viaKeyboard: boolean) => {
     restoreFocus.current = viaKeyboard;
@@ -225,21 +245,28 @@ export function CalendarRow({ calendar, isOnly, onVisibleChange, onRename, onRec
   return (
     <li
       ref={setRowElement}
-      className="calendar-row"
+      className="group flex min-h-9 items-center gap-1 rounded-control pr-1 focus-within:bg-hover hover:bg-hover max-md:min-h-touch"
       style={{ "--calendar-color": calendarColor(calendar) } as CSSProperties}
       data-renaming={renaming || undefined}
     >
-      <label className="calendar-row__toggle">
+      <label className="relative flex min-w-0 flex-1 cursor-pointer items-center gap-3 self-stretch pl-1 text-meta text-ink group-data-renaming:flex-none max-md:text-body">
         <input
+          ref={checkboxRef}
           type="checkbox"
-          className="calendar-row__input"
+          className="peer pointer-events-none absolute m-0 size-px opacity-0"
           checked={calendar.visible}
           onChange={(event) => onVisibleChange(event.currentTarget.checked)}
         />
-        <span className="calendar-row__box" aria-hidden="true">
+        <span
+          className="flex size-swatch flex-none items-center justify-center rounded-small border-2 border-(color:--calendar-color) text-on-accent peer-checked:bg-(color:--calendar-color) peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus-ring [&>svg]:opacity-0 peer-checked:[&>svg]:opacity-100"
+          aria-hidden="true"
+        >
           <CheckIcon size={12} strokeWidth={3.5} />
         </span>
-        <span className={renaming ? "sr-only" : "calendar-row__name"} title={renaming ? undefined : calendar.name}>
+        <span
+          className={renaming ? "sr-only" : "min-w-0 overflow-hidden text-ellipsis whitespace-nowrap"}
+          title={renaming ? undefined : calendar.name}
+        >
           {calendar.name}
         </span>
       </label>
@@ -256,7 +283,7 @@ export function CalendarRow({ calendar, isOnly, onVisibleChange, onRename, onRec
         <Menu
           label={`Options for ${calendar.name}`}
           triggerLabel={`Options for ${calendar.name}`}
-          triggerClassName={`${ICON_BUTTON_SMALL} calendar-row__more`}
+          triggerClassName={cn(ICON_BUTTON_SMALL, MORE_CLASS)}
           align="end"
           trigger={<MoreIcon />}
           sections={sections}
@@ -267,7 +294,7 @@ export function CalendarRow({ calendar, isOnly, onVisibleChange, onRename, onRec
           anchor={rowElement}
           onClose={() => setChoosingColor(false)}
           label={`Colour of ${calendar.name}`}
-          className="calendar-colors"
+          className="p-4"
         >
           <ColorPicker
             value={calendar.color}

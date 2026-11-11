@@ -12,7 +12,6 @@
 
 @import "tailwindcss";
 @import "./tokens.css" layer(legacy);
-@import "../calendars/calendars.css" layer(legacy);
 @import "../search/search.css" layer(legacy);
 @import "../event/details.css" layer(legacy);
 @import "../event/editor.css" layer(legacy);
