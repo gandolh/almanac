@@ -18,7 +18,6 @@ import { toApiError } from "../data/store";
 import { RANGE_DASH, Temporal, formatDate, formatTime, weekdayShort, zonedOf } from "../dates";
 import { viewRoute } from "../router";
 import { normalizeQuery, searchEvents } from "./search-api";
-import "./search.css";
 
 export interface SearchResultsProps {
   /** `?q=` from the address, as typed; may be empty. */

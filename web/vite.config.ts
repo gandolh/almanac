@@ -1,5 +1,6 @@
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv, type ProxyOptions } from "vite";
 
@@ -45,7 +46,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     base,
-    plugins: [react()],
+    plugins: [react(), tailwindcss()],
     server: { port: 5177, strictPort: true, proxy: devProxy(env) },
     // `vite preview` serves the built app, behind the same proxy.
     preview: { port: 4177, strictPort: true, proxy: devProxy(env) },

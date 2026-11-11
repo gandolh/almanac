@@ -2,7 +2,6 @@ import { CALENDAR_COLORS, CALENDAR_COLOR_KEYS, type CalendarColor } from "@alman
 import type { CSSProperties } from "react";
 import { CheckIcon } from "../components/icons";
 import { ToggleGroup, ToggleItem } from "../components/ui/ToggleGroup";
-import "./calendars.css";
 
 /** "blue" → "Blue": a colour's name for the screen reader and the tooltip. */
 export function colorName(color: CalendarColor): string {

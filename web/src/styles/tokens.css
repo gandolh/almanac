@@ -1,174 +1,88 @@
 /*
- * Almanac's design tokens: the one place a colour, a size of type, a radius,
- * a shadow or a layout size is written down. Every other stylesheet reads
- * these; none writes a colour of its own.
- *
- * Google Calendar's look, played straight and light only
- * (corpus/wiki/decisions.md): white surfaces, #1f1f1f text, #444746
- * secondary, #dadce0 hairlines, one #0b57d0 accent, today as a filled accent
- * circle, a 64 px top bar over a 256 px left column, the system font with
- * Roboto where it is installed, 8 px radii and soft shadows on what floats.
- * There is no dark theme and no `prefers-color-scheme` rule.
+ * The old token names, as aliases of the @theme ones in index.css, for the
+ * stylesheets not yet moved to utilities. Gone with the last of them.
  */
 
 :root {
-  /* --- Colour -------------------------------------------------------------- */
-
-  --ground: #ffffff; /* page background */
-  --surface: #ffffff; /* panels, menus, popovers, dialogs */
-  --control: #e9eef6; /* secondary buttons */
-  --field: #f0f4f9; /* filled text fields */
-  --hairline: #dadce0; /* borders between surfaces, the grid's lines */
-  --divider: #dadce0; /* rules inside a surface */
-  --outline: #747775; /* outlined buttons: Today, the view switcher */
-  --ink: #1f1f1f; /* primary text */
-  --ink-2: #444746; /* secondary text, icons */
-  --muted: #5f6368; /* captions, labels, other months' days (6.3:1 on white) */
-  --accent: #0b57d0; /* the one interactive colour, and today */
-  --accent-press: #0842a0; /* pressed, link hover */
-  --accent-ink: #041e49; /* text on the accent tint: the chosen view */
-  --accent-tint: #d3e3fd; /* the chosen view, the shown date, an open menu button */
-  --accent-tint-soft: #e8f0fe; /* a menu row under the pointer, a notice */
-  --toast-surface: #303030; /* the snackbar */
-  --toast-ink: #f2f2f2;
-  --toast-action: #a8c7fa;
-  --now-line: #ea4335; /* the current time across day and week, Google's red */
-
-  /* --- Derived: mixes and aliases of the above, never a new hue ----------- */
-
-  --on-accent: var(--surface); /* text on the accent */
-  --control-hover: color-mix(in srgb, var(--control) 92%, var(--ink));
-  --control-press: color-mix(in srgb, var(--control) 84%, var(--ink));
-  /* Google's state layers: ink at 8% under the pointer, 12% pressed. */
-  --hover: color-mix(in srgb, var(--ink-2) 8%, transparent);
-  --press: color-mix(in srgb, var(--ink-2) 12%, transparent);
-  --field-placeholder: var(--muted);
-  --focus-ring: var(--accent);
-  --selection: var(--accent-tint);
-  --scrollbar-thumb: color-mix(in srgb, var(--muted) 40%, var(--ground));
-  --scrim: color-mix(in srgb, var(--ink) 32%, transparent); /* behind a dialog or the drawer */
-  --toast-hover: color-mix(in srgb, var(--toast-ink) 8%, transparent); /* the toast's buttons under the pointer */
-
-  /* --- Type --------------------------------------------------------------- */
-
-  --font-sans: Roboto, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-
-  --text-title: 34px; /* the login page's wordmark, 700, -0.02em */
-  --text-title-phone: 32px;
-  --text-brand: 22px; /* "Almanac" in the top bar */
-  --text-range: 22px; /* "October 2026" in the top bar */
-  --text-range-phone: 17px;
-  --text-heading: 18px; /* a dialog's title */
-  --text-action-large: 16px; /* a large primary action, 600 */
-  --text-input-phone: 16px; /* fields: below 16 px iOS zooms in */
-  --text-body: 15px;
-  --text-meta: 14px; /* controls on the desktop, menu rows, Create */
-  --text-small: 13px; /* hints and field errors */
-  --text-label: 12px; /* field labels, 600; the year view's days */
-  --text-mini: 11px; /* the mini-month's days and weekday initials */
-  --text-badge: 9px; /* the day's number on the phone's Today icon, 700 */
-  --text-day-number: 26px; /* the date under a weekday in day and week */
-  --text-day-number-phone: 18px;
-  --text-event: 12px; /* events and the hour labels in the views */
-
-  --weight-regular: 400;
-  --weight-medium: 500;
-  --weight-semibold: 600;
-  --weight-bold: 700;
-
-  --tracking-title: -0.02em;
-
-  --leading-body: 1.45;
-  --leading-phone: 1.4;
-  --leading-tight: 1.25;
-
-  /* --- Radii -------------------------------------------------------------- */
-
-  --radius-small: 4px; /* a menu row, a colour swatch */
-  --radius-control: 8px; /* buttons, notices, popovers, menus */
-  --radius-field: 10px; /* text fields */
-  --radius-container: 16px; /* the login panel, the Create button */
-  --radius-sheet: 20px; /* dialogs */
-  --radius-pill: 999px;
-
-  /* --- Elevation: only what floats casts a shadow ------------------------- */
-
-  /* Google's level 1: the Create button at rest. */
-  --shadow-raised: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
-  /* Level 2: the Create button under the pointer, the round phone button. */
-  --shadow-raised-hover: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
-  /* Menus, popovers, the toast. */
-  --shadow-float: 0 4px 8px 3px rgba(60, 64, 67, 0.15), 0 1px 3px rgba(60, 64, 67, 0.3);
-  /* Dialogs. */
-  --shadow-dialog:
-    0 24px 38px 3px rgba(60, 64, 67, 0.14), 0 9px 46px 8px rgba(60, 64, 67, 0.12),
-    0 11px 15px -7px rgba(60, 64, 67, 0.2);
-
-  /* --- Sizes -------------------------------------------------------------- */
-
-  --touch: 44px; /* the smallest target on a phone */
-  --control-height: 34px; /* buttons on the desktop */
-  --control-height-large: 48px; /* a large primary action */
-  --icon-button: 40px; /* round icon buttons: ☰ ‹ › */
-  --icon-button-small: 28px; /* the mini-month's ‹ › */
-  --outlined-height: 36px; /* Today, the view switcher */
-  --topbar-height: 64px;
-  --sidebar-width: 256px;
-  --drawer-width: 304px;
-  --create-height: 56px;
-  --fab-size: 56px;
-  --account-disc: 32px;
-  --mini-cell: 32px; /* a mini-month column */
-  --mini-day: 24px; /* its day circle */
-  --year-cell: 32px; /* a year view column */
-  --year-day: 28px; /* its day circle */
-  --day-dot: 4px; /* the "has events" dot */
-  --swatch-size: 14px; /* a calendar's colour square in the left column */
-  --popover-width: 448px;
-  --day-disc: 46px; /* the circle round a date in day and week's heads; today's is filled */
-  --day-disc-phone: 32px;
-  --menu-width: 224px;
-  --dialog-small: 400px;
-  --dialog-medium: 560px;
-  --dialog-large: 720px;
-  --toast-width: 568px;
-  --gutter-desktop: 8px; /* the top bar's ends */
-  --gutter-phone: 16px;
-
-  /* --- Search ------------------------------------------------------------ */
-
-  --search-dot: 10px; /* a result's (and a day list's) calendar colour dot */
-  --day-popover-width: 320px; /* the year view's day list */
-  --search-field-width: 360px; /* the open field in the desktop bar */
-  --search-field-width-narrow: 240px; /* ... under 1200 px */
-  --search-field-width-narrowest: 160px; /* ... under 900 px */
-  --search-date-column: 160px; /* the date at the left of its results */
-  --search-time-column: 120px; /* "10:00 – 11:00" */
-  --search-content-max: 880px; /* the results' reading width */
-
-  /* --- The event editor -------------------------------------------------- */
-
-  --editor-field-height: 36px; /* a field on the desktop (a phone's is --touch) */
-  --editor-lead: 44px; /* the icon column of a form row */
-  --date-field-width: 148px;
-  --time-field-width: 88px;
-  --count-field-width: 72px;
-  --time-list-height: 240px; /* the time list scrolls past this */
-  --day-toggle: 32px; /* a weekday's round toggle in "Custom days…" */
-
-  /* --- Layers --------------------------------------------------------------- */
-
-  --z-bar: 10;
-  --z-drawer: 50;
-  --z-float: 100; /* menus, popovers, dialogs: the later one opened sits above */
-  --z-toast: 200;
-
-  /* --- Motion: state changes only, short, ease-out ------------------------ */
-
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --duration-fast: 120ms;
-  --duration: 180ms;
-  --duration-sheet: 240ms;
+  --ground: var(--color-ground);
+  --surface: var(--color-surface);
+  --control: var(--color-control);
+  --field: var(--color-field);
+  --hairline: var(--color-hairline);
+  --divider: var(--color-divider);
+  --outline: var(--color-outline);
+  --ink: var(--color-ink);
+  --ink-2: var(--color-ink-2);
+  --muted: var(--color-muted);
+  --accent: var(--color-accent);
+  --accent-press: var(--color-accent-press);
+  --accent-ink: var(--color-accent-ink);
+  --accent-tint: var(--color-accent-tint);
+  --accent-tint-soft: var(--color-accent-tint-soft);
+  --toast-surface: var(--color-toast-surface);
+  --toast-ink: var(--color-toast-ink);
+  --toast-action: var(--color-toast-action);
+  --now-line: var(--color-now-line);
+  --on-accent: var(--color-on-accent);
+  --control-hover: var(--color-control-hover);
+  --control-press: var(--color-control-press);
+  --hover: var(--color-hover);
+  --press: var(--color-press);
+  --field-placeholder: var(--color-field-placeholder);
+  --focus-ring: var(--color-focus-ring);
+  --selection: var(--color-selection);
+  --scrollbar-thumb: var(--color-scrollbar-thumb);
+  --scrim: var(--color-scrim);
+  --toast-hover: var(--color-toast-hover);
+  --weight-regular: var(--font-weight-regular);
+  --weight-medium: var(--font-weight-medium);
+  --weight-semibold: var(--font-weight-semibold);
+  --weight-bold: var(--font-weight-bold);
+  --touch: var(--size-touch);
+  --control-height: var(--height-control);
+  --control-height-large: var(--height-control-large);
+  --icon-button: var(--size-icon-button);
+  --icon-button-small: var(--size-icon-button-small);
+  --outlined-height: var(--height-outlined);
+  --topbar-height: var(--height-topbar);
+  --sidebar-width: var(--width-sidebar);
+  --drawer-width: var(--width-drawer);
+  --create-height: var(--height-create);
+  --fab-size: var(--size-fab);
+  --account-disc: var(--size-account-disc);
+  --mini-cell: var(--size-mini-cell);
+  --mini-day: var(--size-mini-day);
+  --year-cell: var(--size-year-cell);
+  --year-day: var(--size-year-day);
+  --day-dot: var(--size-day-dot);
+  --swatch-size: var(--size-swatch);
+  --popover-width: var(--width-popover);
+  --day-disc: var(--size-day-disc);
+  --day-disc-phone: var(--size-day-disc-phone);
+  --menu-width: var(--container-menu);
+  --dialog-small: var(--container-dialog-small);
+  --dialog-medium: var(--container-dialog-medium);
+  --dialog-large: var(--container-dialog-large);
+  --toast-width: var(--container-toast);
+  --gutter-desktop: var(--spacing-gutter-desktop);
+  --gutter-phone: var(--spacing-gutter-phone);
+  --search-dot: var(--size-search-dot);
+  --day-popover-width: var(--width-day-popover);
+  --search-field-width: var(--width-search-field);
+  --search-field-width-narrow: var(--width-search-field-narrow);
+  --search-field-width-narrowest: var(--width-search-field-narrowest);
+  --search-content-max: var(--container-search-content);
+  --editor-field-height: var(--height-editor-field);
+  --editor-lead: var(--spacing-editor-lead);
+  --date-field-width: var(--width-date-field);
+  --time-field-width: var(--width-time-field);
+  --count-field-width: var(--width-count-field);
+  --time-list-height: var(--height-time-list);
+  --day-toggle: var(--size-day-toggle);
+  --z-bar: var(--z-index-bar);
+  --z-drawer: var(--z-index-drawer);
+  --z-float: var(--z-index-float);
+  --z-toast: var(--z-index-toast);
 }
 
 /* The event editor's phone sizes: every target is 44 px. */

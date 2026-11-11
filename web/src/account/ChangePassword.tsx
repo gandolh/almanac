@@ -12,7 +12,6 @@ import "../auth/session";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/ui/Dialog";
 import { AlertIcon, AuthField } from "../components/Field";
-import "./account.css";
 
 /**
  * The account menu's "Change password":

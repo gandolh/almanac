@@ -5,7 +5,6 @@ import { useIsDesktop } from "../components/viewport";
 import { registerCommand } from "../layout/commands";
 import { goBack, lastViewRoute, navigateToSearch, usePathname, useQueryParam, useRoute } from "../router";
 import { normalizeQuery } from "./search-api";
-import "./search.css";
 
 /**
  * The top bar's search: a magnifier that opens into a field (on a phone the

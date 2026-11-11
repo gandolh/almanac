@@ -7,7 +7,6 @@ import { Menu, type MenuSection } from "../components/ui/Menu";
 import { Popover } from "../components/ui/Popover";
 import { calendarColor } from "../data/calendars";
 import { ColorPicker, colorName } from "./ColorPicker";
-import "./calendars.css";
 
 /** Why the last calendar stays: also the toast when the server refuses the delete (409). */
 export const LAST_CALENDAR_REASON = "You can't delete your only calendar. Almanac needs at least one.";

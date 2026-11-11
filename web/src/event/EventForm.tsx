@@ -52,7 +52,6 @@ import {
 import { RepeatPicker } from "./RepeatPicker";
 import { askScope } from "./scope";
 import { TimeField } from "./TimeField";
-import "./editor.css";
 
 /**
  * The event form (glossary: event form), Google's full editor: a dialog,

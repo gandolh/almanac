@@ -3,7 +3,6 @@ import { useId, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/ui/Dialog";
-import "./details.css";
 
 /**
  * The edit-scope question (glossary: edit scope), Google's "Edit recurring

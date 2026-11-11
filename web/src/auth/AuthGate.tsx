@@ -4,7 +4,6 @@ import { Button } from "../components/Button";
 import { LOGIN, navigate, useMatchedRoute } from "../router";
 import { LoginPage } from "./LoginPage";
 import { afterSignIn, forgetReturnPath, rememberReturnPath } from "./session";
-import "./auth.css";
 
 /**
  * The session gate around the whole app. The vendored hooks hold the session

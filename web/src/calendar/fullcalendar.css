@@ -1,0 +1,68 @@
+/*
+ * FullCalendar's CSS, and the Monarch palette in Almanac's colours. This is
+ * the one stylesheet besides index.css: it loads with the calendar's lazy
+ * chunk only, so sign-in and the other pages don't pay for it. Both imports go
+ * in the `fullcalendar` layer, under `components` and `utilities` (the order
+ * is fixed in styles/index.css), so the utilities Almanac passes through
+ * FullCalendar's class-name options beat Monarch's own rules.
+ */
+
+@import "@fullcalendar/react/skeleton.css" layer(fullcalendar);
+@import "@fullcalendar/react/themes/monarch/theme.css" layer(fullcalendar);
+
+/*
+ * Every name a Monarch palette defines is set from the tokens; Monarch's own
+ * palettes are not loaded. The values sit on `:root`, not on the view,
+ * because FullCalendar moves an event being dragged to the end of the
+ * document, outside the view.
+ */
+@layer base {
+  :root {
+    /* primary, secondary and tertiary: the accent and its tint. Tertiary is today's disc. */
+    --fc-monarch-primary: var(--color-accent);
+    --fc-monarch-primary-foreground: var(--color-on-accent);
+    --fc-monarch-primary-over: var(--color-accent-press);
+    --fc-monarch-primary-down: var(--color-accent-press);
+    --fc-monarch-secondary: var(--color-accent-tint);
+    --fc-monarch-secondary-foreground: var(--color-accent-ink);
+    --fc-monarch-secondary-over: color-mix(in srgb, var(--color-accent-tint) 92%, var(--color-ink));
+    --fc-monarch-secondary-down: color-mix(in srgb, var(--color-accent-tint) 84%, var(--color-ink));
+    --fc-monarch-tertiary: var(--color-accent);
+    --fc-monarch-tertiary-foreground: var(--color-on-accent);
+    --fc-monarch-tertiary-over: var(--color-accent-press);
+    --fc-monarch-tertiary-down: var(--color-accent-press);
+
+    /* calendar content: an event without a colour, the selection, the time now */
+    --fc-monarch-event: var(--color-accent);
+    --fc-monarch-event-contrast: var(--color-on-accent);
+    --fc-monarch-highlight: color-mix(in srgb, var(--color-accent-tint) 60%, transparent);
+    --fc-monarch-now: var(--color-now-line);
+
+    /* controls (FullCalendar's toolbar, which Almanac doesn't show) */
+    --fc-monarch-selected: var(--color-ink-2);
+    --fc-monarch-selected-foreground: var(--color-on-accent);
+    --fc-monarch-selected-over: var(--color-ink);
+    --fc-monarch-selected-down: var(--color-ink);
+    --fc-monarch-outline: var(--color-focus-ring);
+
+    /* popover */
+    --fc-monarch-popover: var(--color-surface);
+    --fc-monarch-popover-foreground: var(--color-ink);
+
+    /* neutral backgrounds: Google's state layers */
+    --fc-monarch-background: var(--color-ground);
+    --fc-monarch-faint: color-mix(in srgb, var(--color-ink-2) 5%, transparent);
+    --fc-monarch-muted: var(--color-hover);
+    --fc-monarch-strong: var(--color-press);
+    --fc-monarch-stronger: color-mix(in srgb, var(--color-ink-2) 16%, transparent);
+    --fc-monarch-strongest: color-mix(in srgb, var(--color-ink-2) 20%, transparent);
+
+    /* neutral foregrounds and borders */
+    --fc-monarch-foreground: var(--color-ink);
+    --fc-monarch-strong-foreground: var(--color-ink);
+    --fc-monarch-faint-foreground: var(--color-muted);
+    --fc-monarch-muted-foreground: var(--color-muted);
+    --fc-monarch-border: var(--color-hairline);
+    --fc-monarch-strong-border: var(--color-outline);
+  }
+}

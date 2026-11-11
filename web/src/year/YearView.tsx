@@ -10,7 +10,6 @@ import { useSettings, useToday } from "../data/settings";
 import { Temporal, dateKey, instantRange, monthName, sameDate, visibleRange, type DateSpan } from "../dates";
 import { DayList } from "./DayList";
 import { markedDays } from "./days";
-import "./year.css";
 
 export interface YearViewProps {
   year: number;

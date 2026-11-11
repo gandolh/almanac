@@ -16,8 +16,6 @@ import { useCalendars } from "../data/calendars";
 import { notifyOccurrencesChanged } from "../data/occurrences";
 import { CalendarRow, checkCalendarName, LAST_CALENDAR_REASON } from "./CalendarRow";
 import { ColorPicker } from "./ColorPicker";
-import "../auth/auth.css";
-import "./calendars.css";
 
 /** The words for a failed call: the connection's own when there is none, else `fallback`. */
 function reason(error: unknown, fallback: string): string {

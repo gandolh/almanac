@@ -10,7 +10,6 @@ import { deleteOccurrence } from "./delete-occurrence";
 import { useEventEditor } from "./EventEditor";
 import { linkify } from "./linkify";
 import { whenText } from "./occurrence-text";
-import "./details.css";
 
 /**
  * What a click on an event shows, Google's details popover: Edit, Delete

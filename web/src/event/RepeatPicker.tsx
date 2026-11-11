@@ -11,7 +11,6 @@ import {
   type RepeatEndKind,
   type RepeatPreset,
 } from "./editor-state";
-import "./editor.css";
 
 /**
  * How an event repeats (glossary: series), Google's way: a list of presets

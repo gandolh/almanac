@@ -1,5 +1,4 @@
 import { useId, type InputHTMLAttributes, type Ref } from "react";
-import "../auth/auth.css";
 
 /**
  * The error mark beside a field or form error: a 24-unit grid, round caps,

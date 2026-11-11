@@ -14,7 +14,6 @@ import {
   subscribeWith,
   subscriptionBody,
 } from "../push/subscription";
-import "../push/notifications.css";
 
 /**
  * The account menu's "Notifications": a switch that turns

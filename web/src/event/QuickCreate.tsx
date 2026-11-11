@@ -17,7 +17,6 @@ import {
 } from "./editor-state";
 import { CalendarSelect } from "./EventForm";
 import { whenText } from "./occurrence-text";
-import "./editor.css";
 
 /**
  * Quick create (glossary: quick create), Google's small popover beside a

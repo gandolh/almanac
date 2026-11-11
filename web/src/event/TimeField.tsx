@@ -1,7 +1,6 @@
 import { useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import { parseTimeText, type TimeOption } from "./editor-state";
 import { placeTimeList, roomAround } from "./time-list";
-import "./editor.css";
 
 /**
  * A time of day, 24-hour always: type "14:30" or "1430", or pick from a

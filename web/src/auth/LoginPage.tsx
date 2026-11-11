@@ -5,7 +5,6 @@ import { useIsDesktop } from "../components/viewport";
 import { AlertIcon, AuthField } from "../components/Field";
 import { loginMessage, sessionReasonMessage, wardSignInMessage } from "./messages";
 import { wardReturnTo } from "./session";
-import "./auth.css";
 
 export interface LoginViewProps {
   /** The server has Ward configured: "Sign in with Ward" shows only then. */

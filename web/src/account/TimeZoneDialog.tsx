@@ -7,8 +7,6 @@ import { RadioGroup, RadioIndicator, RadioItem } from "../components/ui/RadioGro
 import { CheckIcon } from "../components/icons";
 import { useSettings } from "../data/settings";
 import { listTimeZones, matchesZone, zoneEntry, type ZoneEntry } from "./time-zones";
-import "../auth/auth.css";
-import "./time-zone.css";
 
 export interface TimeZoneDialogProps {
   open: boolean;
