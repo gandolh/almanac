@@ -307,3 +307,37 @@ stylesheet (Q42); the 15 px root moves onto `body` (Q44); tests select by role
 vps-deploy edit (Q1); the error handler keeps Almanac's body (Q43);
 `healthSchema` and `idParamsSchema` live server-side (Q55). New brief 05, a
 redesign with Hallmark on the estate board (Q39). No measurement changed.
+
+## [2026-11-11] build | Brief 01: the house style and its harness
+
+Built on `main`. Vendored `house-style` 1.0.0 in `vendor/house-style/` with
+`house-style:sync`; the twelve tool pins (exact); Prettier at 120 and one
+reformat commit (90 files, listed in `.git-blame-ignore-revs`; the esbuild
+bundle compare matched for every TypeScript and JavaScript file, and the only
+CSS difference is hex case in `tokens.css`); `verbatimModuleSyntax` and
+`erasableSyntaxOnly` (one error, `ApiError`'s parameter property; zero for
+imports); the house ESLint config; `npm run check`, `check:fast` and
+`check:conventions`; a root `CLAUDE.md` and `.claude/rules/`.
+
+Measured before turning rules on (per rule, source and tests): no-floating-
+promises 1 (`void` on Fastify's default parser call), no-misused-promises 0,
+await-thenable 0, switch-exhaustiveness-check 0, no-unnecessary-type-assertion
+2 + 11 (the 11 are `res.json() as T` in tests, now `res.json<T>()`),
+consistent-type-imports 0, no-non-null-assertion 9 (all in
+`reminders.test.ts`, fixed), no-redeclare 3 (a redundant `/* global */`
+comment in `docs/images/demo-seed.mjs`, removed), vitest `expect-expect` 5
+without `assertFunctionNames` and 0 with `expectError` named,
+`n/no-process-env` 4 (a warning). Nothing passed 20, so nothing went to the
+owner. Lint time with `projectService` 18.9-23.7 s against `project: true`
+15.1-17.3 s on a first pair of runs, and 15.7 / 16.9 against 16.3 / 15.1
+interleaved: a draw, so `projectService` stays. knip with the preset: 0
+unused files, 0 unused dependencies once `@vite-pwa/assets-generator` (run by
+hand for the icons, named by no script) is listed in `ignoreDependencies`;
+22 unused exports and 10 unused types, as warnings.
+dependency-cruiser: 7 `no-circular` errors (the route files import
+`FeatureContext` from `app.ts`), lowered to a warning by name. Checkers, left
+`--warn-only`: `check-base-ui` 19 (rule-3 5, rule-5 14), `check-structure` 31
+errors (rule-3 4, rule-6 26, rule-1 1) and 7 warnings (rule-11).
+Timings, warm: `check:fast` 4.9-5.6 s with one server file changed, 12 s with
+one web file, 3 s with none; `npm run check` 41.8 s.
+

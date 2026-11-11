@@ -280,3 +280,23 @@ One commit per step, each with `npm run typecheck`, `npm test`, `npm run lint` a
 
 - Brief 02 adds nothing to the gate. Brief 03 adds `better-tailwindcss` and drops `check-base-ui`'s `--warn-only`. Brief 04 adds dependency-cruiser, drops `check-structure`'s `--warn-only`, and turns `no-process-env` (from `eslint-plugin-n`) into an error.
 - The reformat changes `web/src/styles/tokens.css`'s hex case. Brief 03 deletes that file anyway.
+
+## Outcome (2026-11-11)
+
+Built on `main` in nine commits (06c05e8 vendor, 7c94eeb Prettier config, fdd3172 reformat, 4d8b987 blame ignore, aa5ddb8 tsconfig, c5b902b ESLint, 1159718 gate, e02b399 CLAUDE.md and rules, 9225176 corpus). Synced to `house-style-v1.0.0`; the controller re-syncs to 1.1.0 later.
+
+**Counts** are in [log.md](../../log.md) (2026-11-11 entry): typed rules 1 floating promise, 2 + 11 unnecessary assertions, 0 for the rest; 9 `!` (tests); 3 `no-redeclare` from a `/* global */` comment; `expect-expect` 5 without `expectError` named, 0 with; `n/no-process-env` 4 (warning). All fixed except the 4 warnings. dependency-cruiser: 7 `no-circular`, lowered to a warning by name in `.dependency-cruiser.cjs`. Checkers `--warn-only`: check-base-ui 19, check-structure 31 errors and 7 warnings. knip: 0 files, 0 dependencies, 22 exports and 10 types as warnings.
+
+**Timings**, warm: `check:fast` 4.9-5.6 s (one server file), 12 s (one web file), 3 s (none); `npm run check` 41.8 s. `projectService` kept: a draw with `project: true`.
+
+**Reformat:** 90 files. The esbuild bundle compare matched for every TypeScript and JavaScript file; CSS differs only in `tokens.css` hex case; `package.json` differs only by the two format scripts added between the snapshots.
+
+**Hooks**, run by hand: the formatter hook formatted a messy `server/src/messy.ts`; the Stop hook exited 2 on a type error and 0 once reverted.
+
+**Deviations:**
+- `tsconfig.base.json` carries the house flags itself and doesn't extend the vendored base: the Dockerfile's `deps` stage copies only that file before `tsc -b server` (the same call wicket made).
+- `@vite-pwa/assets-generator` is in knip's `ignoreDependencies` for `web` (`knip.config.js`), not removed: it regenerates the home-screen icons by hand.
+- `docs/images/` is in `houseStyle()`'s `scripts` option (a hand-run helper); `vapid-keys.ts` joined the `console` list and the `n/no-process-env` warning block, beside `index.ts` and `seed.ts`.
+- `void` on `parseJson(...)` in `server/src/app.ts`: the callback form returns nothing at runtime.
+
+**Checks skipped:** docker build (no docker builds here); the live-session hook check waits for the plugin update.
