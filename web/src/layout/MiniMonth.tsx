@@ -29,10 +29,20 @@ export function MiniMonth({ date, today, onPick }: MiniMonthProps) {
           {monthTitle(month)}
         </h2>
         <div className="mini-month__nav">
-          <button type="button" className="icon-button icon-button--small" aria-label="Previous month" onClick={() => setMonth(month.subtract({ months: 1 }))}>
+          <button
+            type="button"
+            className="icon-button icon-button--small"
+            aria-label="Previous month"
+            onClick={() => setMonth(month.subtract({ months: 1 }))}
+          >
             <ChevronLeftIcon size={18} />
           </button>
-          <button type="button" className="icon-button icon-button--small" aria-label="Next month" onClick={() => setMonth(month.add({ months: 1 }))}>
+          <button
+            type="button"
+            className="icon-button icon-button--small"
+            aria-label="Next month"
+            onClick={() => setMonth(month.add({ months: 1 }))}
+          >
             <ChevronRightIcon size={18} />
           </button>
         </div>

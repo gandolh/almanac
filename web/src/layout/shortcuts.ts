@@ -74,11 +74,23 @@ export function isTypingTarget(target: EventTarget | null): boolean {
 
 /** The input types a person types into (an element's `type` already reads "text" for an unknown one). */
 const TEXT_INPUT_TYPES: ReadonlySet<string> = new Set([
-  "text", "search", "email", "url", "tel", "password", "number", "date", "time", "datetime-local", "month", "week",
+  "text",
+  "search",
+  "email",
+  "url",
+  "tel",
+  "password",
+  "number",
+  "date",
+  "time",
+  "datetime-local",
+  "month",
+  "week",
 ]);
 
 /** Controls that use letters or arrows themselves. */
-const OWN_KEYS = '[role="menu"], [role="listbox"], [role="combobox"], [role="slider"], [role="textbox"], [contenteditable=""], [contenteditable="true"]';
+const OWN_KEYS =
+  '[role="menu"], [role="listbox"], [role="combobox"], [role="slider"], [role="textbox"], [contenteditable=""], [contenteditable="true"]';
 
 /** Open things that the shortcuts stay quiet behind. */
 const OVERLAY_SELECTOR = 'dialog[open], [aria-modal="true"], [role="dialog"], [role="alertdialog"], [role="menu"]';

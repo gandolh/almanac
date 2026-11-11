@@ -13,7 +13,9 @@ const october = Temporal.PlainYearMonth.from("2026-10");
 const today = Temporal.PlainDate.from("2026-10-16");
 
 function grid(props: Partial<MonthGridProps> = {}): string {
-  return renderToStaticMarkup(createElement(MonthGrid, { month: october, today, onPickDay: () => undefined, size: "mini", ...props }));
+  return renderToStaticMarkup(
+    createElement(MonthGrid, { month: october, today, onPickDay: () => undefined, size: "mini", ...props }),
+  );
 }
 
 /** The `data-date`s of the day buttons, in order. */
@@ -98,7 +100,10 @@ describe("Toast", () => {
 
   it("shows the message, the action and a dismiss button", () => {
     const html = renderToStaticMarkup(
-      createElement(ToastView, { toast: { id: 1, message: "Event deleted", action: { label: "Undo", onAction: () => undefined } }, onDismiss: () => undefined }),
+      createElement(ToastView, {
+        toast: { id: 1, message: "Event deleted", action: { label: "Undo", onAction: () => undefined } },
+        onDismiss: () => undefined,
+      }),
     );
     expect(html).toContain(">Event deleted</span>");
     expect(html).toContain('class="toast__action">Undo</button>');
@@ -108,11 +113,23 @@ describe("Toast", () => {
 
 describe("Dialog", () => {
   it("renders nothing while closed", () => {
-    expect(renderToStaticMarkup(createElement(Dialog, { open: false, onClose: () => undefined, title: "Time zone", children: "x" }))).toBe("");
+    expect(
+      renderToStaticMarkup(
+        createElement(Dialog, { open: false, onClose: () => undefined, title: "Time zone", children: "x" }),
+      ),
+    ).toBe("");
   });
 
   it("titles itself and offers a close button", () => {
-    const html = renderToStaticMarkup(createElement(Dialog, { open: true, onClose: () => undefined, title: "Time zone", children: "Body", footer: "Actions" }));
+    const html = renderToStaticMarkup(
+      createElement(Dialog, {
+        open: true,
+        onClose: () => undefined,
+        title: "Time zone",
+        children: "Body",
+        footer: "Actions",
+      }),
+    );
     expect(html).toContain('<div role="dialog" class="dialog dialog--medium">');
     expect(html).toContain('class="dialog__title">Time zone</h2>');
     expect(html).toContain('aria-label="Close"');

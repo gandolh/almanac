@@ -34,7 +34,10 @@ export interface DueReminder {
  *   -540 is 09:00 on the day even on a day the clocks change. A wall-clock time
  *   that doesn't exist that day moves on, as everywhere else.
  */
-export function dueAt(occurrence: Pick<Occurrence, "allDay" | "start" | "reminderMinutes">, timeZone: string): number | null {
+export function dueAt(
+  occurrence: Pick<Occurrence, "allDay" | "start" | "reminderMinutes">,
+  timeZone: string,
+): number | null {
   const minutes = occurrence.reminderMinutes;
   if (minutes === null) return null;
   if (!occurrence.allDay) return parseInstant(occurrence.start) - minutes * 60_000;
@@ -76,7 +79,13 @@ export interface FindLog {
  * excluded dates and the occurrences its exceptions replace. A series that
  * won't expand is logged and skipped, as the views skip it.
  */
-export function findDue(events: EventStore, userId: string, timeZone: string, window: Window, log?: FindLog): DueReminder[] {
+export function findDue(
+  events: EventStore,
+  userId: string,
+  timeZone: string,
+  window: Window,
+  log?: FindLog,
+): DueReminder[] {
   const range = lookahead(window, timeZone);
   const candidates: Occurrence[] = events
     .listInRange(userId, range)

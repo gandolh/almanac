@@ -31,18 +31,32 @@ describe("currentUserId", () => {
 describe("crossOriginWrite", () => {
   it("lets every read through, whatever the headers", () => {
     for (const method of ["GET", "HEAD", "OPTIONS"]) {
-      expect(crossOriginWrite(request({ method, headers: { origin: "https://example.net", "sec-fetch-site": "cross-site" } }), ORIGIN)).toBe(false);
+      expect(
+        crossOriginWrite(
+          request({ method, headers: { origin: "https://example.net", "sec-fetch-site": "cross-site" } }),
+          ORIGIN,
+        ),
+      ).toBe(false);
     }
   });
 
   it("refuses a write from another origin, by Origin or by Sec-Fetch-Site", () => {
-    expect(crossOriginWrite(request({ method: "POST", headers: { origin: "https://example.net" } }), ORIGIN)).toBe(true);
+    expect(crossOriginWrite(request({ method: "POST", headers: { origin: "https://example.net" } }), ORIGIN)).toBe(
+      true,
+    );
     expect(crossOriginWrite(request({ method: "POST", headers: { origin: "null" } }), ORIGIN)).toBe(true);
-    expect(crossOriginWrite(request({ method: "DELETE", headers: { "sec-fetch-site": "same-site" } }), ORIGIN)).toBe(true);
+    expect(crossOriginWrite(request({ method: "DELETE", headers: { "sec-fetch-site": "same-site" } }), ORIGIN)).toBe(
+      true,
+    );
   });
 
   it("lets a write from the app's own pages through, and one with neither header", () => {
-    expect(crossOriginWrite(request({ method: "POST", headers: { origin: ORIGIN, "sec-fetch-site": "same-origin" } }), ORIGIN)).toBe(false);
+    expect(
+      crossOriginWrite(
+        request({ method: "POST", headers: { origin: ORIGIN, "sec-fetch-site": "same-origin" } }),
+        ORIGIN,
+      ),
+    ).toBe(false);
     expect(crossOriginWrite(request({ method: "PATCH" }), ORIGIN)).toBe(false);
   });
 });

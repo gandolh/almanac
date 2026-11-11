@@ -50,7 +50,10 @@ export function SearchResults({ query }: SearchResultsProps) {
       (error: unknown) => {
         // A search that was replaced (or this page left): nobody is waiting for it.
         if (controller.signal.aborted) return;
-        setAnswer({ query: q, outcome: { kind: "error", error: toApiError(error, "The search couldn't be completed.") } });
+        setAnswer({
+          query: q,
+          outcome: { kind: "error", error: toApiError(error, "The search couldn't be completed.") },
+        });
       },
     );
     return () => controller.abort();
@@ -113,9 +116,7 @@ export interface ResultsViewProps {
 /** The answer to a search, without fetching it (for tests): "No results for …", or the days. */
 export function ResultsView({ query, results, timeZone, calendars }: ResultsViewProps) {
   if (results.length === 0) {
-    return (
-      <ResultsMessage role="status">{`No results for "${query}".`}</ResultsMessage>
-    );
+    return <ResultsMessage role="status">{`No results for "${query}".`}</ResultsMessage>;
   }
   const byId = new Map(calendars.map((calendar) => [calendar.id, calendar]));
   return (
@@ -129,7 +130,12 @@ export function ResultsView({ query, results, timeZone, calendars }: ResultsView
             <ul className="search-day__events">
               {day.items.map((occurrence) => (
                 <li key={occurrence.id}>
-                  <ResultRow occurrence={occurrence} day={day.date} calendar={byId.get(occurrence.calendarId)} timeZone={timeZone} />
+                  <ResultRow
+                    occurrence={occurrence}
+                    day={day.date}
+                    calendar={byId.get(occurrence.calendarId)}
+                    timeZone={timeZone}
+                  />
                 </li>
               ))}
             </ul>
@@ -151,7 +157,9 @@ interface ResultRowProps {
 }
 
 function ResultRow({ occurrence, day, calendar, timeZone }: ResultRowProps) {
-  const repeat = occurrence.repeat ? describeRepeat(occurrence.repeat, occurrence.originalStart ?? occurrence.start, timeZone) : null;
+  const repeat = occurrence.repeat
+    ? describeRepeat(occurrence.repeat, occurrence.originalStart ?? occurrence.start, timeZone)
+    : null;
   const dot = calendar ? ({ "--calendar-color": calendarColor(calendar) } as CSSProperties) : undefined;
   return (
     <Link to={viewRoute("day", day)} className="search-event">

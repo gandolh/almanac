@@ -41,7 +41,12 @@ function pushServiceOf(endpoint: string): string {
   return URL.canParse(endpoint) ? new URL(endpoint).host : "unknown";
 }
 
-export function createPushService({ vapid, subscriptions, log, send = webPushSender(vapid) }: PushServiceDeps): PushService {
+export function createPushService({
+  vapid,
+  subscriptions,
+  log,
+  send = webPushSender(vapid),
+}: PushServiceDeps): PushService {
   async function deliver(userId: string, sub: StoredPushSubscription, payload: string): Promise<boolean> {
     const details = { userId, pushService: pushServiceOf(sub.endpoint) };
     try {
@@ -52,7 +57,10 @@ export function createPushService({ vapid, subscriptions, log, send = webPushSen
         subscriptions.forget(sub.endpoint);
         log.info({ ...details, statusCode }, "push subscription expired; deleted");
       } else {
-        log.warn({ ...details, statusCode, reason: error instanceof Error ? error.message : String(error) }, "push not delivered");
+        log.warn(
+          { ...details, statusCode, reason: error instanceof Error ? error.message : String(error) },
+          "push not delivered",
+        );
       }
       return false;
     }

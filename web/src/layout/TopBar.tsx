@@ -57,16 +57,34 @@ export function TopBar(props: TopBarProps) {
 
       <div className="topbar__nav">
         {!compact && (
-          <button type="button" className="today-button" title={formatDayLong(today)} aria-keyshortcuts="t" onClick={onToday}>
+          <button
+            type="button"
+            className="today-button"
+            title={formatDayLong(today)}
+            aria-keyshortcuts="t"
+            onClick={onToday}
+          >
             Today
           </button>
         )}
         {view !== null && !compact && (
           <div className="topbar__steps">
-            <button type="button" className="icon-button" aria-label={`Previous ${unit}`} aria-keyshortcuts="k" onClick={() => onStep(-1)}>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label={`Previous ${unit}`}
+              aria-keyshortcuts="k"
+              onClick={() => onStep(-1)}
+            >
               <ChevronLeftIcon />
             </button>
-            <button type="button" className="icon-button" aria-label={`Next ${unit}`} aria-keyshortcuts="j" onClick={() => onStep(1)}>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label={`Next ${unit}`}
+              aria-keyshortcuts="j"
+              onClick={() => onStep(1)}
+            >
               <ChevronRightIcon />
             </button>
           </div>

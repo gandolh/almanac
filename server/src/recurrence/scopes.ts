@@ -144,8 +144,7 @@ function aim(events: EventStore, userId: string, id: number, scope?: EditScope, 
 
   const exceptions = events.listExceptions(userId, series.id);
   const exception = exceptions.find((candidate) => candidate.originalStart === key);
-  const generated =
-    isDateKey(key) === series.allDay && !series.exdates.includes(key) && isGenerated(series, key);
+  const generated = isDateKey(key) === series.allDay && !series.exdates.includes(key) && isGenerated(series, key);
   if (!exception && !generated && !(occurrence === undefined && key === series.start)) throw noSuchOccurrence();
   const current = exception
     ? contentOf(exception)
@@ -169,7 +168,8 @@ function aim(events: EventStore, userId: string, id: number, scope?: EditScope, 
  */
 function apply(current: EventContent, changes: EventChanges, repeat: Repeat | null): EventInput {
   const kindChanged = changes.allDay !== undefined && changes.allDay !== current.allDay;
-  const reminderMinutes = changes.reminderMinutes !== undefined ? changes.reminderMinutes : kindChanged ? null : current.reminderMinutes;
+  const reminderMinutes =
+    changes.reminderMinutes !== undefined ? changes.reminderMinutes : kindChanged ? null : current.reminderMinutes;
   return eventInputSchema.parse({
     ...current,
     ...changes,
@@ -288,7 +288,12 @@ function rewrite(events: EventStore, userId: string, id: number, changes: Partia
 }
 
 /** The series' rule and content for a repeat starting at `start`, moved to its first occurrence. */
-function seriesTiming(content: EventContent, repeat: Repeat, anchor: string, tzid: string): EventContent & SeriesTiming {
+function seriesTiming(
+  content: EventContent,
+  repeat: Repeat,
+  anchor: string,
+  tzid: string,
+): EventContent & SeriesTiming {
   return settle({ ...content, tzid, rrule: repeatToRRule(repeat, anchor, tzid) }, repeat);
 }
 
@@ -314,7 +319,13 @@ export function createEvent(ctx: ScopeContext, userId: string, input: EventInput
  * routes). `tzid` is the user's display time zone, which a one-off that
  * becomes a series takes; a series keeps its own.
  */
-export function updateEvent(ctx: ScopeContext, userId: string, id: number, patch: EventPatch, tzid: string): Occurrence {
+export function updateEvent(
+  ctx: ScopeContext,
+  userId: string,
+  id: number,
+  patch: EventPatch,
+  tzid: string,
+): Occurrence {
   return ctx.db.transaction((): Occurrence => {
     const target = aim(ctx.events, userId, id, patch.scope, patch.occurrence);
     if (target.kind === "single") return updateSingle(ctx.events, userId, target.event, patch.changes, tzid);
@@ -342,7 +353,13 @@ export function updateEvent(ctx: ScopeContext, userId: string, id: number, patch
  * (new) start in `tzid`, the user's display time zone now, as a new series
  * would be: the form worded the repeat in that zone ("Weekly on Thursday").
  */
-function updateSingle(events: EventStore, userId: string, event: EventRecord, changes: EventChanges, tzid: string): Occurrence {
+function updateSingle(
+  events: EventStore,
+  userId: string,
+  event: EventRecord,
+  changes: EventChanges,
+  tzid: string,
+): Occurrence {
   const next = apply(contentOf(event), changes, null);
   if (next.repeat === null) return rowOccurrence(rewrite(events, userId, event.id, contentOf(next)), null);
   const timing = seriesTiming(contentOf(next), next.repeat, next.start, tzid);
@@ -376,7 +393,8 @@ function isFirst(target: Aim): boolean {
 function inherited(exception: EventRecord, series: SeriesRecord, fields: Fields): Fields {
   const own: Fields = {};
   for (const field of FIELDS) {
-    if (fields[field] !== undefined && exception[field] === series[field]) Object.assign(own, { [field]: fields[field] });
+    if (fields[field] !== undefined && exception[field] === series[field])
+      Object.assign(own, { [field]: fields[field] });
   }
   return own;
 }
@@ -390,7 +408,13 @@ function spreadFields(events: EventStore, userId: string, target: Aim, fields: F
 }
 
 /** Every occurrence. */
-function updateAll(events: EventStore, userId: string, target: Aim, next: EventInput, repeatChanged: boolean): Occurrence {
+function updateAll(
+  events: EventStore,
+  userId: string,
+  target: Aim,
+  next: EventInput,
+  repeatChanged: boolean,
+): Occurrence {
   const { series, current } = target;
   const timeChanged = timesChanged(current, next);
   const fields = changedFields(current, next);
@@ -444,12 +468,22 @@ function cutSeries(events: EventStore, userId: string, target: Aim): number {
   const { series, key } = target;
   const { repeat, before } = endBefore(series, target.repeat, key);
   events.setRrule(userId, series.id, repeatToRRule(repeat, series.start, series.tzid));
-  events.setExdates(userId, series.id, series.exdates.filter((date) => date < key));
+  events.setExdates(
+    userId,
+    series.id,
+    series.exdates.filter((date) => date < key),
+  );
   return before;
 }
 
 /** This occurrence and the ones after it: the old series ends before it, a new one starts with the changes. */
-function updateFollowing(events: EventStore, userId: string, target: Aim, next: EventInput, repeatChanged: boolean): Occurrence {
+function updateFollowing(
+  events: EventStore,
+  userId: string,
+  target: Aim,
+  next: EventInput,
+  repeatChanged: boolean,
+): Occurrence {
   const { series, key, current } = target;
   const tzid = series.tzid;
   const timeChanged = timesChanged(current, next);
@@ -487,7 +521,10 @@ function updateFollowing(events: EventStore, userId: string, target: Aim, next: 
   // What the old series had from here on moves over, as far as this occurrence moved, if it still falls on the rule.
   const rekey = (old: string) => shift(old, delta, timing.allDay, tzid);
   const fits = (moved: string) => moved >= timing.start && isGenerated(timing, moved);
-  const exdates = series.exdates.filter((date) => date >= key).map(rekey).filter(fits);
+  const exdates = series.exdates
+    .filter((date) => date >= key)
+    .map(rekey)
+    .filter(fits);
   if (exdates.length > 0) events.setExdates(userId, created.id, exdates);
   for (const exception of after) {
     const original = exception.originalStart ?? key;
@@ -504,7 +541,9 @@ function updateFollowing(events: EventStore, userId: string, target: Aim, next: 
     const own: Partial<EventContent> = inherited(exception, series, fields);
     // One still at its slot's times (only its text changed) moves with the series.
     const atSlot =
-      exception.allDay === series.allDay && exception.start === original && exception.end === occurrenceEnd(series, original);
+      exception.allDay === series.allDay &&
+      exception.start === original &&
+      exception.end === occurrenceEnd(series, original);
     if (atSlot) Object.assign(own, { allDay: timing.allDay, start: moved, end: occurrenceEnd(timing, moved) });
     if (Object.keys(own).length > 0) rewrite(events, userId, exception.id, own);
   }
@@ -554,7 +593,11 @@ export function deleteEvent(ctx: ScopeContext, userId: string, id: number, query
  * does. `false` when the user has no such calendar. The `conflict` for the
  * user's last calendar rolls everything back.
  */
-export function removeCalendar(ctx: ScopeContext & { calendars: CalendarStore }, userId: string, calendarId: number): boolean {
+export function removeCalendar(
+  ctx: ScopeContext & { calendars: CalendarStore },
+  userId: string,
+  calendarId: number,
+): boolean {
   return ctx.db.transaction((): boolean => {
     for (const id of ctx.events.releaseCalendar(userId, calendarId)) {
       const series = ctx.events.get(userId, id);

@@ -92,7 +92,9 @@ describe("a new event's default span", () => {
   });
 
   it("goes to the next hour on the hour, and to the next day after 23:00", () => {
-    expect(defaultSpan(BUCHAREST, Temporal.Instant.from("2026-10-16T11:00:00Z")).start.toString()).toBe("2026-10-16T15:00:00");
+    expect(defaultSpan(BUCHAREST, Temporal.Instant.from("2026-10-16T11:00:00Z")).start.toString()).toBe(
+      "2026-10-16T15:00:00",
+    );
     const late = defaultSpan(BUCHAREST, Temporal.Instant.from("2026-10-16T20:30:00Z"));
     expect(late.start.toString()).toBe("2026-10-17T00:00:00");
     expect(late.end.toString()).toBe("2026-10-17T01:00:00");
@@ -117,13 +119,29 @@ describe("a new event's default span", () => {
 
 describe("a form opened with times", () => {
   it("shows a selection's instants on the display clock", () => {
-    const opened = draftOfSeed({ start: "2026-10-20T07:00:00Z", end: "2026-10-20T08:30:00Z", title: "Plan", calendarId: 3 }, BUCHAREST, NOW);
-    expect(opened).toMatchObject({ title: "Plan", calendarId: 3, startDate: "2026-10-20", startTime: "10:00", endDate: "2026-10-20", endTime: "11:30" });
+    const opened = draftOfSeed(
+      { start: "2026-10-20T07:00:00Z", end: "2026-10-20T08:30:00Z", title: "Plan", calendarId: 3 },
+      BUCHAREST,
+      NOW,
+    );
+    expect(opened).toMatchObject({
+      title: "Plan",
+      calendarId: 3,
+      startDate: "2026-10-20",
+      startTime: "10:00",
+      endDate: "2026-10-20",
+      endTime: "11:30",
+    });
   });
 
   it("gives an end-less start an hour, and a backwards end an hour", () => {
-    expect(draftOfSeed({ start: "2026-10-20T07:00:00Z" }, BUCHAREST, NOW)).toMatchObject({ startTime: "10:00", endTime: "11:00" });
-    expect(draftOfSeed({ start: "2026-10-20T07:00:00Z", end: "2026-10-20T06:00:00Z" }, BUCHAREST, NOW)).toMatchObject({ endTime: "11:00" });
+    expect(draftOfSeed({ start: "2026-10-20T07:00:00Z" }, BUCHAREST, NOW)).toMatchObject({
+      startTime: "10:00",
+      endTime: "11:00",
+    });
+    expect(draftOfSeed({ start: "2026-10-20T07:00:00Z", end: "2026-10-20T06:00:00Z" }, BUCHAREST, NOW)).toMatchObject({
+      endTime: "11:00",
+    });
   });
 
   it("shows an all-day end as its last day (the wire's end is exclusive)", () => {
@@ -133,7 +151,11 @@ describe("a form opened with times", () => {
   });
 
   it("takes a timed start given as a date at the default hour", () => {
-    expect(draftOfSeed({ start: "2026-10-20" }, BUCHAREST, NOW)).toMatchObject({ startDate: "2026-10-20", startTime: "15:00", endTime: "16:00" });
+    expect(draftOfSeed({ start: "2026-10-20" }, BUCHAREST, NOW)).toMatchObject({
+      startDate: "2026-10-20",
+      startTime: "15:00",
+      endTime: "16:00",
+    });
   });
 });
 
@@ -151,7 +173,10 @@ describe("moving the start", () => {
 
   it("keeps an all-day event's number of days", () => {
     const days = draftOfSeed({ start: "2026-10-16", end: "2026-10-19", allDay: true }, BUCHAREST, NOW);
-    expect(withStart(days, { startDate: "2026-10-20" })).toMatchObject({ startDate: "2026-10-20", endDate: "2026-10-22" });
+    expect(withStart(days, { startDate: "2026-10-20" })).toMatchObject({
+      startDate: "2026-10-20",
+      endDate: "2026-10-22",
+    });
   });
 
   it("leaves an end that is already before the start alone", () => {
@@ -160,7 +185,11 @@ describe("moving the start", () => {
   });
 
   it("moves nothing while a date is half typed", () => {
-    expect(withStart(draft(), { startDate: "" })).toMatchObject({ startDate: "", endDate: "2026-10-20", endTime: "11:30" });
+    expect(withStart(draft(), { startDate: "" })).toMatchObject({
+      startDate: "",
+      endDate: "2026-10-20",
+      endTime: "11:30",
+    });
   });
 });
 
@@ -184,7 +213,9 @@ describe("an end before the start", () => {
   it("lets an all-day event last one day but not end before it starts", () => {
     const oneDay = draftOfSeed({ start: "2026-10-16", end: "2026-10-17", allDay: true }, BUCHAREST, NOW);
     expect(hasProblems(problemsOf(oneDay))).toBe(false);
-    expect(problemsOf(withEnd(oneDay, { endDate: "2026-10-15" })).end).toBe("The end date can't be before the start date.");
+    expect(problemsOf(withEnd(oneDay, { endDate: "2026-10-15" })).end).toBe(
+      "The end date can't be before the start date.",
+    );
   });
 
   it("keeps no eventInput back while it is wrong", () => {
@@ -195,7 +226,13 @@ describe("an end before the start", () => {
 describe("the All day checkbox", () => {
   it("keeps the dates, and turning it off brings the times back", () => {
     const allDay = withAllDay(draft(), true);
-    expect(allDay).toMatchObject({ allDay: true, startDate: "2026-10-20", endDate: "2026-10-20", startTime: "10:00", endTime: "11:30" });
+    expect(allDay).toMatchObject({
+      allDay: true,
+      startDate: "2026-10-20",
+      endDate: "2026-10-20",
+      startTime: "10:00",
+      endTime: "11:30",
+    });
     expect(withAllDay(allDay, false)).toMatchObject({ allDay: false, startTime: "10:00", endTime: "11:30" });
   });
 
@@ -267,7 +304,8 @@ describe("time text", () => {
 
 describe("the repeat choices", () => {
   it("are worded for the start date", () => {
-    const labels = (date: string) => Object.fromEntries(repeatOptions(date, BUCHAREST).map((option) => [option.value, option.label]));
+    const labels = (date: string) =>
+      Object.fromEntries(repeatOptions(date, BUCHAREST).map((option) => [option.value, option.label]));
     expect(labels("2026-10-16")).toEqual({
       none: "Does not repeat",
       daily: "Daily",
@@ -277,22 +315,43 @@ describe("the repeat choices", () => {
       yearly: "Annually on 16 October",
       custom: "Custom days…",
     });
-    expect(labels("2026-02-03")).toMatchObject({ weekly: "Weekly on Tuesday", monthly: "Monthly on day 3", yearly: "Annually on 3 February" });
-    expect(labels("2026-12-27")).toMatchObject({ weekly: "Weekly on Sunday", monthly: "Monthly on day 27", yearly: "Annually on 27 December" });
+    expect(labels("2026-02-03")).toMatchObject({
+      weekly: "Weekly on Tuesday",
+      monthly: "Monthly on day 3",
+      yearly: "Annually on 3 February",
+    });
+    expect(labels("2026-12-27")).toMatchObject({
+      weekly: "Weekly on Sunday",
+      monthly: "Monthly on day 27",
+      yearly: "Annually on 27 December",
+    });
   });
 
   it("lose their day while the date is half typed", () => {
     const labels = repeatOptions("", BUCHAREST).map((option) => option.label);
-    expect(labels).toEqual(["Does not repeat", "Daily", "Weekly", "Every weekday (Monday to Friday)", "Monthly", "Annually", "Custom days…"]);
+    expect(labels).toEqual([
+      "Does not repeat",
+      "Daily",
+      "Weekly",
+      "Every weekday (Monday to Friday)",
+      "Monthly",
+      "Annually",
+      "Custom days…",
+    ]);
   });
 
   it("make the shared repeat, weekly following the start's weekday", () => {
     const base = draft({ startDate: "2026-10-16" });
-    const pick = (preset: Parameters<typeof choosePreset>[1], on = base) => repeatOf({ ...on, repeat: choosePreset(on.repeat, preset, on.startDate) });
+    const pick = (preset: Parameters<typeof choosePreset>[1], on = base) =>
+      repeatOf({ ...on, repeat: choosePreset(on.repeat, preset, on.startDate) });
     expect(pick("none")).toBeNull();
     expect(pick("daily")).toEqual({ freq: "daily", end: { type: "never" } });
     expect(pick("weekly")).toEqual({ freq: "weekly", byDay: ["FR"], end: { type: "never" } });
-    expect(pick("weekly", { ...base, startDate: "2026-10-19" })).toEqual({ freq: "weekly", byDay: ["MO"], end: { type: "never" } });
+    expect(pick("weekly", { ...base, startDate: "2026-10-19" })).toEqual({
+      freq: "weekly",
+      byDay: ["MO"],
+      end: { type: "never" },
+    });
     expect(pick("weekdays")).toEqual({ freq: "weekdays", end: { type: "never" } });
     expect(pick("monthly")).toEqual({ freq: "monthly", end: { type: "never" } });
     expect(pick("yearly")).toEqual({ freq: "yearly", end: { type: "never" } });
@@ -303,7 +362,11 @@ describe("the repeat choices", () => {
     expect(repeat.days).toEqual(["FR"]);
     repeat = toggleDay(toggleDay(repeat, "MO"), "WE");
     expect(repeat.days).toEqual(["MO", "WE", "FR"]);
-    expect(repeatOf({ repeat, startDate: "2026-10-16" })).toEqual({ freq: "weekly", byDay: ["MO", "WE", "FR"], end: { type: "never" } });
+    expect(repeatOf({ repeat, startDate: "2026-10-16" })).toEqual({
+      freq: "weekly",
+      byDay: ["MO", "WE", "FR"],
+      end: { type: "never" },
+    });
     expect(toggleDay(toggleDay(toggleDay(repeat, "MO"), "WE"), "FR").days).toEqual(["FR"]);
     // From "Every weekday", custom starts from Monday to Friday.
     const fromWeekdays = choosePreset({ ...repeat, preset: "weekdays" }, "custom", "2026-10-16");
@@ -322,33 +385,49 @@ describe("the repeat choices", () => {
   });
 
   it("refuse an end before the start and a count outside 1 to 730", () => {
-    const repeating = (repeat: Partial<EventDraft["repeat"]>) => draft({ repeat: { ...draft().repeat, preset: "daily", ...repeat } });
-    expect(problemsOf(repeating({ end: "until", until: "2026-10-01" })).repeat).toBe("The repeat can't end before it starts.");
+    const repeating = (repeat: Partial<EventDraft["repeat"]>) =>
+      draft({ repeat: { ...draft().repeat, preset: "daily", ...repeat } });
+    expect(problemsOf(repeating({ end: "until", until: "2026-10-01" })).repeat).toBe(
+      "The repeat can't end before it starts.",
+    );
     expect(problemsOf(repeating({ end: "until", until: "" })).repeat).toBe("Enter the date the repeat ends.");
     expect(problemsOf(repeating({ end: "count", count: "0" })).repeat).toContain("1 to 730");
     expect(problemsOf(repeating({ end: "count", count: "731" })).repeat).toContain("1 to 730");
     expect(problemsOf(repeating({ end: "count", count: "2.5" })).repeat).toContain("1 to 730");
     expect(problemsOf(repeating({ end: "count", count: "730" })).repeat).toBeUndefined();
     // "Does not repeat" has no end to check.
-    expect(problemsOf(draft({ repeat: { ...draft().repeat, preset: "none", end: "count", count: "0" } })).repeat).toBeUndefined();
+    expect(
+      problemsOf(draft({ repeat: { ...draft().repeat, preset: "none", end: "count", count: "0" } })).repeat,
+    ).toBeUndefined();
   });
 
   it("are read back from a repeat, a one-day weekly on the start's weekday being plain weekly", () => {
     expect(repeatDraftOf(null, "2026-10-16").preset).toBe("none");
-    expect(repeatDraftOf({ freq: "weekly", byDay: ["FR"], end: { type: "never" } }, "2026-10-16").preset).toBe("weekly");
+    expect(repeatDraftOf({ freq: "weekly", byDay: ["FR"], end: { type: "never" } }, "2026-10-16").preset).toBe(
+      "weekly",
+    );
     expect(repeatDraftOf({ freq: "weekly", end: { type: "never" } }, "2026-10-16").preset).toBe("weekly");
-    const custom = repeatDraftOf({ freq: "weekly", byDay: ["WE", "MO"], end: { type: "count", count: 4 } }, "2026-10-16");
+    const custom = repeatDraftOf(
+      { freq: "weekly", byDay: ["WE", "MO"], end: { type: "count", count: 4 } },
+      "2026-10-16",
+    );
     expect(custom).toMatchObject({ preset: "custom", days: ["MO", "WE"], end: "count", count: "4" });
-    expect(repeatDraftOf({ freq: "weekdays", end: { type: "until", date: "2026-12-01" } }, "2026-10-16")).toMatchObject({
-      preset: "weekdays",
-      end: "until",
-      until: "2026-12-01",
-    });
+    expect(repeatDraftOf({ freq: "weekdays", end: { type: "until", date: "2026-12-01" } }, "2026-10-16")).toMatchObject(
+      {
+        preset: "weekdays",
+        end: "until",
+        until: "2026-12-01",
+      },
+    );
     expect(repeatDraftOf({ freq: "monthly", end: { type: "never" } }, "2026-10-16").preset).toBe("monthly");
   });
 
   it("are summed up with describeRepeat", () => {
-    const series = draftOfOccurrence(weekly({ repeat: { freq: "weekly", byDay: ["MO", "WE"], end: { type: "until", date: "2026-12-01" } } }), BUCHAREST, NOW);
+    const series = draftOfOccurrence(
+      weekly({ repeat: { freq: "weekly", byDay: ["MO", "WE"], end: { type: "until", date: "2026-12-01" } } }),
+      BUCHAREST,
+      NOW,
+    );
     expect(repeatSummary(series, BUCHAREST)).toBe("Weekly on Monday, Wednesday, until 1 Dec 2026");
     expect(repeatSummary(draft(), BUCHAREST)).toBeNull();
     const touched = { ...draft(), repeat: choosePreset(draft().repeat, "monthly", "2026-10-20"), repeatTouched: true };
@@ -362,7 +441,13 @@ describe("the repeat choices", () => {
     expect(sameRepeat(friday, { ...friday, end: { type: "count", count: 3 } }, "2026-10-16")).toBe(false);
     expect(sameRepeat(null, null, "2026-10-16")).toBe(true);
     expect(sameRepeat(friday, null, "2026-10-16")).toBe(false);
-    expect(sameRepeat({ freq: "daily", end: { type: "count", count: 3 } }, { freq: "daily", end: { type: "count", count: 3 } }, "2026-10-16")).toBe(true);
+    expect(
+      sameRepeat(
+        { freq: "daily", end: { type: "count", count: 3 } },
+        { freq: "daily", end: { type: "count", count: 3 } },
+        "2026-10-16",
+      ),
+    ).toBe(true);
   });
 });
 
@@ -400,7 +485,11 @@ describe("saving a new event", () => {
 
   it("sends the repeat", () => {
     const repeating = draft({ repeat: choosePreset(draft().repeat, "weekly", "2026-10-20"), repeatTouched: true });
-    expect(eventInputOf(repeating, 2, BUCHAREST)?.repeat).toEqual({ freq: "weekly", byDay: ["TU"], end: { type: "never" } });
+    expect(eventInputOf(repeating, 2, BUCHAREST)?.repeat).toEqual({
+      freq: "weekly",
+      byDay: ["TU"],
+      end: { type: "never" },
+    });
   });
 });
 
@@ -445,7 +534,8 @@ describe("the reminder", () => {
   it("is sent with a new event, and with an edit only when it changed", () => {
     expect(eventInputOf(draft({ reminderMinutes: 10 }), 2, BUCHAREST)?.reminderMinutes).toBe(10);
     const found = occurrence({ reminderMinutes: 10 });
-    const edit = (extra: Partial<EventDraft>) => changedFields({ ...draftOfOccurrence(found, BUCHAREST, NOW), ...extra }, found, BUCHAREST);
+    const edit = (extra: Partial<EventDraft>) =>
+      changedFields({ ...draftOfOccurrence(found, BUCHAREST, NOW), ...extra }, found, BUCHAREST);
     expect(edit({})).toEqual({});
     expect(edit({ reminderMinutes: 60 })).toEqual({ reminderMinutes: 60 });
     expect(edit({ reminderMinutes: null })).toEqual({ reminderMinutes: null });
@@ -455,17 +545,26 @@ describe("the reminder", () => {
 });
 
 describe("saving an edit", () => {
-  const edited = (found: Occurrence, extra: Partial<EventDraft> = {}) => ({ ...draftOfOccurrence(found, BUCHAREST, NOW), ...extra });
+  const edited = (found: Occurrence, extra: Partial<EventDraft> = {}) => ({
+    ...draftOfOccurrence(found, BUCHAREST, NOW),
+    ...extra,
+  });
 
   it("sends nothing when nothing changed", () => {
-    for (const found of [occurrence(), weekly(), occurrence({ allDay: true, start: "2026-10-16", end: "2026-10-18" })]) {
+    for (const found of [
+      occurrence(),
+      weekly(),
+      occurrence({ allDay: true, start: "2026-10-16", end: "2026-10-18" }),
+    ]) {
       expect(changedFields(edited(found), found, BUCHAREST), found.id).toEqual({});
     }
   });
 
   it("sends only the fields that changed", () => {
     const found = occurrence({ location: "Room 4", notes: "Bring the list" });
-    expect(changedFields(edited(found, { title: "Daily standup" }), found, BUCHAREST)).toEqual({ title: "Daily standup" });
+    expect(changedFields(edited(found, { title: "Daily standup" }), found, BUCHAREST)).toEqual({
+      title: "Daily standup",
+    });
     expect(changedFields(edited(found, { location: " Room 5 " }), found, BUCHAREST)).toEqual({ location: "Room 5" });
     expect(changedFields(edited(found, { notes: "" }), found, BUCHAREST)).toEqual({ notes: "" });
     expect(changedFields(edited(found, { calendarId: 2 }), found, BUCHAREST)).toEqual({ calendarId: 2 });
@@ -476,7 +575,9 @@ describe("saving an edit", () => {
     // 03:30 happens twice on 25 October in Bucharest; this is the second one.
     const found = occurrence({ start: "2026-10-25T01:30:00Z", end: "2026-10-25T02:00:00Z" });
     expect(draftOfOccurrence(found, BUCHAREST, NOW)).toMatchObject({ startTime: "03:30", endTime: "04:00" });
-    expect(changedFields(edited(found, { title: "Standup, late" }), found, BUCHAREST)).toEqual({ title: "Standup, late" });
+    expect(changedFields(edited(found, { title: "Standup, late" }), found, BUCHAREST)).toEqual({
+      title: "Standup, late",
+    });
   });
 
   it("sends the start and end together when either moved", () => {
@@ -493,7 +594,11 @@ describe("saving an edit", () => {
 
   it("sends allDay with the dates when it is switched", () => {
     const found = occurrence();
-    expect(changedFields(withAllDay(edited(found), true), found, BUCHAREST)).toEqual({ allDay: true, start: "2026-10-16", end: "2026-10-17" });
+    expect(changedFields(withAllDay(edited(found), true), found, BUCHAREST)).toEqual({
+      allDay: true,
+      start: "2026-10-16",
+      end: "2026-10-17",
+    });
     const allDay = occurrence({ allDay: true, start: "2026-10-16", end: "2026-10-17" });
     expect(changedFields(withAllDay(edited(allDay), false), allDay, BUCHAREST)).toMatchObject({ allDay: false });
   });
@@ -512,7 +617,10 @@ describe("saving an edit", () => {
 
   it("counts a repeat as changed only when it means another rule", () => {
     const found = weekly();
-    const same = edited(found, { repeat: choosePreset(repeatDraftOf(found.repeat, "2026-10-23"), "weekly", "2026-10-23"), repeatTouched: true });
+    const same = edited(found, {
+      repeat: choosePreset(repeatDraftOf(found.repeat, "2026-10-23"), "weekly", "2026-10-23"),
+      repeatTouched: true,
+    });
     const noChange = changedFields(same, found, BUCHAREST);
     expect(noChange).toEqual({});
     expect(noChange && scopeQuestion(noChange)).toEqual({ action: "edit", allowThis: true });
@@ -525,17 +633,26 @@ describe("saving an edit", () => {
 
   it("asks for the two broader scopes only when the repeat changed", () => {
     expect(scopeQuestion({ title: "Daily standup" })).toEqual({ action: "edit", allowThis: true });
-    expect(scopeQuestion({ repeat: { freq: "daily", end: { type: "never" } } })).toEqual({ action: "edit", allowThis: false });
+    expect(scopeQuestion({ repeat: { freq: "daily", end: { type: "never" } } })).toEqual({
+      action: "edit",
+      allowThis: false,
+    });
     // Ending the repeat is a change of the rule too.
     expect(scopeQuestion({ repeat: null })).toEqual({ action: "edit", allowThis: false });
   });
 
   it("turns a one-off into a series, and a series into a one-off", () => {
     const found = occurrence();
-    const repeating = edited(found, { repeat: choosePreset(edited(found).repeat, "daily", "2026-10-16"), repeatTouched: true });
+    const repeating = edited(found, {
+      repeat: choosePreset(edited(found).repeat, "daily", "2026-10-16"),
+      repeatTouched: true,
+    });
     expect(changedFields(repeating, found, BUCHAREST)).toEqual({ repeat: { freq: "daily", end: { type: "never" } } });
     const series = weekly();
-    const none = edited(series, { repeat: choosePreset(edited(series).repeat, "none", "2026-10-23"), repeatTouched: true });
+    const none = edited(series, {
+      repeat: choosePreset(edited(series).repeat, "none", "2026-10-23"),
+      repeatTouched: true,
+    });
     expect(changedFields(none, series, BUCHAREST)).toEqual({ repeat: null });
   });
 
@@ -549,7 +666,11 @@ describe("saving an edit", () => {
   });
 
   it("shows an all-day occurrence's last day", () => {
-    const form = draftOfOccurrence(occurrence({ allDay: true, start: "2026-10-16", end: "2026-10-18" }), BUCHAREST, NOW);
+    const form = draftOfOccurrence(
+      occurrence({ allDay: true, start: "2026-10-16", end: "2026-10-18" }),
+      BUCHAREST,
+      NOW,
+    );
     expect(form).toMatchObject({ allDay: true, startDate: "2026-10-16", endDate: "2026-10-17" });
   });
 
@@ -580,7 +701,10 @@ describe("the default calendar", () => {
 
     it("remembers the last calendar", () => {
       const store = new Map<string, string>();
-      vi.stubGlobal("localStorage", { getItem: (key: string) => store.get(key) ?? null, setItem: (key: string, value: string) => store.set(key, value) });
+      vi.stubGlobal("localStorage", {
+        getItem: (key: string) => store.get(key) ?? null,
+        setItem: (key: string, value: string) => store.set(key, value),
+      });
       expect(readLastCalendar()).toBeNull();
       rememberCalendar(5);
       expect(readLastCalendar()).toBe(5);

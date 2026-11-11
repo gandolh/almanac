@@ -59,7 +59,11 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
 
   return (
     <BaseMenu.Root modal={false}>
-      <BaseMenu.Trigger ref={triggerRef} className={triggerClassName ?? "button button--secondary button--regular menu-trigger"} aria-label={triggerLabel}>
+      <BaseMenu.Trigger
+        ref={triggerRef}
+        className={triggerClassName ?? "button button--secondary button--regular menu-trigger"}
+        aria-label={triggerLabel}
+      >
         {typeof trigger === "string" ? (
           // The open button's label turns semibold; keep its width from moving the row.
           <span className="menu-trigger__label" data-label={trigger}>
@@ -70,7 +74,13 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
         )}
       </BaseMenu.Trigger>
       <BaseMenu.Portal>
-        <BaseMenu.Positioner className="menu-positioner" side="bottom" align={align} sideOffset={GAP} collisionPadding={MARGIN}>
+        <BaseMenu.Positioner
+          className="menu-positioner"
+          side="bottom"
+          align={align}
+          sideOffset={GAP}
+          collisionPadding={MARGIN}
+        >
           <BaseMenu.Popup
             className="menu"
             aria-label={label}
@@ -92,7 +102,11 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
               const chosen = section.items.find((item) => item.selected);
               // A section whose items are choices is a radio group, the chosen one ticked.
               return section.items.some((item) => item.selected !== undefined) ? (
-                <BaseMenu.RadioGroup key={section.label ?? sectionIndex} className="menu__section" value={chosen?.label ?? null}>
+                <BaseMenu.RadioGroup
+                  key={section.label ?? sectionIndex}
+                  className="menu__section"
+                  value={chosen?.label ?? null}
+                >
                   {heading}
                   {section.items.map((item) => (
                     <BaseMenu.RadioItem
@@ -116,7 +130,12 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
                 <BaseMenu.Group key={section.label ?? sectionIndex} className="menu__section">
                   {heading}
                   {section.items.map((item) => (
-                    <BaseMenu.Item key={item.label} className="menu__item" disabled={item.disabled} onClick={choose(item)}>
+                    <BaseMenu.Item
+                      key={item.label}
+                      className="menu__item"
+                      disabled={item.disabled}
+                      onClick={choose(item)}
+                    >
                       <ItemText item={item} />
                     </BaseMenu.Item>
                   ))}

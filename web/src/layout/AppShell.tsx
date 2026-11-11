@@ -1,5 +1,15 @@
 import { Dialog } from "@base-ui/react/dialog";
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import type { Temporal } from "temporal-polyfill";
 import { PlusIcon } from "../components/icons";
 import { Toaster } from "../components/Toast";
@@ -161,7 +171,11 @@ export function AppShell() {
     const shown = place.view;
     main =
       shown === "year" ? (
-        <YearView year={place.date.year} onOpenDay={(day) => go("day", day)} onOpenMonth={(first) => go("month", first)} />
+        <YearView
+          year={place.date.year}
+          onOpenDay={(day) => go("day", day)}
+          onOpenMonth={(first) => go("month", first)}
+        />
       ) : (
         <Suspense fallback={<div className="calendar-area" />}>
           <CalendarArea view={shown} date={place.date} onNavigate={go} />

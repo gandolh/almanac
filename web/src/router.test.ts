@@ -74,10 +74,22 @@ describe("matchRoute", () => {
 
   it("matches the four views and search, parameters decoded", () => {
     expect(matchRoute("/almanac/search", BASE)).toEqual(SEARCH);
-    expect(matchRoute("/almanac/day/2026/10/16", BASE)).toEqual({ name: "day", params: { y: "2026", m: "10", d: "16" } });
-    expect(matchRoute("/almanac/week/2026/10/16/", BASE)).toEqual({ name: "week", params: { y: "2026", m: "10", d: "16" } });
-    expect(matchRoute("/almanac/month/2026/1/5", BASE)).toEqual({ name: "month", params: { y: "2026", m: "1", d: "5" } });
-    expect(matchRoute("/almanac/year/2026/10/16", BASE)).toEqual({ name: "year", params: { y: "2026", m: "10", d: "16" } });
+    expect(matchRoute("/almanac/day/2026/10/16", BASE)).toEqual({
+      name: "day",
+      params: { y: "2026", m: "10", d: "16" },
+    });
+    expect(matchRoute("/almanac/week/2026/10/16/", BASE)).toEqual({
+      name: "week",
+      params: { y: "2026", m: "10", d: "16" },
+    });
+    expect(matchRoute("/almanac/month/2026/1/5", BASE)).toEqual({
+      name: "month",
+      params: { y: "2026", m: "1", d: "5" },
+    });
+    expect(matchRoute("/almanac/year/2026/10/16", BASE)).toEqual({
+      name: "year",
+      params: { y: "2026", m: "10", d: "16" },
+    });
     expect(matchRoute("/almanac/day/2026/10/%E0%A4%A", BASE)).toBeNull();
     expect(matchRoute("/almanac/day/2026/10/%20", BASE)).toBeNull();
   });
@@ -137,7 +149,8 @@ describe("view routes", () => {
   });
 
   it("read loose but real dates, and refuse impossible ones", () => {
-    const read = (y: string, m: string, d: string) => dateOfRoute({ name: "month", params: { y, m, d } })?.toString() ?? null;
+    const read = (y: string, m: string, d: string) =>
+      dateOfRoute({ name: "month", params: { y, m, d } })?.toString() ?? null;
     expect(read("2026", "01", "05")).toBe("2026-01-05");
     expect(read("2028", "2", "29")).toBe("2028-02-29");
     expect(read("2026", "2", "29")).toBeNull();

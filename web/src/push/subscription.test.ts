@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { base64UrlToBytes, isIos, openRequestPath, pushSupport, sameKey, subscriptionBody, workerUrl, type PushEnvironment } from "./subscription";
+import {
+  base64UrlToBytes,
+  isIos,
+  openRequestPath,
+  pushSupport,
+  sameKey,
+  subscriptionBody,
+  workerUrl,
+  type PushEnvironment,
+} from "./subscription";
 
 const CHROME: PushEnvironment = {
   userAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0 Safari/537.36",
@@ -12,7 +21,8 @@ const CHROME: PushEnvironment = {
 };
 const IPHONE: PushEnvironment = {
   ...CHROME,
-  userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1",
+  userAgent:
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1",
   platform: "iPhone",
   maxTouchPoints: 5,
 };
@@ -31,8 +41,12 @@ describe("pushSupport", () => {
   });
 
   it("knows an iPad that says it is a Mac", () => {
-    expect(isIos({ userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)", platform: "MacIntel", maxTouchPoints: 5 })).toBe(true);
-    expect(isIos({ userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)", platform: "MacIntel", maxTouchPoints: 0 })).toBe(false);
+    expect(
+      isIos({ userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)", platform: "MacIntel", maxTouchPoints: 5 }),
+    ).toBe(true);
+    expect(
+      isIos({ userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)", platform: "MacIntel", maxTouchPoints: 0 }),
+    ).toBe(false);
   });
 });
 
@@ -76,7 +90,9 @@ describe("the worker", () => {
     expect(open("https://elsewhere.example/almanac/day/2026/10/27")).toBeNull();
     expect(open("https://almanac.example/other-app/")).toBeNull();
     expect(open("not a url")).toBeNull();
-    expect(openRequestPath({ type: "something-else", url: "https://almanac.example/almanac/" }, origin, "/almanac/")).toBeNull();
+    expect(
+      openRequestPath({ type: "something-else", url: "https://almanac.example/almanac/" }, origin, "/almanac/"),
+    ).toBeNull();
     expect(openRequestPath(null, origin, "/almanac/")).toBeNull();
   });
 });

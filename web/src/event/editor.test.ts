@@ -27,7 +27,14 @@ const gym: Calendar = { ...work, id: 2, name: "Gym", color: "yellow", position: 
 
 function picker(repeat: RepeatDraft, extra: Partial<RepeatPickerProps> = {}): string {
   return renderToStaticMarkup(
-    createElement(RepeatPicker, { repeat, labelDate: "2026-10-16", startDate: "2026-10-16", timeZone: BUCHAREST, onChange: none, ...extra }),
+    createElement(RepeatPicker, {
+      repeat,
+      labelDate: "2026-10-16",
+      startDate: "2026-10-16",
+      timeZone: BUCHAREST,
+      onChange: none,
+      ...extra,
+    }),
   );
 }
 
@@ -97,7 +104,9 @@ describe("RepeatPicker", () => {
 
 describe("TimeField", () => {
   const field = (value: string) =>
-    renderToStaticMarkup(createElement(TimeField, { value, options: startTimeOptions, onChange: none, label: "Start time" }));
+    renderToStaticMarkup(
+      createElement(TimeField, { value, options: startTimeOptions, onChange: none, label: "Start time" }),
+    );
 
   it("shows the time as 24-hour text in a closed combobox", () => {
     const html = field("14:30");
@@ -111,7 +120,9 @@ describe("TimeField", () => {
 
 describe("CalendarSelect", () => {
   it("lists the calendars with the chosen one's colour", () => {
-    const html = renderToStaticMarkup(createElement(CalendarSelect, { calendars: [work, gym], value: 2, onChange: none }));
+    const html = renderToStaticMarkup(
+      createElement(CalendarSelect, { calendars: [work, gym], value: 2, onChange: none }),
+    );
     expect(html).toContain('<option value="1">Work</option>');
     expect(html).toContain('<option value="2" selected="">Gym</option>');
     expect(html).toContain("--calendar-color:#F6BF26");
@@ -128,8 +139,13 @@ describe("QuickCreateForm", () => {
   const html = (extra: { start?: string; end?: string; allDay?: boolean } = {}) =>
     renderToStaticMarkup(
       createElement(QuickCreateForm, {
-        init: { start: "2026-10-16T07:00:00Z", end: "2026-10-16T08:00:00Z", allDay: false, // QuickCreateForm doesn't use the anchor; the popover around it does.
-        anchor: {} as DOMRect, ...extra },
+        init: {
+          start: "2026-10-16T07:00:00Z",
+          end: "2026-10-16T08:00:00Z",
+          allDay: false, // QuickCreateForm doesn't use the anchor; the popover around it does.
+          anchor: {} as DOMRect,
+          ...extra,
+        },
         onClose: none,
         onSaved: none,
         onMoreOptions: none,
@@ -158,12 +174,16 @@ describe("EventForm", () => {
 
   it("waits for the display time zone before drafting any time", () => {
     // Nothing has loaded the settings here: their status is "loading".
-    expect(renderToStaticMarkup(createElement(EventForm, { onClose: none, seed: { start: "2026-10-20T07:00:00Z" } }))).toBe("");
+    expect(
+      renderToStaticMarkup(createElement(EventForm, { onClose: none, seed: { start: "2026-10-20T07:00:00Z" } })),
+    ).toBe("");
   });
 
   it("drafts the times in the display time zone it is given", () => {
     const seed = { start: "2026-10-20T07:00:00Z", end: "2026-10-20T08:00:00Z" };
-    const london = renderToStaticMarkup(createElement(EventFormDialog, { onClose: none, timeZone: "Europe/London", seed }));
+    const london = renderToStaticMarkup(
+      createElement(EventFormDialog, { onClose: none, timeZone: "Europe/London", seed }),
+    );
     expect(london).toMatch(/aria-label="Start time"[^>]*value="08:00"/);
     expect(form({ seed })).toMatch(/aria-label="Start time"[^>]*value="10:00"/);
   });

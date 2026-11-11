@@ -50,7 +50,12 @@ export function placeTimeList(field: Box, list: { width: number; height: number 
 export function roomAround(element: Element): Box {
   const viewport = window.visualViewport;
   const room: Box = viewport
-    ? { top: viewport.offsetTop, left: viewport.offsetLeft, right: viewport.offsetLeft + viewport.width, bottom: viewport.offsetTop + viewport.height }
+    ? {
+        top: viewport.offsetTop,
+        left: viewport.offsetLeft,
+        right: viewport.offsetLeft + viewport.width,
+        bottom: viewport.offsetTop + viewport.height,
+      }
     : { top: 0, left: 0, right: document.documentElement.clientWidth, bottom: window.innerHeight };
   for (let box = element.parentElement; box !== null; box = box.parentElement) {
     const { overflowX, overflowY } = getComputedStyle(box);

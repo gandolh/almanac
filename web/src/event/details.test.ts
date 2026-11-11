@@ -70,7 +70,9 @@ describe("whenText", () => {
   });
 
   it("writes all-day occurrences as dates, the end exclusive", () => {
-    expect(whenText({ allDay: true, start: "2026-10-16", end: "2026-10-17" }, BUCHAREST)).toBe("Friday, 16 October · All day");
+    expect(whenText({ allDay: true, start: "2026-10-16", end: "2026-10-17" }, BUCHAREST)).toBe(
+      "Friday, 16 October · All day",
+    );
     expect(whenText({ allDay: true, start: "2026-10-16", end: "2026-10-19" }, BUCHAREST)).toBe(
       "Friday, 16 October – Sunday, 18 October",
     );
@@ -110,12 +112,18 @@ describe("EventDetails", () => {
       end: "2026-10-20T08:00:00Z",
       repeat: { freq: "weekly", byDay: ["MO", "WE"], end: { type: "until", date: "2026-12-01" } },
     };
-    expect(details({ occurrence })).toContain('<p class="details__repeat">Weekly on Monday, Wednesday, until 1 Dec 2026</p>');
+    expect(details({ occurrence })).toContain(
+      '<p class="details__repeat">Weekly on Monday, Wednesday, until 1 Dec 2026</p>',
+    );
   });
 
   it("makes links in the location and notes clickable and keeps the notes' lines", () => {
     const html = details({
-      occurrence: { ...standup, location: "https://meet.example.com/abc", notes: "Agenda:\n<b>https://example.com/doc</b>" },
+      occurrence: {
+        ...standup,
+        location: "https://meet.example.com/abc",
+        notes: "Agenda:\n<b>https://example.com/doc</b>",
+      },
     });
     expect(html).toContain(
       '<p class="details__text"><a href="https://meet.example.com/abc" target="_blank" rel="noopener noreferrer">https://meet.example.com/abc</a></p>',
@@ -142,7 +150,9 @@ describe("the edit scope", () => {
   });
 
   it("draws radio buttons with the first one chosen, and OK and Cancel", () => {
-    const html = renderToStaticMarkup(createElement(ScopeDialog, { action: "edit", allowThis: true, onDone: () => undefined }));
+    const html = renderToStaticMarkup(
+      createElement(ScopeDialog, { action: "edit", allowThis: true, onDone: () => undefined }),
+    );
     const labels = [...html.matchAll(/<span>([^<]+)<\/span><\/label>/g)].map((match) => match[1]);
     expect(labels).toEqual([SCOPE_LABELS.this, SCOPE_LABELS.following, SCOPE_LABELS.all]);
     expect(labels).toEqual(["This event", "This and following events", "All events"]);
@@ -154,7 +164,9 @@ describe("the edit scope", () => {
   });
 
   it("chooses 'This and following events' first when 'This event' can't apply", () => {
-    const html = renderToStaticMarkup(createElement(ScopeDialog, { action: "delete", allowThis: false, onDone: () => undefined }));
+    const html = renderToStaticMarkup(
+      createElement(ScopeDialog, { action: "delete", allowThis: false, onDone: () => undefined }),
+    );
     expect(html).not.toContain("This event<");
     expect(html).toMatch(/checked="" value="following"/);
     expect(html).toContain("Delete recurring event");

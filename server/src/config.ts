@@ -111,18 +111,26 @@ function describe(issue: z.core.$ZodIssue): string {
  * under the API prefix, where the session cookie and the dev proxy are.
  * Messages never repeat the key.
  */
-function wardSettings(env: NodeJS.ProcessEnv, apiPrefix: string | undefined, problems: string[]): WardClientOptions | undefined {
+function wardSettings(
+  env: NodeJS.ProcessEnv,
+  apiPrefix: string | undefined,
+  problems: string[],
+): WardClientOptions | undefined {
   let ward: WardClientOptions | undefined;
   try {
     ward = wardClientOptionsFromEnv(env);
   } catch (error) {
-    problems.push(`${error instanceof Error ? error.message : String(error)}. Set all of them, or leave WARD_OIDC_ISSUER empty for local accounts only.`);
+    problems.push(
+      `${error instanceof Error ? error.message : String(error)}. Set all of them, or leave WARD_OIDC_ISSUER empty for local accounts only.`,
+    );
     return undefined;
   }
   if (ward === undefined || apiPrefix === undefined) return ward;
   const expected = `${apiPrefix}${WARD_CALLBACK_PATH}`;
   if (!URL.canParse(ward.redirectUri) || new URL(ward.redirectUri).pathname !== expected) {
-    problems.push(`WARD_OIDC_REDIRECT_URI must be the callback as the browser reaches it: the app's origin, then ${expected}.`);
+    problems.push(
+      `WARD_OIDC_REDIRECT_URI must be the callback as the browser reaches it: the app's origin, then ${expected}.`,
+    );
   }
   return ward;
 }
@@ -177,10 +185,14 @@ function pushSettings(env: NodeJS.ProcessEnv, problems: string[]): VapidKeys | u
   }
   const before = problems.length;
   const fromRun = "the same `npm run vapid-keys -w @almanac/server` run";
-  if (!base64urlOf(publicKey, 65)) problems.push(`VAPID_PUBLIC_KEY must be the public key from ${fromRun} (87 base64url characters).`);
-  if (!base64urlOf(privateKey, 32)) problems.push(`VAPID_PRIVATE_KEY must be the private key from ${fromRun} (43 base64url characters).`);
+  if (!base64urlOf(publicKey, 65))
+    problems.push(`VAPID_PUBLIC_KEY must be the public key from ${fromRun} (87 base64url characters).`);
+  if (!base64urlOf(privateKey, 32))
+    problems.push(`VAPID_PRIVATE_KEY must be the private key from ${fromRun} (43 base64url characters).`);
   if (!isVapidSubject(subject)) {
-    problems.push("VAPID_SUBJECT must be a mailto: URL with an address, such as mailto:johndoe@example.com, or an https: URL.");
+    problems.push(
+      "VAPID_SUBJECT must be a mailto: URL with an address, such as mailto:johndoe@example.com, or an https: URL.",
+    );
   }
   if (problems.length === before && !isVapidPair(publicKey, privateKey)) {
     problems.push(`VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY are not one pair. Copy both from ${fromRun}.`);

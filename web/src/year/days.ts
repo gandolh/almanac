@@ -36,7 +36,11 @@ export function coveredSpan(
 }
 
 /** Whether `date` is one of the days of `occurrence`. */
-export function isOnDay(occurrence: Pick<Occurrence, "allDay" | "start" | "end">, date: Temporal.PlainDate, timeZone: string): boolean {
+export function isOnDay(
+  occurrence: Pick<Occurrence, "allDay" | "start" | "end">,
+  date: Temporal.PlainDate,
+  timeZone: string,
+): boolean {
   const { first, last } = coveredSpan(occurrence, timeZone);
   return Temporal.PlainDate.compare(first, date) <= 0 && Temporal.PlainDate.compare(date, last) <= 0;
 }

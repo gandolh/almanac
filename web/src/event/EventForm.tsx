@@ -1,5 +1,14 @@
 import type { Calendar, EditScope, Occurrence } from "@almanac/shared";
-import { useCallback, useEffect, useId, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { isApiError } from "../api";
 import { occurrencePatch } from "../calendar/events";
 import { Button } from "../components/Button";
@@ -89,7 +98,9 @@ export function EventForm(props: EventFormProps) {
 /** The form itself, for a known display time zone (for tests, which have no settings). */
 export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFormProps & { timeZone: string }) {
   const { calendars } = useCalendars();
-  const [draft, setDraft] = useState<EventDraft>(() => (occurrence ? draftOfOccurrence(occurrence, timeZone) : draftOfSeed(seed ?? {}, timeZone)));
+  const [draft, setDraft] = useState<EventDraft>(() =>
+    occurrence ? draftOfOccurrence(occurrence, timeZone) : draftOfSeed(seed ?? {}, timeZone),
+  );
   const [lastCalendar] = useState(readLastCalendar);
   const [attempted, setAttempted] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -204,7 +215,13 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
       footer={
         <>
           {occurrence && (
-            <Button id={deleteId} variant="quiet" className="event-form__delete" onClick={() => void remove()} disabled={busy}>
+            <Button
+              id={deleteId}
+              variant="quiet"
+              className="event-form__delete"
+              onClick={() => void remove()}
+              disabled={busy}
+            >
               Delete
             </Button>
           )}
@@ -278,7 +295,11 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
             />
           </div>
           <label className="editor-check">
-            <input type="checkbox" checked={draft.allDay} onChange={(event) => setDraft((current) => withAllDay(current, event.target.checked))} />
+            <input
+              type="checkbox"
+              checked={draft.allDay}
+              onChange={(event) => setDraft((current) => withAllDay(current, event.target.checked))}
+            />
             <span>All day</span>
           </label>
           {whenError && (
@@ -293,7 +314,9 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
             className="editor-input editor-select editor-reminder"
             aria-label="Reminder"
             value={reminderValue(draft.reminderMinutes)}
-            onChange={(event) => setDraft((current) => ({ ...current, reminderMinutes: reminderOfValue(event.target.value) }))}
+            onChange={(event) =>
+              setDraft((current) => ({ ...current, reminderMinutes: reminderOfValue(event.target.value) }))
+            }
           >
             {reminderOptions(draft.allDay).map((option) => (
               <option key={option.value} value={option.value}>
@@ -316,7 +339,11 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
         </Row>
 
         <Row icon={<CalendarIcon size={ICON} />} label="Calendar">
-          <CalendarSelect calendars={calendars} value={calendarId} onChange={(id) => setDraft((current) => ({ ...current, calendarId: id }))} />
+          <CalendarSelect
+            calendars={calendars}
+            value={calendarId}
+            onChange={(id) => setDraft((current) => ({ ...current, calendarId: id }))}
+          />
         </Row>
 
         <Row icon={<PlaceIcon size={ICON} />} label="Location">

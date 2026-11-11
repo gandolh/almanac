@@ -41,7 +41,10 @@ export function MonthGrid({ month, today, selected, marked, onPickDay, size, lab
   const allDays = weeks.flat();
   const defaultStop =
     (selected && inMonth(selected) && selected) || (inMonth(today) && today) || month.toPlainDate({ day: 1 });
-  const stopKey = focused !== null && allDays.some((date) => dateKey(date) === focused && pickable(date)) ? focused : dateKey(defaultStop);
+  const stopKey =
+    focused !== null && allDays.some((date) => dateKey(date) === focused && pickable(date))
+      ? focused
+      : dateKey(defaultStop);
 
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, date: Temporal.PlainDate) => {
     const step = STEPS[event.key];

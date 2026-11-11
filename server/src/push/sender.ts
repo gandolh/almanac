@@ -31,7 +31,10 @@ type SendNotification = (subscription: PushTarget, payload: string, options: Req
  * encoding Apple takes. Urgency is high, not Satchel's normal: a phone saving
  * its battery holds a normal push back, and a reminder is only any use on time.
  */
-export function webPushSender(vapid: VapidKeys, sendNotification: SendNotification = webpush.sendNotification): SendPush {
+export function webPushSender(
+  vapid: VapidKeys,
+  sendNotification: SendNotification = webpush.sendNotification,
+): SendPush {
   const options: RequestOptions = {
     vapidDetails: { subject: vapid.subject, publicKey: vapid.publicKey, privateKey: vapid.privateKey },
     TTL: PUSH_TTL_SECONDS,

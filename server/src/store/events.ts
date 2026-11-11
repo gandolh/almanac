@@ -59,7 +59,12 @@ export interface EventStore {
    * unique error when the occurrence already has an exception (update that
    * one instead).
    */
-  insertException(userId: string, seriesId: number, originalStart: string, content: EventContent): EventRecord | undefined;
+  insertException(
+    userId: string,
+    seriesId: number,
+    originalStart: string,
+    content: EventContent,
+  ): EventRecord | undefined;
   /**
    * Points an exception at another of the user's series and occurrence key
    * ("this and following" moves the exceptions after the split to
@@ -279,9 +284,8 @@ export function createEventStore(db: Db, now: () => Date = () => new Date()): Ev
     return reread(userId, Number(insertRow.run(params).lastInsertRowid));
   }
 
-  const create = db.transaction(
-    (userId: string, event: NewEvent): EventRecord =>
-      insert(userId, event, { tzid: event.tzid, rrule: event.rrule ?? null, seriesId: null, originalStart: null }),
+  const create = db.transaction((userId: string, event: NewEvent): EventRecord =>
+    insert(userId, event, { tzid: event.tzid, rrule: event.rrule ?? null, seriesId: null, originalStart: null }),
   );
 
   const update = db.transaction(
@@ -322,7 +326,8 @@ export function createEventStore(db: Db, now: () => Date = () => new Date()): Ev
     (userId: string, id: number, seriesId: number, originalStart: string): EventRecord | undefined => {
       const series = get(userId, seriesId);
       if (!series || series.rrule === null) return undefined;
-      if (updateSeriesLink.run(seriesId, originalStart, now().toISOString(), userId, id).changes === 0) return undefined;
+      if (updateSeriesLink.run(seriesId, originalStart, now().toISOString(), userId, id).changes === 0)
+        return undefined;
       return reread(userId, id);
     },
   );

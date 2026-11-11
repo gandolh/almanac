@@ -62,16 +62,20 @@ describe("eventInputSchema", () => {
 
   it("refuses an end that is not after the start", () => {
     expect(issue(eventInputSchema.safeParse({ ...timed, end: timed.start }))).toBe("end: must be after the start");
-    expect(
-      issue(eventInputSchema.safeParse({ ...timed, allDay: true, start: "2026-10-16", end: "2026-10-16" })),
-    ).toBe("end: must be after the start");
+    expect(issue(eventInputSchema.safeParse({ ...timed, allDay: true, start: "2026-10-16", end: "2026-10-16" }))).toBe(
+      "end: must be after the start",
+    );
   });
 
   it("refuses an event longer than EVENT_LENGTH_MAX_DAYS, timed or all-day", () => {
     const last = addDays("2026-10-16", EVENT_LENGTH_MAX_DAYS);
     const tooLong = `end: must be at most ${EVENT_LENGTH_MAX_DAYS} days after the start`;
-    expect(eventInputSchema.safeParse({ ...timed, start: "2026-10-16T07:00:00Z", end: `${last}T07:00:00Z` }).success).toBe(true);
-    expect(issue(eventInputSchema.safeParse({ ...timed, start: "2026-10-16T07:00:00Z", end: `${last}T07:00:01Z` }))).toBe(tooLong);
+    expect(
+      eventInputSchema.safeParse({ ...timed, start: "2026-10-16T07:00:00Z", end: `${last}T07:00:00Z` }).success,
+    ).toBe(true);
+    expect(
+      issue(eventInputSchema.safeParse({ ...timed, start: "2026-10-16T07:00:00Z", end: `${last}T07:00:01Z` })),
+    ).toBe(tooLong);
     const allDay = { ...timed, allDay: true, start: "2026-10-16" };
     expect(eventInputSchema.safeParse({ ...allDay, end: last }).success).toBe(true);
     expect(issue(eventInputSchema.safeParse({ ...allDay, end: addDays(last, 1) }))).toBe(tooLong);
@@ -149,7 +153,9 @@ describe("repeatSchema", () => {
   });
 
   it("refuses an end date after REPEAT_UNTIL_MAX, which a zone behind UTC would push past the year 9999", () => {
-    expect(repeatSchema.safeParse({ freq: "daily", end: { type: "until", date: REPEAT_UNTIL_MAX } }).success).toBe(true);
+    expect(repeatSchema.safeParse({ freq: "daily", end: { type: "until", date: REPEAT_UNTIL_MAX } }).success).toBe(
+      true,
+    );
     expect(issue(repeatSchema.safeParse({ freq: "daily", end: { type: "until", date: "9999-01-01" } }))).toBe(
       `end.date: must be on or before ${REPEAT_UNTIL_MAX}`,
     );
@@ -209,7 +215,8 @@ describe("occurrence ids", () => {
     expect(seriesOccurrenceId(7, "2026-10-16T07:00:00Z")).toBe("s7:2026-10-16T07:00:00Z");
     expect(parseOccurrenceId("e12")).toEqual({ kind: "event", eventId: 12 });
     expect(parseOccurrenceId("s7:2026-10-16")).toEqual({ kind: "series", seriesId: 7, key: "2026-10-16" });
-    for (const id of ["e0", "e", "x12", "s7", "s7:tomorrow", "s0:2026-10-16"]) expect(parseOccurrenceId(id), id).toBe(undefined);
+    for (const id of ["e0", "e", "x12", "s7", "s7:tomorrow", "s0:2026-10-16"])
+      expect(parseOccurrenceId(id), id).toBe(undefined);
   });
 });
 

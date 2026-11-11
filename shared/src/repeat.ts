@@ -267,7 +267,10 @@ export function describeRepeat(repeat: Repeat, start: string, timeZone: string):
   const what = {
     daily: () => "Daily",
     weekdays: () => "Every weekday (Monday to Friday)",
-    weekly: () => `Weekly on ${weeklyDays(repeat, date).map((d) => WEEKDAY_NAMES[d]).join(", ")}`,
+    weekly: () =>
+      `Weekly on ${weeklyDays(repeat, date)
+        .map((d) => WEEKDAY_NAMES[d])
+        .join(", ")}`,
     monthly: () => `Monthly on day ${day}`,
     yearly: () => `Annually on ${day} ${MONTH_NAMES[month - 1]}`,
   }[repeat.freq]();

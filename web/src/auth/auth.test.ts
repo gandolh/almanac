@@ -33,7 +33,9 @@ describe("LoginView", () => {
     expect(html).toContain(">Password</label>");
     expect(html).toContain('type="password"');
     expect(html).toContain('autoComplete="current-password"');
-    expect(html).toMatch(/<button type="submit" class="button button--primary button--large button--pill[^"]*"[^>]*>Sign in<\/button>/);
+    expect(html).toMatch(
+      /<button type="submit" class="button button--primary button--large button--pill[^"]*"[^>]*>Sign in<\/button>/,
+    );
   });
 
   it("offers Sign in with Ward under it only when the server has Ward", () => {
@@ -88,7 +90,9 @@ describe("GateScreen", () => {
 
 describe("messages", () => {
   it("says how long to wait after too many tries", () => {
-    expect(loginMessage({ code: "too_many_attempts", retryAfterSeconds: 45 })).toBe("Too many tries. Wait 45 seconds, then try again.");
+    expect(loginMessage({ code: "too_many_attempts", retryAfterSeconds: 45 })).toBe(
+      "Too many tries. Wait 45 seconds, then try again.",
+    );
     expect(waitText(1)).toBe("1 second");
     expect(waitText(600)).toBe("10 minutes");
   });

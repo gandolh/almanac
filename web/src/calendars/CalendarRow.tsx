@@ -47,7 +47,9 @@ export function rowMenuSections(calendar: Calendar, isOnly: boolean, actions: Ro
       ],
     },
     {
-      items: [{ label: "Delete", detail: isOnly ? "Only calendar" : undefined, disabled: isOnly, onSelect: actions.remove }],
+      items: [
+        { label: "Delete", detail: isOnly ? "Only calendar" : undefined, disabled: isOnly, onSelect: actions.remove },
+      ],
     },
   ];
 }
@@ -158,7 +160,13 @@ export interface DeleteCalendarDialogProps {
 }
 
 /** Google's confirm: the calendar's events go with it. */
-export function DeleteCalendarDialog({ calendar, isOnly, busy = false, onConfirm, onClose }: DeleteCalendarDialogProps) {
+export function DeleteCalendarDialog({
+  calendar,
+  isOnly,
+  busy = false,
+  onConfirm,
+  onClose,
+}: DeleteCalendarDialogProps) {
   return (
     <Dialog
       open
@@ -261,7 +269,10 @@ export function CalendarRow({ calendar, isOnly, onVisibleChange, onRename, onRec
         <span className="calendar-row__box" aria-hidden="true">
           <CheckIcon size={12} strokeWidth={3.5} />
         </span>
-        <span className={renaming ? "visually-hidden" : "calendar-row__name"} title={renaming ? undefined : calendar.name}>
+        <span
+          className={renaming ? "visually-hidden" : "calendar-row__name"}
+          title={renaming ? undefined : calendar.name}
+        >
           {calendar.name}
         </span>
       </label>
@@ -285,7 +296,12 @@ export function CalendarRow({ calendar, isOnly, onVisibleChange, onRename, onRec
         />
       )}
       {choosingColor && rowElement && (
-        <Popover anchor={rowElement} onClose={() => setChoosingColor(false)} label={`Colour of ${calendar.name}`} className="calendar-colors">
+        <Popover
+          anchor={rowElement}
+          onClose={() => setChoosingColor(false)}
+          label={`Colour of ${calendar.name}`}
+          className="calendar-colors"
+        >
           <ColorPicker
             value={calendar.color}
             autoFocus

@@ -1,7 +1,14 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { MESSAGES, NotificationsDialog, NotificationsPanel, blockedHelp, type NotificationsPanelProps, type NotificationsView } from "./Notifications";
+import {
+  MESSAGES,
+  NotificationsDialog,
+  NotificationsPanel,
+  blockedHelp,
+  type NotificationsPanelProps,
+  type NotificationsView,
+} from "./Notifications";
 
 // Base UI's dialog portal needs a DOM; this renders the dialog in place.
 vi.mock("@base-ui/react/dialog", () => import("../components/dialog-stub"));
@@ -17,7 +24,11 @@ const ready = (over: Partial<Extract<NotificationsView, { kind: "ready" }>> = {}
 });
 
 /** The markup's text, tags dropped and entities as they read. */
-const text = (html: string) => html.replace(/<[^>]+>/g, " ").replace(/&#x27;/g, "'").replace(/\s+/g, " ");
+const text = (html: string) =>
+  html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&#x27;/g, "'")
+    .replace(/\s+/g, " ");
 
 describe("the Notifications dialog", () => {
   it.each([
@@ -61,13 +72,19 @@ describe("the Notifications dialog", () => {
   });
 
   it("shows a failure as an alert and a note as a status", () => {
-    const html = panel({ view: ready({ on: true, permission: "granted" }), error: "Couldn't send the test. Try again.", note: "Sent." });
+    const html = panel({
+      view: ready({ on: true, permission: "granted" }),
+      error: "Couldn't send the test. Try again.",
+      note: "Sent.",
+    });
     expect(html).toMatch(/role="alert"[^>]*>Couldn&#x27;t send the test/);
     expect(html).toMatch(/role="status"[^>]*>Sent\./);
   });
 
   it("renders nothing of itself while closed, and starts by checking when open", () => {
-    expect(renderToStaticMarkup(createElement(NotificationsDialog, { open: false, onClose: () => undefined }))).toBe("");
+    expect(renderToStaticMarkup(createElement(NotificationsDialog, { open: false, onClose: () => undefined }))).toBe(
+      "",
+    );
     const open = renderToStaticMarkup(createElement(NotificationsDialog, { open: true, onClose: () => undefined }));
     expect(text(open)).toContain("Notifications");
     expect(text(open)).toContain(MESSAGES.loading);

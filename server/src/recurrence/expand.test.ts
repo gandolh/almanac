@@ -80,12 +80,20 @@ describe("expandSeries: each preset over a month", () => {
       end: "2026-10-01T07:30:00Z",
       repeat: { freq: "daily", end: never },
     });
-    expect(starts(found).slice(23, 26)).toEqual(["2026-10-24T07:00:00Z", "2026-10-25T08:00:00Z", "2026-10-26T08:00:00Z"]);
+    expect(starts(found).slice(23, 26)).toEqual([
+      "2026-10-24T07:00:00Z",
+      "2026-10-25T08:00:00Z",
+      "2026-10-26T08:00:00Z",
+    ]);
     expect(found[30]).toMatchObject({ start: "2026-10-31T08:00:00Z", end: "2026-10-31T08:30:00Z" });
   });
 
   it("every weekday: Monday to Friday", () => {
-    const found = expandSeries(series("2026-10-01T06:00:00Z", "2026-10-01T07:00:00Z", { freq: "weekdays", end: never }), [], OCTOBER);
+    const found = expandSeries(
+      series("2026-10-01T06:00:00Z", "2026-10-01T07:00:00Z", { freq: "weekdays", end: never }),
+      [],
+      OCTOBER,
+    );
     expect(found).toHaveLength(22);
     expect(starts(found).slice(0, 4)).toEqual([
       "2026-10-01T06:00:00Z",
@@ -97,7 +105,11 @@ describe("expandSeries: each preset over a month", () => {
   });
 
   it("weekly on chosen days", () => {
-    const weekly = series("2026-10-05T07:00:00Z", "2026-10-05T08:00:00Z", { freq: "weekly", byDay: ["MO", "WE"], end: never });
+    const weekly = series("2026-10-05T07:00:00Z", "2026-10-05T08:00:00Z", {
+      freq: "weekly",
+      byDay: ["MO", "WE"],
+      end: never,
+    });
     expect(starts(expandSeries(weekly, [], OCTOBER))).toEqual([
       "2026-10-05T07:00:00Z",
       "2026-10-07T07:00:00Z",
@@ -114,7 +126,9 @@ describe("expandSeries: each preset over a month", () => {
     const monthly = series("2026-08-16T07:00:00Z", "2026-08-16T08:00:00Z", { freq: "monthly", end: never });
     expect(starts(expandSeries(monthly, [], OCTOBER))).toEqual(["2026-10-16T07:00:00Z"]);
     const yearly = series("2020-10-16", "2020-10-17", { freq: "yearly", end: never });
-    expect(expandSeries(yearly, [], OCTOBER)).toMatchObject([{ id: "s7:2026-10-16", start: "2026-10-16", end: "2026-10-17", allDay: true }]);
+    expect(expandSeries(yearly, [], OCTOBER)).toMatchObject([
+      { id: "s7:2026-10-16", start: "2026-10-16", end: "2026-10-17", allDay: true },
+    ]);
   });
 
   it("monthly on the 31st skips the shorter months; yearly on 29 February waits for a leap year", () => {
@@ -131,7 +145,9 @@ describe("expandSeries: each preset over a month", () => {
     ]);
     const leap = series("2024-02-29", "2024-03-01", { freq: "yearly", end: never });
     expect(starts(expandSeries(leap, [], range("2025-01-01T00:00:00Z", "2026-01-01T00:00:00Z")))).toEqual([]);
-    expect(starts(expandSeries(leap, [], range("2028-01-01T00:00:00Z", "2029-01-01T00:00:00Z")))).toEqual(["2028-02-29"]);
+    expect(starts(expandSeries(leap, [], range("2028-01-01T00:00:00Z", "2029-01-01T00:00:00Z")))).toEqual([
+      "2028-02-29",
+    ]);
   });
 });
 
@@ -157,7 +173,12 @@ describe("expandSeries: time zones", () => {
 
   it("follows the series' own zone, not the display zone", () => {
     // 10:00 in New York, which leaves summer time a week after Bucharest.
-    const weekly = series("2026-10-19T14:00:00Z", "2026-10-19T15:00:00Z", { freq: "weekly", end: never }, { tzid: "America/New_York" });
+    const weekly = series(
+      "2026-10-19T14:00:00Z",
+      "2026-10-19T15:00:00Z",
+      { freq: "weekly", end: never },
+      { tzid: "America/New_York" },
+    );
     expect(starts(expandSeries(weekly, [], range("2026-10-19T00:00:00Z", "2026-11-10T00:00:00Z")))).toEqual([
       "2026-10-19T14:00:00Z",
       "2026-10-26T14:00:00Z",
@@ -180,24 +201,45 @@ describe("expandSeries: time zones", () => {
 describe("expandSeries: ends, deletions and exceptions", () => {
   it("ends after a date, every occurrence on that date included", () => {
     // 23:30 local is already the next day in UTC.
-    const late = series("2026-10-16T20:30:00Z", "2026-10-16T21:00:00Z", { freq: "daily", end: { type: "until", date: "2026-10-20" } });
+    const late = series("2026-10-16T20:30:00Z", "2026-10-16T21:00:00Z", {
+      freq: "daily",
+      end: { type: "until", date: "2026-10-20" },
+    });
     const found = expandSeries(late, [], OCTOBER);
     expect(found).toHaveLength(5);
     expect(found[4]?.start).toBe("2026-10-20T20:30:00Z");
     expect(found[0]?.repeat).toEqual({ freq: "daily", end: { type: "until", date: "2026-10-20" } });
     const allDay = series("2026-10-16", "2026-10-17", { freq: "daily", end: { type: "until", date: "2026-10-20" } });
-    expect(starts(expandSeries(allDay, [], OCTOBER))).toEqual(["2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20"]);
+    expect(starts(expandSeries(allDay, [], OCTOBER))).toEqual([
+      "2026-10-16",
+      "2026-10-17",
+      "2026-10-18",
+      "2026-10-19",
+      "2026-10-20",
+    ]);
   });
 
   it("ends after a count", () => {
-    const three = series("2026-10-05T07:00:00Z", "2026-10-05T08:00:00Z", { freq: "weekly", end: { type: "count", count: 3 } });
-    expect(starts(expandSeries(three, [], OCTOBER))).toEqual(["2026-10-05T07:00:00Z", "2026-10-12T07:00:00Z", "2026-10-19T07:00:00Z"]);
+    const three = series("2026-10-05T07:00:00Z", "2026-10-05T08:00:00Z", {
+      freq: "weekly",
+      end: { type: "count", count: 3 },
+    });
+    expect(starts(expandSeries(three, [], OCTOBER))).toEqual([
+      "2026-10-05T07:00:00Z",
+      "2026-10-12T07:00:00Z",
+      "2026-10-19T07:00:00Z",
+    ]);
   });
 
   it("leaves out excluded dates, which still count towards the count", () => {
-    const three = series("2026-10-05T07:00:00Z", "2026-10-05T08:00:00Z", { freq: "weekly", end: { type: "count", count: 3 } }, {
-      exdates: ["2026-10-12T07:00:00Z"],
-    });
+    const three = series(
+      "2026-10-05T07:00:00Z",
+      "2026-10-05T08:00:00Z",
+      { freq: "weekly", end: { type: "count", count: 3 } },
+      {
+        exdates: ["2026-10-12T07:00:00Z"],
+      },
+    );
     expect(starts(expandSeries(three, [], OCTOBER))).toEqual(["2026-10-05T07:00:00Z", "2026-10-19T07:00:00Z"]);
   });
 
@@ -241,13 +283,19 @@ describe("expandSeries: ends, deletions and exceptions", () => {
   it("finds nothing before the series starts or after it ends", () => {
     const later = series("2026-11-02T08:00:00Z", "2026-11-02T09:00:00Z", { freq: "weekly", end: never });
     expect(expandSeries(later, [], OCTOBER)).toEqual([]);
-    const over = series("2026-09-01T07:00:00Z", "2026-09-01T08:00:00Z", { freq: "daily", end: { type: "count", count: 10 } });
+    const over = series("2026-09-01T07:00:00Z", "2026-09-01T08:00:00Z", {
+      freq: "daily",
+      end: { type: "count", count: 10 },
+    });
     expect(expandSeries(over, [], OCTOBER)).toEqual([]);
   });
 });
 
 describe("rule helpers", () => {
-  const weekly = series("2026-10-19T07:00:00Z", "2026-10-19T08:00:00Z", { freq: "weekly", end: { type: "count", count: 4 } });
+  const weekly = series("2026-10-19T07:00:00Z", "2026-10-19T08:00:00Z", {
+    freq: "weekly",
+    end: { type: "count", count: 4 },
+  });
 
   it("knows which keys the rule generates", () => {
     expect(isGenerated(weekly, "2026-10-26T08:00:00Z")).toBe(true);
@@ -273,12 +321,20 @@ describe("rule helpers", () => {
 
   it("works out an occurrence's end on the wall clock", () => {
     expect(occurrenceEnd(weekly, "2026-10-26T08:00:00Z")).toBe("2026-10-26T09:00:00Z");
-    expect(occurrenceEnd(series("2026-10-16", "2026-10-19", { freq: "monthly", end: never }), "2026-11-16")).toBe("2026-11-19");
+    expect(occurrenceEnd(series("2026-10-16", "2026-10-19", { freq: "monthly", end: never }), "2026-11-16")).toBe(
+      "2026-11-19",
+    );
   });
 
   it("moves a start forward to the first day the rule repeats on", () => {
     // Friday 16 October, weekly on Monday.
-    const timing = { allDay: false, start: "2026-10-16T07:00:00Z", end: "2026-10-16T08:00:00Z", tzid: ZONE, rrule: "FREQ=WEEKLY;BYDAY=MO" };
+    const timing = {
+      allDay: false,
+      start: "2026-10-16T07:00:00Z",
+      end: "2026-10-16T08:00:00Z",
+      tzid: ZONE,
+      rrule: "FREQ=WEEKLY;BYDAY=MO",
+    };
     expect(snapToFirst(timing)).toEqual({ ...timing, start: "2026-10-19T07:00:00Z", end: "2026-10-19T08:00:00Z" });
     const already = { ...timing, rrule: "FREQ=WEEKLY;BYDAY=FR" };
     expect(snapToFirst(already)).toBe(already);
@@ -299,19 +355,32 @@ describe("searchOccurrence", () => {
   });
 
   it("skips excluded dates and exceptions", () => {
-    const weekly = series("2026-10-05T07:00:00Z", "2026-10-05T08:00:00Z", { freq: "weekly", end: never }, {
-      exdates: ["2026-10-26T08:00:00Z"],
-    });
+    const weekly = series(
+      "2026-10-05T07:00:00Z",
+      "2026-10-05T08:00:00Z",
+      { freq: "weekly", end: never },
+      {
+        exdates: ["2026-10-26T08:00:00Z"],
+      },
+    );
     const moved = exception("2026-11-02T08:00:00Z", "2026-11-03T08:00:00Z", "2026-11-03T09:00:00Z");
     expect(searchOccurrence(weekly, [moved], now, today)?.start).toBe("2026-11-09T08:00:00Z");
   });
 
   it("answers the last occurrence of a series that is over, and nothing when none is left", () => {
-    const over = series("2026-09-01T07:00:00Z", "2026-09-01T08:00:00Z", { freq: "daily", end: { type: "count", count: 10 } });
-    expect(searchOccurrence(over, [], now, today)?.start).toBe("2026-09-10T07:00:00Z");
-    const gone = series("2026-09-01T07:00:00Z", "2026-09-01T08:00:00Z", { freq: "daily", end: { type: "count", count: 1 } }, {
-      exdates: ["2026-09-01T07:00:00Z"],
+    const over = series("2026-09-01T07:00:00Z", "2026-09-01T08:00:00Z", {
+      freq: "daily",
+      end: { type: "count", count: 10 },
     });
+    expect(searchOccurrence(over, [], now, today)?.start).toBe("2026-09-10T07:00:00Z");
+    const gone = series(
+      "2026-09-01T07:00:00Z",
+      "2026-09-01T08:00:00Z",
+      { freq: "daily", end: { type: "count", count: 1 } },
+      {
+        exdates: ["2026-09-01T07:00:00Z"],
+      },
+    );
     expect(searchOccurrence(gone, [], now, today)).toBeUndefined();
   });
 

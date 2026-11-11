@@ -41,7 +41,17 @@ function buttonClass({ variant = "secondary", size = "regular", pill, block }: B
 export interface ButtonProps extends ButtonLook, ButtonHTMLAttributes<HTMLButtonElement> {}
 
 /** A real `<button>`, `type="button"` unless a form asks for `submit`. */
-export function Button({ variant, size, pill, icon, block, className, type = "button", children, ...rest }: ButtonProps) {
+export function Button({
+  variant,
+  size,
+  pill,
+  icon,
+  block,
+  className,
+  type = "button",
+  children,
+  ...rest
+}: ButtonProps) {
   return (
     <button {...rest} type={type} className={buttonClass({ variant, size, pill, block }, className)}>
       {icon}

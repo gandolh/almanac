@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 import { envValue, withVapidLines } from "./env-file.js";
 
 // Stand-ins, not keys.
-const LINES = { VAPID_PUBLIC_KEY: "public-stand-in", VAPID_PRIVATE_KEY: "private-stand-in", VAPID_SUBJECT: "mailto:johndoe@example.com" };
+const LINES = {
+  VAPID_PUBLIC_KEY: "public-stand-in",
+  VAPID_PRIVATE_KEY: "private-stand-in",
+  VAPID_SUBJECT: "mailto:johndoe@example.com",
+};
 
 describe("envValue", () => {
   it("reads a key, the last one winning, quotes and spaces dropped", () => {

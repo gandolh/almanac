@@ -22,7 +22,11 @@ describe("seedUser", () => {
     const store = accounts();
     const secret = password();
     expect(await seedUser(store, { username: "ana", password: secret })).toBe(true);
-    expect(await store.verifyCredentials("ana", secret)).toMatchObject({ username: "ana", role: USER_ROLE, hasPassword: true });
+    expect(await store.verifyCredentials("ana", secret)).toMatchObject({
+      username: "ana",
+      role: USER_ROLE,
+      hasPassword: true,
+    });
   });
 
   it("leaves an existing user exactly as it is when seeded twice, password and id included", async () => {

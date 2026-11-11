@@ -16,7 +16,11 @@ function addUser(name: string): string {
 }
 
 // Made-up endpoints and keys, shaped like a browser's.
-const sub = (n: number, keys = "a") => ({ endpoint: `https://fcm.googleapis.com/fcm/send/${n}`, p256dh: `p-${keys}`, auth: `a-${keys}` });
+const sub = (n: number, keys = "a") => ({
+  endpoint: `https://fcm.googleapis.com/fcm/send/${n}`,
+  p256dh: `p-${keys}`,
+  auth: `a-${keys}`,
+});
 const endpoints = (userId: string) => store.list(userId).map((row) => row.endpoint);
 
 beforeEach(() => {
@@ -94,7 +98,9 @@ describe("push subscriptions", () => {
     store.save(ana, sub(2));
     store.markDelivered(sub(2).endpoint);
     store.forget(sub(1).endpoint);
-    expect(store.list(ana)).toEqual([{ ...sub(2), createdAt: "2026-10-27T10:00:02.000Z", lastSuccessAt: "2026-10-27T10:00:03.000Z" }]);
+    expect(store.list(ana)).toEqual([
+      { ...sub(2), createdAt: "2026-10-27T10:00:02.000Z", lastSuccessAt: "2026-10-27T10:00:03.000Z" },
+    ]);
   });
 
   it("lists every user with a subscription, once", () => {

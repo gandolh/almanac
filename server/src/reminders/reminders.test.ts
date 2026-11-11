@@ -77,7 +77,11 @@ async function create(payload: object, inject?: SignedInTestApp["inject"]): Prom
     const list = await inject({ method: "GET", url: "/api/calendars" });
     calendar = calendarListSchema.parse(list.json()).calendars[0]?.id ?? 0;
   }
-  const res = await (inject ?? t.inject)({ method: "POST", url: "/api/events", payload: { calendarId: calendar, ...payload } });
+  const res = await (inject ?? t.inject)({
+    method: "POST",
+    url: "/api/events",
+    payload: { calendarId: calendar, ...payload },
+  });
   expect(res.statusCode, res.body).toBe(201);
   return occurrenceSchema.parse(res.json());
 }
@@ -103,7 +107,12 @@ afterEach(async () => {
   await t.close();
 });
 
-const dentist = { title: "Dentist", allDay: false, start: "2026-10-27T14:30:00+02:00", end: "2026-10-27T15:30:00+02:00" };
+const dentist = {
+  title: "Dentist",
+  allDay: false,
+  start: "2026-10-27T14:30:00+02:00",
+  end: "2026-10-27T15:30:00+02:00",
+};
 const DENTIST_DUE = at("2026-10-27T12:20:00Z");
 
 describe("a timed event", () => {
@@ -170,18 +179,34 @@ describe("a weekly series", () => {
     const reminders = start();
     for (const due of dues) await tickAt(reminders, due - 5 * MINUTE, due, due + MINUTE, due + 5 * MINUTE);
     expect(titles()).toEqual(["Standup, 10:00", "Standup, 10:00", "Standup, 10:00"]);
-    expect(sent.map((each) => each.payload.url)).toEqual(["/almanac/day/2026/10/19", "/almanac/day/2026/10/26", "/almanac/day/2026/11/2"]);
+    expect(sent.map((each) => each.payload.url)).toEqual([
+      "/almanac/day/2026/10/19",
+      "/almanac/day/2026/10/26",
+      "/almanac/day/2026/11/2",
+    ]);
   });
 
   it("follows an occurrence's own reminder, and none for one set to none", async () => {
     const series = await create(standup);
-    await patch(series.eventId, { scope: "this", occurrence: "2026-10-26T08:00:00Z", changes: { reminderMinutes: 60 } });
-    await patch(series.eventId, { scope: "this", occurrence: "2026-11-02T08:00:00Z", changes: { reminderMinutes: null } });
+    await patch(series.eventId, {
+      scope: "this",
+      occurrence: "2026-10-26T08:00:00Z",
+      changes: { reminderMinutes: 60 },
+    });
+    await patch(series.eventId, {
+      scope: "this",
+      occurrence: "2026-11-02T08:00:00Z",
+      changes: { reminderMinutes: null },
+    });
     clock = dues[0]! - 20 * MINUTE;
     const reminders = start();
     const ownDue = at("2026-10-26T07:00:00Z");
-    for (const due of [dues[0]!, ownDue, dues[1]!, dues[2]!]) await tickAt(reminders, due - 5 * MINUTE, due, due + 5 * MINUTE);
-    expect(sent.map((each) => each.payload.tag.split(":").slice(2).join(":"))).toEqual(["2026-10-19T07:00:00Z", "2026-10-26T08:00:00Z"]);
+    for (const due of [dues[0]!, ownDue, dues[1]!, dues[2]!])
+      await tickAt(reminders, due - 5 * MINUTE, due, due + 5 * MINUTE);
+    expect(sent.map((each) => each.payload.tag.split(":").slice(2).join(":"))).toEqual([
+      "2026-10-19T07:00:00Z",
+      "2026-10-26T08:00:00Z",
+    ]);
   });
 
   it("follows an occurrence moved on its own to its new time", async () => {
@@ -255,7 +280,9 @@ describe("due times across the clock changes in Bucharest", () => {
   });
 
   it("counts a timed reminder back in real time, and has none without one", () => {
-    expect(iso(dueAt({ allDay: false, start: "2026-10-25T08:00:00Z", reminderMinutes: 1440 }, BUCHAREST))).toBe("2026-10-24T08:00:00.000Z");
+    expect(iso(dueAt({ allDay: false, start: "2026-10-25T08:00:00Z", reminderMinutes: 1440 }, BUCHAREST))).toBe(
+      "2026-10-24T08:00:00.000Z",
+    );
     expect(dueAt({ allDay: false, start: "2026-10-25T08:00:00Z", reminderMinutes: null }, BUCHAREST)).toBeNull();
   });
 });
@@ -274,7 +301,13 @@ describe("sending once", () => {
 
   it("a restart 5 minutes after a reminder fell due sends it; 30 minutes after, not", async () => {
     await create({ ...dentist, reminderMinutes: 10 });
-    await create({ ...dentist, title: "Late", start: "2026-10-27T15:00:00+02:00", end: "2026-10-27T16:00:00+02:00", reminderMinutes: 10 });
+    await create({
+      ...dentist,
+      title: "Late",
+      start: "2026-10-27T15:00:00+02:00",
+      end: "2026-10-27T16:00:00+02:00",
+      reminderMinutes: 10,
+    });
     // Started 5 minutes after the dentist's reminder fell due (12:20Z): it goes out on the first tick.
     clock = DENTIST_DUE + 5 * MINUTE;
     await tickAt(start(), DENTIST_DUE + 6 * MINUTE);

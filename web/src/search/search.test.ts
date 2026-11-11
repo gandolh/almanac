@@ -97,10 +97,14 @@ describe("dateLabel and timeText", () => {
   });
 
   it("says All day, or the times in the display time zone", () => {
-    expect(timeText(occurrence("e1", { allDay: true, start: "2026-10-16", end: "2026-10-17" }), BUCHAREST)).toBe("All day");
+    expect(timeText(occurrence("e1", { allDay: true, start: "2026-10-16", end: "2026-10-17" }), BUCHAREST)).toBe(
+      "All day",
+    );
     expect(timeText(occurrence("e1"), BUCHAREST)).toBe("10:00 – 11:00");
     expect(timeText(occurrence("e1"), "UTC")).toBe("07:00 – 08:00");
-    expect(timeText(occurrence("e1", { start: "2026-10-16T06:05:00Z", end: "2026-10-16T06:30:00Z" }), "UTC")).toBe("06:05 – 06:30");
+    expect(timeText(occurrence("e1", { start: "2026-10-16T06:05:00Z", end: "2026-10-16T06:30:00Z" }), "UTC")).toBe(
+      "06:05 – 06:30",
+    );
   });
 });
 
@@ -161,7 +165,9 @@ describe("ResultsView", () => {
   });
 
   it("says when the list was cut short", () => {
-    const full = Array.from({ length: SEARCH_LIMIT }, (_, index) => occurrence(`e${index + 1}`, { eventId: index + 1 }));
+    const full = Array.from({ length: SEARCH_LIMIT }, (_, index) =>
+      occurrence(`e${index + 1}`, { eventId: index + 1 }),
+    );
     expect(view({ results: full })).toContain(`Showing the first ${SEARCH_LIMIT} results`);
     expect(view({ results: full.slice(1) })).not.toContain("Showing the first");
   });

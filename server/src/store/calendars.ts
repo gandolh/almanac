@@ -52,7 +52,9 @@ function toCalendar(row: CalendarRow): Calendar {
 export function createCalendarStore(db: Db, now: () => Date = () => new Date()): CalendarStore {
   const listRows = db.prepare<[string], CalendarRow>(`${SELECT} WHERE user_id = ? ORDER BY position, id`);
   const getRow = db.prepare<[string, number], CalendarRow>(`${SELECT} WHERE user_id = ? AND id = ?`);
-  const countRows = db.prepare<[string], { count: number }>("SELECT COUNT(*) AS count FROM calendars WHERE user_id = ?");
+  const countRows = db.prepare<[string], { count: number }>(
+    "SELECT COUNT(*) AS count FROM calendars WHERE user_id = ?",
+  );
   const insertRow = db.prepare<[Record<string, unknown>]>(`
     INSERT INTO calendars (user_id, name, color, visible, position, created_at, updated_at)
     VALUES (@userId, @name, @color, @visible,

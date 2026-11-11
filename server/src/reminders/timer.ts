@@ -80,7 +80,11 @@ export interface ReminderTimer {
  * tick that fails is logged and the next one tries again from the same point.
  * The interval doesn't keep the process alive.
  */
-export function startReminderTimer(reminders: Reminders, log: Pick<FastifyBaseLogger, "error">, intervalMs = TICK_MS): ReminderTimer {
+export function startReminderTimer(
+  reminders: Reminders,
+  log: Pick<FastifyBaseLogger, "error">,
+  intervalMs = TICK_MS,
+): ReminderTimer {
   let running: Promise<void> | null = null;
   const interval = setInterval(() => {
     if (running !== null) return;

@@ -54,7 +54,20 @@ export const MONTH_NAMES = [
 ] as const;
 
 /** Three letters each, "Sep" included. */
-export const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
+export const MONTH_SHORT = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+] as const;
 
 /** Monday first: index `dayOfWeek - 1` (Temporal's Monday is 1, Sunday 7). */
 export const WEEKDAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] as const;
@@ -245,7 +258,8 @@ export function rangeTitle(view: View, date: Temporal.PlainDate): string {
       if (start.year !== last.year) {
         return `${monthShort(start.month)} ${start.year}${RANGE_DASH}${monthShort(last.month)} ${last.year}`;
       }
-      if (start.month !== last.month) return `${monthShort(start.month)}${RANGE_DASH}${monthShort(last.month)} ${last.year}`;
+      if (start.month !== last.month)
+        return `${monthShort(start.month)}${RANGE_DASH}${monthShort(last.month)} ${last.year}`;
       return `${start.day}${RANGE_DASH}${last.day} ${monthShort(last.month)} ${last.year}`;
     }
     case "month":
@@ -267,7 +281,8 @@ export function rangeTitleShort(view: View, date: Temporal.PlainDate): string {
     case "week": {
       const { start, end } = visibleRange("week", date);
       const last = end.subtract({ days: 1 });
-      if (start.year !== last.year) return `${monthShort(start.month)} ’${yy(start.year)}–${monthShort(last.month)} ’${yy(last.year)}`;
+      if (start.year !== last.year)
+        return `${monthShort(start.month)} ’${yy(start.year)}–${monthShort(last.month)} ’${yy(last.year)}`;
       if (start.month !== last.month) return `${monthShort(start.month)}–${monthShort(last.month)} ${last.year}`;
       return `${monthShort(last.month)} ${last.year}`;
     }
@@ -302,7 +317,11 @@ export function formatDate(date: { readonly year: number; readonly month: number
 }
 
 /** "Friday, 16 October": a day's heading, without the year. */
-export function formatDayLong(date: { readonly dayOfWeek: number; readonly month: number; readonly day: number }): string {
+export function formatDayLong(date: {
+  readonly dayOfWeek: number;
+  readonly month: number;
+  readonly day: number;
+}): string {
   return `${weekdayName(date.dayOfWeek)}, ${date.day} ${monthName(date.month)}`;
 }
 

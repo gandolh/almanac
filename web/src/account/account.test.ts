@@ -10,9 +10,18 @@ const SIGNED_IN = {
 
 describe("the menu's Ward row", () => {
   it("is offered only when signed in to a server that has Ward, and says whether it is linked", () => {
-    expect(wardLinkOf({ ...SIGNED_IN, ward: { enabled: true, linked: true } })).toEqual({ available: true, linked: true });
-    expect(wardLinkOf({ ...SIGNED_IN, ward: { enabled: false, linked: false } })).toEqual({ available: false, linked: false });
-    expect(wardLinkOf({ status: "signed_out", ward: { enabled: true, linked: false } })).toEqual({ available: false, linked: false });
+    expect(wardLinkOf({ ...SIGNED_IN, ward: { enabled: true, linked: true } })).toEqual({
+      available: true,
+      linked: true,
+    });
+    expect(wardLinkOf({ ...SIGNED_IN, ward: { enabled: false, linked: false } })).toEqual({
+      available: false,
+      linked: false,
+    });
+    expect(wardLinkOf({ status: "signed_out", ward: { enabled: true, linked: false } })).toEqual({
+      available: false,
+      linked: false,
+    });
     expect(wardLinkOf({ status: "loading" })).toEqual({ available: false, linked: false });
   });
 });
@@ -22,7 +31,9 @@ describe("checkPasswords", () => {
     expect(checkPasswords({ current: "", next: "long enough", repeat: "long enough" }, true)).toEqual({
       current: "Enter your current password.",
     });
-    expect(checkPasswords({ current: "old", next: "short", repeat: "short" }, true)).toEqual({ next: "Use at least 8 characters." });
+    expect(checkPasswords({ current: "old", next: "short", repeat: "short" }, true)).toEqual({
+      next: "Use at least 8 characters.",
+    });
     expect(checkPasswords({ current: "old", next: "long enough", repeat: "long enouhg" }, true)).toEqual({
       repeat: "The new passwords don't match.",
     });
@@ -67,7 +78,10 @@ describe("the account actions", () => {
   it("says why it couldn't sign out, and stays", async () => {
     const replace = vi.fn();
     vi.stubGlobal("window", { location: { replace } });
-    vi.stubGlobal("fetch", vi.fn(async () => Promise.reject(new TypeError("offline"))));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => Promise.reject(new TypeError("offline"))),
+    );
     await expect(signOut()).rejects.toThrow("Almanac can't be reached.");
     expect(replace).not.toHaveBeenCalled();
   });

@@ -42,11 +42,31 @@ afterEach(() => {
 });
 
 function timed(start: string, end: string, fields: Partial<EventContent> = {}): EventContent {
-  return { calendarId: work, title: "Meeting", location: "", notes: "", allDay: false, start, end, reminderMinutes: null, ...fields };
+  return {
+    calendarId: work,
+    title: "Meeting",
+    location: "",
+    notes: "",
+    allDay: false,
+    start,
+    end,
+    reminderMinutes: null,
+    ...fields,
+  };
 }
 
 function allDay(start: string, end: string, fields: Partial<EventContent> = {}): EventContent {
-  return { calendarId: work, title: "Holiday", location: "", notes: "", allDay: true, start, end, reminderMinutes: null, ...fields };
+  return {
+    calendarId: work,
+    title: "Holiday",
+    location: "",
+    notes: "",
+    allDay: true,
+    start,
+    end,
+    reminderMinutes: null,
+    ...fields,
+  };
 }
 
 function range(fromIso: string, toIso: string): EventRange {
@@ -80,7 +100,12 @@ describe("create and get", () => {
       updatedAt: "2026-10-16T09:00:00.000Z",
     });
     const row = db.prepare("SELECT start_at, end_at, start_date, end_date FROM events WHERE id = 1").get();
-    expect(row).toEqual({ start_at: Date.parse("2026-10-16T07:00:00Z"), end_at: Date.parse("2026-10-16T08:00:00Z"), start_date: null, end_date: null });
+    expect(row).toEqual({
+      start_at: Date.parse("2026-10-16T07:00:00Z"),
+      end_at: Date.parse("2026-10-16T08:00:00Z"),
+      start_date: null,
+      end_date: null,
+    });
     expect(store.get(ana, event.id)).toEqual(event);
   });
 
@@ -101,7 +126,11 @@ describe("create and get", () => {
   });
 
   it("refuses a calendar that is not the user's with not_found", () => {
-    const attempt = () => store.create(ana, { ...timed("2026-10-16T07:00:00Z", "2026-10-16T08:00:00Z", { calendarId: theirs }), tzid: ZONE });
+    const attempt = () =>
+      store.create(ana, {
+        ...timed("2026-10-16T07:00:00Z", "2026-10-16T08:00:00Z", { calendarId: theirs }),
+        tzid: ZONE,
+      });
     expect(attempt).toThrow(ApiError);
     expect(attempt).toThrow("There is no such calendar.");
   });
@@ -134,7 +163,12 @@ describe("update", () => {
   it("changes what is given, keeps the rest and moves updatedAt", () => {
     const event = store.create(ana, { ...timed("2026-10-16T07:00:00Z", "2026-10-16T08:00:00Z"), tzid: ZONE });
     const moved = store.update(ana, event.id, { title: "Retro", end: "2026-10-16T09:00:00Z" });
-    expect(moved).toEqual({ ...event, title: "Retro", end: "2026-10-16T09:00:00Z", updatedAt: "2026-10-16T09:00:01.000Z" });
+    expect(moved).toEqual({
+      ...event,
+      title: "Retro",
+      end: "2026-10-16T09:00:00Z",
+      updatedAt: "2026-10-16T09:00:01.000Z",
+    });
   });
 
   it("turns a timed event all-day, clearing the other pair", () => {
@@ -160,7 +194,11 @@ describe("update", () => {
 describe("search text", () => {
   it("is set on create and every update, folded", () => {
     const event = store.create(ana, {
-      ...timed("2026-10-16T07:00:00Z", "2026-10-16T08:00:00Z", { title: "Ședință", location: "Sala Mare", notes: "Agenda" }),
+      ...timed("2026-10-16T07:00:00Z", "2026-10-16T08:00:00Z", {
+        title: "Ședință",
+        location: "Sala Mare",
+        notes: "Agenda",
+      }),
       tzid: ZONE,
     });
     expect(searchText(event.id)).toBe("sedinta\nsala mare\nagenda");
@@ -169,7 +207,10 @@ describe("search text", () => {
   });
 
   it("finds the user's events by any field, ignoring case and diacritics", () => {
-    const meeting = store.create(ana, { ...timed("2026-10-16T07:00:00Z", "2026-10-16T08:00:00Z", { title: "Ședință de grup" }), tzid: ZONE });
+    const meeting = store.create(ana, {
+      ...timed("2026-10-16T07:00:00Z", "2026-10-16T08:00:00Z", { title: "Ședință de grup" }),
+      tzid: ZONE,
+    });
     const trip = store.create(ana, { ...allDay("2026-10-20", "2026-10-22", { notes: "după ȘEDINȚĂ" }), tzid: ZONE });
     store.create(ana, { ...allDay("2026-10-23", "2026-10-24", { title: "Something else" }), tzid: ZONE });
     store.create(ion, { ...allDay("2026-10-16", "2026-10-17", { calendarId: theirs, title: "Ședință" }), tzid: ZONE });
@@ -203,8 +244,17 @@ describe("listInRange", () => {
   });
 
   it("leaves out series rows and other users' events, and includes exceptions", () => {
-    const series = store.create(ana, { ...timed("2026-10-12T07:00:00Z", "2026-10-12T08:00:00Z"), tzid: ZONE, rrule: "FREQ=DAILY" });
-    const exception = store.insertException(ana, series.id, "2026-10-16T07:00:00Z", timed("2026-10-16T09:00:00Z", "2026-10-16T10:00:00Z"));
+    const series = store.create(ana, {
+      ...timed("2026-10-12T07:00:00Z", "2026-10-12T08:00:00Z"),
+      tzid: ZONE,
+      rrule: "FREQ=DAILY",
+    });
+    const exception = store.insertException(
+      ana,
+      series.id,
+      "2026-10-16T07:00:00Z",
+      timed("2026-10-16T09:00:00Z", "2026-10-16T10:00:00Z"),
+    );
     store.create(ion, { ...timed("2026-10-16T07:00:00Z", "2026-10-16T08:00:00Z", { calendarId: theirs }), tzid: ZONE });
     const found = store.listInRange(ana, range("2026-10-15T21:00:00Z", "2026-10-16T21:00:00Z"));
     expect(found).toEqual([exception]);
@@ -213,7 +263,11 @@ describe("listInRange", () => {
 
 describe("the low-level writes the edit scopes build on", () => {
   function weekly() {
-    return store.create(ana, { ...timed("2026-10-19T07:00:00Z", "2026-10-19T08:00:00Z"), tzid: ZONE, rrule: "FREQ=WEEKLY" });
+    return store.create(ana, {
+      ...timed("2026-10-19T07:00:00Z", "2026-10-19T08:00:00Z"),
+      tzid: ZONE,
+      rrule: "FREQ=WEEKLY",
+    });
   }
 
   it("lists series that start before the range ends, timed and all-day", () => {
@@ -230,17 +284,42 @@ describe("the low-level writes the edit scopes build on", () => {
     const series = weekly();
     const keys = ["2026-11-02T08:00:00Z", "2026-10-26T08:00:00Z", "2026-11-02T08:00:00Z"];
     expect(store.setExdates(ana, series.id, keys)?.exdates).toEqual(["2026-10-26T08:00:00Z", "2026-11-02T08:00:00Z"]);
-    expect(store.setRrule(ana, series.id, "FREQ=WEEKLY;COUNT=3")).toMatchObject({ rrule: "FREQ=WEEKLY;COUNT=3", exdates: keys.slice(1).sort() });
+    expect(store.setRrule(ana, series.id, "FREQ=WEEKLY;COUNT=3")).toMatchObject({
+      rrule: "FREQ=WEEKLY;COUNT=3",
+      exdates: keys.slice(1).sort(),
+    });
     expect(store.setExdates(ion, series.id, [])).toBeUndefined();
     expect(store.setRrule(ion, series.id, null)).toBeUndefined();
   });
 
   it("inserts an exception in the series' zone, at most one per occurrence", () => {
-    const series = store.create(ana, { ...timed("2026-10-19T07:00:00Z", "2026-10-19T08:00:00Z"), tzid: "America/New_York", rrule: "FREQ=WEEKLY" });
-    const exception = store.insertException(ana, series.id, "2026-10-26T07:00:00Z", timed("2026-10-26T09:00:00Z", "2026-10-26T10:00:00Z", { title: "Moved" }));
-    expect(exception).toMatchObject({ seriesId: series.id, originalStart: "2026-10-26T07:00:00Z", tzid: "America/New_York", rrule: null, title: "Moved" });
+    const series = store.create(ana, {
+      ...timed("2026-10-19T07:00:00Z", "2026-10-19T08:00:00Z"),
+      tzid: "America/New_York",
+      rrule: "FREQ=WEEKLY",
+    });
+    const exception = store.insertException(
+      ana,
+      series.id,
+      "2026-10-26T07:00:00Z",
+      timed("2026-10-26T09:00:00Z", "2026-10-26T10:00:00Z", { title: "Moved" }),
+    );
+    expect(exception).toMatchObject({
+      seriesId: series.id,
+      originalStart: "2026-10-26T07:00:00Z",
+      tzid: "America/New_York",
+      rrule: null,
+      title: "Moved",
+    });
     expect(store.listExceptions(ana, series.id)).toEqual([exception]);
-    expect(() => store.insertException(ana, series.id, "2026-10-26T07:00:00Z", timed("2026-10-26T11:00:00Z", "2026-10-26T12:00:00Z"))).toThrow(/UNIQUE/);
+    expect(() =>
+      store.insertException(
+        ana,
+        series.id,
+        "2026-10-26T07:00:00Z",
+        timed("2026-10-26T11:00:00Z", "2026-10-26T12:00:00Z"),
+      ),
+    ).toThrow(/UNIQUE/);
     // The schema keeps an rrule off an exception.
     expect(() => store.setRrule(ana, exception?.id ?? 0, "FREQ=DAILY")).toThrow(/CHECK/);
   });
@@ -249,13 +328,29 @@ describe("the low-level writes the edit scopes build on", () => {
     const oneOff = store.create(ana, { ...allDay("2026-10-16", "2026-10-17"), tzid: ZONE });
     expect(store.insertException(ana, oneOff.id, "2026-10-16", allDay("2026-10-17", "2026-10-18"))).toBeUndefined();
     const series = weekly();
-    expect(store.insertException(ion, series.id, "2026-10-26T07:00:00Z", timed("2026-10-26T09:00:00Z", "2026-10-26T10:00:00Z", { calendarId: theirs }))).toBeUndefined();
+    expect(
+      store.insertException(
+        ion,
+        series.id,
+        "2026-10-26T07:00:00Z",
+        timed("2026-10-26T09:00:00Z", "2026-10-26T10:00:00Z", { calendarId: theirs }),
+      ),
+    ).toBeUndefined();
   });
 
   it("moves an exception to another of the user's series and key, at most one per occurrence", () => {
     const series = weekly();
-    const other = store.create(ana, { ...timed("2026-11-02T08:00:00Z", "2026-11-02T09:00:00Z"), tzid: ZONE, rrule: "FREQ=WEEKLY" });
-    const exception = store.insertException(ana, series.id, "2026-10-26T08:00:00Z", timed("2026-10-27T08:00:00Z", "2026-10-27T09:00:00Z"));
+    const other = store.create(ana, {
+      ...timed("2026-11-02T08:00:00Z", "2026-11-02T09:00:00Z"),
+      tzid: ZONE,
+      rrule: "FREQ=WEEKLY",
+    });
+    const exception = store.insertException(
+      ana,
+      series.id,
+      "2026-10-26T08:00:00Z",
+      timed("2026-10-27T08:00:00Z", "2026-10-27T09:00:00Z"),
+    );
     const id = exception?.id ?? 0;
     expect(store.moveException(ana, id, other.id, "2026-11-09T08:00:00Z")).toMatchObject({
       id,
@@ -275,7 +370,12 @@ describe("the low-level writes the edit scopes build on", () => {
 
   it("deletes a series with its exceptions", () => {
     const series = weekly();
-    const exception = store.insertException(ana, series.id, "2026-10-26T07:00:00Z", timed("2026-10-26T09:00:00Z", "2026-10-26T10:00:00Z"));
+    const exception = store.insertException(
+      ana,
+      series.id,
+      "2026-10-26T07:00:00Z",
+      timed("2026-10-26T09:00:00Z", "2026-10-26T10:00:00Z"),
+    );
     expect(store.remove(ana, series.id)).toBe(true);
     expect(store.get(ana, exception?.id ?? 0)).toBeUndefined();
   });

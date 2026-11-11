@@ -1,5 +1,15 @@
 import type { Occurrence } from "@almanac/shared";
-import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { releaseSelection } from "../calendar/selection";
 import { useIsDesktop } from "../components/viewport";
 import { registerCommand } from "../layout/commands";
@@ -60,7 +70,11 @@ export function EventEditorProvider({ children }: { children: ReactNode }) {
     if (!desktopNow.current) {
       // A phone has no room for the popover: the form, with the same times.
       releaseSelection();
-      setSession({ kind: "create", key: ++opened.current, seed: { start: init.start, end: init.end, allDay: init.allDay } });
+      setSession({
+        kind: "create",
+        key: ++opened.current,
+        seed: { start: init.start, end: init.end, allDay: init.allDay },
+      });
       return;
     }
     const key = ++opened.current;
@@ -99,13 +113,22 @@ export function EventEditorProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => registerCommand("create", () => openCreate()), [openCreate]);
 
-  const editor = useMemo<EventEditor>(() => ({ openCreate, openQuickCreate, openEdit }), [openCreate, openQuickCreate, openEdit]);
+  const editor = useMemo<EventEditor>(
+    () => ({ openCreate, openQuickCreate, openEdit }),
+    [openCreate, openQuickCreate, openEdit],
+  );
 
   return (
     <EditorContext.Provider value={editor}>
       {children}
       {session?.kind === "quick" && (
-        <QuickCreate key={session.key} init={session.init} onClose={closeQuick} onSaved={closeQuick} onMoreOptions={moreOptions} />
+        <QuickCreate
+          key={session.key}
+          init={session.init}
+          onClose={closeQuick}
+          onSaved={closeQuick}
+          onMoreOptions={moreOptions}
+        />
       )}
       {session?.kind === "create" && <EventForm key={session.key} seed={session.seed} onClose={closeForm} />}
       {session?.kind === "edit" && <EventForm key={session.key} occurrence={session.occurrence} onClose={closeForm} />}

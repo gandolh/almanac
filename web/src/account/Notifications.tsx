@@ -69,7 +69,15 @@ export interface NotificationsPanelProps {
 }
 
 /** The dialog's body, without the browser: `NotificationsDialog` feeds it. */
-export function NotificationsPanel({ view, busy = false, error = null, note = null, onToggle, onTest, onRetry }: NotificationsPanelProps) {
+export function NotificationsPanel({
+  view,
+  busy = false,
+  error = null,
+  note = null,
+  onToggle,
+  onTest,
+  onRetry,
+}: NotificationsPanelProps) {
   const id = useId();
   const labelId = `${id}-label`;
   const stateId = `${id}-state`;
@@ -247,13 +255,15 @@ function Notifications() {
 
   const turnOn = async () => {
     // First, before any other await: a browser shows the permission prompt only during the press.
-    const asked = Notification.permission === "granted" ? Promise.resolve("granted" as const) : Notification.requestPermission();
+    const asked =
+      Notification.permission === "granted" ? Promise.resolve("granted" as const) : Notification.requestPermission();
     start();
     try {
       const permission = await asked;
       if (permission !== "granted") {
         setView({ ...view, on: false, permission });
-        if (permission === "default") setNote("Almanac needs your permission to notify you. Turn this on again to be asked.");
+        if (permission === "default")
+          setNote("Almanac needs your permission to notify you. Turn this on again to be asked.");
         return;
       }
       const registration = await pushRegistration();

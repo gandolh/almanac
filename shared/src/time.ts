@@ -86,12 +86,14 @@ export const instantSchema = z.iso
   });
 
 /** An occurrence key: `2026-10-16T07:00:00Z` (timed) or `2026-10-16` (all-day), exactly. */
-export const occurrenceKeySchema = z.string().refine(
-  (value) =>
-    (DATE.test(value) && dateSchema.safeParse(value).success) ||
-    (INSTANT.test(value) && canonicalInstant(value) === value),
-  { message: "must be an occurrence key: 2026-10-16T07:00:00Z, or 2026-10-16 for an all-day event" },
-);
+export const occurrenceKeySchema = z
+  .string()
+  .refine(
+    (value) =>
+      (DATE.test(value) && dateSchema.safeParse(value).success) ||
+      (INSTANT.test(value) && canonicalInstant(value) === value),
+    { message: "must be an occurrence key: 2026-10-16T07:00:00Z, or 2026-10-16 for an all-day event" },
+  );
 export type OccurrenceKey = z.infer<typeof occurrenceKeySchema>;
 
 /** Whether an occurrence key (or a `start`) is a date, so the event is all-day. */

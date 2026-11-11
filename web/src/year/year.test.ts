@@ -59,8 +59,14 @@ describe("coveredSpan", () => {
   it("puts a timed occurrence on the display time zone's days, not UTC's", () => {
     // 21:30 UTC is 00:30 the next day in Bucharest (UTC+3 in October).
     const late = { allDay: false, start: "2026-10-16T21:30:00Z", end: "2026-10-16T22:30:00Z" };
-    expect(coveredSpan(late, BUCHAREST)).toEqual({ first: Temporal.PlainDate.from("2026-10-17"), last: Temporal.PlainDate.from("2026-10-17") });
-    expect(coveredSpan(late, "UTC")).toEqual({ first: Temporal.PlainDate.from("2026-10-16"), last: Temporal.PlainDate.from("2026-10-16") });
+    expect(coveredSpan(late, BUCHAREST)).toEqual({
+      first: Temporal.PlainDate.from("2026-10-17"),
+      last: Temporal.PlainDate.from("2026-10-17"),
+    });
+    expect(coveredSpan(late, "UTC")).toEqual({
+      first: Temporal.PlainDate.from("2026-10-16"),
+      last: Temporal.PlainDate.from("2026-10-16"),
+    });
   });
 
   it("ends a timed occurrence the minute before its exclusive end", () => {
@@ -69,7 +75,10 @@ describe("coveredSpan", () => {
     expect(coveredSpan(toMidnight, BUCHAREST).last.toString()).toBe("2026-10-16");
     // 23:00 to 02:00: both.
     const overnight = { allDay: false, start: "2026-10-16T20:00:00Z", end: "2026-10-16T23:00:00Z" };
-    expect(coveredSpan(overnight, BUCHAREST)).toEqual({ first: Temporal.PlainDate.from("2026-10-16"), last: Temporal.PlainDate.from("2026-10-17") });
+    expect(coveredSpan(overnight, BUCHAREST)).toEqual({
+      first: Temporal.PlainDate.from("2026-10-16"),
+      last: Temporal.PlainDate.from("2026-10-17"),
+    });
   });
 
   it("reads all-day dates as they are, the end exclusive", () => {
@@ -77,17 +86,29 @@ describe("coveredSpan", () => {
       first: Temporal.PlainDate.from("2026-10-16"),
       last: Temporal.PlainDate.from("2026-10-16"),
     });
-    expect(coveredSpan({ allDay: true, start: "2026-10-30", end: "2026-11-02" }, "Pacific/Auckland").last.toString()).toBe("2026-11-01");
+    expect(
+      coveredSpan({ allDay: true, start: "2026-10-30", end: "2026-11-02" }, "Pacific/Auckland").last.toString(),
+    ).toBe("2026-11-01");
   });
 
   it("is never empty, even for an end that is not after the start", () => {
-    expect(coveredSpan({ allDay: true, start: "2026-10-16", end: "2026-10-16" }, BUCHAREST).last.toString()).toBe("2026-10-16");
-    expect(coveredSpan({ allDay: false, start: "2026-10-16T07:00:00Z", end: "2026-10-16T07:00:00Z" }, BUCHAREST).last.toString()).toBe("2026-10-16");
+    expect(coveredSpan({ allDay: true, start: "2026-10-16", end: "2026-10-16" }, BUCHAREST).last.toString()).toBe(
+      "2026-10-16",
+    );
+    expect(
+      coveredSpan(
+        { allDay: false, start: "2026-10-16T07:00:00Z", end: "2026-10-16T07:00:00Z" },
+        BUCHAREST,
+      ).last.toString(),
+    ).toBe("2026-10-16");
   });
 
   it("keeps a day that is 25 hours long (the clocks go back on 25 October) as one day", () => {
     const wholeDay = { allDay: false, start: "2026-10-24T21:00:00Z", end: "2026-10-25T22:00:00Z" };
-    expect(coveredSpan(wholeDay, BUCHAREST)).toEqual({ first: Temporal.PlainDate.from("2026-10-25"), last: Temporal.PlainDate.from("2026-10-25") });
+    expect(coveredSpan(wholeDay, BUCHAREST)).toEqual({
+      first: Temporal.PlainDate.from("2026-10-25"),
+      last: Temporal.PlainDate.from("2026-10-25"),
+    });
   });
 });
 
@@ -95,7 +116,13 @@ describe("isOnDay", () => {
   const trip = allDay("e1", "2026-10-30", "2026-11-02");
   it("holds for every day from the first to the last, and no other", () => {
     const on = (date: string) => isOnDay(trip, Temporal.PlainDate.from(date), BUCHAREST);
-    expect([on("2026-10-29"), on("2026-10-30"), on("2026-10-31"), on("2026-11-01"), on("2026-11-02")]).toEqual([false, true, true, true, false]);
+    expect([on("2026-10-29"), on("2026-10-30"), on("2026-10-31"), on("2026-11-01"), on("2026-11-02")]).toEqual([
+      false,
+      true,
+      true,
+      true,
+      false,
+    ]);
   });
 });
 
@@ -153,7 +180,12 @@ describe("markedDays", () => {
   });
 
   it("marks a day once however many events it has", () => {
-    expect(marked([occurrence("e1"), occurrence("e2", { calendarId: 2 }), allDay("e3", "2026-10-16", "2026-10-17")], [work, gym])).toEqual(["2026-10-16"]);
+    expect(
+      marked(
+        [occurrence("e1"), occurrence("e2", { calendarId: 2 }), allDay("e3", "2026-10-16", "2026-10-17")],
+        [work, gym],
+      ),
+    ).toEqual(["2026-10-16"]);
   });
 });
 
@@ -168,7 +200,12 @@ describe("occurrencesOn", () => {
       allDay("e3", "2026-10-16", "2026-10-17", { title: "Holiday" }),
       occurrence("e4", { title: "Dinner", calendarId: 2, start: "2026-10-16T16:00:00Z", end: "2026-10-16T18:00:00Z" }),
     ];
-    expect(occurrencesOn(day, events, calendars, BUCHAREST).map((each) => each.title)).toEqual(["Holiday", "Standup", "Lunch", "Dinner"]);
+    expect(occurrencesOn(day, events, calendars, BUCHAREST).map((each) => each.title)).toEqual([
+      "Holiday",
+      "Standup",
+      "Lunch",
+      "Dinner",
+    ]);
   });
 
   it("includes a multi-day event on each of its days, and leaves out other days and hidden calendars", () => {
@@ -178,7 +215,10 @@ describe("occurrencesOn", () => {
       occurrence("e3", { title: "Secret", calendarId: 3 }),
       occurrence("e4", { title: "Standup" }),
     ];
-    expect(occurrencesOn(day, events, calendars, BUCHAREST).map((each) => each.title)).toEqual(["Conference", "Standup"]);
+    expect(occurrencesOn(day, events, calendars, BUCHAREST).map((each) => each.title)).toEqual([
+      "Conference",
+      "Standup",
+    ]);
   });
 
   it("decides the day in the display time zone", () => {
@@ -228,7 +268,9 @@ describe("DayList", () => {
 
   /** The `time` and `name` text of each row, in order. */
   function rows(html: string): string[] {
-    return [...html.matchAll(/day-list__time">([^<]*)<\/span><span class="day-list__name">([^<]*)</g)].map((m) => `${m[1]} ${m[2]}`);
+    return [...html.matchAll(/day-list__time">([^<]*)<\/span><span class="day-list__name">([^<]*)</g)].map(
+      (m) => `${m[1]} ${m[2]}`,
+    );
   }
 
   it("heads the list with the day, and names the popover by it", () => {
@@ -271,11 +313,26 @@ describe("DayList", () => {
 
 describe("YearView", () => {
   // Before anything is fetched: the twelve months, in order, each name a button that labels its grid.
-  const html = renderToStaticMarkup(createElement(YearView, { year: 2026, onOpenDay: () => undefined, onOpenMonth: () => undefined }));
+  const html = renderToStaticMarkup(
+    createElement(YearView, { year: 2026, onOpenDay: () => undefined, onOpenMonth: () => undefined }),
+  );
 
   it("draws the twelve months, named by buttons, in the year's order", () => {
     const names = [...html.matchAll(/<button[^>]*class="year-month__title"[^>]*>([^<]+)<\/button>/g)].map((m) => m[1]);
-    expect(names).toEqual(["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]);
+    expect(names).toEqual([
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ]);
     expect(html).toContain('aria-label="Year view"');
     expect(html.match(/<table[^>]*aria-labelledby=/g)).toHaveLength(12);
   });

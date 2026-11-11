@@ -99,7 +99,9 @@ describe("errors", () => {
   });
 
   it("stand in for a proxy's page in front of a stopped API", async () => {
-    serve(() => new Response("<html>502 Bad Gateway</html>", { status: 502, headers: { "content-type": "text/html" } }));
+    serve(
+      () => new Response("<html>502 Bad Gateway</html>", { status: 502, headers: { "content-type": "text/html" } }),
+    );
     const error = await failure(apiRequest("/api/calendars"));
     expect(error.status).toBe(502);
     expect(error.code).toBe("bad_response");
@@ -149,7 +151,9 @@ describe("a 401", () => {
 
   it("is the call's own answer with noSignOut (a login form's wrong password)", async () => {
     serve(() => apiError(401, "unauthorized", "Wrong username or password"));
-    const error = await failure(apiRequest("/auth/login", { method: "POST", body: { username: "u" }, noSignOut: true }));
+    const error = await failure(
+      apiRequest("/auth/login", { method: "POST", body: { username: "u" }, noSignOut: true }),
+    );
     expect(error).toMatchObject({ status: 401, code: "unauthorized", message: "Wrong username or password" });
     expect(signedOutCount).toBe(0);
   });

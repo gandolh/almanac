@@ -1,5 +1,13 @@
 import { z } from "zod";
-import { DAY_MS, MAX_RANGE_DAYS, dateInZone, dateSchema, instantSchema, occurrenceKeySchema, parseInstant } from "./time.js";
+import {
+  DAY_MS,
+  MAX_RANGE_DAYS,
+  dateInZone,
+  dateSchema,
+  instantSchema,
+  occurrenceKeySchema,
+  parseInstant,
+} from "./time.js";
 
 /**
  * Events, their repeats and their occurrences (corpus/wiki/glossary.md,
@@ -34,7 +42,9 @@ export const repeatEndSchema = z.discriminatedUnion("type", [
   z.strictObject({ type: z.literal("never") }),
   z.strictObject({
     type: z.literal("until"),
-    date: dateSchema.refine((date) => date <= REPEAT_UNTIL_MAX, { message: `must be on or before ${REPEAT_UNTIL_MAX}` }),
+    date: dateSchema.refine((date) => date <= REPEAT_UNTIL_MAX, {
+      message: `must be on or before ${REPEAT_UNTIL_MAX}`,
+    }),
   }),
   z.strictObject({
     type: z.literal("count"),
@@ -184,7 +194,11 @@ function settleTimes<T extends { allDay: boolean; start: string; end: string; re
   }
   // A date parses as its midnight in UTC, so both kinds measure the same way.
   if (parseInstant(end.data) - parseInstant(start.data) > EVENT_LENGTH_MAX_DAYS * DAY_MS) {
-    ctx.addIssue({ code: "custom", path: ["end"], message: `must be at most ${EVENT_LENGTH_MAX_DAYS} days after the start` });
+    ctx.addIssue({
+      code: "custom",
+      path: ["end"],
+      message: `must be at most ${EVENT_LENGTH_MAX_DAYS} days after the start`,
+    });
     return z.NEVER;
   }
   return { ...value, start: start.data, end: end.data };

@@ -38,7 +38,10 @@ export async function deleteOccurrence(occurrence: Occurrence, steps: DeleteStep
       steps.notifyOccurrencesChanged();
       return { outcome: "deleted" };
     }
-    return { outcome: "failed", message: isApiError(error) ? error.message : "The event couldn't be deleted. Try again." };
+    return {
+      outcome: "failed",
+      message: isApiError(error) ? error.message : "The event couldn't be deleted. Try again.",
+    };
   }
   return { outcome: "deleted" };
 }

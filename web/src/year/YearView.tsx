@@ -114,7 +114,12 @@ function YearMonth({ month, today, marked, onPickDay, onOpenMonth }: YearMonthPr
   const titleId = useId();
   return (
     <div className="year-month">
-      <button type="button" id={titleId} className="year-month__title" onClick={() => onOpenMonth(month.toPlainDate({ day: 1 }))}>
+      <button
+        type="button"
+        id={titleId}
+        className="year-month__title"
+        onClick={() => onOpenMonth(month.toPlainDate({ day: 1 }))}
+      >
         {monthName(month.month)}
       </button>
       <MonthGrid month={month} today={today} marked={marked} onPickDay={onPickDay} size="year" labelledBy={titleId} />

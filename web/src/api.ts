@@ -118,7 +118,11 @@ export async function apiRequest<T>(
   const data: unknown = await response.json().catch(() => undefined);
   const parsed = schema.safeParse(data);
   if (!parsed.success) {
-    throw new ApiError(response.status, "bad_response", "Almanac sent an answer this app doesn't understand. Reload the page.");
+    throw new ApiError(
+      response.status,
+      "bad_response",
+      "Almanac sent an answer this app doesn't understand. Reload the page.",
+    );
   }
   return parsed.data;
 }
@@ -134,7 +138,9 @@ async function send(url: string, init: RequestInit, signal: AbortSignal | undefi
     return await fetch(url, init);
   } catch (error) {
     if (signal?.aborted) throw signal.reason ?? error;
-    throw new ApiError(0, "network", "Almanac can't be reached. Check your connection and try again.", { cause: error });
+    throw new ApiError(0, "network", "Almanac can't be reached. Check your connection and try again.", {
+      cause: error,
+    });
   }
 }
 

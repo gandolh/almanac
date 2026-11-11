@@ -73,9 +73,22 @@ export interface EventDetailsProps {
 }
 
 /** The popover's contents, without the popover (for tests). */
-export function EventDetails({ occurrence, calendar, timeZone, titleId, onEdit, onDelete, onClose }: EventDetailsProps) {
-  const repeat = occurrence.repeat ? describeRepeat(occurrence.repeat, occurrence.originalStart ?? occurrence.start, timeZone) : null;
-  const reminder = occurrence.reminderMinutes === null ? null : `Reminder: ${describeReminder(occurrence.reminderMinutes, occurrence.allDay)}`;
+export function EventDetails({
+  occurrence,
+  calendar,
+  timeZone,
+  titleId,
+  onEdit,
+  onDelete,
+  onClose,
+}: EventDetailsProps) {
+  const repeat = occurrence.repeat
+    ? describeRepeat(occurrence.repeat, occurrence.originalStart ?? occurrence.start, timeZone)
+    : null;
+  const reminder =
+    occurrence.reminderMinutes === null
+      ? null
+      : `Reminder: ${describeReminder(occurrence.reminderMinutes, occurrence.allDay)}`;
   const swatch = calendar ? ({ "--calendar-color": calendarColor(calendar) } as CSSProperties) : undefined;
   return (
     // Focus lands on the details, not on Edit, as Google's popover does.

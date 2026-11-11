@@ -70,10 +70,16 @@ describe("deleteOccurrence", () => {
 
   it("hands back the server's reason, or a plain one, when the delete fails", async () => {
     const refused = steps(null, new ApiError(500, "internal", "Something went wrong on our side."));
-    expect(await deleteOccurrence(oneOff, refused)).toEqual({ outcome: "failed", message: "Something went wrong on our side." });
+    expect(await deleteOccurrence(oneOff, refused)).toEqual({
+      outcome: "failed",
+      message: "Something went wrong on our side.",
+    });
     expect(refused.notifyOccurrencesChanged).not.toHaveBeenCalled();
 
     const broken = steps(null, new TypeError("Failed to fetch"));
-    expect(await deleteOccurrence(oneOff, broken)).toEqual({ outcome: "failed", message: "The event couldn't be deleted. Try again." });
+    expect(await deleteOccurrence(oneOff, broken)).toEqual({
+      outcome: "failed",
+      message: "The event couldn't be deleted. Try again.",
+    });
   });
 });

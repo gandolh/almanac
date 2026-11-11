@@ -70,7 +70,14 @@ export function offsetMinutesAt(zone: string, at: Date | number): number {
   for (const part of formatterFor(zone).formatToParts(ms)) {
     if (part.type !== "literal") parts[part.type] = Number(part.value);
   }
-  const wall = Date.UTC(parts.year ?? 1970, (parts.month ?? 1) - 1, parts.day ?? 1, parts.hour ?? 0, parts.minute ?? 0, parts.second ?? 0);
+  const wall = Date.UTC(
+    parts.year ?? 1970,
+    (parts.month ?? 1) - 1,
+    parts.day ?? 1,
+    parts.hour ?? 0,
+    parts.minute ?? 0,
+    parts.second ?? 0,
+  );
   return Math.round((wall - ms) / 60_000);
 }
 
@@ -113,7 +120,10 @@ export function supportedZones(): string[] {
 export function listTimeZones(at: Date | number): ZoneEntry[] {
   return supportedZones()
     .map((zone) => zoneEntry(zone, at))
-    .sort((a, b) => a.offsetMinutes - b.offsetMinutes || a.city.localeCompare(b.city, "en") || a.zone.localeCompare(b.zone, "en"));
+    .sort(
+      (a, b) =>
+        a.offsetMinutes - b.offsetMinutes || a.city.localeCompare(b.city, "en") || a.zone.localeCompare(b.zone, "en"),
+    );
 }
 
 /** An offset typed in the search: "+03:00", "gmt+3", "utc-5", "+5:30", "+0530". */

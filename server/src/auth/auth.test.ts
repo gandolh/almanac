@@ -2,7 +2,13 @@ import { generateKeyPairSync } from "node:crypto";
 import type { FastifyInstance } from "fastify";
 import { afterEach, describe, expect, it } from "vitest";
 import { PUBLIC_ROUTES, SESSION_COOKIE } from "../app.js";
-import { sessionCookieFrom, startSignedInApp, startTestApp, type SignedInTestApp, type TestApp } from "../testing/testApp.js";
+import {
+  sessionCookieFrom,
+  startSignedInApp,
+  startTestApp,
+  type SignedInTestApp,
+  type TestApp,
+} from "../testing/testApp.js";
 import { currentUserId } from "./guard.js";
 
 /**
@@ -33,7 +39,13 @@ async function withRoutes(): Promise<TestApp> {
 }
 
 /** The plugin's own routes that need no session (the plugin adds them to `PUBLIC_ROUTES` itself). */
-const AUTH_PUBLIC = ["POST /auth/login", "POST /auth/logout", "GET /auth/session", "POST /auth/ward/start", "GET /auth/ward/callback"];
+const AUTH_PUBLIC = [
+  "POST /auth/login",
+  "POST /auth/logout",
+  "GET /auth/session",
+  "POST /auth/ward/start",
+  "GET /auth/ward/callback",
+];
 
 /**
  * Every route the app serves, as `"METHOD /pattern"`, read from Fastify's own
@@ -60,7 +72,9 @@ function routesOf(app: FastifyInstance): string[] {
 /** A Ward client key in the shape `createWardClient` reads (base64url of a private Ed25519 JWK), made now, for a test only. */
 function testClientKey(): string {
   const { privateKey } = generateKeyPairSync("ed25519");
-  return Buffer.from(JSON.stringify({ ...privateKey.export({ format: "jwk" }), kid: "test-key" })).toString("base64url");
+  return Buffer.from(JSON.stringify({ ...privateKey.export({ format: "jwk" }), kid: "test-key" })).toString(
+    "base64url",
+  );
 }
 
 /** The five settings, as Ward's local seed writes them. Nothing listens at the issuer (the discard port on loopback). */
@@ -84,7 +98,11 @@ describe("the guard", () => {
 
   it.each([
     ["without Ward", () => ({}), ["POST /auth/password"]],
-    ["with Ward", wardSettings, ["POST /auth/password", "POST /auth/ward/link", "POST /auth/ward/unlink", "POST /auth/ward/set-password"]],
+    [
+      "with Ward",
+      wardSettings,
+      ["POST /auth/password", "POST /auth/ward/link", "POST /auth/ward/unlink", "POST /auth/ward/set-password"],
+    ],
   ])("refuses every other route without a session, whichever feature added it (%s)", async (_, env, authRoutes) => {
     t = await startTestApp(env());
     const routes = routesOf(t.app);
@@ -94,8 +112,16 @@ describe("the guard", () => {
     for (const route of guarded) {
       const [method = "", pattern = ""] = route.split(" ");
       const url = pattern.replace(/:[^/]+/g, "1");
-      const res = await t.app.inject({ method: method as "GET", url, payload: method === "GET" || method === "DELETE" ? undefined : {} });
-      expect({ route, status: res.statusCode, body: res.json() as unknown }).toEqual({ route, status: 401, body: { error: "unauthorized" } });
+      const res = await t.app.inject({
+        method: method as "GET",
+        url,
+        payload: method === "GET" || method === "DELETE" ? undefined : {},
+      });
+      expect({ route, status: res.statusCode, body: res.json() as unknown }).toEqual({
+        route,
+        status: 401,
+        body: { error: "unauthorized" },
+      });
     }
   });
 
@@ -118,7 +144,11 @@ describe("the guard", () => {
 
   it("refuses a cookie that names no session, and clears it", async () => {
     t = await startTestApp();
-    const res = await t.app.inject({ method: "GET", url: "/api/nothing-here", headers: { cookie: `${SESSION_COOKIE}=made-up` } });
+    const res = await t.app.inject({
+      method: "GET",
+      url: "/api/nothing-here",
+      headers: { cookie: `${SESSION_COOKIE}=made-up` },
+    });
     expect(res.statusCode).toBe(401);
     expect(String(res.headers["set-cookie"])).toMatch(new RegExp(`^${SESSION_COOKIE}=;.*Max-Age=0`));
   });
@@ -140,8 +170,12 @@ describe("several users", () => {
     const anaId = (await ana.inject({ method: "GET", url: "/api/test/me" })).json<{ id: string }>().id;
     const ionId = (await ion.inject({ method: "GET", url: "/api/test/me" })).json<{ id: string }>().id;
     expect(anaId).not.toBe(ionId);
-    expect((await ana.inject({ method: "GET", url: "/auth/session" })).json()).toMatchObject({ user: { id: anaId, username: "ana", role: "user" } });
-    expect((await ion.inject({ method: "GET", url: "/auth/session" })).json()).toMatchObject({ user: { id: ionId, username: "ion", role: "user" } });
+    expect((await ana.inject({ method: "GET", url: "/auth/session" })).json()).toMatchObject({
+      user: { id: anaId, username: "ana", role: "user" },
+    });
+    expect((await ion.inject({ method: "GET", url: "/auth/session" })).json()).toMatchObject({
+      user: { id: ionId, username: "ion", role: "user" },
+    });
   });
 
   it("sign in as the same id every time", async () => {
@@ -149,7 +183,11 @@ describe("several users", () => {
     const first = await app.signInAs("ana");
     const again = await app.signInAs("ana");
     expect(again.cookie).not.toBe(first.cookie);
-    const ids = await Promise.all([first, again].map(async (user) => (await user.inject({ method: "GET", url: "/api/test/me" })).json<{ id: string }>().id));
+    const ids = await Promise.all(
+      [first, again].map(
+        async (user) => (await user.inject({ method: "GET", url: "/api/test/me" })).json<{ id: string }>().id,
+      ),
+    );
     expect(ids[0]).toBe(ids[1]);
   });
 });
@@ -166,7 +204,10 @@ describe("signing in", () => {
     expect(cookie).toContain("HttpOnly");
     expect(cookie).toContain("SameSite=Lax");
     expect(cookie).not.toContain("Secure");
-    expect(res.json()).toMatchObject({ user: { username: "owner", role: "user", hasPassword: true }, ward: { enabled: false, linked: false } });
+    expect(res.json()).toMatchObject({
+      user: { username: "owner", role: "user", hasPassword: true },
+      ward: { enabled: false, linked: false },
+    });
   });
 
   it("is Secure behind an https origin", async () => {
@@ -192,7 +233,11 @@ describe("signing in", () => {
 
   it("has no sign-up route", async () => {
     const app = await signedIn();
-    const res = await app.inject({ method: "POST", url: "/auth/register", payload: { username: "someone", password: "a long password" } });
+    const res = await app.inject({
+      method: "POST",
+      url: "/auth/register",
+      payload: { username: "someone", password: "a long password" },
+    });
     expect(res.statusCode).toBe(404);
   });
 
@@ -209,16 +254,32 @@ describe("signing in", () => {
     const app = await signedIn();
     const other = await app.signIn();
     const newPassword = `${app.owner.password}-changed`;
-    const wrong = await app.inject({ method: "POST", url: "/auth/password", payload: { currentPassword: "wrong one", newPassword } });
+    const wrong = await app.inject({
+      method: "POST",
+      url: "/auth/password",
+      payload: { currentPassword: "wrong one", newPassword },
+    });
     expect(wrong.json()).toEqual({ error: "invalid_credentials" });
-    const res = await app.inject({ method: "POST", url: "/auth/password", payload: { currentPassword: app.owner.password, newPassword } });
+    const res = await app.inject({
+      method: "POST",
+      url: "/auth/password",
+      payload: { currentPassword: app.owner.password, newPassword },
+    });
     expect(res.statusCode).toBe(204);
 
-    expect((await app.inject({ method: "GET", url: "/auth/session" })).json()).toMatchObject({ user: { username: "owner" } });
-    expect((await app.app.inject({ method: "GET", url: "/auth/session", headers: { cookie: other } })).json()).toMatchObject({ user: null });
+    expect((await app.inject({ method: "GET", url: "/auth/session" })).json()).toMatchObject({
+      user: { username: "owner" },
+    });
+    expect(
+      (await app.app.inject({ method: "GET", url: "/auth/session", headers: { cookie: other } })).json(),
+    ).toMatchObject({ user: null });
     const old = await app.app.inject({ method: "POST", url: "/auth/login", payload: app.owner });
     expect(old.statusCode).toBe(401);
-    const fresh = await app.app.inject({ method: "POST", url: "/auth/login", payload: { username: "owner", password: newPassword } });
+    const fresh = await app.app.inject({
+      method: "POST",
+      url: "/auth/login",
+      payload: { username: "owner", password: newPassword },
+    });
     expect(fresh.statusCode).toBe(200);
   });
 });
@@ -231,14 +292,21 @@ describe("cross-origin writes", () => {
       const owner = await app.signInAs("owner");
       const res = await owner.inject({ method: "POST", url: "/api/test/write", headers: { origin }, payload: {} });
       expect(res.statusCode).toBe(403);
-      expect(res.json()).toEqual({ error: { code: "forbidden", message: "Almanac only accepts changes from its own pages." } });
+      expect(res.json()).toEqual({
+        error: { code: "forbidden", message: "Almanac only accepts changes from its own pages." },
+      });
     },
   );
 
   it.each([["cross-site"], ["same-site"]])("refuses a write with Sec-Fetch-Site %s", async (site) => {
     const app = await withRoutes();
     const owner = await app.signInAs("owner");
-    const res = await owner.inject({ method: "POST", url: "/api/test/write", headers: { "sec-fetch-site": site }, payload: {} });
+    const res = await owner.inject({
+      method: "POST",
+      url: "/api/test/write",
+      headers: { "sec-fetch-site": site },
+      payload: {},
+    });
     expect(res.statusCode).toBe(403);
   });
 
@@ -246,21 +314,32 @@ describe("cross-origin writes", () => {
     const app = await withRoutes();
     const owner = await app.signInAs("owner");
     const own = { origin: app.config.publicOrigin, "sec-fetch-site": "same-origin" };
-    expect((await owner.inject({ method: "POST", url: "/api/test/write", headers: own, payload: {} })).statusCode).toBe(201);
+    expect((await owner.inject({ method: "POST", url: "/api/test/write", headers: own, payload: {} })).statusCode).toBe(
+      201,
+    );
     expect((await owner.inject({ method: "POST", url: "/api/test/write", payload: {} })).statusCode).toBe(201);
   });
 
   it("lets a read through: it changes nothing, and the browser keeps the answer from the other page", async () => {
     const app = await withRoutes();
     const owner = await app.signInAs("owner");
-    const res = await owner.inject({ method: "GET", url: "/api/test/me", headers: { origin: "https://example.net", "sec-fetch-site": "cross-site" } });
+    const res = await owner.inject({
+      method: "GET",
+      url: "/api/test/me",
+      headers: { origin: "https://example.net", "sec-fetch-site": "cross-site" },
+    });
     expect(res.statusCode).toBe(200);
   });
 
   it("leaves the auth routes to the plugin's own check", async () => {
     t = await startTestApp();
     await t.createUser();
-    const res = await t.app.inject({ method: "POST", url: "/auth/login", headers: { origin: "https://example.net" }, payload: t.owner });
+    const res = await t.app.inject({
+      method: "POST",
+      url: "/auth/login",
+      headers: { origin: "https://example.net" },
+      payload: t.owner,
+    });
     expect(res.statusCode).toBe(403);
     expect(res.json()).toEqual({ error: "cross_site" });
   });
@@ -269,15 +348,21 @@ describe("cross-origin writes", () => {
 describe("Sign in with Ward", () => {
   it("is off without WARD_OIDC_ISSUER: the session says so, and its routes are not there", async () => {
     const app = await signedIn();
-    expect((await app.inject({ method: "GET", url: "/auth/session" })).json()).toMatchObject({ ward: { enabled: false } });
+    expect((await app.inject({ method: "GET", url: "/auth/session" })).json()).toMatchObject({
+      ward: { enabled: false },
+    });
     expect((await app.inject({ method: "POST", url: "/auth/ward/link" })).statusCode).toBe(404);
     expect((await app.app.inject({ method: "POST", url: "/auth/ward/start", payload: {} })).statusCode).toBe(401);
   });
 
   it("is on with the five settings, and starts while Ward is unreachable", async () => {
     const app = await signedIn(wardSettings());
-    expect((await app.app.inject({ method: "GET", url: "/auth/session" })).json()).toMatchObject({ ward: { enabled: true, linked: false } });
-    expect((await app.inject({ method: "GET", url: "/auth/session" })).json()).toMatchObject({ ward: { enabled: true, linked: false } });
+    expect((await app.app.inject({ method: "GET", url: "/auth/session" })).json()).toMatchObject({
+      ward: { enabled: true, linked: false },
+    });
+    expect((await app.inject({ method: "GET", url: "/auth/session" })).json()).toMatchObject({
+      ward: { enabled: true, linked: false },
+    });
     // Nothing answers at the issuer: the button's first request says so, and local sign-in kept working.
     const start = await app.app.inject({ method: "POST", url: "/auth/ward/start", payload: { returnTo: "/almanac/" } });
     expect(start.statusCode).toBe(503);

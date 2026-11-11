@@ -49,11 +49,17 @@ function main(): void {
   }
   writeFileSync(
     ENV_FILE,
-    withVapidLines(text, { VAPID_PUBLIC_KEY: publicKey, VAPID_PRIVATE_KEY: privateKey, VAPID_SUBJECT: PLACEHOLDER_SUBJECT }),
+    withVapidLines(text, {
+      VAPID_PUBLIC_KEY: publicKey,
+      VAPID_PRIVATE_KEY: privateKey,
+      VAPID_SUBJECT: PLACEHOLDER_SUBJECT,
+    }),
     { mode: 0o600 },
   );
   const subject = envValue(readEnvFile(), "VAPID_SUBJECT");
-  console.log(`Wrote a new VAPID key pair into .env (VAPID_SUBJECT is ${subject}). Restart the server to turn push on.`);
+  console.log(
+    `Wrote a new VAPID key pair into .env (VAPID_SUBJECT is ${subject}). Restart the server to turn push on.`,
+  );
 }
 
 try {

@@ -64,7 +64,17 @@ describe("GET /api/search", () => {
       db.transaction(() => {
         for (let i = 0; i < count; i++) {
           const start = addDays(first, i);
-          events.create(userId, { calendarId, title, location: "", notes: "", allDay: true, start, end: addDays(start, 1), reminderMinutes: null, tzid: "Europe/Bucharest" });
+          events.create(userId, {
+            calendarId,
+            title,
+            location: "",
+            notes: "",
+            allDay: true,
+            start,
+            end: addDays(start, 1),
+            reminderMinutes: null,
+            tzid: "Europe/Bucharest",
+          });
         }
       })();
     } finally {
@@ -137,7 +147,11 @@ describe("GET /api/search for series", () => {
     const results = await search("standup");
     expect(results).toHaveLength(1);
     const [next] = results;
-    expect(next).toMatchObject({ eventId: series.eventId, seriesId: series.eventId, repeat: { freq: "weekly", byDay: ["MO"] } });
+    expect(next).toMatchObject({
+      eventId: series.eventId,
+      seriesId: series.eventId,
+      repeat: { freq: "weekly", byDay: ["MO"] },
+    });
     expect(next?.id).toBe(`s${series.eventId}:${next?.originalStart}`);
     const start = Date.parse(next?.start ?? "");
     // The first Monday 10:00 that has not ended: within a week of now, still in its hour or after it.
@@ -147,7 +161,12 @@ describe("GET /api/search for series", () => {
   });
 
   it("shows a series that is over as its last occurrence, and one not started as its first", async () => {
-    await create({ title: "Course", start: "2020-03-02T08:00:00Z", end: "2020-03-02T09:00:00Z", repeat: { freq: "weekly", end: { type: "count", count: 3 } } });
+    await create({
+      title: "Course",
+      start: "2020-03-02T08:00:00Z",
+      end: "2020-03-02T09:00:00Z",
+      repeat: { freq: "weekly", end: { type: "count", count: 3 } },
+    });
     await create({ title: "Course later", start: "2099-03-02T08:00:00Z", end: "2099-03-02T09:00:00Z", repeat: weekly });
     expect((await search("course")).map((o) => o.start)).toEqual(["2020-03-16T08:00:00Z", "2099-03-02T08:00:00Z"]);
   });
@@ -164,8 +183,12 @@ describe("GET /api/search for series", () => {
     expect(titles(await search("retro"))).toEqual(["Standup"]);
     const both = await search("standup");
     expect(both).toHaveLength(2);
-    expect(both[0]).toMatchObject({ id: exception.id, seriesId: series.eventId, start: "2026-01-12T08:00:00Z", repeat: { freq: "weekly" } });
+    expect(both[0]).toMatchObject({
+      id: exception.id,
+      seriesId: series.eventId,
+      start: "2026-01-12T08:00:00Z",
+      repeat: { freq: "weekly" },
+    });
     expect(both[1]?.id).toMatch(new RegExp(`^s${series.eventId}:`));
   });
 });
-

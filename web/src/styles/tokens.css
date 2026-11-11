@@ -14,25 +14,25 @@
 :root {
   /* --- Colour -------------------------------------------------------------- */
 
-  --ground: #FFFFFF; /* page background */
-  --surface: #FFFFFF; /* panels, menus, popovers, dialogs */
-  --control: #E9EEF6; /* secondary buttons */
-  --field: #F0F4F9; /* filled text fields */
-  --hairline: #DADCE0; /* borders between surfaces, the grid's lines */
-  --divider: #DADCE0; /* rules inside a surface */
+  --ground: #ffffff; /* page background */
+  --surface: #ffffff; /* panels, menus, popovers, dialogs */
+  --control: #e9eef6; /* secondary buttons */
+  --field: #f0f4f9; /* filled text fields */
+  --hairline: #dadce0; /* borders between surfaces, the grid's lines */
+  --divider: #dadce0; /* rules inside a surface */
   --outline: #747775; /* outlined buttons: Today, the view switcher */
-  --ink: #1F1F1F; /* primary text */
+  --ink: #1f1f1f; /* primary text */
   --ink-2: #444746; /* secondary text, icons */
-  --muted: #5F6368; /* captions, labels, other months' days (6.3:1 on white) */
-  --accent: #0B57D0; /* the one interactive colour, and today */
-  --accent-press: #0842A0; /* pressed, link hover */
-  --accent-ink: #041E49; /* text on the accent tint: the chosen view */
-  --accent-tint: #D3E3FD; /* the chosen view, the shown date, an open menu button */
-  --accent-tint-soft: #E8F0FE; /* a menu row under the pointer, a notice */
+  --muted: #5f6368; /* captions, labels, other months' days (6.3:1 on white) */
+  --accent: #0b57d0; /* the one interactive colour, and today */
+  --accent-press: #0842a0; /* pressed, link hover */
+  --accent-ink: #041e49; /* text on the accent tint: the chosen view */
+  --accent-tint: #d3e3fd; /* the chosen view, the shown date, an open menu button */
+  --accent-tint-soft: #e8f0fe; /* a menu row under the pointer, a notice */
   --toast-surface: #303030; /* the snackbar */
-  --toast-ink: #F2F2F2;
-  --toast-action: #A8C7FA;
-  --now-line: #EA4335; /* the current time across day and week, Google's red */
+  --toast-ink: #f2f2f2;
+  --toast-action: #a8c7fa;
+  --now-line: #ea4335; /* the current time across day and week, Google's red */
 
   /* --- Derived: mixes and aliases of the above, never a new hue ----------- */
 
@@ -100,7 +100,9 @@
   /* Menus, popovers, the toast. */
   --shadow-float: 0 4px 8px 3px rgba(60, 64, 67, 0.15), 0 1px 3px rgba(60, 64, 67, 0.3);
   /* Dialogs. */
-  --shadow-dialog: 0 24px 38px 3px rgba(60, 64, 67, 0.14), 0 9px 46px 8px rgba(60, 64, 67, 0.12), 0 11px 15px -7px rgba(60, 64, 67, 0.2);
+  --shadow-dialog:
+    0 24px 38px 3px rgba(60, 64, 67, 0.14), 0 9px 46px 8px rgba(60, 64, 67, 0.12),
+    0 11px 15px -7px rgba(60, 64, 67, 0.2);
 
   /* --- Sizes -------------------------------------------------------------- */
 

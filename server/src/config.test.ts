@@ -35,7 +35,11 @@ describe("loadConfig", () => {
   });
 
   it("names every key at fault", () => {
-    const message = problems({ PORT: "70000", ALMANAC_API_PREFIX: "/almanac-api/", PUBLIC_ORIGIN: "https://example.com/" });
+    const message = problems({
+      PORT: "70000",
+      ALMANAC_API_PREFIX: "/almanac-api/",
+      PUBLIC_ORIGIN: "https://example.com/",
+    });
     expect(message).toContain("PORT");
     expect(message).toContain("ALMANAC_API_PREFIX");
     expect(message).toContain("PUBLIC_ORIGIN");
@@ -84,10 +88,16 @@ describe("loadConfig", () => {
     });
 
     it("wants the callback under the API prefix", () => {
-      const elsewhere = problems({ ...WARD, WARD_OIDC_REDIRECT_URI: "http://localhost:5177/almanac/auth/ward/callback" });
+      const elsewhere = problems({
+        ...WARD,
+        WARD_OIDC_REDIRECT_URI: "http://localhost:5177/almanac/auth/ward/callback",
+      });
       expect(elsewhere).toContain("WARD_OIDC_REDIRECT_URI");
       expect(elsewhere).toContain("/almanac-api/auth/ward/callback");
-      const prefix = { ALMANAC_API_PREFIX: "/calendar-api", WARD_OIDC_REDIRECT_URI: "https://example.com/calendar-api/auth/ward/callback" };
+      const prefix = {
+        ALMANAC_API_PREFIX: "/calendar-api",
+        WARD_OIDC_REDIRECT_URI: "https://example.com/calendar-api/auth/ward/callback",
+      };
       expect(loadConfig({ ...WARD, ...prefix }).ward?.redirectUri).toBe(prefix.WARD_OIDC_REDIRECT_URI);
     });
   });
@@ -116,7 +126,9 @@ describe("loadConfig", () => {
 
     it("is on with all three settings", () => {
       expect(loadConfig(VAPID).push).toEqual({ ...pair, subject: "mailto:johndoe@example.com" });
-      expect(loadConfig({ ...VAPID, VAPID_SUBJECT: "https://example.com/contact" }).push?.subject).toBe("https://example.com/contact");
+      expect(loadConfig({ ...VAPID, VAPID_SUBJECT: "https://example.com/contact" }).push?.subject).toBe(
+        "https://example.com/contact",
+      );
     });
 
     it("is off with all three empty", () => {
@@ -127,11 +139,17 @@ describe("loadConfig", () => {
       const message = problems({ ...VAPID, VAPID_PRIVATE_KEY: "", VAPID_SUBJECT: "" });
       expect(message).toContain("VAPID_PRIVATE_KEY, VAPID_SUBJECT are not set");
       expect(message).not.toContain(pair.publicKey);
-      expect(problems({ VAPID_SUBJECT: "mailto:johndoe@example.com" })).toContain("VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY are not set");
+      expect(problems({ VAPID_SUBJECT: "mailto:johndoe@example.com" })).toContain(
+        "VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY are not set",
+      );
     });
 
     it("checks each one's shape, and never repeats a key", () => {
-      const message = problems({ VAPID_PUBLIC_KEY: "short", VAPID_PRIVATE_KEY: `${pair.privateKey}x`, VAPID_SUBJECT: "mailto:" });
+      const message = problems({
+        VAPID_PUBLIC_KEY: "short",
+        VAPID_PRIVATE_KEY: `${pair.privateKey}x`,
+        VAPID_SUBJECT: "mailto:",
+      });
       expect(message).toContain("VAPID_PUBLIC_KEY must be");
       expect(message).toContain("VAPID_PRIVATE_KEY must be");
       expect(message).toContain("VAPID_SUBJECT must be");
@@ -148,7 +166,11 @@ describe("loadConfig", () => {
   });
 
   it("names the Ward and proxy keys along with the rest", () => {
-    const message = problems({ PORT: "0", AUTH_TRUSTED_PROXIES: "0.0.0.0/0", WARD_OIDC_ISSUER: "http://localhost:8792/ward-api/oidc" });
+    const message = problems({
+      PORT: "0",
+      AUTH_TRUSTED_PROXIES: "0.0.0.0/0",
+      WARD_OIDC_ISSUER: "http://localhost:8792/ward-api/oidc",
+    });
     expect(message).toContain("PORT");
     expect(message).toContain("AUTH_TRUSTED_PROXIES");
     expect(message).toContain("WARD_OIDC_CLIENT_ID");

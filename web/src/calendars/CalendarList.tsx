@@ -1,4 +1,10 @@
-import { CALENDAR_NAME_MAX, nextCalendarColor, type Calendar, type CalendarColor, type CalendarCreate } from "@almanac/shared";
+import {
+  CALENDAR_NAME_MAX,
+  nextCalendarColor,
+  type Calendar,
+  type CalendarColor,
+  type CalendarCreate,
+} from "@almanac/shared";
 import { useId, useState, type FormEvent } from "react";
 import { isApiError } from "../api";
 import { AuthField } from "../components/Field";
@@ -52,7 +58,12 @@ export function CalendarList() {
         <h2 id={headingId} className="calendar-list__title">
           My calendars
         </h2>
-        <button type="button" className="icon-button icon-button--small" aria-label="New calendar" onClick={() => setCreating(true)}>
+        <button
+          type="button"
+          className="icon-button icon-button--small"
+          aria-label="New calendar"
+          onClick={() => setCreating(true)}
+        >
           <PlusIcon size={20} />
         </button>
       </header>
@@ -70,7 +81,9 @@ export function CalendarList() {
             key={calendar.id}
             calendar={calendar}
             isOnly={calendars.length === 1}
-            onVisibleChange={(visible) => change(calendar, { visible }, `Couldn't ${visible ? "show" : "hide"} "${calendar.name}". Try again.`)}
+            onVisibleChange={(visible) =>
+              change(calendar, { visible }, `Couldn't ${visible ? "show" : "hide"} "${calendar.name}". Try again.`)
+            }
             onRename={(name) => change(calendar, { name }, "Couldn't rename the calendar. Try again.")}
             onRecolor={(color) => change(calendar, { color }, "Couldn't change the colour. Try again.")}
             onDelete={() => deleteCalendar(calendar)}

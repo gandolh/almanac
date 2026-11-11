@@ -27,8 +27,10 @@ describe("shortcutFor", () => {
     expect(shortcutFor(press("w"), false)).toEqual({ kind: "view", view: "week" });
     expect(shortcutFor(press("m"), false)).toEqual({ kind: "view", view: "month" });
     expect(shortcutFor(press("y"), false)).toEqual({ kind: "view", view: "year" });
-    for (const key of ["j", "n", "ArrowRight"]) expect(shortcutFor(press(key), false), key).toEqual({ kind: "step", by: 1 });
-    for (const key of ["k", "p", "ArrowLeft"]) expect(shortcutFor(press(key), false), key).toEqual({ kind: "step", by: -1 });
+    for (const key of ["j", "n", "ArrowRight"])
+      expect(shortcutFor(press(key), false), key).toEqual({ kind: "step", by: 1 });
+    for (const key of ["k", "p", "ArrowLeft"])
+      expect(shortcutFor(press(key), false), key).toEqual({ kind: "step", by: -1 });
     expect(shortcutFor(press("c"), false)).toEqual({ kind: "command", name: "create" });
     expect(shortcutFor(press("/"), false)).toEqual({ kind: "command", name: "focusSearch" });
   });
@@ -38,7 +40,8 @@ describe("shortcutFor", () => {
   });
 
   it("has nothing for other keys", () => {
-    for (const key of ["x", "Enter", " ", "ArrowUp", "ArrowDown", "Escape", "1"]) expect(shortcutFor(press(key), false), key).toBeNull();
+    for (const key of ["x", "Enter", " ", "ArrowUp", "ArrowDown", "Escape", "1"])
+      expect(shortcutFor(press(key), false), key).toBeNull();
   });
 
   it("stays quiet with Ctrl, Alt or Meta, and with Shift except for /", () => {
@@ -53,11 +56,16 @@ describe("shortcutFor", () => {
     for (const tagName of ["INPUT", "TEXTAREA", "SELECT", "input"]) {
       expect(shortcutFor(press("t", { target: { tagName } as unknown as EventTarget }), false), tagName).toBeNull();
     }
-    expect(shortcutFor(press("t", { target: { tagName: "DIV", isContentEditable: true } as unknown as EventTarget }), false)).toBeNull();
+    expect(
+      shortcutFor(press("t", { target: { tagName: "DIV", isContentEditable: true } as unknown as EventTarget }), false),
+    ).toBeNull();
   });
 
   it("ignores keys inside a menu or a list that uses them", () => {
-    const inMenu = { tagName: "BUTTON", closest: (selector: string) => (selector.includes('[role="menu"]') ? {} : null) };
+    const inMenu = {
+      tagName: "BUTTON",
+      closest: (selector: string) => (selector.includes('[role="menu"]') ? {} : null),
+    };
     expect(isTypingTarget(inMenu as unknown as EventTarget)).toBe(true);
     expect(shortcutFor(press("m", { target: inMenu as unknown as EventTarget }), false)).toBeNull();
     expect(isTypingTarget({ tagName: "BUTTON", closest: () => null } as unknown as EventTarget)).toBe(false);
@@ -66,7 +74,21 @@ describe("shortcutFor", () => {
 
   it("counts text-like inputs as typing, but not a checkbox, button or range that holds focus after a click", () => {
     const input = (type?: string) => ({ tagName: "INPUT", type, closest: () => null }) as unknown as EventTarget;
-    for (const type of [undefined, "text", "search", "email", "url", "tel", "password", "number", "date", "time", "datetime-local", "month", "week"]) {
+    for (const type of [
+      undefined,
+      "text",
+      "search",
+      "email",
+      "url",
+      "tel",
+      "password",
+      "number",
+      "date",
+      "time",
+      "datetime-local",
+      "month",
+      "week",
+    ]) {
       expect(isTypingTarget(input(type))).toBe(true);
     }
     for (const type of ["checkbox", "radio", "button", "submit", "range", "color", "file"]) {
@@ -164,7 +186,9 @@ describe("MiniMonth", () => {
   const today = Temporal.PlainDate.from("2026-10-16");
 
   it("titles the month, with its own previous and next", () => {
-    const html = renderToStaticMarkup(createElement(MiniMonth, { date: Temporal.PlainDate.from("2026-11-03"), today, onPick: () => undefined }));
+    const html = renderToStaticMarkup(
+      createElement(MiniMonth, { date: Temporal.PlainDate.from("2026-11-03"), today, onPick: () => undefined }),
+    );
     expect(html).toContain(">November 2026</h2>");
     expect(html).toContain('aria-label="Previous month"');
     expect(html).toContain('aria-label="Next month"');

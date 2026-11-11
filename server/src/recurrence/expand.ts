@@ -71,7 +71,11 @@ export function ruleOf(timing: SeriesTiming): Rule {
   const id = `${timing.allDay ? "date" : timing.tzid}|${timing.start}|${timing.rrule}`;
   let rule = rules.get(id);
   if (rule === undefined) {
-    rule = new RRuleTemporal({ temporal: Temporal, rruleString: timing.rrule, dtstart: keyToZoned(timing.start, timing) });
+    rule = new RRuleTemporal({
+      temporal: Temporal,
+      rruleString: timing.rrule,
+      dtstart: keyToZoned(timing.start, timing),
+    });
     if (rules.size >= 500) rules.clear();
     rules.set(id, rule);
   }
@@ -100,7 +104,9 @@ export function occurrenceEnd(timing: SeriesTiming, key: string): string {
   const start = keyToZoned(key, timing);
   const end = start.toPlainDateTime().add(wallDuration(timing)).toZonedDateTime(timing.tzid);
   const exact = parseInstant(timing.end) - parseInstant(timing.start);
-  return formatInstant(end.epochMilliseconds > start.epochMilliseconds ? end.epochMilliseconds : start.epochMilliseconds + exact);
+  return formatInstant(
+    end.epochMilliseconds > start.epochMilliseconds ? end.epochMilliseconds : start.epochMilliseconds + exact,
+  );
 }
 
 /** Whether the rule generates an occurrence at `key` (excluded dates aside). */
@@ -113,7 +119,11 @@ export function isGenerated(timing: SeriesTiming, key: string): boolean {
  * generates and `excluded` does not hold, or `undefined` when the rule has
  * no more.
  */
-export function nextKey(timing: SeriesTiming, from: string, excluded: ReadonlySet<string> = new Set()): string | undefined {
+export function nextKey(
+  timing: SeriesTiming,
+  from: string,
+  excluded: ReadonlySet<string> = new Set(),
+): string | undefined {
   const rule = ruleOf(timing);
   let at = rule.next(keyToZoned(from, timing), true);
   // Each excluded key is skipped at most once.
@@ -126,7 +136,11 @@ export function nextKey(timing: SeriesTiming, from: string, excluded: ReadonlySe
 }
 
 /** The last key before `before` that the rule generates and `excluded` does not hold. */
-export function previousKey(timing: SeriesTiming, before: string, excluded: ReadonlySet<string> = new Set()): string | undefined {
+export function previousKey(
+  timing: SeriesTiming,
+  before: string,
+  excluded: ReadonlySet<string> = new Set(),
+): string | undefined {
   const rule = ruleOf(timing);
   let at = rule.previous(keyToZoned(before, timing), false);
   for (let skipped = 0; at !== null && skipped <= excluded.size; skipped++) {
@@ -211,7 +225,10 @@ export function seriesOccurrence(series: SeriesRecord, key: string, repeat: Repe
 }
 
 /** The keys a series does not generate an occurrence for: its excluded dates, and those its exceptions replace. */
-export function excludedKeys(series: SeriesRecord, exceptions: readonly Pick<EventRecord, "originalStart">[]): Set<string> {
+export function excludedKeys(
+  series: SeriesRecord,
+  exceptions: readonly Pick<EventRecord, "originalStart">[],
+): Set<string> {
   const keys = new Set(series.exdates);
   for (const exception of exceptions) if (exception.originalStart !== null) keys.add(exception.originalStart);
   return keys;
@@ -235,7 +252,11 @@ function utcMidnight(date: string): number {
  * row, which `listInRange` finds at the time it was moved to, in this range
  * or another. `GET /api/occurrences` puts the two together.
  */
-export function expandSeries(series: SeriesRecord, exceptions: readonly EventRecord[], range: EventRange): Occurrence[] {
+export function expandSeries(
+  series: SeriesRecord,
+  exceptions: readonly EventRecord[],
+  range: EventRange,
+): Occurrence[] {
   const excluded = excludedKeys(series, exceptions);
   const repeat = seriesRepeat(series);
   const rule = ruleOf(series);
@@ -243,7 +264,11 @@ export function expandSeries(series: SeriesRecord, exceptions: readonly EventRec
 
   if (series.allDay) {
     const days = dayCount(series);
-    const starts = rule.between(new Date(utcMidnight(addDays(range.dates.start, -days))), new Date(utcMidnight(range.dates.end)), true);
+    const starts = rule.between(
+      new Date(utcMidnight(addDays(range.dates.start, -days))),
+      new Date(utcMidnight(range.dates.end)),
+      true,
+    );
     for (const at of starts) {
       const key = zonedToKey(at, true);
       if (key >= range.dates.end || addDays(key, days) <= range.dates.start || excluded.has(key)) continue;
@@ -296,11 +321,13 @@ export function searchOccurrence(
   // Only the excluded ones and the couple that ended within reach are passed over.
   for (let passed = 0; at !== null && passed <= excluded.size + 3; passed++) {
     const key = zonedToKey(at, false);
-    if (!excluded.has(key) && parseInstant(occurrenceEnd(series, key)) > now) return seriesOccurrence(series, key, repeat);
+    if (!excluded.has(key) && parseInstant(occurrenceEnd(series, key)) > now)
+      return seriesOccurrence(series, key, repeat);
     at = rule.next(at, false);
   }
   // Either the series is over (`at` is null) or, past the guard, the next start after now.
-  const key = at === null ? previousKey(series, formatInstant(now), excluded) : nextKey(series, formatInstant(now), excluded);
+  const key =
+    at === null ? previousKey(series, formatInstant(now), excluded) : nextKey(series, formatInstant(now), excluded);
   return key === undefined ? undefined : seriesOccurrence(series, key, repeat);
 }
 

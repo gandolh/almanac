@@ -2,7 +2,17 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ZoneList } from "./TimeZoneDialog";
-import { cityOf, formatOffset, listTimeZones, matchesZone, normalize, offsetMinutesAt, supportedZones, zoneEntry, zoneLabel } from "./time-zones";
+import {
+  cityOf,
+  formatOffset,
+  listTimeZones,
+  matchesZone,
+  normalize,
+  offsetMinutesAt,
+  supportedZones,
+  zoneEntry,
+  zoneLabel,
+} from "./time-zones";
 
 const WINTER = Date.UTC(2026, 0, 15, 12); // 15 January 2026
 const SUMMER = Date.UTC(2026, 6, 15, 12); // 15 July 2026
@@ -80,7 +90,10 @@ describe("listTimeZones", () => {
     for (let index = 1; index < list.length; index++) {
       const before = list[index - 1];
       const entry = list[index];
-      expect(before && entry && before.offsetMinutes <= entry.offsetMinutes, `${before?.zone} before ${entry?.zone}`).toBe(true);
+      expect(
+        before && entry && before.offsetMinutes <= entry.offsetMinutes,
+        `${before?.zone} before ${entry?.zone}`,
+      ).toBe(true);
     }
     const plusThree = list.filter((entry) => entry.offsetMinutes === 180).map((entry) => entry.city);
     expect(plusThree).toEqual([...plusThree].sort((a, b) => a.localeCompare(b, "en")));
@@ -112,7 +125,8 @@ describe("matchesZone", () => {
   ];
   const winter = ZONES.map((zone) => zoneEntry(zone, WINTER));
   const summer = ZONES.map((zone) => zoneEntry(zone, SUMMER));
-  const found = (query: string, list = summer) => list.filter((entry) => matchesZone(entry, query)).map((entry) => entry.zone);
+  const found = (query: string, list = summer) =>
+    list.filter((entry) => matchesZone(entry, query)).map((entry) => entry.zone);
 
   it("finds a city, ignoring case and spaces at the ends", () => {
     expect(found("bucharest")).toContain("Europe/Bucharest");
@@ -174,8 +188,11 @@ describe("matchesZone", () => {
 });
 
 describe("ZoneList", () => {
-  const entries = listTimeZones(WINTER).filter((entry) => ["Europe/Bucharest", "Europe/London", "UTC"].includes(entry.zone));
-  const render = (selected: string, shown = entries) => renderToStaticMarkup(createElement(ZoneList, { entries: shown, selected, onSelect: () => undefined }));
+  const entries = listTimeZones(WINTER).filter((entry) =>
+    ["Europe/Bucharest", "Europe/London", "UTC"].includes(entry.zone),
+  );
+  const render = (selected: string, shown = entries) =>
+    renderToStaticMarkup(createElement(ZoneList, { entries: shown, selected, onSelect: () => undefined }));
 
   it("shows each zone as its label over its name, the chosen one ticked and in the Tab order", () => {
     const html = render("Europe/Bucharest");

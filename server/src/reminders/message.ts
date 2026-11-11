@@ -9,7 +9,9 @@ import { addDays, occurrenceDate, parseInstant, dateInZone, type Occurrence, typ
 
 /** "14:30" in `timeZone`, on the 24-hour clock the app uses. */
 function clock(ms: number, timeZone: string): string {
-  return new Intl.DateTimeFormat("en-GB", { timeZone, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(ms);
+  return new Intl.DateTimeFormat("en-GB", { timeZone, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(
+    ms,
+  );
 }
 
 /** "today", "tomorrow", or "on 16 Oct" for anything further (no reminder offered reaches that far today). */
@@ -17,7 +19,9 @@ function dayWord(date: string, from: string): string {
   if (date === from) return "today";
   if (date === addDays(from, 1)) return "tomorrow";
   const [, month, day] = date.split("-").map(Number);
-  const name = new Intl.DateTimeFormat("en-GB", { month: "short", timeZone: "UTC" }).format(Date.UTC(2000, (month ?? 1) - 1, 1));
+  const name = new Intl.DateTimeFormat("en-GB", { month: "short", timeZone: "UTC" }).format(
+    Date.UTC(2000, (month ?? 1) - 1, 1),
+  );
   return `on ${day} ${name}`;
 }
 

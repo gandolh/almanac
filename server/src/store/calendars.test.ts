@@ -87,7 +87,11 @@ describe("update", () => {
     const work = store.create(ana, { name: "Work" });
     const changed = store.update(ana, work.id, { name: "Job", visible: false });
     expect(changed).toEqual({ ...work, name: "Job", visible: false, updatedAt: "2026-10-16T09:00:01.000Z" });
-    expect(store.update(ana, work.id, { color: "purple" })).toMatchObject({ name: "Job", color: "purple", visible: false });
+    expect(store.update(ana, work.id, { color: "purple" })).toMatchObject({
+      name: "Job",
+      color: "purple",
+      visible: false,
+    });
   });
 
   it("leaves the row as it is for an empty patch", () => {
@@ -107,7 +111,15 @@ describe("remove", () => {
     const events = createEventStore(db, clock);
     const work = store.create(ana, { name: "Work" });
     const home = store.create(ana, { name: "Home" });
-    const content = { title: "x", location: "", notes: "", allDay: true, start: "2026-10-16", end: "2026-10-17", reminderMinutes: null };
+    const content = {
+      title: "x",
+      location: "",
+      notes: "",
+      allDay: true,
+      start: "2026-10-16",
+      end: "2026-10-17",
+      reminderMinutes: null,
+    };
     const gone = events.create(ana, { ...content, calendarId: work.id, tzid: "Europe/Bucharest" });
     const kept = events.create(ana, { ...content, calendarId: home.id, tzid: "Europe/Bucharest" });
     expect(store.remove(ana, work.id)).toBe(true);

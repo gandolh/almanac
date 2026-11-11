@@ -7,7 +7,14 @@ import { useCalendars } from "../data/calendars";
 import { createEvent } from "../data/occurrences";
 import { useSettings } from "../data/settings";
 import type { QuickCreateInit } from "./editor-session";
-import { EVENT_TITLE_MAX, pickCalendar, readLastCalendar, rememberCalendar, titleOf, type FormSeed } from "./editor-state";
+import {
+  EVENT_TITLE_MAX,
+  pickCalendar,
+  readLastCalendar,
+  rememberCalendar,
+  titleOf,
+  type FormSeed,
+} from "./editor-state";
 import { CalendarSelect } from "./EventForm";
 import { whenText } from "./occurrence-text";
 import "./editor.css";
@@ -38,7 +45,13 @@ const ICON = 20;
 
 export function QuickCreate(props: QuickCreateProps) {
   return (
-    <Popover anchor={props.init.anchor} onClose={props.onClose} placement="side" label="New event" className="quick-create">
+    <Popover
+      anchor={props.init.anchor}
+      onClose={props.onClose}
+      placement="side"
+      label="New event"
+      className="quick-create"
+    >
       <QuickCreateForm {...props} />
     </Popover>
   );
@@ -70,7 +83,13 @@ export function QuickCreateForm({ init, onClose, onSaved, onMoreOptions }: Quick
     setBusy(true);
     setFailure(null);
     try {
-      await createEvent({ calendarId, title: titleOf({ title }), allDay: init.allDay, start: init.start, end: init.end });
+      await createEvent({
+        calendarId,
+        title: titleOf({ title }),
+        allDay: init.allDay,
+        start: init.start,
+        end: init.end,
+      });
       rememberCalendar(calendarId);
       onSaved();
     } catch (error) {

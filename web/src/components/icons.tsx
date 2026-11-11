@@ -205,7 +205,15 @@ export function AppMark({ size = 40 }: { size?: number }) {
       <rect className="app-mark__ring" x="294" y="122" width="28" height="60" rx="14" />
       {[231, 279, 327].map((y) =>
         [165, 215, 265, 315].map((x) => (
-          <rect key={`${x}-${y}`} className={x === 265 && y === 279 ? "app-mark__today" : "app-mark__day"} x={x} y={y} width="32" height="32" rx="8" />
+          <rect
+            key={`${x}-${y}`}
+            className={x === 265 && y === 279 ? "app-mark__today" : "app-mark__day"}
+            x={x}
+            y={y}
+            width="32"
+            height="32"
+            rx="8"
+          />
         )),
       )}
     </svg>

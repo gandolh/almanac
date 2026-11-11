@@ -79,7 +79,11 @@ export function checkPasswords(entry: PasswordEntry, needsCurrent: boolean): Pas
 
 /** Mount once inside the auth gate (`App.tsx`). Renders nothing while closed. */
 export function ChangePasswordDialog() {
-  const isOpen = useSyncExternalStore(subscribe, () => open, () => false);
+  const isOpen = useSyncExternalStore(
+    subscribe,
+    () => open,
+    () => false,
+  );
   const { result, clear } = useWardResult();
   const confirmed = result === "reauthenticated";
 
@@ -251,7 +255,16 @@ function PasswordForm(props: PasswordFormProps) {
   return (
     <form id={id} className="password-form" onSubmit={submit} noValidate>
       {intro && <p className="password-text">{intro}</p>}
-      <input className="visually-hidden" type="text" name="username" autoComplete="username" value={username} readOnly tabIndex={-1} aria-hidden="true" />
+      <input
+        className="visually-hidden"
+        type="text"
+        name="username"
+        autoComplete="username"
+        value={username}
+        readOnly
+        tabIndex={-1}
+        aria-hidden="true"
+      />
       {needsCurrent && (
         <AuthField
           ref={currentRef}
@@ -298,8 +311,8 @@ function ConfirmWithWard({ failure }: { failure: AuthError | null }) {
   return (
     <div className="password-form">
       <p className="password-text">
-        You sign in with Ward, and Almanac has no password for you yet. Confirm it's you with your Ward password, then choose
-        one here, so you can still sign in while Ward is down.
+        You sign in with Ward, and Almanac has no password for you yet. Confirm it's you with your Ward password, then
+        choose one here, so you can still sign in while Ward is down.
       </p>
       {failure !== null && (
         <p className="auth-error" role="alert">

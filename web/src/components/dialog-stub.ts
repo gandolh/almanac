@@ -17,7 +17,10 @@ interface PartProps {
 
 /** The attributes worth seeing in markup: the class, ids, `aria-*`, `data-*`. Callbacks and refs are Base UI's. */
 function attributes({ className, ...rest }: PartProps): Record<string, unknown> {
-  const kept = Object.entries(rest).filter(([name, value]) => (name === "id" || name.startsWith("aria-") || name.startsWith("data-")) && typeof value !== "function");
+  const kept = Object.entries(rest).filter(
+    ([name, value]) =>
+      (name === "id" || name.startsWith("aria-") || name.startsWith("data-")) && typeof value !== "function",
+  );
   return { className, ...Object.fromEntries(kept) };
 }
 

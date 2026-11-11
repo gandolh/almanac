@@ -1,4 +1,10 @@
-import { EVENT_LENGTH_MAX_DAYS, REPEAT_UNTIL_MAX, calendarListSchema, occurrenceSchema, type Occurrence } from "@almanac/shared";
+import {
+  EVENT_LENGTH_MAX_DAYS,
+  REPEAT_UNTIL_MAX,
+  calendarListSchema,
+  occurrenceSchema,
+  type Occurrence,
+} from "@almanac/shared";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { databasePath, openDb } from "../db/open.js";
 import { startSignedInApp, type SignedInTestApp } from "../testing/testApp.js";
@@ -113,31 +119,55 @@ describe("POST /api/events", () => {
       repeat: { freq: "weekly", byDay: ["FR"], end: { type: "count", count: 10 } },
       reminderMinutes: null,
     });
-    expect(storedRow(series.eventId)).toMatchObject({ tzid: "Europe/Bucharest", rrule: "FREQ=WEEKLY;BYDAY=FR;COUNT=10" });
+    expect(storedRow(series.eventId)).toMatchObject({
+      tzid: "Europe/Bucharest",
+      rrule: "FREQ=WEEKLY;BYDAY=FR;COUNT=10",
+    });
     expect((await create({ ...standup(), repeat: null })).repeat).toBeNull();
   });
 
   it("moves a series' start to the first day it repeats on", async () => {
     // Friday 16 October, weekly on Monday and Wednesday: the first is Monday the 19th, at the same time.
-    const series = await create({ ...standup(), repeat: { freq: "weekly", byDay: ["WE", "MO"], end: { type: "never" } } });
+    const series = await create({
+      ...standup(),
+      repeat: { freq: "weekly", byDay: ["WE", "MO"], end: { type: "never" } },
+    });
     expect(series).toMatchObject({ start: "2026-10-19T07:00:00Z", end: "2026-10-19T07:15:00Z" });
     expect(storedRow(series.eventId)).toMatchObject({ rrule: "FREQ=WEEKLY;BYDAY=MO,WE" });
-    const weekdays = await create({ calendarId, title: "Off", allDay: true, start: "2026-10-17", end: "2026-10-18", repeat: { freq: "weekdays", end: { type: "never" } } });
+    const weekdays = await create({
+      calendarId,
+      title: "Off",
+      allDay: true,
+      start: "2026-10-17",
+      end: "2026-10-18",
+      repeat: { freq: "weekdays", end: { type: "never" } },
+    });
     expect(weekdays).toMatchObject({ start: "2026-10-19", end: "2026-10-20", id: `s${weekdays.eventId}:2026-10-19` });
   });
 
   it("refuses a repeat that ends before it starts or before it first happens", async () => {
     const until = (date: string, byDay = ["FR"]) => ({ freq: "weekly", byDay, end: { type: "until", date } });
-    const post = (repeat: object) => t.inject({ method: "POST", url: "/api/events", payload: { ...standup(), repeat } });
-    expect(expectError(await post(until("2026-10-15")), 400, "validation")).toBe("repeat.end.date: must not be before the start");
-    expect(expectError(await post(until("2026-10-18", ["MO"])), 400, "validation")).toBe("repeat: ends before it first happens");
+    const post = (repeat: object) =>
+      t.inject({ method: "POST", url: "/api/events", payload: { ...standup(), repeat } });
+    expect(expectError(await post(until("2026-10-15")), 400, "validation")).toBe(
+      "repeat.end.date: must not be before the start",
+    );
+    expect(expectError(await post(until("2026-10-18", ["MO"])), 400, "validation")).toBe(
+      "repeat: ends before it first happens",
+    );
     expect((await post(until("2026-10-16"))).statusCode).toBe(201);
     expectError(await post({ freq: "monthly", byDay: ["MO"], end: { type: "never" } }), 400, "validation");
   });
 
   it("refuses an event longer than EVENT_LENGTH_MAX_DAYS", async () => {
-    const res = await t.inject({ method: "POST", url: "/api/events", payload: { ...standup(), allDay: true, start: "2026-10-01", end: "9999-12-31" } });
-    expect(expectError(res, 400, "validation")).toBe(`end: must be at most ${EVENT_LENGTH_MAX_DAYS} days after the start`);
+    const res = await t.inject({
+      method: "POST",
+      url: "/api/events",
+      payload: { ...standup(), allDay: true, start: "2026-10-01", end: "9999-12-31" },
+    });
+    expect(expectError(res, 400, "validation")).toBe(
+      `end: must be at most ${EVENT_LENGTH_MAX_DAYS} days after the start`,
+    );
   });
 
   it("refuses a repeat ending after REPEAT_UNTIL_MAX, which a zone behind UTC would push past the year 9999", async () => {
@@ -161,7 +191,11 @@ describe("POST /api/events", () => {
   it("answers 404 for a calendar that is not the user's", async () => {
     const other = await t.signInAs("other");
     expectError(await other.inject({ method: "POST", url: "/api/events", payload: standup() }), 404, "not_found");
-    expectError(await t.inject({ method: "POST", url: "/api/events", payload: { ...standup(), calendarId: 999 } }), 404, "not_found");
+    expectError(
+      await t.inject({ method: "POST", url: "/api/events", payload: { ...standup(), calendarId: 999 } }),
+      404,
+      "not_found",
+    );
   });
 });
 
@@ -188,7 +222,13 @@ describe("PATCH /api/events/:id", () => {
     const tooLong = `end: must be at most ${EVENT_LENGTH_MAX_DAYS} days after the start`;
     const event = await create(standup());
     const far = { end: "2037-01-01T07:00:00Z" };
-    expect(expectError(await t.inject({ method: "PATCH", url: `/api/events/${event.eventId}`, payload: { changes: far } }), 400, "validation")).toBe(tooLong);
+    expect(
+      expectError(
+        await t.inject({ method: "PATCH", url: `/api/events/${event.eventId}`, payload: { changes: far } }),
+        400,
+        "validation",
+      ),
+    ).toBe(tooLong);
     const series = await create({ ...standup(), repeat: { freq: "weekly", end: { type: "never" } } });
     for (const scope of ["this", "following", "all"]) {
       const res = await t.inject({
@@ -204,7 +244,11 @@ describe("PATCH /api/events/:id", () => {
     const event = await create(standup());
     const url = `/api/events/${event.eventId}`;
     expectError(await t.inject({ method: "PATCH", url, payload: { changes: { allDay: true } } }), 400, "validation");
-    const res = await t.inject({ method: "PATCH", url, payload: { changes: { allDay: true, start: "2026-10-16", end: "2026-10-17" } } });
+    const res = await t.inject({
+      method: "PATCH",
+      url,
+      payload: { changes: { allDay: true, start: "2026-10-16", end: "2026-10-17" } },
+    });
     expect(res.statusCode).toBe(200);
     expect(res.json()).toMatchObject({ allDay: true, start: "2026-10-16", end: "2026-10-17" });
     expect(storedRow(event.eventId)).toMatchObject({ start_at: null, start_date: "2026-10-16" });
@@ -214,13 +258,22 @@ describe("PATCH /api/events/:id", () => {
     const event = await create(standup());
     const work = await t.inject({ method: "POST", url: "/api/calendars", payload: { name: "Work" } });
     const workId = (work.json() as { id: number }).id;
-    const moved = await t.inject({ method: "PATCH", url: `/api/events/${event.eventId}`, payload: { changes: { calendarId: workId } } });
+    const moved = await t.inject({
+      method: "PATCH",
+      url: `/api/events/${event.eventId}`,
+      payload: { changes: { calendarId: workId } },
+    });
     expect(moved.json()).toMatchObject({ calendarId: workId });
 
     const other = await t.signInAs("other");
-    const theirs = calendarListSchema.parse((await other.inject({ method: "GET", url: "/api/calendars" })).json()).calendars[0];
+    const theirs = calendarListSchema.parse((await other.inject({ method: "GET", url: "/api/calendars" })).json())
+      .calendars[0];
     expectError(
-      await t.inject({ method: "PATCH", url: `/api/events/${event.eventId}`, payload: { changes: { calendarId: theirs?.id } } }),
+      await t.inject({
+        method: "PATCH",
+        url: `/api/events/${event.eventId}`,
+        payload: { changes: { calendarId: theirs?.id } },
+      }),
       404,
       "not_found",
     );
@@ -229,7 +282,11 @@ describe("PATCH /api/events/:id", () => {
   it("accepts a scope and an occurrence key, which a one-off ignores, and checks their shape", async () => {
     const event = await create(standup());
     const url = `/api/events/${event.eventId}`;
-    const ok = await t.inject({ method: "PATCH", url, payload: { scope: "all", occurrence: event.start, changes: { title: "X" } } });
+    const ok = await t.inject({
+      method: "PATCH",
+      url,
+      payload: { scope: "all", occurrence: event.start, changes: { title: "X" } },
+    });
     expect(ok.statusCode).toBe(200);
     expectError(await t.inject({ method: "PATCH", url, payload: { scope: "every", changes: {} } }), 400, "validation");
     expectError(await t.inject({ method: "PATCH", url, payload: { title: "no changes wrapper" } }), 400, "validation");
@@ -266,28 +323,52 @@ describe("PATCH /api/events/:id", () => {
     expect(res.json()).toMatchObject({ start: "2026-10-16T02:00:00Z", repeat: { freq: "weekly", byDay: ["TH"] } });
     expect(storedRow(event.eventId)).toMatchObject({ tzid: "America/New_York", rrule: "FREQ=WEEKLY;BYDAY=TH" });
     // Still 22:00 on Thursdays once New York's summer time ends on 1 November.
-    const after = await t.inject({ method: "GET", url: "/api/occurrences?from=2026-11-02T00:00:00Z&to=2026-11-09T00:00:00Z" });
-    expect((after.json() as { occurrences: Occurrence[] }).occurrences.map((o) => o.start)).toEqual(["2026-11-06T03:00:00Z"]);
+    const after = await t.inject({
+      method: "GET",
+      url: "/api/occurrences?from=2026-11-02T00:00:00Z&to=2026-11-09T00:00:00Z",
+    });
+    expect((after.json() as { occurrences: Occurrence[] }).occurrences.map((o) => o.start)).toEqual([
+      "2026-11-06T03:00:00Z",
+    ]);
   });
 
   it("answers 404 for a bad id or one that does not exist", async () => {
-    expectError(await t.inject({ method: "PATCH", url: "/api/events/abc", payload: { changes: {} } }), 404, "not_found");
-    expectError(await t.inject({ method: "PATCH", url: "/api/events/999", payload: { changes: {} } }), 404, "not_found");
+    expectError(
+      await t.inject({ method: "PATCH", url: "/api/events/abc", payload: { changes: {} } }),
+      404,
+      "not_found",
+    );
+    expectError(
+      await t.inject({ method: "PATCH", url: "/api/events/999", payload: { changes: {} } }),
+      404,
+      "not_found",
+    );
   });
 });
 
 describe("DELETE /api/events/:id", () => {
   it("deletes the event", async () => {
     const event = await create(standup());
-    const res = await t.inject({ method: "DELETE", url: `/api/events/${event.eventId}?scope=this&occurrence=${event.start}` });
+    const res = await t.inject({
+      method: "DELETE",
+      url: `/api/events/${event.eventId}?scope=this&occurrence=${event.start}`,
+    });
     expect(res.statusCode).toBe(204);
     expectError(await t.inject({ method: "DELETE", url: `/api/events/${event.eventId}` }), 404, "not_found");
   });
 
   it("checks the query's shape", async () => {
     const event = await create(standup());
-    expectError(await t.inject({ method: "DELETE", url: `/api/events/${event.eventId}?scope=some` }), 400, "validation");
-    expectError(await t.inject({ method: "DELETE", url: `/api/events/${event.eventId}?occurrence=soon` }), 400, "validation");
+    expectError(
+      await t.inject({ method: "DELETE", url: `/api/events/${event.eventId}?scope=some` }),
+      400,
+      "validation",
+    );
+    expectError(
+      await t.inject({ method: "DELETE", url: `/api/events/${event.eventId}?occurrence=soon` }),
+      400,
+      "validation",
+    );
   });
 });
 
@@ -296,7 +377,11 @@ describe("another user", () => {
     const event = await create(standup());
     const other = await t.signInAs("other");
     const url = `/api/events/${event.eventId}`;
-    expectError(await other.inject({ method: "PATCH", url, payload: { changes: { title: "Mine" } } }), 404, "not_found");
+    expectError(
+      await other.inject({ method: "PATCH", url, payload: { changes: { title: "Mine" } } }),
+      404,
+      "not_found",
+    );
     expectError(await other.inject({ method: "DELETE", url }), 404, "not_found");
     const still = await t.inject({ method: "PATCH", url, payload: { changes: {} } });
     expect(still.json()).toEqual(event);
@@ -342,7 +427,9 @@ describe("reminders", () => {
       expect(expectError(res, 400, "validation"), JSON.stringify(payload)).toMatch(/^reminderMinutes: /);
     }
     const event = await create(standup());
-    expect(expectError(await edit(event.eventId, { changes: { reminderMinutes: 45 } }), 400, "validation")).toMatch(/^reminderMinutes: /);
+    expect(expectError(await edit(event.eventId, { changes: { reminderMinutes: 45 } }), 400, "validation")).toMatch(
+      /^reminderMinutes: /,
+    );
   });
 
   it("changes and clears on an edit", async () => {
@@ -364,7 +451,9 @@ describe("reminders", () => {
     });
     expect(occurrenceSchema.parse(back.json()).reminderMinutes).toBe(5);
 
-    const wrongKind = await edit(event.eventId, { changes: { allDay: true, start: "2026-10-16", end: "2026-10-17", reminderMinutes: 5 } });
+    const wrongKind = await edit(event.eventId, {
+      changes: { allDay: true, start: "2026-10-16", end: "2026-10-17", reminderMinutes: 5 },
+    });
     expect(expectError(wrongKind, 400, "validation")).toMatch(/^reminderMinutes: .* all-day event$/);
   });
 });

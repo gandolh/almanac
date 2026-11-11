@@ -68,7 +68,9 @@ const signIn: Feature = async (app, { config, db }) => {
     app.log.info("WARD_OIDC_ISSUER is not set: local accounts only, no Sign in with Ward.");
   } else if (new URL(ward.redirectUri).origin !== config.publicOrigin) {
     // Only Sign in with Ward breaks (its cookie lands on the other origin), so this warns rather than refusing to start.
-    app.log.warn(`WARD_OIDC_REDIRECT_URI is not on PUBLIC_ORIGIN (${config.publicOrigin}): Sign in with Ward will not work.`);
+    app.log.warn(
+      `WARD_OIDC_REDIRECT_URI is not on PUBLIC_ORIGIN (${config.publicOrigin}): Sign in with Ward will not work.`,
+    );
   }
 
   await app.register(wardAuth, {

@@ -38,7 +38,13 @@ describe("findLinks", () => {
   });
 
   it("links nothing but http(s)", () => {
-    for (const text of ["javascript:alert(1)", "mailto:ana@example.com", "example.com", "ftp://example.com/file", "https://"]) {
+    for (const text of [
+      "javascript:alert(1)",
+      "mailto:ana@example.com",
+      "example.com",
+      "ftp://example.com/file",
+      "https://",
+    ]) {
       expect(findLinks(text), text).toEqual([{ text }]);
     }
   });

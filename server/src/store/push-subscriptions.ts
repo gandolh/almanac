@@ -49,7 +49,9 @@ interface Row {
 }
 
 export function createPushSubscriptionStore(db: Db, now: () => Date = () => new Date()): PushSubscriptionStore {
-  const holderOf = db.prepare<[string], { userId: string }>("SELECT user_id AS userId FROM push_subscriptions WHERE endpoint = ?");
+  const holderOf = db.prepare<[string], { userId: string }>(
+    "SELECT user_id AS userId FROM push_subscriptions WHERE endpoint = ?",
+  );
   const insertRow = db.prepare<[Record<string, string>]>(`
     INSERT INTO push_subscriptions (user_id, endpoint, p256dh, auth, created_at)
     VALUES (@userId, @endpoint, @p256dh, @auth, @at)`);
@@ -62,10 +64,14 @@ export function createPushSubscriptionStore(db: Db, now: () => Date = () => new 
   const listRows = db.prepare<[string], Row>(`
     SELECT endpoint, p256dh, auth, created_at AS createdAt, last_success_at AS lastSuccessAt
     FROM push_subscriptions WHERE user_id = ? ORDER BY id`);
-  const users = db.prepare<[], { userId: string }>("SELECT DISTINCT user_id AS userId FROM push_subscriptions ORDER BY user_id");
+  const users = db.prepare<[], { userId: string }>(
+    "SELECT DISTINCT user_id AS userId FROM push_subscriptions ORDER BY user_id",
+  );
   const deleteOwn = db.prepare<[string, string]>("DELETE FROM push_subscriptions WHERE endpoint = ? AND user_id = ?");
   const deleteAny = db.prepare<[string]>("DELETE FROM push_subscriptions WHERE endpoint = ?");
-  const delivered = db.prepare<[string, string]>("UPDATE push_subscriptions SET last_success_at = ? WHERE endpoint = ?");
+  const delivered = db.prepare<[string, string]>(
+    "UPDATE push_subscriptions SET last_success_at = ? WHERE endpoint = ?",
+  );
 
   const save = db.transaction((userId: string, { endpoint, p256dh, auth }: PushSubscriptionKeys) => {
     const holder = holderOf.get(endpoint)?.userId;

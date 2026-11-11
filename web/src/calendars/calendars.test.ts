@@ -2,7 +2,15 @@ import type { Calendar } from "@almanac/shared";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { CalendarRow, checkCalendarName, DeleteCalendarDialog, LAST_CALENDAR_REASON, RenameField, rowMenuSections, type CalendarRowProps } from "./CalendarRow";
+import {
+  CalendarRow,
+  checkCalendarName,
+  DeleteCalendarDialog,
+  LAST_CALENDAR_REASON,
+  RenameField,
+  rowMenuSections,
+  type CalendarRowProps,
+} from "./CalendarRow";
 import { ColorPicker } from "./ColorPicker";
 
 // Base UI's dialog portal needs a DOM; this renders the dialog in place.
@@ -34,7 +42,11 @@ function row(props: Partial<CalendarRowProps> = {}): string {
 
 /** The opening tag of the first element whose tag contains `marker`. */
 function tagWith(html: string, element: string, marker: string): string {
-  return [...html.matchAll(new RegExp(`<${element}[^>]*>`, "g"))].map((match) => match[0]).find((tag) => tag.includes(marker)) ?? "";
+  return (
+    [...html.matchAll(new RegExp(`<${element}[^>]*>`, "g"))]
+      .map((match) => match[0])
+      .find((tag) => tag.includes(marker)) ?? ""
+  );
 }
 
 describe("CalendarRow", () => {
@@ -71,14 +83,18 @@ describe("the ⋮ menu", () => {
   });
 
   it("disables Delete for the user's only calendar and says why", () => {
-    const [only] = rowMenuSections(work, true, actions()).flatMap((section) => section.items).slice(-1);
+    const [only] = rowMenuSections(work, true, actions())
+      .flatMap((section) => section.items)
+      .slice(-1);
     expect(only?.label).toBe("Delete");
     expect(only?.disabled).toBe(true);
     expect(only?.detail).toBe("Only calendar");
   });
 
   it("leaves Delete enabled when there are other calendars", () => {
-    const [other] = rowMenuSections(work, false, actions()).flatMap((section) => section.items).slice(-1);
+    const [other] = rowMenuSections(work, false, actions())
+      .flatMap((section) => section.items)
+      .slice(-1);
     expect(other?.disabled).toBeFalsy();
     expect(other?.detail).toBeUndefined();
   });
@@ -96,7 +112,15 @@ describe("the ⋮ menu", () => {
 });
 
 describe("DeleteCalendarDialog", () => {
-  const dialog = (isOnly: boolean) => renderToStaticMarkup(createElement(DeleteCalendarDialog, { calendar: work, isOnly, onConfirm: () => undefined, onClose: () => undefined }));
+  const dialog = (isOnly: boolean) =>
+    renderToStaticMarkup(
+      createElement(DeleteCalendarDialog, {
+        calendar: work,
+        isOnly,
+        onConfirm: () => undefined,
+        onClose: () => undefined,
+      }),
+    );
   const deleteButton = (html: string) => /<button[^>]*>Delete<\/button>/.exec(html)?.[0] ?? "";
 
   it("asks about the calendar by name and says its events go too", () => {
@@ -122,7 +146,9 @@ describe("DeleteCalendarDialog", () => {
 
 describe("RenameField", () => {
   it("starts on the name, limited to 60 characters", () => {
-    const html = renderToStaticMarkup(createElement(RenameField, { name: "Work", onCommit: () => undefined, onCancel: () => undefined }));
+    const html = renderToStaticMarkup(
+      createElement(RenameField, { name: "Work", onCommit: () => undefined, onCancel: () => undefined }),
+    );
     expect(html).toContain('value="Work"');
     expect(html).toMatch(/maxlength="60"/i);
     expect(html).toContain('aria-label="Calendar name"');

@@ -73,13 +73,27 @@ describe("toEventInputs", () => {
   });
 
   it("passes all-day dates through, end exclusive", () => {
-    const [event] = toEventInputs([occurrence("e2", { allDay: true, start: "2026-10-16", end: "2026-10-18", calendarId: 2 })], [gym]);
-    expect(event).toMatchObject({ allDay: true, start: "2026-10-16", end: "2026-10-18", color: "#F6BF26", contrastColor: "var(--ink)" });
+    const [event] = toEventInputs(
+      [occurrence("e2", { allDay: true, start: "2026-10-16", end: "2026-10-18", calendarId: 2 })],
+      [gym],
+    );
+    expect(event).toMatchObject({
+      allDay: true,
+      start: "2026-10-16",
+      end: "2026-10-18",
+      color: "#F6BF26",
+      contrastColor: "var(--ink)",
+    });
   });
 
   it("drops hidden calendars and calendars it doesn't know (still loading, or just deleted)", () => {
     const events = toEventInputs(
-      [occurrence("e1"), occurrence("e2", { calendarId: 2 }), occurrence("e3", { calendarId: 3 }), occurrence("e4", { calendarId: 9 })],
+      [
+        occurrence("e1"),
+        occurrence("e2", { calendarId: 2 }),
+        occurrence("e3", { calendarId: 3 }),
+        occurrence("e4", { calendarId: 9 }),
+      ],
       [work, gym, hidden],
     );
     expect(events.map((event) => event.id)).toEqual(["e1", "e2"]);
@@ -99,7 +113,17 @@ describe("toEventInputs", () => {
 
 describe("eventInk", () => {
   it("is white on the palette's colours and ink on its light yellow", () => {
-    for (const hex of ["#4285F4", "#009688", "#33B679", "#7CB342", "#F4511E", "#D50000", "#E67C73", "#8E24AA", "#616161"]) {
+    for (const hex of [
+      "#4285F4",
+      "#009688",
+      "#33B679",
+      "#7CB342",
+      "#F4511E",
+      "#D50000",
+      "#E67C73",
+      "#8E24AA",
+      "#616161",
+    ]) {
       expect(eventInk(hex), hex).toBe("var(--on-accent)");
     }
     expect(eventInk("#F6BF26")).toBe("var(--ink)");
@@ -114,7 +138,9 @@ describe("FullCalendar's dates back on the wire", () => {
   it("takes an all-day date in the display time zone, and a timed one as the instant", () => {
     expect(plainDateOf(midnight16, BUCHAREST).toString()).toBe("2026-10-16");
     expect(plainDateOf(midnight16, "UTC").toString()).toBe("2026-10-15");
-    expect(wireSpan(new Date("2026-10-16T07:15:30.500Z"), new Date("2026-10-16T08:15:30.500Z"), false, BUCHAREST)).toEqual({
+    expect(
+      wireSpan(new Date("2026-10-16T07:15:30.500Z"), new Date("2026-10-16T08:15:30.500Z"), false, BUCHAREST),
+    ).toEqual({
       start: "2026-10-16T07:15:30Z",
       end: "2026-10-16T08:15:30Z",
       allDay: false,
@@ -122,15 +148,27 @@ describe("FullCalendar's dates back on the wire", () => {
   });
 
   it("makes a span, filling in an end FullCalendar left out", () => {
-    expect(wireSpan(midnight16, midnight18, true, BUCHAREST)).toEqual({ start: "2026-10-16", end: "2026-10-18", allDay: true });
-    expect(wireSpan(midnight16, null, true, BUCHAREST)).toEqual({ start: "2026-10-16", end: "2026-10-17", allDay: true });
+    expect(wireSpan(midnight16, midnight18, true, BUCHAREST)).toEqual({
+      start: "2026-10-16",
+      end: "2026-10-18",
+      allDay: true,
+    });
+    expect(wireSpan(midnight16, null, true, BUCHAREST)).toEqual({
+      start: "2026-10-16",
+      end: "2026-10-17",
+      allDay: true,
+    });
     const ten = new Date("2026-10-16T07:00:00Z");
     expect(wireSpan(ten, new Date("2026-10-16T08:30:00Z"), false, BUCHAREST)).toEqual({
       start: "2026-10-16T07:00:00Z",
       end: "2026-10-16T08:30:00Z",
       allDay: false,
     });
-    expect(wireSpan(ten, null, false, BUCHAREST)).toEqual({ start: "2026-10-16T07:00:00Z", end: "2026-10-16T08:00:00Z", allDay: false });
+    expect(wireSpan(ten, null, false, BUCHAREST)).toEqual({
+      start: "2026-10-16T07:00:00Z",
+      end: "2026-10-16T08:00:00Z",
+      allDay: false,
+    });
   });
 
   it("crosses a change of clocks by the instant: an all-day span over the October change stays whole days", () => {
@@ -145,7 +183,9 @@ describe("FullCalendar's dates back on the wire", () => {
   it("widens a click (one snap on the hours) to an hour and leaves drags alone", () => {
     const snap = 15 * 60_000;
     const ten = new Date("2026-10-16T07:00:00Z");
-    expect(clickEnd(ten, new Date("2026-10-16T07:15:00Z"), false, snap)?.toISOString()).toBe("2026-10-16T08:00:00.000Z");
+    expect(clickEnd(ten, new Date("2026-10-16T07:15:00Z"), false, snap)?.toISOString()).toBe(
+      "2026-10-16T08:00:00.000Z",
+    );
     expect(clickEnd(ten, new Date("2026-10-16T07:30:00Z"), false, snap)).toBe(null);
     expect(clickEnd(midnight16, new Date("2026-10-16T21:00:00Z"), true, snap)).toBe(null);
   });
@@ -162,11 +202,28 @@ describe("a drag's patch", () => {
   it("names the scope and the original start for a series, nothing more for a one-off", () => {
     const changes = { start: span.start, end: span.end };
     expect(occurrencePatch(occurrence("e1"), changes, null)).toEqual({ changes });
-    const generated = occurrence("s7:2026-10-16T07:00:00Z", { eventId: 7, seriesId: 7, originalStart: "2026-10-16T07:00:00Z" });
-    expect(occurrencePatch(generated, changes, "following")).toEqual({ scope: "following", occurrence: "2026-10-16T07:00:00Z", changes });
+    const generated = occurrence("s7:2026-10-16T07:00:00Z", {
+      eventId: 7,
+      seriesId: 7,
+      originalStart: "2026-10-16T07:00:00Z",
+    });
+    expect(occurrencePatch(generated, changes, "following")).toEqual({
+      scope: "following",
+      occurrence: "2026-10-16T07:00:00Z",
+      changes,
+    });
     // An exception: its own row, the series' key.
-    const moved = occurrence("e12", { eventId: 12, seriesId: 7, originalStart: "2026-10-16T07:00:00Z", start: "2026-10-16T09:00:00Z" });
-    expect(occurrencePatch(moved, changes, "this")).toEqual({ scope: "this", occurrence: "2026-10-16T07:00:00Z", changes });
+    const moved = occurrence("e12", {
+      eventId: 12,
+      seriesId: 7,
+      originalStart: "2026-10-16T07:00:00Z",
+      start: "2026-10-16T09:00:00Z",
+    });
+    expect(occurrencePatch(moved, changes, "this")).toEqual({
+      scope: "this",
+      occurrence: "2026-10-16T07:00:00Z",
+      changes,
+    });
   });
 });
 

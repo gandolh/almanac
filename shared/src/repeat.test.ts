@@ -53,7 +53,8 @@ describe("repeatToRRule", () => {
   });
 
   it("ends on a date as the last second of that date in the zone, in UTC, for a timed series", () => {
-    const until = (date: string, zone = BUCHAREST) => rule({ freq: "daily", end: { type: "until", date } }, FRIDAY_TEN, zone);
+    const until = (date: string, zone = BUCHAREST) =>
+      rule({ freq: "daily", end: { type: "until", date } }, FRIDAY_TEN, zone);
     // Winter time (UTC+2), summer time (UTC+3), and the day summer time ends.
     expect(until("2026-12-01")).toBe("FREQ=DAILY;UNTIL=20261201T215959Z");
     expect(until("2026-07-01")).toBe("FREQ=DAILY;UNTIL=20260701T205959Z");
@@ -90,23 +91,44 @@ describe("rruleToRepeat", () => {
         ["2026-10-16T03:00:00Z", "America/New_York"],
         ["2026-10-16", BUCHAREST],
       ] as const) {
-        expect(rruleToRepeat(repeatToRRule(repeat, start, zone), start, zone), `${repeat.freq} ${start}`).toEqual(repeat);
+        expect(rruleToRepeat(repeatToRRule(repeat, start, zone), start, zone), `${repeat.freq} ${start}`).toEqual(
+          repeat,
+        );
       }
     }
   });
 
   it("fills a weekly rule's days, and reads Monday to Friday as every weekday", () => {
     expect(rruleToRepeat("FREQ=WEEKLY", FRIDAY_TEN, BUCHAREST)).toEqual({ freq: "weekly", byDay: ["FR"], end: never });
-    expect(rruleToRepeat("FREQ=WEEKLY", "2026-10-19", BUCHAREST)).toEqual({ freq: "weekly", byDay: ["MO"], end: never });
-    expect(rruleToRepeat("FREQ=WEEKLY;BYDAY=FR,TH,WE,TU,MO", FRIDAY_TEN, BUCHAREST)).toEqual({ freq: "weekdays", end: never });
+    expect(rruleToRepeat("FREQ=WEEKLY", "2026-10-19", BUCHAREST)).toEqual({
+      freq: "weekly",
+      byDay: ["MO"],
+      end: never,
+    });
+    expect(rruleToRepeat("FREQ=WEEKLY;BYDAY=FR,TH,WE,TU,MO", FRIDAY_TEN, BUCHAREST)).toEqual({
+      freq: "weekdays",
+      end: never,
+    });
     expect(rruleToRepeat("RRULE:FREQ=MONTHLY", FRIDAY_TEN, BUCHAREST)).toEqual({ freq: "monthly", end: never });
   });
 
   it("reads a UTC UNTIL as its date in the zone, and a date UNTIL as it is", () => {
-    expect(rruleToRepeat("FREQ=DAILY;UNTIL=20261201T215959Z", FRIDAY_TEN, BUCHAREST).end).toEqual({ type: "until", date: "2026-12-01" });
-    expect(rruleToRepeat("FREQ=DAILY;UNTIL=20261201T215959Z", FRIDAY_TEN, "UTC").end).toEqual({ type: "until", date: "2026-12-01" });
-    expect(rruleToRepeat("FREQ=DAILY;UNTIL=20261202T005959Z", FRIDAY_TEN, BUCHAREST).end).toEqual({ type: "until", date: "2026-12-02" });
-    expect(rruleToRepeat("FREQ=DAILY;UNTIL=20261201", "2026-10-16", BUCHAREST).end).toEqual({ type: "until", date: "2026-12-01" });
+    expect(rruleToRepeat("FREQ=DAILY;UNTIL=20261201T215959Z", FRIDAY_TEN, BUCHAREST).end).toEqual({
+      type: "until",
+      date: "2026-12-01",
+    });
+    expect(rruleToRepeat("FREQ=DAILY;UNTIL=20261201T215959Z", FRIDAY_TEN, "UTC").end).toEqual({
+      type: "until",
+      date: "2026-12-01",
+    });
+    expect(rruleToRepeat("FREQ=DAILY;UNTIL=20261202T005959Z", FRIDAY_TEN, BUCHAREST).end).toEqual({
+      type: "until",
+      date: "2026-12-02",
+    });
+    expect(rruleToRepeat("FREQ=DAILY;UNTIL=20261201", "2026-10-16", BUCHAREST).end).toEqual({
+      type: "until",
+      date: "2026-12-01",
+    });
   });
 
   it("refuses a rule that is not a preset", () => {
@@ -147,7 +169,9 @@ describe("describeRepeat", () => {
 
   it("follows the start's date in the zone, or a date as it is", () => {
     expect(say({ freq: "yearly", end: never }, "2026-10-15T21:30:00Z")).toBe("Annually on 16 October");
-    expect(describeRepeat({ freq: "yearly", end: never }, "2026-10-15T21:30:00Z", "UTC")).toBe("Annually on 15 October");
+    expect(describeRepeat({ freq: "yearly", end: never }, "2026-10-15T21:30:00Z", "UTC")).toBe(
+      "Annually on 15 October",
+    );
     expect(say({ freq: "monthly", end: never }, "2026-02-01")).toBe("Monthly on day 1");
     expect(say({ freq: "weekly", end: never }, "2026-10-18")).toBe("Weekly on Sunday");
   });

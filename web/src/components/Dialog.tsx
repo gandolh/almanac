@@ -27,9 +27,19 @@ export interface DialogProps {
   className?: string;
 }
 
-const FOCUSABLE = "input:not(:disabled), select:not(:disabled), textarea:not(:disabled), button:not(:disabled), a[href]";
+const FOCUSABLE =
+  "input:not(:disabled), select:not(:disabled), textarea:not(:disabled), button:not(:disabled), a[href]";
 
-export function Dialog({ open, onClose, title, children, footer, size = "medium", dismissOnBackdrop = true, className }: DialogProps) {
+export function Dialog({
+  open,
+  onClose,
+  title,
+  children,
+  footer,
+  size = "medium",
+  dismissOnBackdrop = true,
+  className,
+}: DialogProps) {
   const popupRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
 

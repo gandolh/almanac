@@ -22,6 +22,9 @@ export function searchPath(query: string): string {
 
 /** The matching occurrences, in the order the server gives (by date in the display time zone). */
 export async function searchEvents(query: string, options: Pick<RequestOptions, "signal"> = {}): Promise<Occurrence[]> {
-  const answer = await apiRequest(searchPath(normalizeQuery(query)), { schema: searchResponseSchema, signal: options.signal });
+  const answer = await apiRequest(searchPath(normalizeQuery(query)), {
+    schema: searchResponseSchema,
+    signal: options.signal,
+  });
   return answer.results;
 }

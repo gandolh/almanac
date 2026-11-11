@@ -33,7 +33,9 @@ export function isPushEndpoint(value: string): boolean {
   if (url.protocol !== "https:" || url.username !== "" || url.password !== "") return false;
   const host = url.hostname.toLowerCase().replace(/\.+$/, "");
   if (host.startsWith("[") || IPV4_HOST.test(host) || !host.includes(".")) return false;
-  return host !== "localhost" && !host.endsWith(".localhost") && !host.endsWith(".local") && !host.endsWith(".internal");
+  return (
+    host !== "localhost" && !host.endsWith(".localhost") && !host.endsWith(".local") && !host.endsWith(".internal")
+  );
 }
 
 const endpointSchema = z
@@ -52,7 +54,9 @@ const keysSchema = z.object(
     auth: z
       .string()
       .regex(base64url, { message: "must be base64url" })
-      .refine((value) => value.replace(/=+$/, "").length >= 22 && value.length <= 64, { message: "must be 16 bytes or more" }),
+      .refine((value) => value.replace(/=+$/, "").length >= 22 && value.length <= 64, {
+        message: "must be 16 bytes or more",
+      }),
   },
   { error: "a push subscription needs keys.p256dh and keys.auth" },
 );

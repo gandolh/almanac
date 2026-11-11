@@ -44,7 +44,12 @@ const MONDAYS = {
 };
 
 /** The Mondays at 10:00 local, as keys: 07:00Z in summer time, 08:00Z after. */
-const OCT = { 5: "2026-10-05T07:00:00Z", 12: "2026-10-12T07:00:00Z", 19: "2026-10-19T07:00:00Z", 26: "2026-10-26T08:00:00Z" };
+const OCT = {
+  5: "2026-10-05T07:00:00Z",
+  12: "2026-10-12T07:00:00Z",
+  19: "2026-10-19T07:00:00Z",
+  26: "2026-10-26T08:00:00Z",
+};
 const NOV = { 2: "2026-11-02T08:00:00Z", 9: "2026-11-09T08:00:00Z", 16: "2026-11-16T08:00:00Z" };
 
 async function create(payload: object): Promise<Occurrence> {
@@ -177,10 +182,18 @@ describe("this event", () => {
   it("deletes a generated occurrence as an excluded date", async () => {
     const series = await create(MONDAYS);
     expect((await remove(series.eventId, { scope: "this", occurrence: OCT[19] })).statusCode).toBe(204);
-    expect(shown(await autumn()).slice(0, 3)).toEqual([`${OCT[5]} Standup`, `${OCT[12]} Standup`, `${OCT[26]} Standup`]);
+    expect(shown(await autumn()).slice(0, 3)).toEqual([
+      `${OCT[5]} Standup`,
+      `${OCT[12]} Standup`,
+      `${OCT[26]} Standup`,
+    ]);
     expect(rows()).toMatchObject([{ id: series.eventId, exdates: [OCT[19]] }]);
     // A deleted occurrence is no longer one to edit.
-    expectError(await patch(series.eventId, { scope: "this", occurrence: OCT[19], changes: { title: "X" } }), 404, "not_found");
+    expectError(
+      await patch(series.eventId, { scope: "this", occurrence: OCT[19], changes: { title: "X" } }),
+      404,
+      "not_found",
+    );
   });
 
   it("deletes an exception, and its slot stays empty", async () => {
@@ -211,7 +224,11 @@ describe("this and following events", () => {
     const series = await create(MONDAYS);
     const next = await edit(series.eventId, { scope: "following", occurrence: OCT[19], changes: { title: "Sync" } });
     const [old, created] = rows();
-    expect(old).toMatchObject({ id: series.eventId, title: "Standup", rrule: "FREQ=WEEKLY;BYDAY=MO;UNTIL=20261018T205959Z" });
+    expect(old).toMatchObject({
+      id: series.eventId,
+      title: "Standup",
+      rrule: "FREQ=WEEKLY;BYDAY=MO;UNTIL=20261018T205959Z",
+    });
     expect(created).toMatchObject({ title: "Sync", rrule: "FREQ=WEEKLY;BYDAY=MO", start: OCT[19], series_id: null });
     expect(next).toMatchObject({
       id: `s${created?.id}:${OCT[19]}`,
@@ -255,8 +272,14 @@ describe("this and following events", () => {
     const created = all.find((row) => row.rrule === "FREQ=WEEKLY;BYDAY=MO" && row.id !== series.eventId);
     expect(all.find((row) => row.id === series.eventId)).toMatchObject({ exdates: [OCT[12]] });
     expect(created).toMatchObject({ start: "2026-10-19T08:30:00Z", exdates: ["2026-11-02T09:30:00Z"] });
-    expect(all.find((row) => row.id === tuesday.eventId)).toMatchObject({ series_id: created?.id, original_start: "2026-10-26T09:30:00Z" });
-    expect(all.find((row) => row.id === renamed.eventId)).toMatchObject({ series_id: created?.id, original_start: "2026-11-09T09:30:00Z" });
+    expect(all.find((row) => row.id === tuesday.eventId)).toMatchObject({
+      series_id: created?.id,
+      original_start: "2026-10-26T09:30:00Z",
+    });
+    expect(all.find((row) => row.id === renamed.eventId)).toMatchObject({
+      series_id: created?.id,
+      original_start: "2026-11-09T09:30:00Z",
+    });
 
     expect(shown(await autumn()).slice(0, 6)).toEqual([
       `${OCT[5]} Standup`,
@@ -277,7 +300,10 @@ describe("this and following events", () => {
       occurrence: OCT[19],
       changes: { repeat: { freq: "weekly", byDay: ["TU"], end: never } },
     });
-    expect(next).toMatchObject({ start: "2026-10-20T07:00:00Z", repeat: { freq: "weekly", byDay: ["TU"], end: never } });
+    expect(next).toMatchObject({
+      start: "2026-10-20T07:00:00Z",
+      repeat: { freq: "weekly", byDay: ["TU"], end: never },
+    });
     expect(rows().filter((row) => row.title === "Retro")).toEqual([]);
     expect(shown(await autumn()).slice(0, 4)).toEqual([
       `${OCT[5]} Standup`,
@@ -335,7 +361,10 @@ describe("this and following events", () => {
     await edit(tuesday.eventId, { scope: "following", changes: { end: "2026-10-20T11:30:00+03:00" } });
     const created = createdSeries(series.eventId);
     expect(created).toMatchObject({ rrule: "FREQ=WEEKLY;BYDAY=MO", start: OCT[19] });
-    expect(rows().find((row) => row.id === tuesday.eventId)).toMatchObject({ series_id: created?.id, original_start: OCT[19] });
+    expect(rows().find((row) => row.id === tuesday.eventId)).toMatchObject({
+      series_id: created?.id,
+      original_start: OCT[19],
+    });
     expect((await autumn()).slice(0, 4).map((o) => [o.start, o.end])).toEqual([
       [OCT[5], "2026-10-05T08:00:00Z"],
       [OCT[12], "2026-10-12T08:00:00Z"],
@@ -364,7 +393,10 @@ describe("this and following events", () => {
   it("follows a moved exception's own date for a new repeat from there", async () => {
     const series = await create(MONDAYS);
     const tuesday = await tuesdayException(series.eventId);
-    const first = await edit(tuesday.eventId, { scope: "following", changes: { repeat: { freq: "monthly", end: never } } });
+    const first = await edit(tuesday.eventId, {
+      scope: "following",
+      changes: { repeat: { freq: "monthly", end: never } },
+    });
     expect(first).toMatchObject({ start: "2026-10-20T07:00:00Z", repeat: { freq: "monthly", end: never } });
     expect(createdSeries(series.eventId)).toMatchObject({ rrule: "FREQ=MONTHLY;BYMONTHDAY=20" });
   });
@@ -377,7 +409,10 @@ describe("this and following events", () => {
       occurrence: "2026-10-14T07:00:00Z",
       changes: { start: "2026-10-15T10:00:00+03:00", end: "2026-10-15T11:00:00+03:00" },
     });
-    expect(next).toMatchObject({ start: "2026-10-15T07:00:00Z", repeat: { freq: "weekly", byDay: ["TU", "TH"], end: never } });
+    expect(next).toMatchObject({
+      start: "2026-10-15T07:00:00Z",
+      repeat: { freq: "weekly", byDay: ["TU", "TH"], end: never },
+    });
     expect((await autumn()).slice(0, 6).map((o) => o.start.slice(0, 10))).toEqual([
       "2026-10-05",
       "2026-10-07",
@@ -503,7 +538,10 @@ describe("all events", () => {
       occurrence: OCT[19],
       changes: { start: "2026-10-20T10:00:00+03:00", end: "2026-10-20T11:00:00+03:00" },
     });
-    expect(first).toMatchObject({ start: "2026-10-06T07:00:00Z", repeat: { freq: "weekly", byDay: ["TU"], end: never } });
+    expect(first).toMatchObject({
+      start: "2026-10-06T07:00:00Z",
+      repeat: { freq: "weekly", byDay: ["TU"], end: never },
+    });
     expect(rows()).toMatchObject([{ rrule: "FREQ=WEEKLY;BYDAY=TU" }]);
   });
 
@@ -525,7 +563,11 @@ describe("all events", () => {
     });
     // Only the end changes: every occurrence gets longer, and stays on Monday at 10:00.
     const longer = await edit(tuesday.eventId, { scope: "all", changes: { end: "2026-10-20T11:30:00+03:00" } });
-    expect(longer).toMatchObject({ start: OCT[5], end: "2026-10-05T08:30:00Z", repeat: { freq: "weekly", byDay: ["MO"] } });
+    expect(longer).toMatchObject({
+      start: OCT[5],
+      end: "2026-10-05T08:30:00Z",
+      repeat: { freq: "weekly", byDay: ["MO"] },
+    });
     expect(rows()).toMatchObject([{ id: series.eventId, rrule: "FREQ=WEEKLY;BYDAY=MO" }]);
     expect((await autumn()).slice(2, 4).map((o) => [o.start, o.end])).toEqual([
       [OCT[19], "2026-10-19T08:30:00Z"],
@@ -545,7 +587,11 @@ describe("all events", () => {
       scope: "all",
       changes: { start: "2026-10-20T11:00:00+03:00", end: "2026-10-20T12:00:00+03:00" },
     });
-    expect(first).toMatchObject({ start: "2026-10-05T08:00:00Z", end: "2026-10-05T09:00:00Z", repeat: { byDay: ["MO"] } });
+    expect(first).toMatchObject({
+      start: "2026-10-05T08:00:00Z",
+      end: "2026-10-05T09:00:00Z",
+      repeat: { byDay: ["MO"] },
+    });
     expect(rows()).toMatchObject([{ id: series.eventId, rrule: "FREQ=WEEKLY;BYDAY=MO" }]);
   });
 
@@ -577,7 +623,9 @@ describe("all events", () => {
       `${OCT[12]} Standup`,
       "2026-10-14T07:00:00Z Standup",
     ]);
-    expect(rows()).toMatchObject([{ id: series.eventId, rrule: "FREQ=WEEKLY;BYDAY=MO,WE;UNTIL=20261014T205959Z", exdates: [] }]);
+    expect(rows()).toMatchObject([
+      { id: series.eventId, rrule: "FREQ=WEEKLY;BYDAY=MO,WE;UNTIL=20261014T205959Z", exdates: [] },
+    ]);
   });
 
   it("follows the edited occurrence for a new monthly repeat", async () => {
@@ -616,7 +664,12 @@ describe("all events", () => {
       occurrence: OCT[19],
       changes: { allDay: true, start: "2026-10-19", end: "2026-10-20" },
     });
-    expect(first).toMatchObject({ id: `s${series.eventId}:2026-10-05`, allDay: true, start: "2026-10-05", end: "2026-10-06" });
+    expect(first).toMatchObject({
+      id: `s${series.eventId}:2026-10-05`,
+      allDay: true,
+      start: "2026-10-05",
+      end: "2026-10-06",
+    });
     expect(rows()).toMatchObject([{ rrule: "FREQ=WEEKLY;BYDAY=MO;UNTIL=20261026", start: null }]);
     expect((await autumn()).map((o) => o.start)).toEqual(["2026-10-05", "2026-10-12", "2026-10-19", "2026-10-26"]);
   });
@@ -630,7 +683,13 @@ describe("all events", () => {
 
 describe("all-day series", () => {
   it("edits and deletes by date keys", async () => {
-    const series = await create({ title: "Gym", allDay: true, start: "2026-10-05", end: "2026-10-06", repeat: { freq: "weekly", end: never } });
+    const series = await create({
+      title: "Gym",
+      allDay: true,
+      start: "2026-10-05",
+      end: "2026-10-06",
+      repeat: { freq: "weekly", end: never },
+    });
     const moved = await edit(series.eventId, {
       scope: "this",
       occurrence: "2026-10-12",
@@ -648,7 +707,11 @@ describe("all-day series", () => {
       "2026-11-09 Swim",
     ]);
     // A timed key names no occurrence of an all-day series.
-    expectError(await patch(series.eventId, { scope: "this", occurrence: "2026-10-05T00:00:00Z", changes: { title: "X" } }), 404, "not_found");
+    expectError(
+      await patch(series.eventId, { scope: "this", occurrence: "2026-10-05T00:00:00Z", changes: { title: "X" } }),
+      404,
+      "not_found",
+    );
   });
 });
 
@@ -721,9 +784,9 @@ describe("a series' reminder", () => {
 describe("aiming at an occurrence", () => {
   it("needs a scope for a series or an exception", async () => {
     const series = await create(MONDAYS);
-    expect(expectError(await patch(series.eventId, { occurrence: OCT[19], changes: { title: "X" } }), 400, "validation")).toMatch(
-      /^scope:/,
-    );
+    expect(
+      expectError(await patch(series.eventId, { occurrence: OCT[19], changes: { title: "X" } }), 400, "validation"),
+    ).toMatch(/^scope:/);
     expectError(await remove(series.eventId, {}), 400, "validation");
     const renamed = await edit(series.eventId, { scope: "this", occurrence: OCT[19], changes: { title: "Retro" } });
     expectError(await remove(renamed.eventId, {}), 400, "validation");
@@ -732,13 +795,17 @@ describe("aiming at an occurrence", () => {
 
   it("needs the occurrence for this and following, and one the series has", async () => {
     const series = await create(MONDAYS);
-    expect(expectError(await patch(series.eventId, { scope: "this", changes: { title: "X" } }), 400, "validation")).toMatch(
-      /^occurrence:/,
-    );
+    expect(
+      expectError(await patch(series.eventId, { scope: "this", changes: { title: "X" } }), 400, "validation"),
+    ).toMatch(/^occurrence:/);
     expectError(await remove(series.eventId, { scope: "following" }), 400, "validation");
     // A Tuesday, 11:00 on a Monday, and a Monday after... none of them is an occurrence.
     for (const occurrence of ["2026-10-20T07:00:00Z", "2026-10-19T08:00:00Z", "2026-10-19"]) {
-      expectError(await patch(series.eventId, { scope: "this", occurrence, changes: { title: "X" } }), 404, "not_found");
+      expectError(
+        await patch(series.eventId, { scope: "this", occurrence, changes: { title: "X" } }),
+        404,
+        "not_found",
+      );
     }
     expectError(await remove(series.eventId, { scope: "this", occurrence: "2026-09-28T07:00:00Z" }), 404, "not_found");
   });
@@ -746,7 +813,11 @@ describe("aiming at an occurrence", () => {
   it("refuses an exception aimed at another occurrence than its own", async () => {
     const series = await create(MONDAYS);
     const renamed = await edit(series.eventId, { scope: "this", occurrence: OCT[19], changes: { title: "Retro" } });
-    expectError(await patch(renamed.eventId, { scope: "this", occurrence: OCT[26], changes: { title: "X" } }), 400, "validation");
+    expectError(
+      await patch(renamed.eventId, { scope: "this", occurrence: OCT[26], changes: { title: "X" } }),
+      400,
+      "validation",
+    );
   });
 
   it("gives another user 404 for the series and its exceptions, and changes nothing", async () => {
@@ -756,7 +827,11 @@ describe("aiming at an occurrence", () => {
     const other = await t.signInAs("other");
     for (const scope of ["this", "following", "all"]) {
       for (const id of [series.eventId, renamed.eventId]) {
-        expectError(await patch(id, { scope, occurrence: OCT[19], changes: { title: "Mine" } }, other.inject), 404, "not_found");
+        expectError(
+          await patch(id, { scope, occurrence: OCT[19], changes: { title: "Mine" } }, other.inject),
+          404,
+          "not_found",
+        );
         expectError(await remove(id, { scope, occurrence: OCT[19] }, other.inject), 404, "not_found");
       }
     }

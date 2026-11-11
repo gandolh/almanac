@@ -33,7 +33,16 @@ export interface PopoverProps {
 const GAP = 8; // between the anchor and the panel
 const MARGIN = 8; // the panel never comes closer to the window's edge than this
 
-export function Popover({ anchor, onClose, children, placement = "below", label, labelledBy, className, autoFocus = true }: PopoverProps) {
+export function Popover({
+  anchor,
+  onClose,
+  children,
+  placement = "below",
+  label,
+  labelledBy,
+  className,
+  autoFocus = true,
+}: PopoverProps) {
   const popupRef = useRef<HTMLDivElement>(null);
 
   // What Base UI places against. An anchor element that left the page (a view
@@ -59,7 +68,13 @@ export function Popover({ anchor, onClose, children, placement = "below", label,
         if (details.reason === "escape-key" && details.event.defaultPrevented) return;
         // A press on the anchor is the anchor's own: its click toggles.
         const target = details.event.target;
-        if (details.reason === "outside-press" && anchor instanceof Element && target instanceof Node && anchor.contains(target)) return;
+        if (
+          details.reason === "outside-press" &&
+          anchor instanceof Element &&
+          target instanceof Node &&
+          anchor.contains(target)
+        )
+          return;
         onClose();
       }}
     >
@@ -78,7 +93,9 @@ export function Popover({ anchor, onClose, children, placement = "below", label,
             aria-labelledby={labelledBy}
             className={className ? `popover ${className}` : "popover"}
             data-placement={placement}
-            initialFocus={autoFocus ? () => popupRef.current?.querySelector<HTMLElement>("[data-autofocus]") ?? true : false}
+            initialFocus={
+              autoFocus ? () => popupRef.current?.querySelector<HTMLElement>("[data-autofocus]") ?? true : false
+            }
           >
             {children}
           </BasePopover.Popup>

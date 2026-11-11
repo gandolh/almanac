@@ -10,7 +10,11 @@ vi.mock("web-push", () => ({ default: { sendNotification } }));
 
 // Shaped like a browser's PushSubscription.toJSON(); not a real subscription.
 const keys = { p256dh: `B${"A".repeat(86)}`, auth: "A".repeat(22) };
-const subscription = (n: number) => ({ endpoint: `https://fcm.googleapis.com/fcm/send/device-${n}`, expirationTime: null, keys });
+const subscription = (n: number) => ({
+  endpoint: `https://fcm.googleapis.com/fcm/send/device-${n}`,
+  expirationTime: null,
+  keys,
+});
 
 let t: SignedInTestApp;
 
@@ -38,14 +42,22 @@ describe("/api/push with push off", () => {
   it("has no key, takes no subscription and sends no test, and says why", async () => {
     const key = await t.inject({ method: "GET", url: "/api/push/key" });
     expect(key.statusCode).toBe(404);
-    expect(key.json()).toEqual({ error: { code: "not_found", message: "Notifications aren't set up on this server." } });
-    expect((await t.inject({ method: "PUT", url: "/api/push/subscriptions", payload: subscription(1) })).statusCode).toBe(404);
+    expect(key.json()).toEqual({
+      error: { code: "not_found", message: "Notifications aren't set up on this server." },
+    });
+    expect(
+      (await t.inject({ method: "PUT", url: "/api/push/subscriptions", payload: subscription(1) })).statusCode,
+    ).toBe(404);
     expect((await t.inject({ method: "POST", url: "/api/push/test" })).statusCode).toBe(404);
     expect(sendNotification).not.toHaveBeenCalled();
   });
 
   it("still lets a browser delete its subscription", async () => {
-    const res = await t.inject({ method: "DELETE", url: "/api/push/subscriptions", payload: { endpoint: subscription(1).endpoint } });
+    const res = await t.inject({
+      method: "DELETE",
+      url: "/api/push/subscriptions",
+      payload: { endpoint: subscription(1).endpoint },
+    });
     expect(res.statusCode).toBe(204);
   });
 });
@@ -104,7 +116,11 @@ describe("/api/push with the VAPID keys set", () => {
 
   it("sends nothing once the browser turned it off", async () => {
     await save(1);
-    const res = await t.inject({ method: "DELETE", url: "/api/push/subscriptions", payload: { endpoint: subscription(1).endpoint } });
+    const res = await t.inject({
+      method: "DELETE",
+      url: "/api/push/subscriptions",
+      payload: { endpoint: subscription(1).endpoint },
+    });
     expect(res.statusCode).toBe(204);
     expect((await test()).json()).toEqual({ sent: 0 });
     expect(sendNotification).not.toHaveBeenCalled();
@@ -113,7 +129,11 @@ describe("/api/push with the VAPID keys set", () => {
   it("doesn't let one user delete another's subscription", async () => {
     const other = await t.signInAs("other");
     await save(1);
-    const res = await other.inject({ method: "DELETE", url: "/api/push/subscriptions", payload: { endpoint: subscription(1).endpoint } });
+    const res = await other.inject({
+      method: "DELETE",
+      url: "/api/push/subscriptions",
+      payload: { endpoint: subscription(1).endpoint },
+    });
     expect(res.statusCode).toBe(204);
     expect((await test()).json()).toEqual({ sent: 1 });
   });
@@ -130,7 +150,8 @@ describe("/api/push with the VAPID keys set", () => {
     await save(1);
     await save(2);
     sendNotification.mockImplementation(async (target: { endpoint: string }) => {
-      if (target.endpoint === subscription(1).endpoint) throw Object.assign(new Error("Received unexpected response code"), { statusCode: 410 });
+      if (target.endpoint === subscription(1).endpoint)
+        throw Object.assign(new Error("Received unexpected response code"), { statusCode: 410 });
       throw Object.assign(new Error("Received unexpected response code"), { statusCode: 500 });
     });
     expect((await test()).json()).toEqual({ sent: 0 });

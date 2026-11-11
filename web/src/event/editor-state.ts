@@ -203,7 +203,11 @@ function dayOfWire(value: string | undefined, timeZone: string): Temporal.PlainD
 }
 
 /** The wall-clock moment of a wire value in `timeZone`; a bare date takes `time`. `null` when it is neither. */
-function momentOfWire(value: string | undefined, timeZone: string, time: Temporal.PlainTime): Temporal.PlainDateTime | null {
+function momentOfWire(
+  value: string | undefined,
+  timeZone: string,
+  time: Temporal.PlainTime,
+): Temporal.PlainDateTime | null {
   if (value === undefined) return null;
   if (isDateKey(value)) return parseDateKey(value)?.toPlainDateTime(time) ?? null;
   try {
@@ -214,7 +218,11 @@ function momentOfWire(value: string | undefined, timeZone: string, time: Tempora
 }
 
 /** The start and end fields of a new event, from what opened the form (`CreateInit`), else the default span. */
-export function draftOfSeed(seed: FormSeed, timeZone: string, now: Temporal.Instant = Temporal.Now.instant()): EventDraft {
+export function draftOfSeed(
+  seed: FormSeed,
+  timeZone: string,
+  now: Temporal.Instant = Temporal.Now.instant(),
+): EventDraft {
   const fallback = defaultSpan(timeZone, now);
   let span: Pick<EventDraft, "startDate" | "startTime" | "endDate" | "endTime">;
 
@@ -225,7 +233,12 @@ export function draftOfSeed(seed: FormSeed, timeZone: string, now: Temporal.Inst
     let last = after ? after.subtract({ days: 1 }) : first;
     if (Temporal.PlainDate.compare(last, first) < 0) last = first;
     // The times are what turning All day off will show.
-    span = { startDate: first.toString(), startTime: formatTime(fallback.start), endDate: last.toString(), endTime: formatTime(fallback.end) };
+    span = {
+      startDate: first.toString(),
+      startTime: formatTime(fallback.start),
+      endDate: last.toString(),
+      endTime: formatTime(fallback.end),
+    };
   } else {
     const start = momentOfWire(seed.start, timeZone, fallback.start.toPlainTime()) ?? fallback.start;
     let end = momentOfWire(seed.end, timeZone, fallback.start.toPlainTime()) ?? start.add({ hours: 1 });
@@ -253,7 +266,11 @@ export function draftOfSeed(seed: FormSeed, timeZone: string, now: Temporal.Inst
 }
 
 /** The form for an existing occurrence: its times in `timeZone`, its repeat, and the date that repeat is anchored to. */
-export function draftOfOccurrence(occurrence: Occurrence, timeZone: string, now: Temporal.Instant = Temporal.Now.instant()): EventDraft {
+export function draftOfOccurrence(
+  occurrence: Occurrence,
+  timeZone: string,
+  now: Temporal.Instant = Temporal.Now.instant(),
+): EventDraft {
   const fallback = defaultSpan(timeZone, now);
   let span: Pick<EventDraft, "startDate" | "startTime" | "endDate" | "endTime">;
   if (occurrence.allDay) {
@@ -371,7 +388,8 @@ export function problemsOf(draft: EventDraft): DraftProblems {
       const until = parseDateKey(draft.repeat.until);
       const first = parseDateKey(draft.startDate);
       if (!until) problems.repeat = "Enter the date the repeat ends.";
-      else if (first && Temporal.PlainDate.compare(until, first) < 0) problems.repeat = "The repeat can't end before it starts.";
+      else if (first && Temporal.PlainDate.compare(until, first) < 0)
+        problems.repeat = "The repeat can't end before it starts.";
     } else if (draft.repeat.end === "count") {
       const count = Number(draft.repeat.count);
       if (!Number.isInteger(count) || count < 1 || count > REPEAT_COUNT_MAX) {
@@ -401,7 +419,12 @@ function inWeekOrder(days: readonly Weekday[]): Weekday[] {
 function defaultUntil(preset: RepeatPreset, startDate: string): string {
   const start = parseDateKey(startDate);
   if (!start) return "";
-  const later = preset === "yearly" ? start.add({ years: 5 }) : preset === "monthly" ? start.add({ years: 1 }) : start.add({ months: 1 });
+  const later =
+    preset === "yearly"
+      ? start.add({ years: 5 })
+      : preset === "monthly"
+        ? start.add({ years: 1 })
+        : start.add({ months: 1 });
   return later.toString();
 }
 
@@ -410,7 +433,13 @@ const DEFAULT_COUNT = "10";
 /** The picker's state for a repeat; `anchor` is the date its weekdays and days of the month follow. */
 export function repeatDraftOf(repeat: Repeat | null, anchor: string): RepeatDraft {
   const own = weekdayAt(anchor);
-  const base: RepeatDraft = { preset: "none", days: [own], end: "never", until: defaultUntil("daily", anchor), count: DEFAULT_COUNT };
+  const base: RepeatDraft = {
+    preset: "none",
+    days: [own],
+    end: "never",
+    until: defaultUntil("daily", anchor),
+    count: DEFAULT_COUNT,
+  };
   if (!repeat) return base;
   const draft: RepeatDraft = { ...base, preset: repeat.freq === "weekly" ? "weekly" : repeat.freq };
   if (repeat.freq === "weekly") {
@@ -433,7 +462,11 @@ export function repeatDraftOf(repeat: Repeat | null, anchor: string): RepeatDraf
 export function repeatOf(draft: Pick<EventDraft, "repeat" | "startDate">): Repeat | null {
   const { repeat } = draft;
   const end: Repeat["end"] =
-    repeat.end === "until" ? { type: "until", date: repeat.until } : repeat.end === "count" ? { type: "count", count: Number(repeat.count) } : { type: "never" };
+    repeat.end === "until"
+      ? { type: "until", date: repeat.until }
+      : repeat.end === "count"
+        ? { type: "count", count: Number(repeat.count) }
+        : { type: "never" };
   switch (repeat.preset) {
     case "none":
       return null;
@@ -501,7 +534,8 @@ export function choosePreset(repeat: RepeatDraft, preset: RepeatPreset, startDat
   if (preset === "custom") {
     next.days = repeat.preset === "weekdays" ? ["MO", "TU", "WE", "TH", "FR"] : [weekdayAt(startDate)];
   }
-  if (repeat.end === "until" && preset !== "none" && parseDateKey(repeat.until) === null) next.until = defaultUntil(preset, startDate);
+  if (repeat.end === "until" && preset !== "none" && parseDateKey(repeat.until) === null)
+    next.until = defaultUntil(preset, startDate);
   return next;
 }
 
@@ -518,7 +552,8 @@ export function chooseEnd(repeat: RepeatDraft, end: RepeatEndKind, startDate: st
   if (end === "until") {
     const until = parseDateKey(repeat.until);
     const first = parseDateKey(startDate);
-    if (!until || (first && Temporal.PlainDate.compare(until, first) < 0)) next.until = defaultUntil(repeat.preset, startDate);
+    if (!until || (first && Temporal.PlainDate.compare(until, first) < 0))
+      next.until = defaultUntil(repeat.preset, startDate);
   }
   return next;
 }
@@ -526,8 +561,15 @@ export function chooseEnd(repeat: RepeatDraft, end: RepeatEndKind, startDate: st
 function normalized(repeat: Repeat | null, anchor: string): unknown {
   if (!repeat) return null;
   const days =
-    repeat.freq === "weekly" ? inWeekOrder(repeat.byDay !== undefined && repeat.byDay.length > 0 ? repeat.byDay : [weekdayAt(anchor)]) : null;
-  const end = repeat.end.type === "until" ? ["until", repeat.end.date] : repeat.end.type === "count" ? ["count", repeat.end.count] : ["never"];
+    repeat.freq === "weekly"
+      ? inWeekOrder(repeat.byDay !== undefined && repeat.byDay.length > 0 ? repeat.byDay : [weekdayAt(anchor)])
+      : null;
+  const end =
+    repeat.end.type === "until"
+      ? ["until", repeat.end.date]
+      : repeat.end.type === "count"
+        ? ["count", repeat.end.count]
+        : ["never"];
   return [repeat.freq, days, end];
 }
 
@@ -563,7 +605,10 @@ function sentenceCase(text: string): string {
 export function reminderOptions(allDay: boolean): ReminderOption[] {
   return [
     { value: "none", label: "None" },
-    ...remindersFor(allDay).map((minutes) => ({ value: reminderValue(minutes), label: sentenceCase(describeReminder(minutes, allDay)) })),
+    ...remindersFor(allDay).map((minutes) => ({
+      value: reminderValue(minutes),
+      label: sentenceCase(describeReminder(minutes, allDay)),
+    })),
   ];
 }
 
@@ -588,7 +633,8 @@ export function wireTimesOf(draft: EventDraft, timeZone: string): WireTimes | nu
   if (draft.allDay) {
     return { start: start.toPlainDate().toString(), end: end.toPlainDate().add({ days: 1 }).toString(), allDay: true };
   }
-  const instant = (moment: Temporal.PlainDateTime) => wireInstant(moment.toZonedDateTime(timeZone, { disambiguation: "compatible" }).toInstant());
+  const instant = (moment: Temporal.PlainDateTime) =>
+    wireInstant(moment.toZonedDateTime(timeZone, { disambiguation: "compatible" }).toInstant());
   return { start: instant(start), end: instant(end), allDay: false };
 }
 
@@ -622,7 +668,11 @@ export function eventInputOf(draft: EventDraft, calendarId: number, timeZone: st
  * means another rule; re-sending the same one is no change. `null` while
  * something is wrong with the draft.
  */
-export function changedFields(draft: EventDraft, occurrence: Occurrence, timeZone: string): EventPatchBody["changes"] | null {
+export function changedFields(
+  draft: EventDraft,
+  occurrence: Occurrence,
+  timeZone: string,
+): EventPatchBody["changes"] | null {
   const input = eventInputOf(draft, draft.calendarId ?? occurrence.calendarId, timeZone);
   if (!input) return null;
   const changes: EventPatchBody["changes"] = {};
@@ -688,7 +738,10 @@ export function rememberCalendar(id: number): void {
 }
 
 /** The calendar a new event goes to: the last one used if it still exists, else the first visible one, else the first. */
-export function pickCalendar(calendars: readonly Pick<Calendar, "id" | "visible">[], lastUsed: number | null): number | null {
+export function pickCalendar(
+  calendars: readonly Pick<Calendar, "id" | "visible">[],
+  lastUsed: number | null,
+): number | null {
   const last = calendars.find((calendar) => calendar.id === lastUsed);
   return (last ?? calendars.find((calendar) => calendar.visible) ?? calendars[0])?.id ?? null;
 }

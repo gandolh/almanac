@@ -78,7 +78,10 @@ describe("the worker", () => {
   });
 
   it("shows the server's payload, with a click target inside the app", async () => {
-    await dispatch("push", pushOf({ title: "Dentist, 14:30", body: "In 10 minutes", url: "/almanac/day/2026/10/27", tag: "r1" }));
+    await dispatch(
+      "push",
+      pushOf({ title: "Dentist, 14:30", body: "In 10 minutes", url: "/almanac/day/2026/10/27", tag: "r1" }),
+    );
     expect(showNotification).toHaveBeenCalledWith("Dentist, 14:30", {
       body: "In 10 minutes",
       icon: `${SCOPE}icons/icon-192.png`,

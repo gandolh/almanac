@@ -21,14 +21,26 @@ describe("quickSession", () => {
     expect(kept).toEqual({ kind: "quick", key: 1, init: monday });
     expect(kept.kind === "quick" && kept.init).toBe(again);
     // FullCalendar drew the selection anew: the new element is the anchor.
-    expect(quickSession(open, { ...monday, anchor: redrawn }, 3)).toEqual({ kind: "quick", key: 1, init: { ...monday, anchor: redrawn } });
+    expect(quickSession(open, { ...monday, anchor: redrawn }, 3)).toEqual({
+      kind: "quick",
+      key: 1,
+      init: { ...monday, anchor: redrawn },
+    });
   });
 
   it("opens a fresh one for another span", () => {
     const open = quickSession(null, monday, 1);
-    expect(quickSession(open, { ...monday, end: "2026-10-21" }, 2)).toMatchObject({ key: 2, init: { end: "2026-10-21" } });
+    expect(quickSession(open, { ...monday, end: "2026-10-21" }, 2)).toMatchObject({
+      key: 2,
+      init: { end: "2026-10-21" },
+    });
     expect(quickSession(open, { ...monday, start: "2026-10-20", end: "2026-10-21" }, 3)).toMatchObject({ key: 3 });
-    const timed: QuickCreateInit = { start: "2026-10-19T07:00:00Z", end: "2026-10-19T08:00:00Z", allDay: false, anchor: cell };
+    const timed: QuickCreateInit = {
+      start: "2026-10-19T07:00:00Z",
+      end: "2026-10-19T08:00:00Z",
+      allDay: false,
+      anchor: cell,
+    };
     expect(quickSession(open, timed, 4)).toMatchObject({ key: 4, init: { allDay: false } });
   });
 });

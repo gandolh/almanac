@@ -353,7 +353,9 @@ async function saveMove(info: EventChangeInfo, timeZone: string): Promise<void> 
 function fetchFailure(error: unknown, retry: () => void): void {
   // Signed out: the login page takes over.
   if (isApiError(error, "signed_out")) return;
-  showToast(isApiError(error) ? error.message : "Your events couldn't be loaded.", { action: { label: "Retry", onAction: retry } });
+  showToast(isApiError(error) ? error.message : "Your events couldn't be loaded.", {
+    action: { label: "Retry", onAction: retry },
+  });
 }
 
 /** Where the pointer was let go, when FullCalendar says (a mouse or pen; not a selection made in code). */

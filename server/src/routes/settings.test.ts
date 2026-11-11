@@ -31,11 +31,18 @@ describe("/api/settings", () => {
     expect((await t.inject({ method: "GET", url: "/api/settings" })).json()).toEqual({ timeZone: "America/New_York" });
 
     const other = await t.signInAs("other");
-    expect((await other.inject({ method: "GET", url: "/api/settings" })).json()).toEqual({ timeZone: "Europe/Bucharest" });
+    expect((await other.inject({ method: "GET", url: "/api/settings" })).json()).toEqual({
+      timeZone: "Europe/Bucharest",
+    });
   });
 
   it("refuses a zone that is not an IANA name, and unknown fields", async () => {
-    for (const payload of [{ timeZone: "+02:00" }, { timeZone: "Atlantis/Capital" }, { timeZone: 3 }, { theme: "dark" }]) {
+    for (const payload of [
+      { timeZone: "+02:00" },
+      { timeZone: "Atlantis/Capital" },
+      { timeZone: 3 },
+      { theme: "dark" },
+    ]) {
       const res = await t.inject({ method: "PATCH", url: "/api/settings", payload });
       expect(res.statusCode, JSON.stringify(payload)).toBe(400);
       expect((res.json() as { error: { code: string; message: string } }).error).toMatchObject({ code: "validation" });
