@@ -3,6 +3,7 @@ import type { Temporal } from "temporal-polyfill";
 import { ChevronLeftIcon, ChevronRightIcon } from "../components/icons";
 import { MonthGrid } from "../components/MonthGrid";
 import { monthTitle } from "../dates";
+import { ICON_BUTTON_SMALL } from "../components/looks";
 
 export interface MiniMonthProps {
   /** The date the main view is on: marked, and the month shown first. */
@@ -31,7 +32,7 @@ export function MiniMonth({ date, today, onPick }: MiniMonthProps) {
         <div className="mini-month__nav">
           <button
             type="button"
-            className="icon-button icon-button--small"
+            className={ICON_BUTTON_SMALL}
             aria-label="Previous month"
             onClick={() => setMonth(month.subtract({ months: 1 }))}
           >
@@ -39,7 +40,7 @@ export function MiniMonth({ date, today, onPick }: MiniMonthProps) {
           </button>
           <button
             type="button"
-            className="icon-button icon-button--small"
+            className={ICON_BUTTON_SMALL}
             aria-label="Next month"
             onClick={() => setMonth(month.add({ months: 1 }))}
           >

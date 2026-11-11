@@ -1,6 +1,15 @@
 import { Toast } from "@base-ui/react/toast";
 import { CloseIcon } from "../icons";
 
+const VIEWPORT_CLASS =
+  "pointer-events-none fixed bottom-6 left-6 z-toast flex max-w-[min(var(--container-toast),calc(100vw-48px))] max-md:right-2 max-md:bottom-[max(8px,env(safe-area-inset-bottom))] max-md:left-2 max-md:max-w-none";
+const TOAST_CLASS =
+  "pointer-events-auto flex min-h-12 [translate:var(--toast-swipe-movement-x,0)_var(--toast-swipe-movement-y,0)] items-center gap-1 rounded-small bg-toast-surface py-1.5 pr-2 pl-4 text-meta leading-tight text-toast-ink shadow-float motion-safe:animate-toast-in data-limited:hidden max-md:flex-1 [&_:focus-visible]:outline-toast-action";
+const ACTION_CLASS =
+  "min-h-9 rounded-small bg-transparent px-3 text-meta font-medium text-toast-action hover:bg-toast-hover";
+const CLOSE_CLASS =
+  "flex size-9 flex-none items-center justify-center rounded-pill bg-transparent p-0 text-toast-ink hover:bg-toast-hover";
+
 /**
  * A short message at the bottom of the screen, Google's snackbar: "Event
  * deleted", with an optional action ("Undo"). One at a time: a new one
@@ -62,7 +71,7 @@ export function Toaster() {
   return (
     <Toast.Provider toastManager={manager} limit={1}>
       <Toast.Portal>
-        <Toast.Viewport className="toaster">
+        <Toast.Viewport className={VIEWPORT_CLASS}>
           <ToastList />
         </Toast.Viewport>
       </Toast.Portal>
@@ -73,10 +82,10 @@ export function Toaster() {
 function ToastList() {
   const { toasts } = Toast.useToastManager();
   return toasts.map((toast) => (
-    <Toast.Root key={toast.id} toast={toast} className="toast">
-      <Toast.Title render={<span />} className="toast__message" />
-      <Toast.Action className="toast__action" />
-      <Toast.Close className="toast__close" aria-label="Dismiss">
+    <Toast.Root key={toast.id} toast={toast} className={TOAST_CLASS}>
+      <Toast.Title render={<span />} className="mr-2 flex-1 py-2" />
+      <Toast.Action className={ACTION_CLASS} />
+      <Toast.Close className={CLOSE_CLASS} aria-label="Dismiss">
         <CloseIcon size={18} />
       </Toast.Close>
     </Toast.Root>

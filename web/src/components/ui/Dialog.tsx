@@ -1,5 +1,7 @@
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { useRef, type ReactNode } from "react";
+import { cn } from "../../lib/cn";
+import { ICON_BUTTON, DIALOG } from "../looks";
 import { CloseIcon } from "../icons";
 
 /**
@@ -54,10 +56,10 @@ export function Dialog({
       disablePointerDismissal={!dismissOnBackdrop}
     >
       <BaseDialog.Portal>
-        <BaseDialog.Backdrop className="dialog-backdrop" />
+        <BaseDialog.Backdrop className={DIALOG.backdrop} />
         <BaseDialog.Popup
           ref={popupRef}
-          className={["dialog", `dialog--${size}`, className].filter(Boolean).join(" ")}
+          className={cn(DIALOG.popup, DIALOG[size], className)}
           // Not the title row's close button: the first field, as before.
           initialFocus={() =>
             popupRef.current?.querySelector<HTMLElement>("[data-autofocus]") ??
@@ -66,18 +68,18 @@ export function Dialog({
             true
           }
         >
-          <div className="dialog__frame">
-            <header className="dialog__head">
-              <BaseDialog.Title className="dialog__title">{title}</BaseDialog.Title>
-              <BaseDialog.Close className="icon-button" aria-label="Close">
+          <div className={DIALOG.frame}>
+            <header className={DIALOG.head}>
+              <BaseDialog.Title className={DIALOG.title}>{title}</BaseDialog.Title>
+              <BaseDialog.Close className={ICON_BUTTON} aria-label="Close">
                 <CloseIcon size={20} />
               </BaseDialog.Close>
             </header>
-            <div ref={bodyRef} className="dialog__body">
+            <div ref={bodyRef} className={DIALOG.body}>
               {children}
             </div>
             {footer && (
-              <footer ref={footerRef} className="dialog__footer">
+              <footer ref={footerRef} className={DIALOG.footer}>
                 {footer}
               </footer>
             )}

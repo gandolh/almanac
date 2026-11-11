@@ -12,7 +12,6 @@
 
 @import "tailwindcss";
 @import "./tokens.css" layer(legacy);
-@import "./components.css" layer(legacy);
 @import "./shell.css" layer(legacy);
 @import "../auth/auth.css" layer(legacy);
 @import "../account/account.css" layer(legacy);
@@ -190,6 +189,59 @@
 
   /* Motion: state changes only, short, ease-out */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Enter animations (state changes only, short, ease-out). There are no exit animations. */
+@theme {
+  --animate-float-in: float-in var(--duration) var(--ease-out);
+  --animate-dialog-in: dialog-in var(--duration) var(--ease-out);
+  --animate-sheet-in: sheet-in var(--duration-sheet) var(--ease-out);
+  --animate-toast-in: toast-in var(--duration-sheet) var(--ease-out);
+  --animate-scrim-in: scrim-in var(--duration) var(--ease-out);
+  --animate-drawer-in: drawer-in var(--duration-sheet) var(--ease-out);
+  --animate-gate-wait-in: gate-wait-in var(--duration) var(--ease-out) 400ms both;
+
+  @keyframes float-in {
+    from {
+      transform: translateY(-4px);
+    }
+  }
+
+  @keyframes dialog-in {
+    from {
+      transform: translateY(8px);
+    }
+  }
+
+  @keyframes sheet-in {
+    from {
+      transform: translateY(24px);
+    }
+  }
+
+  @keyframes toast-in {
+    from {
+      transform: translateY(calc(100% + 24px));
+    }
+  }
+
+  @keyframes scrim-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes drawer-in {
+    from {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes gate-wait-in {
+    from {
+      opacity: 0;
+    }
+  }
 }
 
 /* Variables no utility namespace owns. */

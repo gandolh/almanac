@@ -1,5 +1,6 @@
 import { useRef, useState, type KeyboardEvent } from "react";
 import type { Temporal } from "temporal-polyfill";
+import { cn } from "../lib/cn";
 import { WEEKDAY_INITIALS, WEEKDAY_NAMES, dateKey, formatDayFull, monthWeeks, sameDate } from "../dates";
 
 /**
@@ -29,6 +30,26 @@ export interface MonthGridProps {
   labelledBy?: string;
 }
 
+/** The cell and the day circle are variables, so a container query in the year view can resize them. */
+const GRID: Record<MonthGridProps["size"], string> = {
+  mini: "w-[calc(var(--cell)*7)] text-mini [--cell:var(--size-mini-cell)] [--day:var(--size-mini-day)]",
+  year: "w-[calc(var(--cell)*7)] text-label [--cell:var(--size-year-cell)] [--day:var(--size-year-day)]",
+};
+
+const cellClass = (size: MonthGridProps["size"]) =>
+  size === "year" ? "h-[calc(var(--day)+2px)] w-(--cell) p-0 text-center" : "h-(--day) w-(--cell) p-0 text-center";
+
+const DAY_CLASS = [
+  "group relative inline-flex size-(--day) items-center justify-center rounded-pill bg-transparent p-0 leading-none font-medium text-ink",
+  "transition-[background-color] duration-(--duration-fast) ease-out hover:bg-hover focus-visible:outline-offset-0",
+  // Another month's day, in the mini-month.
+  "data-outside:font-regular data-outside:text-muted",
+  // The date the main view is on: a light accent circle.
+  "data-selected:bg-accent-tint data-selected:text-accent-ink data-selected:hover:bg-accent-tint",
+  // Today: the filled accent circle, everywhere.
+  "data-today:bg-accent data-today:text-on-accent data-today:hover:bg-accent-press",
+].join(" ");
+
 const STEPS: Readonly<Record<string, number>> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
 
 export function MonthGrid({ month, today, selected, marked, onPickDay, size, labelledBy }: MonthGridProps) {
@@ -55,11 +76,21 @@ export function MonthGrid({ month, today, selected, marked, onPickDay, size, lab
   };
 
   return (
-    <table ref={tableRef} className={`month-grid month-grid--${size}`} aria-labelledby={labelledBy}>
+    <table
+      ref={tableRef}
+      className={cn("table-fixed border-collapse tabular-nums", GRID[size])}
+      data-size={size}
+      aria-labelledby={labelledBy}
+    >
       <thead>
         <tr>
           {WEEKDAY_INITIALS.map((initial, index) => (
-            <th key={index} scope="col" abbr={WEEKDAY_NAMES[index]} className="month-grid__weekday">
+            <th
+              key={index}
+              scope="col"
+              abbr={WEEKDAY_NAMES[index]}
+              className="h-(--day) w-(--cell) p-0 text-center font-medium text-ink-2"
+            >
               {initial}
             </th>
           ))}
@@ -70,15 +101,15 @@ export function MonthGrid({ month, today, selected, marked, onPickDay, size, lab
           <tr key={dateKey(week[0] ?? today)}>
             {week.map((date) => {
               const key = dateKey(date);
-              if (!pickable(date)) return <td key={key} className="month-grid__cell" />;
+              if (!pickable(date)) return <td key={key} className={cellClass(size)} />;
               const isToday = sameDate(date, today);
               const isSelected = selected !== undefined && sameDate(date, selected);
               const hasEvents = marked?.has(key) ?? false;
               return (
-                <td key={key} className="month-grid__cell">
+                <td key={key} className={cellClass(size)}>
                   <button
                     type="button"
-                    className="month-grid__day"
+                    className={DAY_CLASS}
                     data-date={key}
                     data-today={isToday || undefined}
                     data-selected={(isSelected && !isToday) || undefined}
@@ -93,7 +124,12 @@ export function MonthGrid({ month, today, selected, marked, onPickDay, size, lab
                     onClick={() => onPickDay(date)}
                   >
                     <span>{date.day}</span>
-                    {hasEvents && <span className="month-grid__dot" aria-hidden="true" />}
+                    {hasEvents && (
+                      <span
+                        className="absolute bottom-0.5 left-1/2 size-day-dot -translate-x-1/2 rounded-pill bg-accent group-data-today:bg-on-accent"
+                        aria-hidden="true"
+                      />
+                    )}
                   </button>
                 </td>
               );

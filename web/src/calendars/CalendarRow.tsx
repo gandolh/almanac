@@ -7,6 +7,7 @@ import { Menu, type MenuSection } from "../components/ui/Menu";
 import { Popover } from "../components/ui/Popover";
 import { calendarColor } from "../data/calendars";
 import { ColorPicker, colorName } from "./ColorPicker";
+import { ICON_BUTTON_SMALL } from "../components/looks";
 
 /** Why the last calendar stays: also the toast when the server refuses the delete (409). */
 export const LAST_CALENDAR_REASON = "You can't delete your only calendar. Almanac needs at least one.";
@@ -255,7 +256,7 @@ export function CalendarRow({ calendar, isOnly, onVisibleChange, onRename, onRec
         <Menu
           label={`Options for ${calendar.name}`}
           triggerLabel={`Options for ${calendar.name}`}
-          triggerClassName="icon-button icon-button--small calendar-row__more"
+          triggerClassName={`${ICON_BUTTON_SMALL} calendar-row__more`}
           align="end"
           trigger={<MoreIcon />}
           sections={sections}

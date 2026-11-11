@@ -42,7 +42,7 @@ describe("MonthGrid", () => {
     expect(keys[3]).toBe("2026-10-01");
     expect(keys.at(-1)).toBe("2026-11-08");
     expect(dayTag(grid(), "2026-09-28")).toContain('data-outside="true"');
-    expect(dayTag(grid(), "2026-10-01")).not.toContain("data-outside");
+    expect(dayTag(grid(), "2026-10-01")).not.toContain("data-outside=");
   });
 
   it("marks today with aria-current and its own state", () => {
@@ -73,8 +73,8 @@ describe("MonthGrid", () => {
     const html = grid({ marked: new Set(["2026-10-05", "2026-10-16"]) });
     expect(dayTag(html, "2026-10-05")).toContain('data-marked="true"');
     expect(dayTag(html, "2026-10-05")).toContain('aria-label="Monday, 5 October 2026, has events"');
-    expect(dayTag(html, "2026-10-06")).not.toContain("data-marked");
-    expect(html.match(/class="month-grid__dot"/g)).toHaveLength(2);
+    expect(dayTag(html, "2026-10-06")).not.toContain("data-marked=");
+    expect(html.match(/<span[^>]*aria-hidden="true"/g)).toHaveLength(2);
   });
 
   it("leaves other months' cells empty in the year view", () => {
@@ -83,11 +83,11 @@ describe("MonthGrid", () => {
     expect(keys).toHaveLength(31);
     expect(keys[0]).toBe("2026-10-01");
     expect(keys.at(-1)).toBe("2026-10-31");
-    expect(html).toContain('class="month-grid month-grid--year"');
+    expect(html).toContain('data-size="year"');
     // A dot on a day of September doesn't show in October.
-    expect(html.match(/class="month-grid__dot"/g)).toHaveLength(1);
+    expect(html.match(/<span[^>]*aria-hidden="true"/g)).toHaveLength(1);
     // No selection in the year view: no pressed state at all.
-    expect(html).not.toContain("aria-pressed");
+    expect(html).not.toContain("aria-pressed=");
   });
 });
 
@@ -126,9 +126,9 @@ describe("Dialog", () => {
         footer: "Actions",
       }),
     );
-    expect(html).toContain('<div role="dialog" class="dialog dialog--medium">');
-    expect(html).toContain('class="dialog__title">Time zone</h2>');
+    expect(html).toMatch(/<div role="dialog"[^>]*>/);
+    expect(html).toMatch(/<h2[^>]*>Time zone<\/h2>/);
     expect(html).toContain('aria-label="Close"');
-    expect(html).toContain('<footer class="dialog__footer">Actions</footer>');
+    expect(html).toMatch(/<footer[^>]*>Actions<\/footer>/);
   });
 });

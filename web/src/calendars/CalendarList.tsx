@@ -16,6 +16,7 @@ import { useCalendars } from "../data/calendars";
 import { notifyOccurrencesChanged } from "../data/occurrences";
 import { CalendarRow, checkCalendarName, LAST_CALENDAR_REASON } from "./CalendarRow";
 import { ColorPicker } from "./ColorPicker";
+import { ICON_BUTTON_SMALL } from "../components/looks";
 
 /** The words for a failed call: the connection's own when there is none, else `fallback`. */
 function reason(error: unknown, fallback: string): string {
@@ -58,12 +59,7 @@ export function CalendarList() {
         <h2 id={headingId} className="calendar-list__title">
           My calendars
         </h2>
-        <button
-          type="button"
-          className="icon-button icon-button--small"
-          aria-label="New calendar"
-          onClick={() => setCreating(true)}
-        >
+        <button type="button" className={ICON_BUTTON_SMALL} aria-label="New calendar" onClick={() => setCreating(true)}>
           <PlusIcon size={20} />
         </button>
       </header>

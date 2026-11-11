@@ -33,9 +33,7 @@ describe("LoginView", () => {
     expect(html).toContain(">Password</label>");
     expect(html).toContain('type="password"');
     expect(html).toContain('autoComplete="current-password"');
-    expect(html).toMatch(
-      /<button type="submit" class="button button--primary button--large button--pill[^"]*"[^>]*>Sign in<\/button>/,
-    );
+    expect(html).toMatch(/<button type="submit"[^>]*>Sign in<\/button>/);
   });
 
   it("offers Sign in with Ward under it only when the server has Ward", () => {

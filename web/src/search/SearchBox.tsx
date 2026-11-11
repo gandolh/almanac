@@ -5,6 +5,7 @@ import { useIsDesktop } from "../components/viewport";
 import { registerCommand } from "../layout/commands";
 import { goBack, lastViewRoute, navigateToSearch, usePathname, useQueryParam, useRoute } from "../router";
 import { normalizeQuery } from "./search-api";
+import { ICON_BUTTON } from "../components/looks";
 
 /**
  * The top bar's search: a magnifier that opens into a field (on a phone the
@@ -92,7 +93,7 @@ export function SearchBox() {
       <button
         ref={opener}
         type="button"
-        className="icon-button"
+        className={ICON_BUTTON}
         aria-label="Search"
         title="Search (/)"
         aria-keyshortcuts="/"
@@ -140,7 +141,7 @@ export function SearchField({ inputRef, value, onChange, onSubmit, onClose, onCl
   };
   return (
     <form className="search" role="search" onSubmit={onSubmit} onKeyDown={onKeyDown}>
-      <button type="button" className="icon-button" aria-label="Close search" onClick={onClose}>
+      <button type="button" className={ICON_BUTTON} aria-label="Close search" onClick={onClose}>
         <BackIcon />
       </button>
       <input
@@ -158,7 +159,7 @@ export function SearchField({ inputRef, value, onChange, onSubmit, onClose, onCl
         onChange={(event) => onChange(event.target.value)}
       />
       {value !== "" && (
-        <button type="button" className="icon-button" aria-label="Clear search" onClick={onClear}>
+        <button type="button" className={ICON_BUTTON} aria-label="Clear search" onClick={onClear}>
           <CloseIcon />
         </button>
       )}

@@ -3,6 +3,7 @@ import { useLogin, useSession, useWardSignIn, type AuthError } from "../../vendo
 import { Button } from "../components/Button";
 import { useIsDesktop } from "../components/viewport";
 import { AlertIcon, AuthField } from "../components/Field";
+import { ERROR_NOTE, ERROR_NOTE_TEXT } from "../components/looks";
 import { loginMessage, sessionReasonMessage, wardSignInMessage } from "./messages";
 import { wardReturnTo } from "./session";
 
@@ -120,9 +121,9 @@ export function LoginView({
               }}
             />
             {error !== null && (
-              <p className="auth-error" role="alert">
+              <p className={ERROR_NOTE} role="alert">
                 <AlertIcon />
-                <span className="auth-error__text">{loginMessage(error)}</span>
+                <span className={ERROR_NOTE_TEXT}>{loginMessage(error)}</span>
               </p>
             )}
             <Button type="submit" variant="primary" size="large" block className="login__submit" disabled={pending}>
@@ -139,10 +140,15 @@ export function LoginView({
                 {wardPending ? "Opening Ward…" : "Sign in with Ward"}
               </Button>
               {wardError !== null && (
-                <p className="auth-error" role="alert">
+                <p className={ERROR_NOTE} role="alert">
                   <AlertIcon />
-                  <span className="auth-error__text">{wardSignInMessage(wardError)}</span>
-                  <Button variant="quiet" size="compact" className="auth-error__dismiss" onClick={onDismissWard}>
+                  <span className={ERROR_NOTE_TEXT}>{wardSignInMessage(wardError)}</span>
+                  <Button
+                    variant="quiet"
+                    size="compact"
+                    className="-mr-1 -my-0.5 min-h-0 flex-none text-meta font-semibold"
+                    onClick={onDismissWard}
+                  >
                     Dismiss
                   </Button>
                 </p>

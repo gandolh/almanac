@@ -12,6 +12,7 @@ import "../auth/session";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/ui/Dialog";
 import { AlertIcon, AuthField } from "../components/Field";
+import { ERROR_NOTE, ERROR_NOTE_TEXT } from "../components/looks";
 
 /**
  * The account menu's "Change password":
@@ -297,9 +298,9 @@ function PasswordForm(props: PasswordFormProps) {
         onChange={update("repeat")}
       />
       {blockFailure !== null && (
-        <p className="auth-error" role="alert">
+        <p className={ERROR_NOTE} role="alert">
           <AlertIcon />
-          <span className="auth-error__text">{blockFailure}</span>
+          <span className={ERROR_NOTE_TEXT}>{blockFailure}</span>
         </p>
       )}
     </form>
@@ -314,9 +315,9 @@ function ConfirmWithWard({ failure }: { failure: AuthError | null }) {
         choose one here, so you can still sign in while Ward is down.
       </p>
       {failure !== null && (
-        <p className="auth-error" role="alert">
+        <p className={ERROR_NOTE} role="alert">
           <AlertIcon />
-          <span className="auth-error__text">{accountMessage(failure)}</span>
+          <span className={ERROR_NOTE_TEXT}>{accountMessage(failure)}</span>
         </p>
       )}
     </div>

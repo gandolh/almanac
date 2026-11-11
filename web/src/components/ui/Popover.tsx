@@ -1,5 +1,6 @@
 import { Popover as BasePopover } from "@base-ui/react/popover";
 import { useMemo, useRef, type ReactNode } from "react";
+import { cn } from "../../lib/cn";
 
 /**
  * A white floating panel anchored to an element or a rectangle: quick create
@@ -29,6 +30,9 @@ export interface PopoverProps {
   /** Move focus into the panel on open. Default true. */
   autoFocus?: boolean;
 }
+
+const POPUP_CLASS =
+  "max-h-[calc(100dvh-16px)] w-max max-w-[min(var(--width-popover),calc(100vw-16px))] overflow-auto rounded-control bg-surface text-ink shadow-float focus:outline-none motion-safe:animate-float-in";
 
 const GAP = 8; // between the anchor and the panel
 const MARGIN = 8; // the panel never comes closer to the window's edge than this
@@ -80,7 +84,7 @@ export function Popover({
     >
       <BasePopover.Portal>
         <BasePopover.Positioner
-          className="popover-positioner"
+          className="z-float"
           anchor={virtualAnchor}
           side={placement === "below" ? "bottom" : "right"}
           align="start"
@@ -91,7 +95,7 @@ export function Popover({
             ref={popupRef}
             aria-label={labelledBy ? undefined : label}
             aria-labelledby={labelledBy}
-            className={className ? `popover ${className}` : "popover"}
+            className={cn(POPUP_CLASS, className)}
             data-placement={placement}
             initialFocus={
               autoFocus ? () => popupRef.current?.querySelector<HTMLElement>("[data-autofocus]") ?? true : false

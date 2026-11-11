@@ -7,6 +7,7 @@ import { HOME } from "../router";
 import { SearchBox } from "../search/SearchBox";
 import { AccountMenu } from "./AccountMenu";
 import { ViewSwitcher } from "./ViewSwitcher";
+import { ICON_BUTTON } from "../components/looks";
 
 export interface TopBarProps {
   /** The view on screen; `null` on the search results, which have no ‹ ›. */
@@ -39,7 +40,7 @@ export function TopBar(props: TopBarProps) {
         <button
           ref={menuButtonRef}
           type="button"
-          className="icon-button"
+          className={ICON_BUTTON}
           aria-label="Main menu"
           aria-expanded={sidebarOpen}
           aria-controls="sidebar"
@@ -71,7 +72,7 @@ export function TopBar(props: TopBarProps) {
           <div className="topbar__steps">
             <button
               type="button"
-              className="icon-button"
+              className={ICON_BUTTON}
               aria-label={`Previous ${unit}`}
               aria-keyshortcuts="k"
               onClick={() => onStep(-1)}
@@ -80,7 +81,7 @@ export function TopBar(props: TopBarProps) {
             </button>
             <button
               type="button"
-              className="icon-button"
+              className={ICON_BUTTON}
               aria-label={`Next ${unit}`}
               aria-keyshortcuts="j"
               onClick={() => onStep(1)}
@@ -97,7 +98,7 @@ export function TopBar(props: TopBarProps) {
       <div className="topbar__end">
         <SearchBox />
         {compact && (
-          <button type="button" className="icon-button" aria-label={`Today, ${formatDayLong(today)}`} onClick={onToday}>
+          <button type="button" className={ICON_BUTTON} aria-label={`Today, ${formatDayLong(today)}`} onClick={onToday}>
             <CalendarPageIcon />
             <span className="today-icon__number" aria-hidden="true">
               {today.day}

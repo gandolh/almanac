@@ -2,6 +2,7 @@ import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { useRef, useState, type ReactNode } from "react";
 import { Button } from "../Button";
 import { CloseIcon } from "../icons";
+import { DIALOG, ICON_BUTTON } from "../looks";
 
 /**
  * A question with one action, on Base UI's `AlertDialog`: Cancel (which has
@@ -65,25 +66,25 @@ export function ConfirmDialog({
       }}
     >
       <AlertDialog.Portal>
-        <AlertDialog.Backdrop className="dialog-backdrop" />
+        <AlertDialog.Backdrop className={DIALOG.backdrop} />
         <AlertDialog.Popup
           ref={popupRef}
-          className="dialog dialog--small"
+          className={`${DIALOG.popup} ${DIALOG.small}`}
           // Cancel, the safe answer, by name, whatever the order.
           initialFocus={() => popupRef.current?.querySelector<HTMLElement>("[data-cancel]") ?? true}
         >
-          <div className="dialog__frame">
-            <header className="dialog__head">
-              <AlertDialog.Title className="dialog__title">{title}</AlertDialog.Title>
-              <AlertDialog.Close className="icon-button" aria-label="Close" disabled={pending}>
+          <div className={DIALOG.frame}>
+            <header className={DIALOG.head}>
+              <AlertDialog.Title className={DIALOG.title}>{title}</AlertDialog.Title>
+              <AlertDialog.Close className={ICON_BUTTON} aria-label="Close" disabled={pending}>
                 <CloseIcon size={20} />
               </AlertDialog.Close>
             </header>
-            <div className="dialog__body">
+            <div className={DIALOG.body}>
               <AlertDialog.Description render={<div />}>{message}</AlertDialog.Description>
               {children}
             </div>
-            <footer className="dialog__footer">
+            <footer className={DIALOG.footer}>
               <AlertDialog.Close
                 disabled={pending}
                 data-cancel=""

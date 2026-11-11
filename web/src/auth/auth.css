@@ -87,68 +87,6 @@
   gap: 16px;
 }
 
-.auth-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-
-.auth-field__label {
-  color: var(--muted);
-  font-size: var(--text-label);
-  font-weight: var(--weight-semibold);
-  line-height: var(--leading-tight);
-}
-
-.auth-field__input {
-  width: 100%;
-  height: var(--editor-field-height); /* one field height with the event editor */
-  padding: 0 12px;
-  border: 0;
-  border-radius: var(--radius-field);
-  background: var(--field);
-  color: var(--ink);
-  font-size: var(--text-input-phone); /* 16 px: iOS doesn't zoom into the field */
-  appearance: none;
-}
-
-.auth-field__input:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 0;
-}
-
-.auth-field__input[aria-invalid="true"] {
-  outline: 1.5px solid var(--ink-2);
-  outline-offset: -1.5px;
-}
-
-.auth-field__input[aria-invalid="true"]:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 0;
-}
-
-.auth-field__hint {
-  color: var(--muted);
-  font-size: var(--text-small);
-  line-height: var(--leading-tight);
-}
-
-.auth-field__error {
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  color: var(--ink);
-  font-size: var(--text-small);
-  font-weight: var(--weight-semibold);
-  line-height: var(--leading-tight);
-}
-
-.auth-field__error svg {
-  flex: none;
-  margin-top: -1px;
-}
-
 .login__submit {
   margin-top: 4px;
 }
@@ -175,39 +113,6 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-/* --- Notes and errors (no danger colour: ink, semibold, with the mark) ---------------- */
-
-.auth-error {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: var(--radius-control);
-  background: var(--field);
-  color: var(--ink);
-  font-size: var(--text-meta);
-  font-weight: var(--weight-semibold);
-  line-height: var(--leading-tight);
-}
-
-.auth-error svg {
-  flex: none;
-  margin-top: -1px;
-}
-
-.auth-error__text {
-  flex: 1;
-  min-width: 0;
-}
-
-.auth-error__dismiss {
-  flex: none;
-  min-height: 0;
-  margin: -2px -4px -2px 0;
-  font-size: var(--text-meta);
-  font-weight: var(--weight-semibold);
 }
 
 /* Why the last session ended: a calm line on the ground, over the panel. */

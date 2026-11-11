@@ -130,7 +130,7 @@ describe("DeleteCalendarDialog", () => {
   it("leaves Delete enabled for a calendar that isn't the last", () => {
     const button = deleteButton(dialog(false));
     expect(button).not.toBe("");
-    expect(button).not.toContain("disabled");
+    expect(button).not.toContain("disabled=");
     expect(button).not.toContain("title=");
   });
 

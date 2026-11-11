@@ -1,5 +1,6 @@
 import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { useRef, type ReactNode } from "react";
+import { buttonClass } from "../Button";
 import { CheckIcon } from "../icons";
 
 export interface MenuItem {
@@ -35,6 +36,15 @@ export interface MenuProps {
   align?: "start" | "end";
 }
 
+/** The open button's label turns semibold; a hidden bold copy keeps its width from moving the row. */
+const LABEL_CLASS =
+  "inline-flex flex-col items-center after:invisible after:pointer-events-none after:h-0 after:overflow-hidden after:font-semibold after:select-none after:content-[attr(data-label)]";
+const POPUP_CLASS =
+  "flex max-w-[calc(100vw-16px)] min-w-menu flex-col rounded-control bg-surface py-2 text-ink shadow-float outline-none motion-safe:animate-float-in";
+const LABEL_HEAD_CLASS = "px-4 pt-1.5 pb-0.5 text-label font-semibold text-muted";
+const ITEM_CLASS =
+  "flex min-h-10 cursor-default items-center gap-3 bg-transparent px-4 text-left text-meta text-ink select-none not-data-disabled:data-highlighted:bg-hover focus-visible:-outline-offset-2 data-disabled:text-muted max-md:min-h-touch max-md:text-body";
+
 const GAP = 4; // between the button and the menu
 const MARGIN = 8; // the menu never comes closer to the window's edge than this
 
@@ -61,12 +71,12 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
     <BaseMenu.Root modal={false}>
       <BaseMenu.Trigger
         ref={triggerRef}
-        className={triggerClassName ?? "button button--secondary button--regular menu-trigger"}
+        className={triggerClassName ?? buttonClass({ variant: "secondary", size: "regular" })}
         aria-label={triggerLabel}
       >
         {typeof trigger === "string" ? (
           // The open button's label turns semibold; keep its width from moving the row.
-          <span className="menu-trigger__label" data-label={trigger}>
+          <span className={LABEL_CLASS} data-label={trigger}>
             {trigger}
           </span>
         ) : (
@@ -74,15 +84,9 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
         )}
       </BaseMenu.Trigger>
       <BaseMenu.Portal>
-        <BaseMenu.Positioner
-          className="menu-positioner"
-          side="bottom"
-          align={align}
-          sideOffset={GAP}
-          collisionPadding={MARGIN}
-        >
+        <BaseMenu.Positioner className="z-float" side="bottom" align={align} sideOffset={GAP} collisionPadding={MARGIN}>
           <BaseMenu.Popup
-            className="menu"
+            className={POPUP_CLASS}
             aria-label={label}
             finalFocus={() => {
               const item = chosen.current;
@@ -95,16 +99,16 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
           >
             {sections.map((section, sectionIndex) => {
               const heading = section.label ? (
-                <BaseMenu.GroupLabel className="menu__label">{section.label}</BaseMenu.GroupLabel>
+                <BaseMenu.GroupLabel className={LABEL_HEAD_CLASS}>{section.label}</BaseMenu.GroupLabel>
               ) : sectionIndex > 0 ? (
-                <BaseMenu.Separator className="menu__separator" />
+                <BaseMenu.Separator className="my-2 h-px bg-divider" />
               ) : null;
               const chosen = section.items.find((item) => item.selected);
               // A section whose items are choices is a radio group, the chosen one ticked.
               return section.items.some((item) => item.selected !== undefined) ? (
                 <BaseMenu.RadioGroup
                   key={section.label ?? sectionIndex}
-                  className="menu__section"
+                  className="flex flex-col"
                   value={chosen?.label ?? null}
                 >
                   {heading}
@@ -112,13 +116,13 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
                     <BaseMenu.RadioItem
                       key={item.label}
                       value={item.label}
-                      className="menu__item"
+                      className={ITEM_CLASS}
                       disabled={item.disabled}
                       closeOnClick
                       onClick={choose(item)}
                     >
-                      <span className="menu__check">
-                        <BaseMenu.RadioItemIndicator className="menu__tick">
+                      <span className="flex w-[18px] flex-none text-ink-2">
+                        <BaseMenu.RadioItemIndicator className="flex">
                           <CheckIcon size={18} />
                         </BaseMenu.RadioItemIndicator>
                       </span>
@@ -127,12 +131,12 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
                   ))}
                 </BaseMenu.RadioGroup>
               ) : (
-                <BaseMenu.Group key={section.label ?? sectionIndex} className="menu__section">
+                <BaseMenu.Group key={section.label ?? sectionIndex} className="flex flex-col">
                   {heading}
                   {section.items.map((item) => (
                     <BaseMenu.Item
                       key={item.label}
-                      className="menu__item"
+                      className={ITEM_CLASS}
                       disabled={item.disabled}
                       onClick={choose(item)}
                     >
@@ -152,8 +156,8 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
 function ItemText({ item }: { item: MenuItem }) {
   return (
     <>
-      <span className="menu__item-label">{item.label}</span>
-      {item.detail && <span className="menu__item-detail">{item.detail}</span>}
+      <span className="flex-1">{item.label}</span>
+      {item.detail && <span className="ml-3 text-small text-muted">{item.detail}</span>}
     </>
   );
 }

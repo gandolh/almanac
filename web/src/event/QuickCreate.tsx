@@ -17,6 +17,7 @@ import {
 } from "./editor-state";
 import { CalendarSelect } from "./EventForm";
 import { whenText } from "./occurrence-text";
+import { ICON_BUTTON } from "../components/looks";
 
 /**
  * Quick create (glossary: quick create), Google's small popover beside a
@@ -106,7 +107,7 @@ export function QuickCreateForm({ init, onClose, onSaved, onMoreOptions }: Quick
   return (
     <form className="quick-create__form" onSubmit={onSubmit} noValidate>
       <div className="quick-create__head">
-        <button type="button" className="icon-button" aria-label="Close" title="Close" onClick={onClose}>
+        <button type="button" className={ICON_BUTTON} aria-label="Close" title="Close" onClick={onClose}>
           <CloseIcon size={ICON} />
         </button>
       </div>

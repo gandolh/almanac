@@ -10,6 +10,7 @@ import { deleteOccurrence } from "./delete-occurrence";
 import { useEventEditor } from "./EventEditor";
 import { linkify } from "./linkify";
 import { whenText } from "./occurrence-text";
+import { ICON_BUTTON } from "../components/looks";
 
 /**
  * What a click on an event shows, Google's details popover: Edit, Delete
@@ -93,13 +94,13 @@ export function EventDetails({
     // Focus lands on the details, not on Edit, as Google's popover does.
     <div className="details" tabIndex={-1} data-autofocus="">
       <div className="details__actions">
-        <button type="button" className="icon-button" aria-label="Edit event" title="Edit event" onClick={onEdit}>
+        <button type="button" className={ICON_BUTTON} aria-label="Edit event" title="Edit event" onClick={onEdit}>
           <EditIcon size={ICON} />
         </button>
-        <button type="button" className="icon-button" aria-label="Delete event" title="Delete event" onClick={onDelete}>
+        <button type="button" className={ICON_BUTTON} aria-label="Delete event" title="Delete event" onClick={onDelete}>
           <DeleteIcon size={ICON} />
         </button>
-        <button type="button" className="icon-button" aria-label="Close" title="Close" onClick={onClose}>
+        <button type="button" className={ICON_BUTTON} aria-label="Close" title="Close" onClick={onClose}>
           <CloseIcon size={ICON} />
         </button>
       </div>
