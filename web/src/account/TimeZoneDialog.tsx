@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type RefObjec
 import { isApiError } from "../api";
 import { AuthField } from "../components/Field";
 import { Button } from "../components/Button";
+import { RADIO_ROW, RADIO_TICK } from "../components/looks";
 import { Dialog } from "../components/ui/Dialog";
 import { RadioGroup, RadioIndicator, RadioItem } from "../components/ui/RadioGroup";
 import { CheckIcon } from "../components/icons";
@@ -165,13 +166,8 @@ export function ZoneList({ entries, selected, onSelect, listRef }: ZoneListProps
       onValueChange={onSelect}
     >
       {entries.map((entry) => (
-        <RadioItem
-          key={entry.zone}
-          value={entry.zone}
-          data-zone={entry.zone}
-          className="flex min-h-12 w-full items-center gap-3 bg-transparent px-3 py-1.5 text-left text-ink hover:bg-hover focus-visible:-outline-offset-2 data-checked:bg-accent-tint-soft data-checked:hover:bg-accent-tint-soft"
-        >
-          <span className="flex w-[18px] flex-none text-accent">
+        <RadioItem key={entry.zone} value={entry.zone} data-zone={entry.zone} className={RADIO_ROW}>
+          <span className={RADIO_TICK}>
             <RadioIndicator>
               <CheckIcon size={18} />
             </RadioIndicator>

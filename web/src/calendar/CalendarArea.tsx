@@ -27,6 +27,7 @@ import { Temporal, VIEW_LABELS, dateKey, wireInstant, type CalendarView, type Vi
 import { DetailsPopover } from "../event/DetailsPopover";
 import { useEventEditor, type EventEditor } from "../event/EventEditor";
 import { askScope } from "../event/scope";
+import { useColorScheme } from "../layout/theme";
 import { dayHeaderContent, eventContent, eventTimeText, slotLabel } from "./content";
 import {
   VIEW_TYPES,
@@ -69,6 +70,7 @@ export interface CalendarAreaProps {
  */
 export function CalendarArea({ view, date, onNavigate }: CalendarAreaProps) {
   const { timeZone } = useSettings();
+  const colorScheme = useColorScheme();
   const { calendars } = useCalendars();
   const editor = useEventEditor();
   const calendarRef = useRef<CalendarRef>(null);
@@ -202,6 +204,7 @@ export function CalendarArea({ view, date, onNavigate }: CalendarAreaProps) {
         ref={calendarRef}
         plugins={PLUGINS}
         {...OPTIONS}
+        colorScheme={colorScheme}
         initialView={VIEW_TYPES[view]}
         initialDate={dateKey(date)}
         timeZone={timeZone}
@@ -235,7 +238,7 @@ const OPTIONS: CalendarOptions = {
   firstDay: 1,
   headerToolbar: false,
   height: "100%",
-  colorScheme: "light",
+  // `colorScheme` follows the theme, as a prop of <FullCalendar>.
   className: "min-h-0 flex-1 font-sans text-event leading-tight text-ink",
   // Flush with the page, as Google's grid is: no frame round the view.
   borderless: true,

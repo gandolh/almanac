@@ -13,6 +13,18 @@
 
 @import "tailwindcss";
 
+/* dark: follows the theme switch, never the system alone: Dark always, System only while the system is dark. */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where([data-theme="system"], [data-theme="system"] *) {
+      @slot;
+    }
+  }
+}
+
 /* Only Almanac's own scales exist: no Tailwind palette, text scale, radii or shadows. */
 @theme {
   --color-*: initial;
@@ -34,29 +46,31 @@
  * utility uses it: the calendar's sheet loads later and reads them.
  * Google Calendar's look, played straight (corpus/wiki/decisions.md): white
  * surfaces, #1f1f1f text, one #0b57d0 accent, a 64 px top bar over a 256 px
- * left column, the system font with Roboto where it is installed.
+ * left column, the system font with Roboto where it is installed. Each colour
+ * is light-dark(light, dark): the dark values are a first pass, in Google's
+ * dark palette, that the redesign refines; each text and icon pair clears 4.5:1.
  */
 @theme static {
   /* Colour */
-  --color-ground: #ffffff; /* page background */
-  --color-surface: #ffffff; /* panels, menus, popovers, dialogs */
-  --color-control: #e9eef6; /* secondary buttons */
-  --color-field: #f0f4f9; /* filled text fields */
-  --color-hairline: #dadce0; /* borders between surfaces, the grid's lines */
-  --color-divider: #dadce0; /* rules inside a surface */
-  --color-outline: #747775; /* outlined buttons: Today, the view switcher */
-  --color-ink: #1f1f1f; /* primary text */
-  --color-ink-2: #444746; /* secondary text, icons */
-  --color-muted: #5f6368; /* captions, labels, other months' days (6.3:1 on white) */
-  --color-accent: #0b57d0; /* the one interactive colour, and today */
-  --color-accent-press: #0842a0; /* pressed, link hover */
-  --color-accent-ink: #041e49; /* text on the accent tint: the chosen view */
-  --color-accent-tint: #d3e3fd; /* the chosen view, the shown date, an open menu button */
-  --color-accent-tint-soft: #e8f0fe; /* a menu row under the pointer, a notice */
-  --color-toast-surface: #303030; /* the snackbar */
-  --color-toast-ink: #f2f2f2;
-  --color-toast-action: #a8c7fa;
-  --color-now-line: #ea4335; /* the current time across day and week, Google's red */
+  --color-ground: light-dark(#ffffff, #131314); /* page background */
+  --color-surface: light-dark(#ffffff, #1e1f20); /* panels, menus, popovers, dialogs */
+  --color-control: light-dark(#e9eef6, #2d2f31); /* secondary buttons */
+  --color-field: light-dark(#f0f4f9, #282a2c); /* filled text fields */
+  --color-hairline: light-dark(#dadce0, #3c4043); /* borders between surfaces, the grid's lines */
+  --color-divider: light-dark(#dadce0, #444746); /* rules inside a surface */
+  --color-outline: light-dark(#747775, #8e918f); /* outlined buttons: Today, the view switcher */
+  --color-ink: light-dark(#1f1f1f, #e3e3e3); /* primary text */
+  --color-ink-2: light-dark(#444746, #c4c7c5); /* secondary text, icons */
+  --color-muted: light-dark(#5f6368, #a0a4a8); /* captions, labels, other months' days (6.3:1 on white) */
+  --color-accent: light-dark(#0b57d0, #a8c7fa); /* the one interactive colour, and today */
+  --color-accent-press: light-dark(#0842a0, #d3e3fd); /* pressed, link hover */
+  --color-accent-ink: light-dark(#041e49, #d3e3fd); /* text on the accent tint: the chosen view */
+  --color-accent-tint: light-dark(#d3e3fd, #0842a0); /* the chosen view, the shown date, an open menu button */
+  --color-accent-tint-soft: light-dark(#e8f0fe, #1a2a47); /* a menu row under the pointer, a notice */
+  --color-toast-surface: light-dark(#303030, #e3e3e3); /* the snackbar */
+  --color-toast-ink: light-dark(#f2f2f2, #1f1f1f);
+  --color-toast-action: light-dark(#a8c7fa, #0b57d0);
+  --color-now-line: light-dark(#ea4335, #f28b82); /* the current time across day and week, Google's red */
 
   /* Derived: mixes and aliases of the above, never a new hue */
   --color-on-accent: var(--color-surface); /* text on the accent */
@@ -69,7 +83,10 @@
   --color-focus-ring: var(--color-accent);
   --color-selection: var(--color-accent-tint);
   --color-scrollbar-thumb: color-mix(in srgb, var(--color-muted) 40%, var(--color-ground));
-  --color-scrim: color-mix(in srgb, var(--color-ink) 32%, transparent); /* behind a dialog or the drawer */
+  --color-scrim: light-dark(
+    color-mix(in srgb, var(--color-ink) 32%, transparent),
+    rgb(0 0 0 / 0.6)
+  ); /* behind a dialog or the drawer */
   --color-toast-hover: color-mix(
     in srgb,
     var(--color-toast-ink) 8%,
@@ -250,12 +267,22 @@
  * links, tabular numerals and thin scrollbars.
  */
 @layer base {
+  /* Light on a first visit; the switch sets data-theme on <html> (layout/theme.ts). light-dark() picks the
+     value by this declaration, which lightningcss rewrites in this one stylesheet, so it stays here. */
   :root {
     color-scheme: light;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
     scrollbar-color: var(--color-scrollbar-thumb) transparent;
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  :root[data-theme="system"] {
+    color-scheme: light dark;
   }
 
   /* The app's 15 px lives on body; html keeps the reader's own size. */

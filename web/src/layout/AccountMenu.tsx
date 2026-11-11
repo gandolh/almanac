@@ -2,11 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { useSession } from "../../vendor/ward/ward-auth-react.js";
 import { changePassword, linkWard, signOut, unlinkWard, useWardLink, useWardNotice } from "../account/actions";
 import { NotificationsDialog } from "../account/Notifications";
+import { THEME_LABELS, ThemeDialog } from "../account/ThemeDialog";
 import { TimeZoneDialog } from "../account/TimeZoneDialog";
 import { AlertIcon } from "../components/Field";
 import { Menu, type MenuSection } from "../components/ui/Menu";
 import { useSettings } from "../data/settings";
 import { cn } from "../lib/cn";
+import { useTheme } from "./theme";
 
 const NOTICE_MS = 6000;
 
@@ -27,7 +29,7 @@ export function initialOf(username: string): string {
 /**
  * The account button and its menu, in place of a Settings page
  * (corpus/wiki/features.md "Account menu"): Change password, Sign in with
- * Ward (link or unlink), Time zone…, Notifications, then Sign out.
+ * Ward (link or unlink), Time zone…, Theme…, Notifications, then Sign out.
  * The button is a disc with the username's initial, as Google's is with a photo.
  */
 export function AccountMenu() {
@@ -35,7 +37,9 @@ export function AccountMenu() {
   const username = session.status === "signed_in" ? session.user.username : "";
   const ward = useWardLink();
   const { timeZone } = useSettings();
+  const theme = useTheme();
   const [zoneOpen, setZoneOpen] = useState(false);
+  const [themeOpen, setThemeOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notice, setNotice] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -76,6 +80,7 @@ export function AccountMenu() {
             ]
           : []),
         { label: "Time zone…", detail: zoneCity(timeZone), onSelect: () => setZoneOpen(true) },
+        { label: "Theme…", detail: THEME_LABELS[theme], onSelect: () => setThemeOpen(true) },
         { label: "Notifications", onSelect: () => setNotificationsOpen(true) },
       ],
     },
@@ -111,6 +116,7 @@ export function AccountMenu() {
         {shown}
       </p>
       <TimeZoneDialog open={zoneOpen} onClose={() => setZoneOpen(false)} />
+      <ThemeDialog open={themeOpen} onClose={() => setThemeOpen(false)} />
       <NotificationsDialog open={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
     </div>
   );

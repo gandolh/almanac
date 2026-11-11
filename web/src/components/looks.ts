@@ -55,3 +55,10 @@ export const DIALOG = {
  */
 export const GATE_CLASS =
   "grid min-h-dvh items-start justify-items-center bg-ground px-gutter-phone pt-[max(14vh,64px)] pb-12 max-md:pt-[calc(env(safe-area-inset-top)+max(7vh,80px))] max-md:leading-phone";
+
+/** A row of a RadioGroup list (the time zones, the theme): a tick column, then the label. Checked is Base UI's `data-checked`. */
+export const RADIO_ROW =
+  "flex min-h-12 w-full items-center gap-3 bg-transparent px-3 py-1.5 text-left text-ink hover:bg-hover focus-visible:-outline-offset-2 data-checked:bg-accent-tint-soft data-checked:hover:bg-accent-tint-soft";
+
+/** The tick's column, kept on every row so the labels line up. */
+export const RADIO_TICK = "flex w-[18px] flex-none text-accent";

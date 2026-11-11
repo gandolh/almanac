@@ -44,13 +44,18 @@ function luminance(hex: string): number {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
+/** The text on an event: white, and the light theme's ink where white can't be read. */
+const INK = { light: "#ffffff", dark: "#1f1f1f" } as const;
+
 /**
  * The text colour on an event of `hex`: white, as Google writes on its
  * event colours, except on the palette's light yellow, where white can't be
- * read and the ink is used. A token, never a new colour.
+ * read and dark ink is used. The calendar colours are data and the same in
+ * both themes, so the text on them is fixed too: a theme token would turn
+ * light with the dark theme and vanish on the yellow.
  */
 export function eventInk(hex: string): string {
-  return luminance(hex) > 0.5 ? "var(--color-ink)" : "var(--color-on-accent)";
+  return luminance(hex) > 0.5 ? INK.dark : INK.light;
 }
 
 // --- Occurrences in ------------------------------------------------------------------------------

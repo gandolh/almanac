@@ -66,7 +66,7 @@ describe("toEventInputs", () => {
       end: "2026-10-16T07:30:00Z",
       allDay: false,
       color: "#009688",
-      contrastColor: "var(--color-on-accent)",
+      contrastColor: "#ffffff",
       extendedProps: { occurrence: timed },
     });
     expect(occurrenceOf(event as { extendedProps: Record<string, unknown> })).toBe(timed);
@@ -82,7 +82,7 @@ describe("toEventInputs", () => {
       start: "2026-10-16",
       end: "2026-10-18",
       color: "#F6BF26",
-      contrastColor: "var(--color-ink)",
+      contrastColor: "#1f1f1f",
     });
   });
 
@@ -112,7 +112,7 @@ describe("toEventInputs", () => {
 });
 
 describe("eventInk", () => {
-  it("is white on the palette's colours and ink on its light yellow", () => {
+  it("is white on the palette's colours and dark ink on its light yellow, in either theme", () => {
     for (const hex of [
       "#4285F4",
       "#009688",
@@ -124,9 +124,9 @@ describe("eventInk", () => {
       "#8E24AA",
       "#616161",
     ]) {
-      expect(eventInk(hex), hex).toBe("var(--color-on-accent)");
+      expect(eventInk(hex), hex).toBe("#ffffff");
     }
-    expect(eventInk("#F6BF26")).toBe("var(--color-ink)");
+    expect(eventInk("#F6BF26")).toBe("#1f1f1f");
   });
 });
 
