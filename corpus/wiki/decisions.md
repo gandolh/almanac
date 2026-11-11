@@ -1,6 +1,6 @@
 ---
-summary: Locked calls for Almanac, each with date, rejected alternatives and reason. React + Fastify + SQLite on Shelfmark's layout; FullCalendar v7 for day, week and month with a year view of our own; several users, each with a private calendar and no sign-up; named calendars; Base UI under the dialogs, popovers and menus; common repeats with three edit scopes, expanded on the server; no import; one reminder per event by Web Push (since 2026-10-27, none in v1); one display time zone per user, Bucharest by default; phone browser without offline; deployed on the VPS; Google Calendar's layout, light only.
-updated: 2026-11-01
+summary: Locked calls for Almanac, each with date, rejected alternatives and reason. React + Fastify + SQLite on Shelfmark's layout; FullCalendar v7 for day, week and month with a year view of our own; several users, each with a private calendar and no sign-up; named calendars; Base UI under the dialogs, popovers and menus; common repeats with three edit scopes, expanded on the server; no import; one reminder per event by Web Push (since 2026-10-27, none in v1); one display time zone per user, Bucharest by default; phone browser without offline; deployed on the VPS; Google Calendar's layout, light only; the house style, formatted and checked (Prettier at 120, vendored configs, one gate).
+updated: 2026-11-11
 ---
 
 # Decisions
@@ -111,3 +111,23 @@ hand-written key handling did before. It costs about 50 kB gzip on the main
 chunk. Native selects, checkboxes and radios stay native, and so does the
 time field's list. Rejected: keeping the hand-built components, and shadcn,
 which brings Tailwind, which Almanac doesn't use.
+
+## The house style, formatted and checked
+_2026-11-11_, the owner's grilling of 2026-11-10. Almanac holds a copy of the
+skills library's `house-style` folder in `vendor/house-style/` (version
+header inside, refreshed by `npm run house-style:sync`, never edited), and its
+configs extend it: Prettier at width 120 with trailing commas, double quotes
+and semicolons; a thin ESLint config with six typed rules; knip and
+dependency-cruiser presets; `npm run check` as the gate and `check:fast` as
+its subset. The reformat is one commit, listed in `.git-blame-ignore-revs`.
+Markdown stays out of Prettier. `tsconfig.base.json` carries the house flags
+itself instead of extending the copy, because the image build copies only
+that file before `tsc -b server`. Rejected: width 130, which churns the least
+(333 lines against 502) but gives the estate two widths; a git or tarball
+dependency, which needs `git` in the Docker `deps` stage; and committing
+hooks to `.claude/settings.json`, since the plugin carries them. Two rules
+start softer: `n/no-process-env` and dependency-cruiser's `no-circular` are
+warnings until the server takes its settings from `config.ts` and each
+feature has its own options type. The two convention checkers run
+`--warn-only` until the Base UI and Tailwind work and the server layout work
+land.

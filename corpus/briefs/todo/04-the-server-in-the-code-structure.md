@@ -16,6 +16,8 @@
 
 **Before you start:** run `brief-board guide` ([corpus/CLAUDE.md](../../CLAUDE.md)).
 
+> **Update 2026-11-11:** dependency-cruiser landed in brief 01. `.dependency-cruiser.cjs` exists and `check:conventions` runs `depcruise` already, with `no-circular` lowered to a warning (the route files import `FeatureContext` from `app.ts`; 7 cycles). This brief keeps the cross-feature check, drops the `no-circular` override once each feature has its own options type, and drops `check-structure`'s `--warn-only` and the `n/no-process-env` warning block in `eslint.config.js`.
+
 ## Context
 
 The owner asked on 2026-11-09 for one researched code structure, enforced in every repo. Almanac's server is already near it:
