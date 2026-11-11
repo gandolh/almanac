@@ -92,8 +92,14 @@ interface Answer {
 
 function ResultsMessage({ role, children }: { role?: "status" | "alert"; children: ReactNode }) {
   return (
-    <section className="search-results search-results--message" aria-label="Search results">
-      <div className="search-message" role={role}>
+    <section
+      className="mx-auto flex w-full max-w-search-content flex-1 items-start justify-center px-6 pt-[72px] pb-8 max-md:px-gutter-phone max-md:pt-12 max-md:pb-6"
+      aria-label="Search results"
+    >
+      <div
+        className="flex flex-col items-center gap-4 text-center text-body leading-body wrap-anywhere text-muted"
+        role={role}
+      >
         {children}
       </div>
     </section>
@@ -119,14 +125,20 @@ export function ResultsView({ query, results, timeZone, calendars }: ResultsView
   }
   const byId = new Map(calendars.map((calendar) => [calendar.id, calendar]));
   return (
-    <section className="search-results" aria-label="Search results">
-      <ol className="search-days">
+    <section
+      className="mx-auto w-full max-w-search-content flex-none px-6 pt-2 pb-8 max-md:px-gutter-phone max-md:pt-0 max-md:pb-6"
+      aria-label="Search results"
+    >
+      <ol>
         {groupResults(results, timeZone).map((day) => (
-          <li key={day.key} className="search-day">
-            <h2 className="search-day__date">
+          <li
+            key={day.key}
+            className="grid grid-cols-[var(--search-date-column)_minmax(0,1fr)] border-t border-divider py-2 first:border-t-0 max-md:grid-cols-[minmax(0,1fr)] max-md:pt-3 max-md:pb-1"
+          >
+            <h2 className="pt-3 pl-3 text-small font-medium tracking-[0.04em] text-ink uppercase max-md:pt-0 max-md:pb-1 max-md:pl-0">
               <time dateTime={day.key}>{dateLabel(day.date)}</time>
             </h2>
-            <ul className="search-day__events">
+            <ul>
               {day.items.map((occurrence) => (
                 <li key={occurrence.id}>
                   <ResultRow
@@ -142,7 +154,9 @@ export function ResultsView({ query, results, timeZone, calendars }: ResultsView
         ))}
       </ol>
       {results.length >= SEARCH_LIMIT && (
-        <p className="search-results__limit">Showing the first {SEARCH_LIMIT} results. Try more specific words.</p>
+        <p className="mt-4 px-3 text-small text-muted">
+          Showing the first {SEARCH_LIMIT} results. Try more specific words.
+        </p>
       )}
     </section>
   );
@@ -161,15 +175,24 @@ function ResultRow({ occurrence, day, calendar, timeZone }: ResultRowProps) {
     : null;
   const dot = calendar ? ({ "--calendar-color": calendarColor(calendar) } as CSSProperties) : undefined;
   return (
-    <Link to={viewRoute("day", day)} className="search-event">
-      <span className="search-event__dot" style={dot} aria-hidden="true" />
-      <span className="search-event__time">{timeText(occurrence, timeZone)}</span>
-      <span className="search-event__body">
-        <span className="search-event__line">
-          <span className="search-event__title">{displayTitle(occurrence.title)}</span>
-          {occurrence.location !== "" && <span className="search-event__location">{occurrence.location}</span>}
+    <Link
+      to={viewRoute("day", day)}
+      className="grid grid-cols-[var(--size-search-dot)_var(--search-time-column)_minmax(0,1fr)] items-start gap-x-3 rounded-control px-3 py-2 text-meta leading-tight text-ink no-underline transition-[background-color] duration-(--duration-fast) ease-out hover:bg-hover hover:text-ink focus-visible:-outline-offset-2 active:bg-press max-md:min-h-touch max-md:grid-cols-[var(--size-search-dot)_minmax(0,1fr)] max-md:gap-y-0.5 max-md:rounded-none max-md:px-0"
+    >
+      <span
+        className="mt-1 size-search-dot [grid-area:1/1] rounded-pill bg-[var(--calendar-color,var(--color-muted))] max-md:mt-[3px] max-md:[grid-area:1/1/3/2]"
+        style={dot}
+        aria-hidden="true"
+      />
+      <span className="[grid-area:1/2] whitespace-nowrap text-ink-2 tabular-nums">
+        {timeText(occurrence, timeZone)}
+      </span>
+      <span className="flex min-w-0 [grid-area:1/3] flex-col gap-0.5 max-md:[grid-area:2/2]">
+        <span className="flex flex-wrap gap-x-3">
+          <span className="font-medium wrap-anywhere">{displayTitle(occurrence.title)}</span>
+          {occurrence.location !== "" && <span className="wrap-anywhere text-muted">{occurrence.location}</span>}
         </span>
-        {repeat !== null && <span className="search-event__repeat">{repeat}</span>}
+        {repeat !== null && <span className="text-small wrap-anywhere text-muted">{repeat}</span>}
       </span>
     </Link>
   );

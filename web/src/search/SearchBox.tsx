@@ -7,6 +7,18 @@ import { goBack, lastViewRoute, navigateToSearch, usePathname, useQueryParam, us
 import { normalizeQuery } from "./search-api";
 import { ICON_BUTTON } from "../components/looks";
 
+/** The field lifts and whitens on focus, in the focus ring's place. On a phone it is the top bar: back arrow, the field, ✕. */
+const FORM_CLASS = [
+  "flex h-control-large w-search-field flex-none items-center gap-0.5 rounded-pill bg-field px-1",
+  "transition-[background-color,box-shadow] duration-(--duration-fast) ease-out focus-within:bg-surface focus-within:shadow-raised",
+  "max-[1200px]:w-search-field-narrow max-[900px]:w-search-field-narrowest",
+  "max-md:absolute max-md:inset-0 max-md:z-[1] max-md:h-auto max-md:w-auto max-md:rounded-none max-md:bg-ground max-md:pr-gutter-phone max-md:pl-2 max-md:shadow-none max-md:focus-within:bg-ground max-md:focus-within:shadow-none",
+].join(" ");
+
+/** Without the browser's own ✕: ours clears and keeps the focus. 16 px on a phone, so iOS doesn't zoom in. */
+const INPUT_CLASS =
+  "h-full min-w-0 flex-1 appearance-none rounded-pill bg-transparent px-2 text-body text-ink focus-visible:outline-none max-md:text-input-phone [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:hidden [&::-webkit-search-decoration]:appearance-none";
+
 /**
  * The top bar's search: a magnifier that opens into a field (on a phone the
  * field covers the whole bar). Enter shows the results at `/search?q=…`;
@@ -140,14 +152,14 @@ export function SearchField({ inputRef, value, onChange, onSubmit, onClose, onCl
     onClose();
   };
   return (
-    <form className="search" role="search" onSubmit={onSubmit} onKeyDown={onKeyDown}>
+    <form className={FORM_CLASS} role="search" onSubmit={onSubmit} onKeyDown={onKeyDown}>
       <button type="button" className={ICON_BUTTON} aria-label="Close search" onClick={onClose}>
         <BackIcon />
       </button>
       <input
         ref={inputRef}
         type="search"
-        className="search__input"
+        className={INPUT_CLASS}
         name="q"
         value={value}
         maxLength={SEARCH_QUERY_MAX}

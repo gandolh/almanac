@@ -149,19 +149,20 @@ describe("ResultsView", () => {
       repeat: { freq: "weekly", byDay: ["FR"], end: { type: "never" } },
     });
     expect(view({ results: [series] })).toContain("Weekly on Friday");
-    expect(view({ results: [occurrence("e1")] })).not.toContain("search-event__repeat");
+    expect(view({ results: [occurrence("e1")] })).not.toContain("Weekly");
   });
 
   it("gives an event with no title the views' name for it, and leaves out an empty location", () => {
     const html = view({ results: [occurrence("e1", { title: "" })] });
     expect(html).toContain("(No title)");
-    expect(html).not.toContain("search-event__location");
+    // The line ends with the title: no location span follows it.
+    expect(html).toMatch(/\(No title\)<\/span><\/span>/);
   });
 
   it("gives a result whose calendar isn't known yet a neutral dot", () => {
     const html = view({ results: [occurrence("e1", { calendarId: 99 })], calendars: [work] });
-    expect(html).toContain("search-event__dot");
-    expect(html).not.toContain("--calendar-color");
+    expect(html).toMatch(/<span[^>]*aria-hidden="true"/);
+    expect(html).not.toContain("--calendar-color:");
   });
 
   it("says when the list was cut short", () => {
