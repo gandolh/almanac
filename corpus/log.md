@@ -353,3 +353,25 @@ rules 1-4, 6, 7 and 9-11 are 0. jsdom and Testing Library were added as root
 devDependencies for the wrapper tests (745 to 771 tests). Before and after
 screenshots at 1280 and 390 px show no change. See the brief's outcome note.
 
+## [2026-11-11] build | Brief 03: the web app to Tailwind
+
+Built on `main`, one commit per step. All fourteen stylesheets are gone; the app
+has `web/src/styles/index.css` (the layer order, `@theme` with the 117 tokens in
+Tailwind's namespaces, the page's base rules) and `web/src/calendar/fullcalendar.css`
+(FullCalendar's two sheets in a `fullcalendar` layer under `components` and
+`utilities`, and the Monarch palette). Tailwind 4.3.5, `@tailwindcss/vite`,
+`clsx`, `tailwind-merge` 3.7.0. The 15 px root moved to `body`. FullCalendar is
+styled through its class-name options; the markers `cal-mirror` and
+`cal-highlight` stay. Repeated looks are class strings in
+`web/src/components/looks.ts` and `web/src/event/looks.ts`. `better-tailwindcss`
+is on, class order included; `check-base-ui` is strict with two exceptions in
+`scripts/conventions.json`. A Light / Dark / System switch (account menu,
+Theme…) was added, light on a first visit, kept in `localStorage`, set before
+the first paint by a script in `web/index.html`. Revisited in
+[wiki/decisions.md](wiki/decisions.md): "Base UI under the dialogs, popovers,
+menus and drawer", "FullCalendar v7 draws day, week and month; the year view is
+our own" (the Tailwind half no longer applies), and "Google Calendar's layout,
+light only", now "…with a Light / Dark / System switch". Light screenshots at
+1280, 390 and 1024 px match the old ones but for the clock and the hover state a
+tap no longer leaves; built CSS 45.3 kB (8.6 gzip) to 57.2 kB (11.1 gzip) main,
+20.6 kB (4.5 gzip) to 19.3 kB (4.1 gzip) for the calendar's sheet.

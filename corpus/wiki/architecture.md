@@ -1,6 +1,6 @@
 ---
 summary: How Almanac is put together, built on 2026-10-16. Shelfmark's three workspaces (shared, server, web), what each owns, the API routes, request paths behind Caddy, dev and production ports (API 8809, Vite 5177, VPS 8797), time zones on both sides, where data lives, where the reminder timer runs, and secrets.
-updated: 2026-11-01
+updated: 2026-11-11
 ---
 
 # Architecture
@@ -20,8 +20,9 @@ TypeScript strict, Vitest, ESLint:
   and `/auth/*` routes. The Ward auth library is vendored the way Shelfmark
   does it (`shelfmark/server/vendor/ward`).
 - `web`: Vite + React. FullCalendar v7 (`daygrid`, `timegrid`, `interaction`)
-  for day, week and month; our own year view; plain CSS with tokens, light
-  only. A web manifest for the home-screen icon, and since 2026-10-27 a
+  for day, week and month; our own year view; Tailwind 4 (one stylesheet,
+  the tokens in `@theme`, utilities on the markup), with a Light / Dark /
+  System switch. A web manifest for the home-screen icon, and since 2026-10-27 a
   push-only service worker, `web/public/sw.js`, that caches nothing. How the
   web app is wired: [web-app.md](web-app.md).
 

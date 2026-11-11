@@ -1,5 +1,5 @@
 ---
-summary: Snapshot as of 2026-11-11, per area. v1 built 2026-10-16 and reviewed; Base UI under the overlays 2026-10-23; phone notifications (push worker, a reminder on each event, the minute sender) 2026-10-27; the estate's conventions (house style, Base UI rules, Tailwind, the server structure) filed as briefs 01-04 on 2026-11-09, the house style and its harness (brief 01) built 2026-11-11. Pushed to GitHub through 2026-11-01, nothing deployed, no phone has shown a notification. What waits on the owner, open bugs, accepted known issues, and the todos.
+summary: Snapshot as of 2026-11-11, per area. v1 built 2026-10-16 and reviewed; Base UI under the overlays 2026-10-23; phone notifications (push worker, a reminder on each event, the minute sender) 2026-10-27; the estate's conventions (house style, Base UI rules, Tailwind, the server structure) filed as briefs 01-04 on 2026-11-09, the house style and its harness (brief 01) built 2026-11-11, Base UI by the conventions (brief 02) and the whole web app on Tailwind with a Light / Dark / System switch (brief 03) built 2026-11-11. Pushed to GitHub through 2026-11-01, nothing deployed, no phone has shown a notification. What waits on the owner, open bugs, accepted known issues, and the todos.
 updated: 2026-11-11
 ---
 
@@ -40,9 +40,11 @@ deployed. Briefs 01-04 are open (2026-11-09); brief numbering restarted at
 - **Conventions** (2026-11-11). The house style and its harness are built
   (brief 01): vendored `house-style` 1.0.0, Prettier at 120, the typed ESLint
   rules, `npm run check` and `check:fast`, a root `CLAUDE.md` and
-  `.claude/rules/`. Brief 02 (Base UI by the base-ui skill's rules) is built; briefs 03-04 (the
-  whole web app on Tailwind v4, the server layout) are open and run inside it.
-  Base UI is already pinned at 1.9.0, so no bump is needed.
+  `.claude/rules/`. Brief 02 (Base UI by the base-ui skill's rules) and brief
+  03 (the whole web app on Tailwind 4.3.5, one stylesheet, the Light / Dark /
+  System switch) are built; `check-base-ui` runs strict with two recorded
+  exceptions (FullCalendar's sheet, the calendar colour). Brief 04 (the server
+  layout) is open. Base UI is pinned at 1.9.0.
 - **Sibling repos** (2026-10-27). The stale app lists in `wzd_auth` and
   `shelfmark` that the deploy work left behind were fixed; both are pushed.
 
@@ -77,8 +79,10 @@ three lanes.
 
 - On a phone the search field covers the top bar, but the bar's buttons
   under it stay in tab order: `TopBar` has no `inert` while search is open.
-- The search field's width between 768 and 1200 px hasn't had a browser
-  look.
+- The dark theme's values are a first pass in Google's dark palette; brief 05 (the
+  redesign) refines them. The tick on a calendar's checkbox and swatch is
+  `on-accent`, which turns dark in the dark theme: on red, purple and graphite
+  it falls below 3:1.
 
 ## Known and accepted
 
@@ -101,6 +105,9 @@ three lanes.
   sends it again at the new time.
 - Three small differences from the hand-built overlays were kept
   ([overlays.md](overlays.md)).
+- Tailwind 4's `hover:` applies only where the device can hover, so a tap on a
+  phone no longer leaves a hover state behind (the Create button, a dialog's
+  primary action).
 
 ## Todos
 

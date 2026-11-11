@@ -1,6 +1,6 @@
 ---
-summary: How Almanac's web app is put together, as built 2026-10-16. The hand-rolled router and its URL scheme, the external-store data layer and the occurrences-changed signal, commands and keyboard shortcuts, the shell on desktop and phone (drawer, swipe, data-no-swipe), how FullCalendar is wired (Monarch theme mapped to tokens on :root, lazy chunk, slots and snapping), and the rules the event editor, year view, calendar list, time zone dialog and search follow that the code alone doesn't explain.
-updated: 2026-11-01
+summary: How Almanac's web app is put together, as built 2026-10-16. The hand-rolled router and its URL scheme, the external-store data layer and the occurrences-changed signal, commands and keyboard shortcuts, the shell on desktop and phone (drawer, swipe, data-no-swipe), how FullCalendar is wired (its CSS in a layer and the Monarch palette on :root, in a sheet that loads with the lazy chunk; utilities through its class-name options; slots and snapping), and the rules the event editor, year view, calendar list, time zone dialog and search follow that the code alone doesn't explain.
+updated: 2026-11-11
 ---
 
 # Web app
@@ -56,9 +56,20 @@ inputs, with modifiers, or while a dialog or popover is open are ignored.
 ## FullCalendar
 
 `web/src/calendar/`. FullCalendar v7 with `dayGrid`, `timeGrid`,
-`interaction` and the Monarch theme, its palette mapped to Almanac's tokens on
-`:root` rather than on the view, because a dragged event leaves the view's
-subtree and would lose the colours. No FullCalendar toolbar; the shell's is
+`interaction` and the Monarch theme. Its CSS and the palette live in
+`calendar/fullcalendar.css`, the one stylesheet besides `styles/index.css`,
+so they load with the lazy chunk only. The two FullCalendar imports sit in a
+cascade layer (`fullcalendar`, under `components` and `utilities`), because
+their own CSS is unlayered and would beat any utility. So the overrides are
+utilities passed through FullCalendar's class-name options
+(`slotHeaderInnerClass`, `eventTitleClass`, `allDayHeaderInnerClass`, the
+`className` on its root) and Almanac's own markup (`calendar/content.tsx`),
+and only the palette stays CSS. The palette is on `:root`, set in
+`@layer base` from the tokens, rather than on the view, because a dragged
+event leaves the view's subtree and would lose the colours. Two classes stay
+as markers the selection code queries: `cal-mirror` and `cal-highlight`. The
+text on an event is white, or dark on the palette's yellow, in both themes
+(`eventInk`), and FullCalendar's `colorScheme` follows the theme. No FullCalendar toolbar; the shell's is
 the only one, and FullCalendar's own navigation (day-number links, "+N more")
 reports back through `onNavigate`. 30-minute slots, 15-minute snapping,
 scrolled to 07:45. A click on the hours selects one hour, as Google does.

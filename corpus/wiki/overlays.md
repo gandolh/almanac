@@ -6,8 +6,9 @@ updated: 2026-11-11
 # Overlays
 
 The decision is in [decisions.md](decisions.md), "Base UI under the dialogs,
-popovers, menus and drawer". `@base-ui/react` is pinned at 1.9.0 and Almanac
-keeps its own CSS. The wrappers live in `web/src/components/ui/`, the only
+popovers, menus and drawer". `@base-ui/react` is pinned at 1.9.0 and the wrappers are styled with
+Tailwind (since 2026-11-11), their class strings in the wrappers and in
+`web/src/components/looks.ts`. The wrappers live in `web/src/components/ui/`, the only
 place that imports `@base-ui/react` (base-ui rule 3); the first three kept
 their props when they moved there, so no call site changed. Base UI now owns focus, keys, placement
 and nesting; the old `layer.ts`, `placePopover` and `escapeClosesDrawer` are

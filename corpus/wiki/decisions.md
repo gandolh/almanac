@@ -1,5 +1,5 @@
 ---
-summary: Locked calls for Almanac, each with date, rejected alternatives and reason. React + Fastify + SQLite on Shelfmark's layout; FullCalendar v7 for day, week and month with a year view of our own; several users, each with a private calendar and no sign-up; named calendars; Base UI under the dialogs, popovers and menus; common repeats with three edit scopes, expanded on the server; no import; one reminder per event by Web Push (since 2026-10-27, none in v1); one display time zone per user, Bucharest by default; phone browser without offline; deployed on the VPS; Google Calendar's layout, light only; the house style, formatted and checked (Prettier at 120, vendored configs, one gate).
+summary: Locked calls for Almanac, each with date, rejected alternatives and reason. React + Fastify + SQLite on Shelfmark's layout; FullCalendar v7 for day, week and month with a year view of our own; several users, each with a private calendar and no sign-up; named calendars; Base UI under the dialogs, popovers and menus, styled with Tailwind; common repeats with three edit scopes, expanded on the server; no import; one reminder per event by Web Push (since 2026-10-27, none in v1); one display time zone per user, Bucharest by default; phone browser without offline; deployed on the VPS; Google Calendar's layout, with a Light / Dark / System switch, light on a first visit; the house style, formatted and checked (Prettier at 120, vendored configs, one gate).
 updated: 2026-11-11
 ---
 
@@ -22,8 +22,14 @@ all four views and drag, drop and resize free. Its year view stacks 12 full
 month grids, so Almanac builds a Google-style year view of 12 mini-months,
 with a dot on days that have events. Rejected: Schedule-X, whose drag and
 resize became paid in v4; react-big-calendar, which has no year view;
-ilamy-calendar, which needs Tailwind and has one maintainer; building every
-view ourselves, which is several times the work. Survey: [research.md](research.md).
+ilamy-calendar, which has one maintainer (it also needed Tailwind, which no
+longer counts against it: see below); building every view ourselves, which is
+several times the work. Survey: [research.md](research.md).
+
+_2026-11-11_, revisited. Almanac's web app is on Tailwind now (the entry
+below), so the "needs Tailwind" half of the ilamy-calendar rejection no longer
+applies; the choice stands on the other half (one maintainer). The choice
+itself isn't reopened.
 
 ## Several users, each with a private calendar, no sign-up
 _2026-10-16_. Every calendar belongs to one user and nobody else can see it.
@@ -95,11 +101,20 @@ to the API container on port 8797, deployed by `vps-deploy`. The stack and
 the Ward seed entry (`wzd_auth`) are committed locally; the owner deploys.
 Rejected: local only.
 
-## Google Calendar's layout, light only
+## Google Calendar's layout, with a Light / Dark / System switch
 _2026-10-16_. The owner asked for something that works like Google Calendar
 and always light. The UI copies Google's layout straight, with no design
 direction round and no dark mode. Rejected: themed directions, which the owner
 turned down for showcase and Shelfmark. Layout: [features.md](features.md).
+
+_2026-11-11_, revisited (the owner's call of 2026-11-10, Q18). The layout
+stays; "light only" ends. Account menu, Theme…, offers Light, Dark and System,
+and a first visit is light whatever the system says. The choice is kept on the
+device (`localStorage`, beside the sidebar's preference), not on the server,
+since `user_settings` holds only the time zone. The colour tokens are
+`light-dark()` pairs; the dark values are a first pass in Google's dark
+palette that the redesign (brief 05) refines. The calendar colours are data
+and look the same in both themes, so the text on an event is fixed.
 
 ## Base UI under the dialogs, popovers, menus and drawer
 _2026-10-23_, the owner's call, to match their other apps (atrium,
@@ -112,6 +127,13 @@ chunk. Native selects, checkboxes and radios stay native, and so does the
 time field's list. Rejected: keeping the hand-built components, and shadcn,
 which brings Tailwind, which Almanac doesn't use.
 
+_2026-11-11_, revisited. The wrappers are styled with Tailwind now, by the
+owner's call of 2026-11-09 (whole apps move to Tailwind v4, Almanac's web app
+included: one stylesheet, `web/src/styles/index.css`, and utilities on the
+markup). Both halves of the old entry change: "styled by Almanac's own CSS"
+and "Tailwind, which Almanac doesn't use". shadcn stays rejected, for a reason
+of its own: Base UI is used directly, without a styled kit on top.
+
 _2026-11-11_, the base-ui skill's conventions (the owner's grilling of
 2026-11-10): Base UI is imported only under `web/src/components/ui/`, and the
 widgets Almanac had built by hand moved onto it: the toast (`Toast`), the
@@ -122,8 +144,7 @@ phone drawer is Base UI's `Drawer` (Q40), closed by a swipe too; it replaces
 the "a side panel without swipe is a positioned Dialog" call above. No
 `SwipeArea`, which would fight the swipe on the view. Native text, date and
 time inputs and selects stay native (Q16). `Button` and tooltips stay as
-they were (decision 4 of the brief). Styling is still Almanac's own CSS; the
-move to Tailwind is the next brief.
+they were (decision 4 of the brief). Styling moved to Tailwind afterwards (above).
 
 ## The house style, formatted and checked
 _2026-11-11_, the owner's grilling of 2026-11-10. Almanac holds a copy of the

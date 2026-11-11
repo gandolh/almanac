@@ -1,6 +1,6 @@
 ---
-summary: What Almanac is in a paragraph. The owner's personal calendar, a Google Calendar look-alike with day, week, month and year views where they type in every meeting and event from everywhere they have a schedule. Private per user, no sharing, no import, light only, on the estate's Fastify + React + SQLite stack.
-updated: 2026-10-27
+summary: What Almanac is in a paragraph. The owner's personal calendar, a Google Calendar look-alike with day, week, month and year views where they type in every meeting and event from everywhere they have a schedule. Private per user, no sharing, no import, light or dark, on the estate's Fastify + React + SQLite stack.
+updated: 2026-11-11
 ---
 
 # Overview

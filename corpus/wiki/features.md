@@ -1,12 +1,12 @@
 ---
 summary: What Almanac v1 does, screen by screen, as settled with the owner on 2026-10-16. The Google-style layout (top bar, left column with mini-month and calendars), the four views with month as default, mouse interactions and keyboard shortcuts, event fields, search, the account menu, date and time format, and what is deliberately left out. Read before writing or promoting any brief.
-updated: 2026-11-01
+updated: 2026-11-11
 ---
 
 # Features
 
-The model is Google Calendar played straight, light only
-([decisions.md](decisions.md)). Words follow [glossary.md](glossary.md).
+The model is Google Calendar played straight, with a Light / Dark / System
+switch and light on a first visit ([decisions.md](decisions.md)). Words follow [glossary.md](glossary.md).
 
 ## Layout
 
@@ -62,7 +62,8 @@ starts with one calendar.
 
 Change password, link or unlink Sign in with Ward, display time zone (starts
 at Europe/Bucharest), sign out. No Settings page. Since 2026-10-27 it also has
-Notifications (turn push on in this browser, send a test).
+Notifications (turn push on in this browser, send a test). Since 2026-11-11
+also Theme… (Light, Dark or System, kept on this device).
 
 ## Left out of v1
 
