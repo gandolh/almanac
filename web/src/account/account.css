@@ -1,6 +1,6 @@
 /*
  * The account menu's dialogs (web/src/account): Change password is a small
- * components/Dialog; its fields and errors are the login page's (auth/auth.css).
+ * components/ui/Dialog; its fields and errors are the login page's (auth/auth.css).
  */
 
 .password-form {

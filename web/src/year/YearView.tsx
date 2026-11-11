@@ -2,7 +2,7 @@ import type { Occurrence } from "@almanac/shared";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { isApiError } from "../api";
 import { MonthGrid } from "../components/MonthGrid";
-import { Popover } from "../components/Popover";
+import { Popover } from "../components/ui/Popover";
 import { showToast } from "../components/Toast";
 import { useCalendars } from "../data/calendars";
 import { fetchOccurrences, onOccurrencesChanged } from "../data/occurrences";

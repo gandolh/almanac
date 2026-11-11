@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type RefObjec
 import { isApiError } from "../api";
 import { AuthField } from "../components/Field";
 import { Button } from "../components/Button";
-import { Dialog } from "../components/Dialog";
+import { Dialog } from "../components/ui/Dialog";
 import { CheckIcon } from "../components/icons";
 import { useSettings } from "../data/settings";
 import { listTimeZones, matchesZone, zoneEntry, type ZoneEntry } from "./time-zones";

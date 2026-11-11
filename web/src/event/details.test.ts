@@ -7,7 +7,7 @@ import { whenText } from "./occurrence-text";
 import { SCOPE_LABELS, ScopeDialog, answerOnce, scopeChoices, scopeTitle } from "./scope";
 
 // Base UI's dialog portal needs a DOM; this renders the dialog in place.
-vi.mock("@base-ui/react/dialog", () => import("../components/dialog-stub"));
+vi.mock("@base-ui/react/dialog", () => import("../components/ui/dialog-stub"));
 
 const BUCHAREST = "Europe/Bucharest";
 

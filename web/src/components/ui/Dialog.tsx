@@ -1,6 +1,6 @@
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { useRef, type ReactNode } from "react";
-import { CloseIcon } from "./icons";
+import { CloseIcon } from "../icons";
 
 /**
  * A modal dialog on Base UI's `Dialog` (focus stays in it and the page behind
@@ -42,6 +42,7 @@ export function Dialog({
 }: DialogProps) {
   const popupRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLElement>(null);
 
   return (
     <BaseDialog.Root
@@ -61,7 +62,7 @@ export function Dialog({
           initialFocus={() =>
             popupRef.current?.querySelector<HTMLElement>("[data-autofocus]") ??
             bodyRef.current?.querySelector<HTMLElement>(FOCUSABLE) ??
-            popupRef.current?.querySelector<HTMLElement>(".dialog__footer button:not(:disabled)") ??
+            footerRef.current?.querySelector<HTMLElement>("button:not(:disabled)") ??
             true
           }
         >
@@ -75,7 +76,11 @@ export function Dialog({
             <div ref={bodyRef} className="dialog__body">
               {children}
             </div>
-            {footer && <footer className="dialog__footer">{footer}</footer>}
+            {footer && (
+              <footer ref={footerRef} className="dialog__footer">
+                {footer}
+              </footer>
+            )}
           </div>
         </BaseDialog.Popup>
       </BaseDialog.Portal>

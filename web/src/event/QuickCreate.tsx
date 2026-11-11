@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { isApiError } from "../api";
 import { Button } from "../components/Button";
 import { CalendarIcon, ClockIcon, CloseIcon } from "../components/icons";
-import { Popover } from "../components/Popover";
+import { Popover } from "../components/ui/Popover";
 import { useCalendars } from "../data/calendars";
 import { createEvent } from "../data/occurrences";
 import { useSettings } from "../data/settings";

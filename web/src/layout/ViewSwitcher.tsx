@@ -1,7 +1,7 @@
 import type { Temporal } from "temporal-polyfill";
 import { CaretDownIcon } from "../components/icons";
 import { Link } from "../components/Link";
-import { Menu } from "../components/Menu";
+import { Menu } from "../components/ui/Menu";
 import { VIEWS, VIEW_LABELS, type View } from "../dates";
 import { navigate, viewRoute } from "../router";
 

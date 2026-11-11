@@ -2,7 +2,7 @@ import type { EditScope } from "@almanac/shared";
 import { useId, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Button } from "../components/Button";
-import { Dialog } from "../components/Dialog";
+import { Dialog } from "../components/ui/Dialog";
 import "./details.css";
 
 /**

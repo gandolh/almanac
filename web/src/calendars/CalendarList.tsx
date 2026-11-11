@@ -9,7 +9,7 @@ import { useId, useState, type FormEvent } from "react";
 import { isApiError } from "../api";
 import { AuthField } from "../components/Field";
 import { Button } from "../components/Button";
-import { Dialog } from "../components/Dialog";
+import { Dialog } from "../components/ui/Dialog";
 import { PlusIcon } from "../components/icons";
 import { showToast } from "../components/Toast";
 import { useCalendars } from "../data/calendars";

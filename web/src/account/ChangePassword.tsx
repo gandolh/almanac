@@ -10,13 +10,13 @@ import { accountMessage } from "../auth/messages";
 // The hooks below need the client set up; the session module does that when it loads.
 import "../auth/session";
 import { Button } from "../components/Button";
-import { Dialog } from "../components/Dialog";
+import { Dialog } from "../components/ui/Dialog";
 import { AlertIcon, AuthField } from "../components/Field";
 import "./account.css";
 
 /**
  * The account menu's "Change password":
- * a small `components/Dialog`, so focus stays in the form until it is done or
+ * a small `components/ui/Dialog`, so focus stays in the form until it is done or
  * cancelled.
  *
  * - With a password: the current one, the new one twice. Every other session

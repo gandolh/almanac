@@ -2,12 +2,12 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Temporal } from "temporal-polyfill";
 import { describe, expect, it, vi } from "vitest";
-import { Dialog } from "./Dialog";
+import { Dialog } from "./ui/Dialog";
 import { MonthGrid, type MonthGridProps } from "./MonthGrid";
 import { ToastView } from "./Toast";
 
 // Base UI's dialog portal needs a DOM; this renders the dialog in place.
-vi.mock("@base-ui/react/dialog", () => import("./dialog-stub"));
+vi.mock("@base-ui/react/dialog", () => import("./ui/dialog-stub"));
 
 const october = Temporal.PlainYearMonth.from("2026-10");
 const today = Temporal.PlainDate.from("2026-10-16");

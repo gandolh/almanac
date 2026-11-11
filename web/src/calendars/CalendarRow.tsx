@@ -2,10 +2,10 @@ import { CALENDAR_NAME_MAX, calendarCreateSchema, type Calendar, type CalendarCo
 import { useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { AlertIcon } from "../components/Field";
 import { Button } from "../components/Button";
-import { Dialog } from "../components/Dialog";
+import { Dialog } from "../components/ui/Dialog";
 import { CheckIcon } from "../components/icons";
-import { Menu, type MenuSection } from "../components/Menu";
-import { Popover } from "../components/Popover";
+import { Menu, type MenuSection } from "../components/ui/Menu";
+import { Popover } from "../components/ui/Popover";
 import { calendarColor } from "../data/calendars";
 import { ColorPicker, colorName } from "./ColorPicker";
 import "./calendars.css";

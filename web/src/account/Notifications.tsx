@@ -2,7 +2,7 @@ import { Switch } from "@base-ui/react/switch";
 import { useEffect, useId, useState } from "react";
 import { isApiError } from "../api";
 import { Button } from "../components/Button";
-import { Dialog } from "../components/Dialog";
+import { Dialog } from "../components/ui/Dialog";
 import { deletePushSubscription, getPushKey, savePushSubscription, sendTestPush } from "../push/push-api";
 import {
   base64UrlToBytes,

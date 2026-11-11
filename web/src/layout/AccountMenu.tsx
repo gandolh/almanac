@@ -4,7 +4,7 @@ import { changePassword, linkWard, signOut, unlinkWard, useWardLink, useWardNoti
 import { NotificationsDialog } from "../account/Notifications";
 import { TimeZoneDialog } from "../account/TimeZoneDialog";
 import { AlertIcon } from "../components/Field";
-import { Menu, type MenuSection } from "../components/Menu";
+import { Menu, type MenuSection } from "../components/ui/Menu";
 import { useSettings } from "../data/settings";
 
 const NOTICE_MS = 6000;

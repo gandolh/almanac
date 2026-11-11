@@ -11,7 +11,7 @@ import {
 } from "./Notifications";
 
 // Base UI's dialog portal needs a DOM; this renders the dialog in place.
-vi.mock("@base-ui/react/dialog", () => import("../components/dialog-stub"));
+vi.mock("@base-ui/react/dialog", () => import("../components/ui/dialog-stub"));
 
 const panel = (props: NotificationsPanelProps) => renderToStaticMarkup(createElement(NotificationsPanel, props));
 const ready = (over: Partial<Extract<NotificationsView, { kind: "ready" }>> = {}): NotificationsView => ({

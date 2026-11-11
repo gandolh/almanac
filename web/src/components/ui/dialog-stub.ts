@@ -7,7 +7,7 @@ import { createElement, type ReactNode } from "react";
  * behaviour (focus, Esc, the backdrop) is Base UI's and is checked in the
  * browser. A test file that renders a dialog says:
  *
- *   vi.mock("@base-ui/react/dialog", () => import("../components/dialog-stub"));
+ *   vi.mock("@base-ui/react/dialog", () => import("../components/ui/dialog-stub"));
  */
 interface PartProps {
   children?: ReactNode;

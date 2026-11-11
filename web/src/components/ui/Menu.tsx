@@ -1,6 +1,6 @@
 import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { useRef, type ReactNode } from "react";
-import { CheckIcon } from "./icons";
+import { CheckIcon } from "../icons";
 
 export interface MenuItem {
   label: string;

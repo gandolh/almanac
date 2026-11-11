@@ -2,7 +2,7 @@ import { describeReminder, describeRepeat, type Calendar, type Occurrence } from
 import { useId, type CSSProperties, type ReactNode } from "react";
 import { displayTitle } from "../calendar/events";
 import { CalendarIcon, CloseIcon, DeleteIcon, EditIcon, NotesIcon, PlaceIcon } from "../components/icons";
-import { Popover } from "../components/Popover";
+import { Popover } from "../components/ui/Popover";
 import { showToast } from "../components/Toast";
 import { calendarColor, useCalendars } from "../data/calendars";
 import { useSettings } from "../data/settings";
