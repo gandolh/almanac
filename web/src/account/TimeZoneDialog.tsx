@@ -86,12 +86,12 @@ function OpenTimeZoneDialog({ onClose }: Pick<TimeZoneDialogProps, "onClose">) {
         </>
       }
     >
-      <div className="zone-dialog">
-        <p className="zone-dialog__intro">Times show in this time zone wherever you are.</p>
-        <div className="zone-current">
-          <span className="zone-current__caption">Current time zone</span>
-          <span className="zone-current__label">{current?.label ?? timeZone}</span>
-          {current && <span className="zone-current__zone">{current.zone}</span>}
+      <div className="flex flex-col gap-4">
+        <p className="text-meta leading-body text-ink-2">Times show in this time zone wherever you are.</p>
+        <div className="flex flex-col gap-0.5 rounded-control bg-accent-tint-soft px-3 py-2.5 text-accent-ink">
+          <span className="text-label font-semibold">Current time zone</span>
+          <span className="text-body font-medium">{current?.label ?? timeZone}</span>
+          {current && <span className="text-small">{current.zone}</span>}
         </div>
         <AuthField
           label="Search"
@@ -107,7 +107,7 @@ function OpenTimeZoneDialog({ onClose }: Pick<TimeZoneDialogProps, "onClose">) {
         />
         <ZoneList entries={matches} selected={selected} onSelect={setSelected} listRef={listRef} />
         {error !== undefined && (
-          <p className="zone-dialog__error" role="alert">
+          <p className="text-small font-semibold text-ink" role="alert">
             {error}
           </p>
         )}
@@ -150,7 +150,7 @@ export function ZoneList({ entries, selected, onSelect, listRef }: ZoneListProps
 
   if (entries.length === 0) {
     return (
-      <p className="zone-list__empty" role="status">
+      <p className="px-3 py-6 text-center text-meta text-muted" role="status">
         No time zone matches that.
       </p>
     );
@@ -159,21 +159,26 @@ export function ZoneList({ entries, selected, onSelect, listRef }: ZoneListProps
   return (
     <RadioGroup<string>
       ref={ref}
-      className="zone-list"
+      className="relative h-[min(320px,40dvh)] overflow-y-auto overscroll-contain rounded-control border border-hairline"
       aria-label="Time zones"
       value={selected}
       onValueChange={onSelect}
     >
       {entries.map((entry) => (
-        <RadioItem key={entry.zone} value={entry.zone} data-zone={entry.zone} className="zone-option">
-          <span className="zone-option__tick">
+        <RadioItem
+          key={entry.zone}
+          value={entry.zone}
+          data-zone={entry.zone}
+          className="flex min-h-12 w-full items-center gap-3 bg-transparent px-3 py-1.5 text-left text-ink hover:bg-hover focus-visible:-outline-offset-2 data-checked:bg-accent-tint-soft data-checked:hover:bg-accent-tint-soft"
+        >
+          <span className="flex w-[18px] flex-none text-accent">
             <RadioIndicator>
               <CheckIcon size={18} />
             </RadioIndicator>
           </span>
-          <span className="zone-option__text">
-            <span className="zone-option__label">{entry.label}</span>
-            <span className="zone-option__zone">{entry.zone}</span>
+          <span className="flex min-w-0 flex-col">
+            <span className="text-meta max-md:text-body">{entry.label}</span>
+            <span className="text-small text-muted">{entry.zone}</span>
           </span>
         </RadioItem>
       ))}

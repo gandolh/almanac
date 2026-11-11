@@ -81,15 +81,15 @@ export function NotificationsPanel({
   const labelId = `${id}-label`;
   const stateId = `${id}-state`;
   return (
-    <div className="notify" aria-busy={view.kind === "loading" || busy}>
+    <div className="flex flex-col gap-4" aria-busy={view.kind === "loading" || busy}>
       {view.kind === "ready" ? (
         <>
-          <div className="notify-switch">
-            <span className="notify-switch__text">
-              <span className="notify-switch__label" id={labelId}>
+          <div className="flex min-h-touch items-center justify-between gap-4">
+            <span className="grid min-w-0 gap-0.5">
+              <span className="text-body font-medium text-ink" id={labelId}>
                 Notifications in this browser
               </span>
-              <span className="notify-switch__state" id={stateId}>
+              <span className="text-meta leading-body text-ink-2" id={stateId}>
                 {view.permission === "denied" ? "Blocked in this browser." : view.on ? MESSAGES.on : MESSAGES.off}
               </span>
             </span>
@@ -102,9 +102,13 @@ export function NotificationsPanel({
               data-autofocus=""
             />
           </div>
-          {view.permission === "denied" && <p className="notify-hint">{blockedHelp(view.ios)}</p>}
+          {view.permission === "denied" && (
+            <p className="rounded-control bg-accent-tint-soft p-3 text-meta leading-body text-ink">
+              {blockedHelp(view.ios)}
+            </p>
+          )}
           {view.on && (
-            <div className="notify-test">
+            <div className="flex">
               <Button onClick={onTest} disabled={busy}>
                 Send a test
               </Button>
@@ -112,22 +116,22 @@ export function NotificationsPanel({
           )}
         </>
       ) : view.kind === "ios-home-screen" || view.kind === "ios-update" ? (
-        <p className="notify-hint">{MESSAGES[view.kind]}</p>
+        <p className="rounded-control bg-accent-tint-soft p-3 text-meta leading-body text-ink">{MESSAGES[view.kind]}</p>
       ) : (
-        <p className="notify-text">{MESSAGES[view.kind]}</p>
+        <p className="text-meta leading-body text-ink-2">{MESSAGES[view.kind]}</p>
       )}
       {view.kind === "check-failed" && (
-        <div className="notify-test">
+        <div className="flex">
           <Button onClick={onRetry}>Try again</Button>
         </div>
       )}
       {note && (
-        <p className="notify-text" role="status">
+        <p className="text-meta leading-body text-ink-2" role="status">
           {note}
         </p>
       )}
       {error && (
-        <p className="notify-error" role="alert">
+        <p className="text-small font-semibold text-ink" role="alert">
           {error}
         </p>
       )}
