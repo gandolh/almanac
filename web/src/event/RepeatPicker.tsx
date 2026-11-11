@@ -75,7 +75,7 @@ export function RepeatPicker({ repeat, labelDate, startDate, timeZone, summary, 
             <ToggleItem
               key={day}
               value={day}
-              className="flex size-day-toggle items-center justify-center rounded-pill bg-field p-0 text-label font-semibold text-ink-2 hover:bg-control-hover data-pressed:bg-accent data-pressed:text-on-accent data-pressed:hover:bg-accent"
+              className="flex size-day-toggle items-center justify-center rounded-pill bg-field p-0 text-label font-semibold text-ink-2 hover:bg-control-hover data-pressed:bg-accent data-pressed:text-on-accent data-pressed:hover:bg-accent max-md:size-9"
               aria-label={WEEKDAY_NAMES[index]}
               title={WEEKDAY_NAMES[index]}
             >
