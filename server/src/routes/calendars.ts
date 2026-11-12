@@ -1,7 +1,7 @@
 import { calendarCreateSchema, calendarPatchSchema, type CalendarList } from "@almanac/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { FeatureContext } from "../app.js";
-import { currentUserId } from "../auth/guard.js";
+import { currentUserId } from "../plugins/auth/guard.js";
 import { ApiError } from "../errors.js";
 import { removeCalendar } from "../recurrence/scopes.js";
 

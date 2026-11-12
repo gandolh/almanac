@@ -9,7 +9,7 @@ import {
 } from "@almanac/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { FeatureContext } from "../app.js";
-import { currentUserId } from "../auth/guard.js";
+import { currentUserId } from "../plugins/auth/guard.js";
 import { expandSeries, isSeries, rowOccurrence, seriesRepeat } from "../recurrence/expand.js";
 import type { EventStore } from "../store/events.js";
 

@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
 // The type brings the plugin's `request.auth` declaration into every file that uses `currentUserId`.
-import type { AuthContext } from "../../vendor/ward/ward-auth.js";
-import { ApiError, sendError } from "../errors.js";
+import type { AuthContext } from "../../../vendor/ward/ward-auth.js";
+import { ApiError, sendError } from "../../errors.js";
 
 /**
  * Almanac's half of the guard. The vendored `wardAuth` plugin (`app.ts`,

@@ -1,7 +1,7 @@
 import { eventDeleteQuerySchema, eventInputSchema, eventPatchSchema, type Occurrence } from "@almanac/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { FeatureContext } from "../app.js";
-import { currentUserId } from "../auth/guard.js";
+import { currentUserId } from "../plugins/auth/guard.js";
 import { ApiError } from "../errors.js";
 import { createEvent, deleteEvent, updateEvent } from "../recurrence/scopes.js";
 

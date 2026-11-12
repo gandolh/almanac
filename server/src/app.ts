@@ -1,7 +1,7 @@
 import Fastify, { type FastifyInstance, type FastifyServerOptions } from "fastify";
 import { createWardClient, wardAuth } from "../vendor/ward/ward-auth.js";
-import { USER_ROLE, openAccounts } from "./auth/accounts.js";
-import { registerOriginGuard } from "./auth/guard.js";
+import { USER_ROLE, openAccounts } from "./plugins/auth/accounts.js";
+import { registerOriginGuard } from "./plugins/auth/guard.js";
 import { AUTH_ROUTE_PREFIX, type Config } from "./config.js";
 import { databasePath, openDb, type Db } from "./db/open.js";
 import { registerErrorHandling } from "./errors.js";

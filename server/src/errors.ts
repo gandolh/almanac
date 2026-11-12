@@ -12,7 +12,7 @@ export const ERROR_STATUS = {
   validation: 400,
   /** A route that needs a signed-in user was reached without a session (`currentUserId`). */
   unauthorized: 401,
-  /** A browser sent a change from a page on another origin (`auth/guard.ts`). */
+  /** A browser sent a change from a page on another origin (`plugins/auth/guard.ts`). */
   forbidden: 403,
   not_found: 404,
   /** The change would break a rule about what is already stored: deleting the user's last calendar. */

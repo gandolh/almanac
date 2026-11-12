@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { afterEach, describe, expect, it } from "vitest";
-import { migrations } from "../db/migrations.js";
-import { openDb, type Db } from "../db/open.js";
+import { migrations } from "../../db/migrations.js";
+import { openDb, type Db } from "../../db/open.js";
 import { USER_ROLE, openAccounts, seedUser } from "./accounts.js";
 
 let db: Db | undefined;

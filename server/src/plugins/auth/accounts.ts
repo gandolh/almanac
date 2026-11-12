@@ -1,5 +1,5 @@
-import { createAccounts, createSqliteStore, seedUsers, type Accounts } from "../../vendor/ward/ward-auth.js";
-import type { Db } from "../db/open.js";
+import { createAccounts, createSqliteStore, seedUsers, type Accounts } from "../../../vendor/ward/ward-auth.js";
+import type { Db } from "../../db/open.js";
 
 /**
  * Almanac's local accounts, on the vendored ward-auth library.

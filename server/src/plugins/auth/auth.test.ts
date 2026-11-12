@@ -1,14 +1,14 @@
 import { generateKeyPairSync } from "node:crypto";
 import type { FastifyInstance } from "fastify";
 import { afterEach, describe, expect, it } from "vitest";
-import { PUBLIC_ROUTES, SESSION_COOKIE } from "../app.js";
+import { PUBLIC_ROUTES, SESSION_COOKIE } from "../../app.js";
 import {
   sessionCookieFrom,
   startSignedInApp,
   startTestApp,
   type SignedInTestApp,
   type TestApp,
-} from "../testing/testApp.js";
+} from "../../testing/testApp.js";
 import { currentUserId } from "./guard.js";
 
 /**

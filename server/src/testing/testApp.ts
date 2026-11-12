@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { FastifyInstance, InjectOptions, LightMyRequestResponse } from "fastify";
 import { AUTH_ROUTE_PREFIX, SESSION_COOKIE, buildApp } from "../app.js";
-import { openAccounts, seedUser } from "../auth/accounts.js";
+import { openAccounts, seedUser } from "../plugins/auth/accounts.js";
 import { loadConfig, type Config } from "../config.js";
 import { databasePath, openDb } from "../db/open.js";
 

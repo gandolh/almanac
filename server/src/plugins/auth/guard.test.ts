@@ -1,6 +1,6 @@
 import type { FastifyRequest } from "fastify";
 import { describe, expect, it } from "vitest";
-import { ApiError } from "../errors.js";
+import { ApiError } from "../../errors.js";
 import { crossOriginWrite, currentUserId } from "./guard.js";
 
 const ORIGIN = "http://localhost:5177";

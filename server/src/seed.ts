@@ -1,6 +1,6 @@
 import { createInterface } from "node:readline/promises";
 import { Writable } from "node:stream";
-import { openAccounts, seedUser } from "./auth/accounts.js";
+import { openAccounts, seedUser } from "./plugins/auth/accounts.js";
 import { loadEnvFile, loadSeedConfig } from "./config.js";
 import { databasePath, openDb } from "./db/open.js";
 
