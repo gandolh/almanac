@@ -372,6 +372,66 @@ describe("DELETE /api/events/:id", () => {
   });
 });
 
+describe("a weekly series with chosen days", () => {
+  // The repeat's `byDay` is sorted on the way in by a `.transform()`; a reply needs the transform-free
+  // stored schema, or zod throws on encoding and the reply is a 500.
+  const gym = () => ({
+    ...standup(),
+    title: "Gym",
+    repeat: { freq: "weekly", byDay: ["FR", "MO", "WE"], end: { type: "never" } },
+  });
+
+  it("is answered by a create and by an edit of every scope, byDay in week order", async () => {
+    const created = await t.inject({ method: "POST", url: "/api/events", payload: gym() });
+    expect(created.statusCode, created.body).toBe(201);
+    expect(created.json()).toMatchObject({ repeat: { freq: "weekly", byDay: ["MO", "WE", "FR"] } });
+    const { eventId } = occurrenceSchema.parse(created.json());
+    const url = `/api/events/${eventId}`;
+
+    const days = { freq: "weekly", byDay: ["SA", "TU"], end: { type: "never" } };
+    const all = await t.inject({ method: "PATCH", url, payload: { scope: "all", changes: { repeat: days } } });
+    expect(all.statusCode, all.body).toBe(200);
+    expect(all.json()).toMatchObject({ repeat: { byDay: ["TU", "SA"] } });
+    const { originalStart } = occurrenceSchema.parse(all.json());
+    const following = await t.inject({
+      method: "PATCH",
+      url,
+      payload: { scope: "following", occurrence: originalStart, changes: { repeat: { ...days, byDay: ["TH", "MO"] } } },
+    });
+    expect(following.statusCode, following.body).toBe(200);
+    expect(following.json()).toMatchObject({ repeat: { byDay: ["MO", "TH"] } });
+    const next = occurrenceSchema.parse(following.json());
+    const exception = await t.inject({
+      method: "PATCH",
+      url: `/api/events/${next.eventId}`,
+      payload: { scope: "this", occurrence: next.originalStart, changes: { title: "Gym moved" } },
+    });
+    expect(exception.statusCode, exception.body).toBe(200);
+    expect(exception.json()).toMatchObject({ title: "Gym moved", repeat: { byDay: ["MO", "TH"] } });
+  });
+});
+
+describe("the reply schema", () => {
+  it("answers the fields the schema names, in its order, and nothing else", async () => {
+    const res = await t.inject({ method: "POST", url: "/api/events", payload: standup() });
+    expect(Object.keys(res.json<object>())).toEqual([
+      "id",
+      "eventId",
+      "seriesId",
+      "originalStart",
+      "calendarId",
+      "title",
+      "location",
+      "notes",
+      "allDay",
+      "start",
+      "end",
+      "repeat",
+      "reminderMinutes",
+    ]);
+  });
+});
+
 describe("another user", () => {
   it("gets 404 on the first user's event and cannot change or delete it", async () => {
     const event = await create(standup());

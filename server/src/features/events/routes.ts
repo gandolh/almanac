@@ -1,15 +1,13 @@
-import { eventDeleteQuerySchema, eventInputSchema, eventPatchSchema, type Occurrence } from "@almanac/shared";
-import type { FastifyPluginAsync } from "fastify";
+import { eventDeleteQuerySchema, eventInputSchema, eventPatchSchema, occurrenceSchema } from "@almanac/shared";
+import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
+import { z } from "zod";
 import type { Db } from "../../db/open.js";
 import { currentUserId } from "../../plugins/auth/guard.js";
 import { ApiError } from "../../lib/api-error.js";
+import { idParamsSchema } from "../../lib/id-params.js";
 import type { SettingsStore } from "../settings/index.js";
 import { createEvent, deleteEvent, updateEvent } from "./service.js";
 import type { EventStore } from "./store.js";
-
-interface IdParams {
-  Params: { id: string };
-}
 
 /** A positive integer in the path, or a 404: `/api/events/abc` names no event, the same as another user's id. */
 function eventId(raw: string): number {
@@ -47,27 +45,37 @@ export interface EventRoutesOptions {
  *   series), `s<seriesId>:<key>`, or its exception `e<id>` if it has one;
  * - "this": the exception, `e<id>`, with `seriesId` and `originalStart`.
  */
-export const eventRoutes: FastifyPluginAsync<EventRoutesOptions> = async (app, { db, events, settings }) => {
-  app.post("/api/events", (request, reply): Occurrence => {
-    const userId = currentUserId(request);
-    const input = eventInputSchema.parse(request.body);
-    const occurrence = createEvent({ db, events }, userId, input, settings.get(userId).timeZone);
-    reply.code(201);
-    return occurrence;
-  });
+export const eventRoutes: FastifyPluginAsyncZod<EventRoutesOptions> = async (app, { db, events, settings }) => {
+  app.post(
+    "/api/events",
+    { schema: { body: eventInputSchema, response: { 201: occurrenceSchema } } },
+    (request, reply) => {
+      const userId = currentUserId(request);
+      const occurrence = createEvent({ db, events }, userId, request.body, settings.get(userId).timeZone);
+      reply.code(201);
+      return occurrence;
+    },
+  );
 
-  app.patch<IdParams>("/api/events/:id", (request): Occurrence => {
-    const userId = currentUserId(request);
-    const id = eventId(request.params.id);
-    const patch = eventPatchSchema.parse(request.body);
-    return updateEvent({ db, events }, userId, id, patch, settings.get(userId).timeZone);
-  });
+  app.patch(
+    "/api/events/:id",
+    { schema: { params: idParamsSchema, body: eventPatchSchema, response: { 200: occurrenceSchema } } },
+    (request) => {
+      const userId = currentUserId(request);
+      const id = eventId(request.params.id);
+      return updateEvent({ db, events }, userId, id, request.body, settings.get(userId).timeZone);
+    },
+  );
 
-  app.delete<IdParams>("/api/events/:id", (request, reply) => {
-    const userId = currentUserId(request);
-    const id = eventId(request.params.id);
-    const query = eventDeleteQuerySchema.parse(request.query);
-    deleteEvent({ db, events }, userId, id, query);
-    return reply.code(204).send();
-  });
+  app.delete(
+    "/api/events/:id",
+    { schema: { params: idParamsSchema, querystring: eventDeleteQuerySchema, response: { 204: z.null() } } },
+    (request, reply) => {
+      const userId = currentUserId(request);
+      const id = eventId(request.params.id);
+      deleteEvent({ db, events }, userId, id, request.query);
+      reply.code(204);
+      return null;
+    },
+  );
 };
