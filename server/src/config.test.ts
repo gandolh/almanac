@@ -1,5 +1,6 @@
+import { isAbsolute, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { ConfigError, loadConfig } from "./config.js";
+import { ConfigError, loadConfig, loadSeedConfig, resolveDataDir } from "./config.js";
 import { makeVapidPair } from "./testing/vapid.js";
 
 function problems(env: NodeJS.ProcessEnv): string {
@@ -174,5 +175,30 @@ describe("loadConfig", () => {
     expect(message).toContain("PORT");
     expect(message).toContain("AUTH_TRUSTED_PROXIES");
     expect(message).toContain("WARD_OIDC_CLIENT_ID");
+  });
+});
+
+describe("resolveDataDir", () => {
+  it("keeps an absolute path and resolves a relative one against the repo root", () => {
+    expect(resolveDataDir("/srv/almanac/data")).toBe("/srv/almanac/data");
+    const relative = resolveDataDir("./data");
+    expect(isAbsolute(relative)).toBe(true);
+    expect(relative).toBe(resolve(relative, "..", "data"));
+    expect(relative.endsWith("/data")).toBe(true);
+  });
+});
+
+describe("loadSeedConfig", () => {
+  it("trims the name, keeps the password as typed and defaults the data folder", () => {
+    expect(loadSeedConfig({ SEED_USERNAME: "  ana ", SEED_PASSWORD: " pass word " })).toEqual({
+      username: "ana",
+      password: " pass word ",
+      dataDir: resolveDataDir("./data"),
+    });
+  });
+
+  it("is empty when nothing is set, for the command to ask", () => {
+    expect(loadSeedConfig({})).toMatchObject({ username: "", password: "" });
+    expect(loadSeedConfig({ DATA_DIR: "/tmp/x" }).dataDir).toBe("/tmp/x");
   });
 });

@@ -146,9 +146,15 @@ function startReminders(app: FastifyInstance, ctx: FeatureContext): void {
   app.addHook("onClose", () => timer.stop());
 }
 
+/** Fastify's options that belong to the process. `server.ts` sets them; a test leaves them out. */
+export type ServerOptions = Pick<
+  FastifyServerOptions,
+  "logger" | "trustProxy" | "connectionTimeout" | "requestTimeout" | "keepAliveTimeout"
+>;
+
 export interface BuildAppOptions {
-  /** Fastify's logger option. Default off; `index.ts` turns it on. */
-  logger?: FastifyServerOptions["logger"];
+  /** The process's options: the logger (default off), `trustProxy` and the timeouts. */
+  server?: ServerOptions;
 }
 
 /**
@@ -157,7 +163,7 @@ export interface BuildAppOptions {
  * `GET /api/health` needs a session (`signIn` above).
  */
 export async function buildApp(config: Config, options: BuildAppOptions = {}): Promise<FastifyInstance> {
-  const app = Fastify({ logger: options.logger ?? false });
+  const app = Fastify({ logger: false, ...options.server });
 
   const db = openDb(databasePath(config.dataDir));
   app.addHook("onClose", async () => {

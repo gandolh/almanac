@@ -16,7 +16,7 @@ export default [
     scripts: ["scripts", "docs/images"],
     // Allowed to print: the server entry logs before its logger exists, and the seed and key CLIs talk
     // to the person running them.
-    console: ["server/src/index.ts", "server/src/seed.ts", "server/src/vapid-keys.ts"],
+    console: ["server/src/server.ts", "server/src/seed.ts", "server/src/vapid-keys.ts"],
     ignores: ["data/**"],
     // `expectError` is the tests' own assertion helper, so a test that calls it asserts.
     assertFunctionNames: ["expect", "expectTypeOf", "expectError"],
@@ -25,12 +25,5 @@ export default [
     // The push-only service worker: plain JavaScript, run as a classic worker script.
     files: ["web/public/sw.js"],
     languageOptions: { sourceType: "script", globals: { self: "readonly", URL: "readonly" } },
-  },
-  {
-    // A warning for now (2026-11-11): these files still read the environment themselves. When the
-    // server takes its settings from config.ts, this block goes and the rule is an error again.
-    name: "almanac/process-env-warns",
-    files: ["server/src/index.ts", "server/src/seed.ts", "server/src/vapid-keys.ts"],
-    rules: { "n/no-process-env": "warn" },
   },
 ];

@@ -1,6 +1,14 @@
 import { createECDH } from "node:crypto";
+import { isAbsolute, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { parseTrustedProxies, wardClientOptionsFromEnv, type WardClientOptions } from "../vendor/ward/ward-auth.js";
+
+/** The repo root. `src/` (tsx in dev) and `dist/` (built) sit at the same depth, so this resolves the same from both. */
+const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
+
+/** The data folder when `DATA_DIR` is unset. */
+const DEFAULT_DATA_DIR = "./data";
 
 /** Where the auth plugin's routes will sit as Fastify sees them (`app.ts`); the browser reaches them under the API prefix. */
 export const AUTH_ROUTE_PREFIX = "/auth";
@@ -25,7 +33,7 @@ export const VAPID_KEYS = ["VAPID_PUBLIC_KEY", "VAPID_PRIVATE_KEY", "VAPID_SUBJE
 export interface Config {
   host: string;
   port: number;
-  /** As given. `index.ts` resolves a relative path against the repo root. */
+  /** As given. `server.ts` resolves a relative path against the repo root (`resolveDataDir`). */
   dataDir: string;
   /** The app's own origin as the browser sees it, bare. Default is the Vite dev server. */
   publicOrigin: string;
@@ -78,7 +86,7 @@ const envSchema = z.object({
   PORT: optional(
     z.coerce.number<string>().int().min(1).max(65535, { message: "PORT must be a port number (1-65535)." }),
   ).transform((value) => value ?? 8809),
-  DATA_DIR: optional(z.string()).transform((value) => value ?? "./data"),
+  DATA_DIR: optional(z.string()).transform((value) => value ?? DEFAULT_DATA_DIR),
   PUBLIC_ORIGIN: optional(
     z.string().refine((value) => URL.canParse(value) && new URL(value).origin === value, {
       message: "PUBLIC_ORIGIN must be a bare origin such as https://example.com: no path and no trailing slash.",
@@ -238,5 +246,47 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     trustedProxies: proxies,
     push,
     reminderTimer: values.REMINDER_TIMER,
+  };
+}
+
+/**
+ * Loads the repo root's `.env` into the environment for the settings the
+ * environment doesn't already hold. Resolves to the file's path, or `undefined`
+ * when there is no such file. Call it before `loadConfig()` in a process entry.
+ */
+export function loadEnvFile(): string | undefined {
+  const path = `${REPO_ROOT}.env`;
+  try {
+    process.loadEnvFile(path);
+    return path;
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+    return undefined;
+  }
+}
+
+/**
+ * The data folder as an absolute path: `npm run dev` runs the server from
+ * `server/`, so a relative `DATA_DIR` means the repo root's. One rule for the
+ * server and the seed command; `buildApp` opens `<dataDir>/almanac.db` there.
+ */
+export function resolveDataDir(configured: string): string {
+  return isAbsolute(configured) ? configured : resolve(REPO_ROOT, configured);
+}
+
+/** What the seed command reads from the environment. An unset name or password is empty, for the command to ask for. */
+export interface SeedConfig {
+  username: string;
+  password: string;
+  /** `DATA_DIR`, resolved as the server resolves it. */
+  dataDir: string;
+}
+
+/** `SEED_USERNAME` (trimmed), `SEED_PASSWORD` (as typed, spaces and all) and `DATA_DIR`. */
+export function loadSeedConfig(env: NodeJS.ProcessEnv = process.env): SeedConfig {
+  return {
+    username: env.SEED_USERNAME?.trim() ?? "",
+    password: env.SEED_PASSWORD ?? "",
+    dataDir: resolveDataDir(env.DATA_DIR || DEFAULT_DATA_DIR),
   };
 }

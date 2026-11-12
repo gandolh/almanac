@@ -109,4 +109,4 @@ EXPOSE 8797
 # Shell form, so it follows the runtime PORT rather than a baked constant.
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s \
   CMD wget -qO- "http://127.0.0.1:${PORT}/api/health" || exit 1
-CMD ["node", "server/dist/index.js"]
+CMD ["node", "server/dist/server.js"]

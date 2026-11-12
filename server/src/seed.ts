@@ -1,8 +1,7 @@
-import { isAbsolute, resolve } from "node:path";
 import { createInterface } from "node:readline/promises";
 import { Writable } from "node:stream";
-import { fileURLToPath } from "node:url";
 import { openAccounts, seedUser } from "./auth/accounts.js";
+import { loadEnvFile, loadSeedConfig } from "./config.js";
 import { databasePath, openDb } from "./db/open.js";
 
 /**
@@ -22,14 +21,7 @@ import { databasePath, openDb } from "./db/open.js";
  * on every deploy. The database is `DATA_DIR`'s, as for the server.
  */
 
-/** `src/` (tsx) and `dist/` (built) sit at the same depth, so this resolves the same from both. */
-const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
-
-try {
-  process.loadEnvFile(`${REPO_ROOT}.env`);
-} catch (err) {
-  if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
-}
+loadEnvFile();
 
 /**
  * The answer to `question`, with what is typed hidden when `secret`: readline
@@ -58,16 +50,14 @@ async function ask(question: string, secret = false): Promise<string> {
 }
 
 async function main(): Promise<void> {
-  const username = process.env.SEED_USERNAME?.trim() || (await ask("Username: "));
-  const password = process.env.SEED_PASSWORD || (await ask("Password: ", true));
+  const seed = loadSeedConfig();
+  const username = seed.username || (await ask("Username: "));
+  const password = seed.password || (await ask("Password: ", true));
   if (username === "" || password === "") {
     throw new Error("Set SEED_USERNAME and SEED_PASSWORD in the environment, or run this in a terminal to be asked.");
   }
 
-  // The same DATA_DIR rule as `index.ts`: relative means the repo root's.
-  const configured = process.env.DATA_DIR || "./data";
-  const dataDir = isAbsolute(configured) ? configured : resolve(REPO_ROOT, configured);
-  const db = openDb(databasePath(dataDir));
+  const db = openDb(databasePath(seed.dataDir));
   try {
     const created = await seedUser(openAccounts(db), { username, password });
     console.log(created ? `Created ${username}.` : `${username} already exists; left as it was.`);
