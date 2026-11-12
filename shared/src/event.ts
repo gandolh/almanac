@@ -57,10 +57,18 @@ export const repeatEndSchema = z.discriminatedUnion("type", [
 ]);
 export type RepeatEnd = z.infer<typeof repeatEndSchema>;
 
+/** `byDay` is for a weekly repeat only: the one rule both repeat schemas check. */
+function checkByDay(repeat: { freq: string; byDay?: unknown }, ctx: z.RefinementCtx): void {
+  if (repeat.byDay !== undefined && repeat.freq !== "weekly") {
+    ctx.addIssue({ code: "custom", path: ["byDay"], message: "is for a weekly repeat only" });
+  }
+}
+
 /**
- * A repeat preset. `byDay` is for `weekly` only: the days it repeats on, put
- * in week order without duplicates; left out, it repeats on the start's
- * weekday.
+ * A repeat preset, as a request sends it. `byDay` is for `weekly` only: the
+ * days it repeats on, put in week order without duplicates; left out, it
+ * repeats on the start's weekday. The sorting `.transform()` makes this an
+ * input schema: a reply needs `storedRepeatSchema`.
  */
 export const repeatSchema = z
   .strictObject({
@@ -72,12 +80,22 @@ export const repeatSchema = z
       .optional(),
     end: repeatEndSchema,
   })
-  .superRefine((repeat, ctx) => {
-    if (repeat.byDay !== undefined && repeat.freq !== "weekly") {
-      ctx.addIssue({ code: "custom", path: ["byDay"], message: "is for a weekly repeat only" });
-    }
-  });
+  .superRefine(checkByDay);
 export type Repeat = z.infer<typeof repeatSchema>;
+
+/**
+ * A repeat as the server stores and replies it: `byDay` already in week
+ * order, so there is no `.transform()`. The type provider encodes a reply
+ * with zod's `encode`, which throws on a transform, so `occurrenceSchema`
+ * uses this one. The same shape as `Repeat`.
+ */
+export const storedRepeatSchema = z
+  .strictObject({
+    freq: repeatFreqSchema,
+    byDay: z.array(weekdaySchema).min(1).optional(),
+    end: repeatEndSchema,
+  })
+  .superRefine(checkByDay);
 
 /** Which occurrences of a series an edit applies to (glossary: edit scope). One-off events ignore it. */
 export const EDIT_SCOPES = ["this", "following", "all"] as const;
@@ -279,7 +297,7 @@ export const occurrenceSchema = z.object({
   /** `…Z` instants for a timed occurrence, dates (end exclusive) for an all-day one. */
   start: occurrenceKeySchema,
   end: occurrenceKeySchema,
-  repeat: repeatSchema.nullable(),
+  repeat: storedRepeatSchema.nullable(),
   /** The reminder (`TIMED_REMINDERS`, `ALL_DAY_REMINDERS`), or null for none. A generated occurrence has the series'. */
   reminderMinutes: z.number().int().nullable(),
 });

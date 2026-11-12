@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { z } from "zod";
 import {
   ALL_DAY_REMINDERS,
   EVENT_LENGTH_MAX_DAYS,
@@ -12,7 +13,10 @@ import {
   eventPatchSchema,
   occurrenceQuerySchema,
   parseOccurrenceId,
+  occurrenceSchema,
   repeatSchema,
+  storedRepeatSchema,
+  type Repeat,
   seriesOccurrenceId,
   type Occurrence,
 } from "./event.js";
@@ -249,5 +253,40 @@ describe("compareOccurrences", () => {
     // In UTC the early one is still the 15th, after that day's all-day event.
     const utc = [nine, allDay, early, dayBefore].sort(compareOccurrences("UTC"));
     expect(utc.map((o) => o.id)).toEqual(["e5", "e1", "e2", "e3"]);
+  });
+});
+
+describe("storedRepeatSchema", () => {
+  const weekly: Repeat = { freq: "weekly", byDay: ["MO", "WE", "FR"], end: { type: "never" } };
+
+  it("encodes and decodes a weekly repeat with chosen days, which the sorting input schema cannot encode", () => {
+    expect(z.encode(storedRepeatSchema, weekly)).toEqual(weekly);
+    expect(z.decode(storedRepeatSchema, weekly)).toEqual(weekly);
+    // The trap: zod throws when encoding through a `.transform()`, so a reply cannot use `repeatSchema`.
+    expect(() => z.encode(repeatSchema, weekly)).toThrow(/unidirectional transform/);
+  });
+
+  it("keeps the rule that byDay is for a weekly repeat only", () => {
+    const bad = { freq: "daily", byDay: ["MO"], end: { type: "never" } };
+    expect(storedRepeatSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it("is what an occurrence replies with, a weekly series with chosen days included", () => {
+    const occurrence = {
+      id: "s3:2027-03-03T16:00:00Z",
+      eventId: 3,
+      seriesId: 3,
+      originalStart: "2027-03-03T16:00:00Z",
+      calendarId: 1,
+      title: "Gym",
+      location: "",
+      notes: "",
+      allDay: false,
+      start: "2027-03-03T16:00:00Z",
+      end: "2027-03-03T17:00:00Z",
+      repeat: weekly,
+      reminderMinutes: null,
+    };
+    expect(z.encode(occurrenceSchema, occurrence)).toEqual(occurrence);
   });
 });
