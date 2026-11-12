@@ -1,8 +1,11 @@
 import { PUSH_TEST_TITLE, pushPayloadSchema } from "@almanac/shared";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PUSH_TIMEOUT_MS, PUSH_TTL_SECONDS } from "./sender.js";
+import { featureApp } from "../../testing/featureApp.js";
 import { startSignedInApp, type SignedInTestApp } from "../../testing/testApp.js";
 import { vapidEnv } from "../../testing/vapid.js";
+import { pushRoutes } from "./routes.js";
+import type { PushService } from "./service.js";
 
 // The push services: web-push's one network call, answered here.
 const { sendNotification } = vi.hoisted(() => ({ sendNotification: vi.fn() }));
@@ -179,5 +182,48 @@ describe("/api/push with the VAPID keys set", () => {
     });
     expect(cross.statusCode).toBe(403);
     expect((await test()).json()).toEqual({ sent: 0 });
+  });
+});
+
+describe("the reply schemas", () => {
+  beforeEach(async () => {
+    t = await startSignedInApp();
+  });
+
+  const bare = (push: unknown) =>
+    featureApp(pushRoutes, {
+      config: t.config,
+      push: push as PushService,
+      pushSubscriptions: { save: () => undefined, remove: () => undefined } as never,
+    });
+
+  it("strips a field the schema doesn't name", async () => {
+    const app = await bare({ publicKey: "BKey", privateKey: "secret", sendToUser: async () => ({ sent: 2, leak: 1 }) });
+    const key = await app.inject({ method: "GET", url: "/api/push/key" });
+    expect(key.body).toBe('{"publicKey":"BKey"}');
+    const test = await app.inject({ method: "POST", url: "/api/push/test" });
+    expect(test.body).toBe('{"sent":2}');
+    await app.close();
+  });
+
+  it("answers 500 with the fixed message for a reply that fails its schema", async () => {
+    const app = await bare({ publicKey: "BKey", sendToUser: async () => ({ sent: -1 }) });
+    const res = await app.inject({ method: "POST", url: "/api/push/test" });
+    expect(res.statusCode).toBe(500);
+    expect(res.json()).toEqual({ error: { code: "internal", message: "Something went wrong on the server." } });
+    await app.close();
+  });
+
+  it("keeps a thrown message out of the reply", async () => {
+    const app = await bare({
+      publicKey: "BKey",
+      sendToUser: async () => {
+        throw new Error("connect ECONNREFUSED 10.0.0.5:443");
+      },
+    });
+    const res = await app.inject({ method: "POST", url: "/api/push/test" });
+    expect(res.statusCode).toBe(500);
+    expect(res.body).not.toContain("ECONNREFUSED");
+    await app.close();
   });
 });
