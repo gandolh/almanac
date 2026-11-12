@@ -4,10 +4,10 @@ import {
   dateInZone,
   parseInstant,
   searchQuerySchema,
+  searchResponseSchema,
   type Occurrence,
-  type SearchResponse,
 } from "@almanac/shared";
-import type { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
 import { currentUserId } from "../../plugins/auth/guard.js";
 import { isSeries, rowOccurrence, searchOccurrence, seriesRepeats, type EventStore } from "../events/index.js";
 import type { SettingsStore } from "../settings/index.js";
@@ -37,34 +37,38 @@ export interface SearchRoutesOptions {
  * A row whose occurrence can't be worked out is logged and left out; the
  * rest still answers, as in `GET /api/occurrences`.
  */
-export const searchRoutes: FastifyPluginAsync<SearchRoutesOptions> = async (app, { events, settings }) => {
-  app.get("/api/search", (request): SearchResponse => {
-    const userId = currentUserId(request);
-    const { q } = searchQuerySchema.parse(request.query);
-    const { timeZone } = settings.get(userId);
-    const now = Date.now();
-    const today = dateInZone(now, timeZone);
-    const repeatOf = seriesRepeats(events, userId);
-    const upcoming: Occurrence[] = [];
-    const past: Occurrence[] = [];
-    // Not ended at `now`, as `searchOccurrence` picks a series' occurrence: an all-day one by `today`.
-    const sortOut = (found: Occurrence) =>
-      (found.allDay ? found.end > today : parseInstant(found.end) > now) ? upcoming.push(found) : past.push(found);
-    for (const row of events.search(userId, q)) {
-      try {
-        if (isSeries(row)) {
-          const next = searchOccurrence(row, events.listExceptions(userId, row.id), now, today);
-          if (next) sortOut(next);
-        } else {
-          sortOut(rowOccurrence(row, row.seriesId === null ? null : repeatOf(row.seriesId)));
+export const searchRoutes: FastifyPluginAsyncZod<SearchRoutesOptions> = async (app, { events, settings }) => {
+  app.get(
+    "/api/search",
+    { schema: { querystring: searchQuerySchema, response: { 200: searchResponseSchema } } },
+    (request) => {
+      const userId = currentUserId(request);
+      const { q } = request.query;
+      const { timeZone } = settings.get(userId);
+      const now = Date.now();
+      const today = dateInZone(now, timeZone);
+      const repeatOf = seriesRepeats(events, userId);
+      const upcoming: Occurrence[] = [];
+      const past: Occurrence[] = [];
+      // Not ended at `now`, as `searchOccurrence` picks a series' occurrence: an all-day one by `today`.
+      const sortOut = (found: Occurrence) =>
+        (found.allDay ? found.end > today : parseInstant(found.end) > now) ? upcoming.push(found) : past.push(found);
+      for (const row of events.search(userId, q)) {
+        try {
+          if (isSeries(row)) {
+            const next = searchOccurrence(row, events.listExceptions(userId, row.id), now, today);
+            if (next) sortOut(next);
+          } else {
+            sortOut(rowOccurrence(row, row.seriesId === null ? null : repeatOf(row.seriesId)));
+          }
+        } catch (err) {
+          // One bad row (a rule or a length the expansion can't take) costs its own result, not the whole search.
+          request.log.error({ err, eventId: row.id }, "skipped an event search could not place");
         }
-      } catch (err) {
-        // One bad row (a rule or a length the expansion can't take) costs its own result, not the whole search.
-        request.log.error({ err, eventId: row.id }, "skipped an event search could not place");
       }
-    }
-    const byStart = compareOccurrences(timeZone);
-    const closest = [...upcoming.sort(byStart), ...past.sort((a, b) => byStart(b, a))].slice(0, SEARCH_LIMIT);
-    return { results: closest.sort(byStart) };
-  });
+      const byStart = compareOccurrences(timeZone);
+      const closest = [...upcoming.sort(byStart), ...past.sort((a, b) => byStart(b, a))].slice(0, SEARCH_LIMIT);
+      return { results: closest.sort(byStart) };
+    },
+  );
 };

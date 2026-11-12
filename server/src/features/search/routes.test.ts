@@ -32,6 +32,20 @@ async function search(q: string, inject = t.inject): Promise<Occurrence[]> {
 
 const titles = (list: Occurrence[]) => list.map((occurrence) => occurrence.title);
 
+describe("a weekly series with chosen days", () => {
+  it("is found with its byDay in week order", async () => {
+    await create({
+      title: "Gym",
+      start: "2030-01-07T16:00:00Z",
+      end: "2030-01-07T17:00:00Z",
+      repeat: { freq: "weekly", byDay: ["FR", "MO", "WE"], end: { type: "never" } },
+    });
+    const res = await t.inject({ method: "GET", url: "/api/search?q=gym" });
+    expect(res.statusCode, res.body).toBe(200);
+    expect(res.json()).toMatchObject({ results: [{ title: "Gym", repeat: { byDay: ["MO", "WE", "FR"] } }] });
+  });
+});
+
 describe("GET /api/search", () => {
   it("answers 401 without a session", async () => {
     expect((await t.app.inject({ method: "GET", url: "/api/search?q=x" })).statusCode).toBe(401);
