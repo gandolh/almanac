@@ -2,7 +2,7 @@ import { eventDeleteQuerySchema, eventInputSchema, eventPatchSchema, type Occurr
 import type { FastifyPluginAsync } from "fastify";
 import type { FeatureContext } from "../app.js";
 import { currentUserId } from "../plugins/auth/guard.js";
-import { ApiError } from "../errors.js";
+import { ApiError } from "../lib/api-error.js";
 import { createEvent, deleteEvent, updateEvent } from "../recurrence/scopes.js";
 
 interface IdParams {

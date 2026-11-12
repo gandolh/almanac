@@ -1,6 +1,6 @@
 import { formatInstant, parseInstant, type DateRange } from "@almanac/shared";
 import type { Db } from "../db/open.js";
-import { ApiError } from "../errors.js";
+import { ApiError } from "../lib/api-error.js";
 import { eventSearchText, foldSearchText } from "./search-text.js";
 
 /**

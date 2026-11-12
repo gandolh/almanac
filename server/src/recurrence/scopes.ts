@@ -17,7 +17,7 @@ import {
 } from "@almanac/shared";
 import { Temporal } from "temporal-polyfill";
 import type { Db } from "../db/open.js";
-import { ApiError } from "../errors.js";
+import { ApiError } from "../lib/api-error.js";
 import type { CalendarStore } from "../store/calendars.js";
 import type { EventContent, EventRecord, EventStore } from "../store/events.js";
 import {

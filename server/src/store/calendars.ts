@@ -8,7 +8,7 @@ import {
   type CalendarPatch,
 } from "@almanac/shared";
 import type { Db } from "../db/open.js";
-import { ApiError } from "../errors.js";
+import { ApiError } from "../lib/api-error.js";
 
 /**
  * The calendars store: the only module that runs SQL on `calendars`. Every

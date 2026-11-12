@@ -1,7 +1,7 @@
 import { allDayRange } from "@almanac/shared";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { openDb, type Db } from "../db/open.js";
-import { ApiError } from "../errors.js";
+import { ApiError } from "../lib/api-error.js";
 import { createCalendarStore } from "./calendars.js";
 import { createEventStore, type EventContent, type EventRange, type EventStore } from "./events.js";
 

@@ -3,9 +3,10 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { FastifyInstance, InjectOptions, LightMyRequestResponse } from "fastify";
-import { AUTH_ROUTE_PREFIX, SESSION_COOKIE, buildApp } from "../app.js";
+import { buildApp } from "../app.js";
 import { openAccounts, seedUser } from "../plugins/auth/accounts.js";
-import { loadConfig, type Config } from "../config.js";
+import { SESSION_COOKIE } from "../plugins/auth/index.js";
+import { AUTH_ROUTE_PREFIX, loadConfig, type Config } from "../config.js";
 import { databasePath, openDb } from "../db/open.js";
 
 /**

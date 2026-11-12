@@ -1,7 +1,7 @@
 import { generateKeyPairSync } from "node:crypto";
 import type { FastifyInstance } from "fastify";
 import { afterEach, describe, expect, it } from "vitest";
-import { PUBLIC_ROUTES, SESSION_COOKIE } from "../../app.js";
+import { PUBLIC_ROUTES, SESSION_COOKIE } from "./index.js";
 import {
   sessionCookieFrom,
   startSignedInApp,
