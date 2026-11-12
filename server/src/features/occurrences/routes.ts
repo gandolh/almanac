@@ -39,8 +39,10 @@ export const occurrenceRoutes: FastifyPluginAsyncZod<OccurrenceRoutesOptions> = 
     { schema: { querystring: occurrenceQuerySchema, response: { 200: occurrenceListSchema } } },
     (request) => {
       const userId = currentUserId(request);
-      const from = parseInstant(request.query.from);
-      const to = parseInstant(request.query.to);
+      // The query is validated: two ISO instants, `to` after `from`.
+      const { from: fromInstant, to: toInstant } = request.query;
+      const from = parseInstant(fromInstant);
+      const to = parseInstant(toInstant);
       const { timeZone } = settings.get(userId);
       const range = { from, to, dates: allDayRange(from, to, timeZone) };
 
