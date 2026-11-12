@@ -1,6 +1,8 @@
-import { settingsSchema } from "@almanac/shared";
+import { settingsSchema, type Settings } from "@almanac/shared";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { featureApp } from "../../testing/featureApp.js";
 import { startSignedInApp, type SignedInTestApp } from "../../testing/testApp.js";
+import { settingsRoutes } from "./routes.js";
 
 let t: SignedInTestApp;
 
@@ -48,5 +50,43 @@ describe("/api/settings", () => {
       expect(res.json<{ error: { code: string; message: string } }>().error).toMatchObject({ code: "validation" });
     }
     expect((await t.inject({ method: "GET", url: "/api/settings" })).json()).toEqual({ timeZone: "Europe/Bucharest" });
+  });
+});
+
+describe("the reply schema", () => {
+  const app = async (row: unknown) =>
+    featureApp(settingsRoutes, {
+      settings: { get: () => row as Settings, set: () => row as Settings },
+    });
+
+  it("strips a field the schema doesn't name", async () => {
+    const bare = await app({ timeZone: "Europe/Bucharest", internal: "secret" });
+    const res = await bare.inject({ method: "GET", url: "/api/settings" });
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toBe('{"timeZone":"Europe/Bucharest"}');
+    await bare.close();
+  });
+
+  it("answers 500 with the fixed message, and no detail, for a reply that fails it", async () => {
+    const bare = await app({ timeZone: 3 });
+    const res = await bare.inject({ method: "GET", url: "/api/settings" });
+    expect(res.statusCode).toBe(500);
+    expect(res.json()).toEqual({ error: { code: "internal", message: "Something went wrong on the server." } });
+    await bare.close();
+  });
+
+  it("keeps a thrown message out of the reply", async () => {
+    const bare = await featureApp(settingsRoutes, {
+      settings: {
+        get: () => {
+          throw new Error("no such table: user_settings");
+        },
+        set: () => ({ timeZone: "UTC" }),
+      },
+    });
+    const res = await bare.inject({ method: "GET", url: "/api/settings" });
+    expect(res.statusCode).toBe(500);
+    expect(res.body).not.toContain("user_settings");
+    await bare.close();
   });
 });

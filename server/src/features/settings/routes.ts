@@ -1,5 +1,5 @@
-import { settingsPatchSchema, type Settings } from "@almanac/shared";
-import type { FastifyPluginAsync } from "fastify";
+import { settingsPatchSchema, settingsSchema } from "@almanac/shared";
+import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
 import { currentUserId } from "../../plugins/auth/guard.js";
 import type { SettingsStore } from "./store.js";
 
@@ -9,11 +9,17 @@ export interface SettingsRoutesOptions {
 }
 
 /** The settings routes: the signed-in user's display time zone. Both answer the settings. */
-export const settingsRoutes: FastifyPluginAsync<SettingsRoutesOptions> = async (app, { settings }) => {
-  app.get("/api/settings", (request): Settings => settings.get(currentUserId(request)));
+export const settingsRoutes: FastifyPluginAsyncZod<SettingsRoutesOptions> = async (app, { settings }) => {
+  app.get("/api/settings", { schema: { response: { 200: settingsSchema } } }, (request) =>
+    settings.get(currentUserId(request)),
+  );
 
-  app.patch("/api/settings", (request): Settings => {
-    const userId = currentUserId(request);
-    return settings.set(userId, settingsPatchSchema.parse(request.body));
-  });
+  app.patch(
+    "/api/settings",
+    { schema: { body: settingsPatchSchema, response: { 200: settingsSchema } } },
+    (request) => {
+      const userId = currentUserId(request);
+      return settings.set(userId, request.body);
+    },
+  );
 };
