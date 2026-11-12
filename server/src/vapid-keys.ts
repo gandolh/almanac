@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import webpush from "web-push";
-import { envValue, withVapidLines } from "./push/env-file.js";
+import { envValue, withVapidLines } from "./lib/env-file.js";
 
 /**
  * Makes the server's Web Push key pair and writes it into the repo's

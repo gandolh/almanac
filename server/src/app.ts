@@ -5,19 +5,20 @@ import { databasePath, openDb, type Db } from "./db/open.js";
 import { auth } from "./plugins/auth/index.js";
 import { errors } from "./plugins/errors.js";
 import { jsonBodyParser } from "./plugins/json-body.js";
-import { calendarRoutes } from "./routes/calendars.js";
-import { eventRoutes } from "./routes/events.js";
-import { createPushService, type PushService } from "./push/push.js";
-import { occurrenceRoutes } from "./routes/occurrences.js";
-import { pushRoutes } from "./routes/push.js";
-import { createReminders, startReminderTimer } from "./reminders/timer.js";
-import { createSentLog } from "./reminders/sent-log.js";
-import { searchRoutes } from "./routes/search.js";
-import { settingsRoutes } from "./routes/settings.js";
-import { createCalendarStore, type CalendarStore } from "./store/calendars.js";
-import { createEventStore, type EventStore } from "./store/events.js";
-import { createPushSubscriptionStore, type PushSubscriptionStore } from "./store/push-subscriptions.js";
-import { createSettingsStore, type SettingsStore } from "./store/settings.js";
+import { calendarRoutes, createCalendarStore, type CalendarStore } from "./features/calendars/index.js";
+import { createEventStore, eventRoutes, type EventStore } from "./features/events/index.js";
+import { healthRoutes } from "./features/health/index.js";
+import { occurrenceRoutes } from "./features/occurrences/index.js";
+import {
+  createPushService,
+  createPushSubscriptionStore,
+  pushRoutes,
+  type PushService,
+  type PushSubscriptionStore,
+} from "./features/push/index.js";
+import { startReminders } from "./features/reminders/index.js";
+import { searchRoutes } from "./features/search/index.js";
+import { createSettingsStore, settingsRoutes, type SettingsStore } from "./features/settings/index.js";
 
 /** What every feature is handed. Add a field only when more than one feature needs it. */
 export interface FeatureContext {
@@ -50,6 +51,7 @@ export type Feature = (app: FastifyInstance, ctx: FeatureContext) => PromiseLike
  * feature adds its entry here and nowhere else in this file.
  */
 const FEATURES: Feature[] = [
+  (app) => app.register(healthRoutes),
   (app, ctx) => app.register(calendarRoutes, ctx),
   (app, ctx) => app.register(eventRoutes, ctx),
   (app, ctx) => app.register(occurrenceRoutes, ctx),
@@ -57,31 +59,6 @@ const FEATURES: Feature[] = [
   (app, ctx) => app.register(settingsRoutes, ctx),
   (app, ctx) => app.register(pushRoutes, ctx),
 ];
-
-/**
- * Due reminders, once a minute, while push is on and
- * `REMINDER_TIMER` isn't `off`. Stopped on close: the hook is added after the
- * one that closes the database, and Fastify runs a closing app's hooks last
- * added first, so a running tick finishes before the database goes.
- */
-function startReminders(app: FastifyInstance, ctx: FeatureContext): void {
-  if (ctx.push === undefined) return;
-  if (!ctx.config.reminderTimer) {
-    app.log.info("REMINDER_TIMER is off: this process sends no reminders.");
-    return;
-  }
-  const reminders = createReminders({
-    events: ctx.events,
-    settings: ctx.settings,
-    subscriptions: ctx.pushSubscriptions,
-    sentLog: createSentLog(ctx.db),
-    push: ctx.push,
-    webBase: ctx.config.webBase,
-    log: app.log,
-  });
-  const timer = startReminderTimer(reminders, app.log);
-  app.addHook("onClose", () => timer.stop());
-}
 
 /** Fastify's options that belong to the process. `server.ts` sets them; a test leaves them out. */
 export type ServerOptions = Pick<
@@ -117,8 +94,6 @@ export async function buildApp(config: Config, options: BuildAppOptions = {}): P
   // Accounts and the guard: `wardAuth`'s `onRequest` hook refuses every route set up after it
   // without a session, so this goes before every feature.
   await app.register(auth, { config, db });
-
-  app.get("/api/health", async () => ({ status: "ok" }));
 
   const pushSubscriptions = createPushSubscriptionStore(db);
   if (config.push === undefined) app.log.info("VAPID_* are not set: push notifications are off.");
