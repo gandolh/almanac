@@ -21,7 +21,7 @@ TypeScript strict, Vitest, ESLint:
   health, calendars, events, occurrences, search, settings, push and
   reminders (each with its store, the only module that runs SQL, apart from
   the vendored auth library), and `lib/` holds the pure helpers. Occurrence
-  expansion is `features/events/expand.ts` with rrule-temporal
+  expansion is `server/src/features/events/expand.ts` with rrule-temporal
   ([recurrence.md](recurrence.md)). The `/api/*` routes declare their zod
   schemas through `@fastify/type-provider-zod`. The Ward auth library is
   vendored the way Shelfmark does it (`shelfmark/server/vendor/ward`).

@@ -69,7 +69,7 @@ The choices are `TIMED_REMINDERS` and `ALL_DAY_REMINDERS` in
 list is a 400 naming the choices.
 
 - **Switching kind.** A patch that turns an event all-day or timed without a
-  `reminderMinutes` sets it to none (`apply` in `features/events/service.ts`); one
+  `reminderMinutes` sets it to none (`apply` in `server/src/features/events/service.ts`); one
   that gives a reminder has it checked against the new kind. The form's All
   day box and a drag between the all-day row and the time grid reset it too.
 - **Edit scopes** treat it like the title: "all" changes the series and every
