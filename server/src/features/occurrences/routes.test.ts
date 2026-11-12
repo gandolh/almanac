@@ -51,6 +51,37 @@ function insertRow(event: NewEvent): void {
 /** 16 October 2026 in Bucharest (UTC+3), midnight to midnight. */
 const DAY = ["2026-10-16T00:00:00+03:00", "2026-10-17T00:00:00+03:00"] as const;
 
+describe("a weekly series with chosen days", () => {
+  it("is answered with its byDay in week order, as a series occurrence and as its exception", async () => {
+    const repeat = { freq: "weekly", byDay: ["FR", "MO", "WE"], end: { type: "never" } };
+    const gym = await create({ ...timed("Gym", "2026-10-12T16:00:00+03:00", "2026-10-12T17:00:00+03:00"), repeat });
+    const week = ["2026-10-12T00:00:00+03:00", "2026-10-19T00:00:00+03:00"] as const;
+    const before = await t.inject({
+      method: "GET",
+      url: `/api/occurrences?from=${encodeURIComponent(week[0])}&to=${encodeURIComponent(week[1])}`,
+    });
+    expect(before.statusCode, before.body).toBe(200);
+    const listed = occurrenceListSchema.parse(before.json()).occurrences;
+    expect(listed.map((o) => o.repeat?.byDay)).toEqual([
+      ["MO", "WE", "FR"],
+      ["MO", "WE", "FR"],
+      ["MO", "WE", "FR"],
+    ]);
+
+    await t.inject({
+      method: "PATCH",
+      url: `/api/events/${gym.eventId}`,
+      payload: { scope: "this", occurrence: "2026-10-14T13:00:00Z", changes: { title: "Gym moved" } },
+    });
+    const after = await t.inject({
+      method: "GET",
+      url: `/api/occurrences?from=${encodeURIComponent(week[0])}&to=${encodeURIComponent(week[1])}`,
+    });
+    expect(after.statusCode, after.body).toBe(200);
+    expect(occurrenceListSchema.parse(after.json()).occurrences.map((o) => o.title)).toContain("Gym moved");
+  });
+});
+
 describe("GET /api/occurrences", () => {
   it("answers 401 without a session", async () => {
     const res = await t.app.inject({ method: "GET", url: `/api/occurrences?from=${DAY[0]}&to=${DAY[1]}` });
