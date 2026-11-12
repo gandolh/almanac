@@ -10,7 +10,7 @@ const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
 /** The data folder when `DATA_DIR` is unset. */
 const DEFAULT_DATA_DIR = "./data";
 
-/** Where the auth plugin's routes will sit as Fastify sees them (`app.ts`); the browser reaches them under the API prefix. */
+/** Where the auth plugin's routes will sit as Fastify sees them (`plugins/auth/index.ts`); the browser reaches them under the API prefix. */
 export const AUTH_ROUTE_PREFIX = "/auth";
 
 /** The Ward callback, under the API prefix: `WARD_OIDC_REDIRECT_URI` is the origin, the prefix, then this. */

@@ -61,6 +61,6 @@ happens to existing exceptions, are in
 - [corpus/wiki/decisions.md](../corpus/wiki/decisions.md): what was decided
   and what was rejected
 - Code: [shared/src/repeat.ts](../shared/src/repeat.ts),
-  [server/src/recurrence/](../server/src/recurrence/),
-  [server/src/routes/](../server/src/routes/),
+  [server/src/features/events/](../server/src/features/events/),
+  [server/src/features/](../server/src/features/),
   [web/src/calendar/](../web/src/calendar/)

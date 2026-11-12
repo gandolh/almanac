@@ -26,9 +26,9 @@ export const PUBLIC_ROUTES: readonly string[] = ["GET /api/health"];
  * which also lets in anyone the owner grants Almanac in Ward, as a new user
  * with an empty calendar. There is no sign-up route (no `registration`).
  * Its `onRequest` hook refuses every other route without a live session
- * (`401 { error: "unauthorized" }`); `auth/guard.ts` then refuses a write
+ * (`401 { error: "unauthorized" }`); `plugins/auth/guard.ts` then refuses a write
  * from another origin. Both are root hooks, so this feature goes first. A
- * route reads who is asking with `currentUserId(request)` (`auth/guard.ts`).
+ * route reads who is asking with `currentUserId(request)` (`plugins/auth/guard.ts`).
  */
 const signIn: FastifyPluginAsync<AuthOptions> = async (app, { config, db }) => {
   const accounts = openAccounts(db);

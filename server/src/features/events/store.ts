@@ -10,7 +10,7 @@ import { eventSearchText, foldSearchText } from "./search-text.js";
  *
  * It stores one-off events, series (a row with `rrule`) and exceptions (a row
  * with `seriesId` and `originalStart`), but knows nothing about repeating:
- * expanding and the edit scopes are `recurrence/`, built on the
+ * expanding (`expand.ts`) and the edit scopes (`service.ts`) sit beside it, built on the
  * low-level writes at the end of the interface. Inputs are already validated
  * (`eventInputSchema`); the store sets `search_text` and the times on every
  * write.
@@ -40,7 +40,7 @@ export interface EventStore {
   /** Every row whose title, location or notes contain `query`, case and diacritics folded (`foldSearchText`), by id. */
   search(userId: string, query: string): EventRecord[];
 
-  // Low-level writes for the edit scopes (`recurrence/scopes.ts`). Each is one statement; the caller holds the transaction.
+  // Low-level writes for the edit scopes (`features/events/service.ts`). Each is one statement; the caller holds the transaction.
 
   /** Replaces a series' excluded occurrence keys (stored de-duplicated, sorted). `undefined` when there is no such event. */
   setExdates(userId: string, id: number, exdates: readonly string[]): EventRecord | undefined;

@@ -21,7 +21,7 @@ export interface SearchRoutesOptions {
 /**
  * `GET /api/search?q`: up to `SEARCH_LIMIT` of the user's events whose
  * title, location or notes contain `q`, case and diacritics folded
- * (`store/search-text.ts`), by start in their display time zone. The store
+ * (`features/events/search-text.ts`), by start in their display time zone. The store
  * answers every matching row and the order is settled here, because an
  * all-day row's place among timed ones depends on the zone.
  *

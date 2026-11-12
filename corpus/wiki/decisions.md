@@ -1,6 +1,6 @@
 ---
-summary: Locked calls for Almanac, each with date, rejected alternatives and reason. React + Fastify + SQLite on Shelfmark's layout; FullCalendar v7 for day, week and month with a year view of our own; several users, each with a private calendar and no sign-up; named calendars; Base UI under the dialogs, popovers and menus, styled with Tailwind; common repeats with three edit scopes, expanded on the server; no import; one reminder per event by Web Push (since 2026-10-27, none in v1); one display time zone per user, Bucharest by default; phone browser without offline; deployed on the VPS; Google Calendar's layout, with a Light / Dark / System switch, light on a first visit; the house style, formatted and checked (Prettier at 120, vendored configs, one gate).
-updated: 2026-11-11
+summary: Locked calls for Almanac, each with date, rejected alternatives and reason. React + Fastify + SQLite on Shelfmark's layout; FullCalendar v7 for day, week and month with a year view of our own; several users, each with a private calendar and no sign-up; named calendars; Base UI under the dialogs, popovers and menus, styled with Tailwind; common repeats with three edit scopes, expanded on the server; no import; one reminder per event by Web Push (since 2026-10-27, none in v1); one display time zone per user, Bucharest by default; phone browser without offline; deployed on the VPS; Google Calendar's layout, with a Light / Dark / System switch, light on a first visit; the house style, formatted and checked (Prettier at 120, vendored configs, one gate); the server grouped by feature, a schema on every route, the error body unchanged.
+updated: 2026-11-12
 ---
 
 # Decisions
@@ -15,6 +15,12 @@ auth library and the deploy pattern come from Shelfmark (`shelfmark`):
 `shared`, `server` and `web` npm workspaces, better-sqlite3, Vite. Rejected:
 Postgres, which none of the estate's small apps run, and a new layout, which
 would throw away a working auth and deploy setup.
+
+_2026-11-12_, revisited. The three workspaces, better-sqlite3, Vite and the
+vendored auth library are unchanged. The server no longer splits by layer
+(`server/src/routes/`, `server/src/store/`) as Shelfmark's does: it is grouped
+by feature (entry below), by the owner's call of 2026-11-09. The choice
+itself isn't reopened.
 
 ## FullCalendar v7 draws day, week and month; the year view is our own
 _2026-10-16_. FullCalendar v7 (MIT) is the only maintained React library with
@@ -160,8 +166,37 @@ that file before `tsc -b server`. Rejected: width 130, which churns the least
 (333 lines against 502) but gives the estate two widths; a git or tarball
 dependency, which needs `git` in the Docker `deps` stage; and committing
 hooks to `.claude/settings.json`, since the plugin carries them. Two rules
-start softer: `n/no-process-env` and dependency-cruiser's `no-circular` are
-warnings until the server takes its settings from `config.ts` and each
-feature has its own options type. The two convention checkers run
-`--warn-only` until the Base UI and Tailwind work and the server layout work
-land.
+started softer: `n/no-process-env` and dependency-cruiser's `no-circular` were
+warnings until the server took its settings from `config.ts` and each feature
+had its own options type (both are errors since 2026-11-12), and the two
+convention checkers ran `--warn-only` until the Base UI, Tailwind and server
+layout work landed (both strict since 2026-11-12).
+
+## The server in the house code structure
+_2026-11-12_, the owner's call of 2026-11-09, grilled 2026-11-10; the
+`code-structure` skill. `server/src/` has `server.ts` (the only file that
+listens: settings, `buildApp`, `close-with-grace`, then `listen`), `app.ts`
+(`buildApp(config, options)`, which never listens), `config.ts` (the only
+reader of the environment, and of the `.env` file and the data folder),
+`plugins/` (errors, the JSON body, sign-in: each wrapped in `fastify-plugin`,
+registered in that order, errors first), `features/<name>/` (health,
+calendars, events, occurrences, search, settings, push, reminders: each with an
+`index.ts`, its own options type, its routes and its store, and used by others
+through the index only), `lib/` (the `ApiError` class, `idParamsSchema`, the
+env-file helper; no Fastify import) and `db/`. Every route declares its
+params, querystring and body, and a `response` for each status it sends,
+through `@fastify/type-provider-zod`: a field a schema doesn't name never
+leaves the server. The error body stays `{ error: { code, message } }`, which
+`web/src/api.ts` parses; a reply that fails its schema is a 500 `internal`
+with a fixed message, logged with the method and URL. `occurrenceSchema`
+uses `storedRepeatSchema` (no `.transform()`), because zod throws when it
+encodes through one; the input schemas keep the sorting `repeatSchema`.
+`check-structure` and every dependency-cruiser rule are strict. The process
+sets `trustProxy` (loopback plus `AUTH_TRUSTED_PROXIES`), `connectionTimeout`
+10 s, `requestTimeout` 30 s and `keepAliveTimeout` 125 s (above Caddy's
+two-minute idle keep-alive); these are defaults, still open for the owner.
+Rejected: Shelfmark's layer split (a feature's change should stay in one
+folder), `@fastify/autoload` (the registration order is the architecture, and
+a feature registered by name is found with grep), and TypeBox (the shared
+schemas are zod and the web imports them). The before-and-after JSON comparison is in
+[log.md](../log.md).

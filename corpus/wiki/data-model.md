@@ -1,6 +1,6 @@
 ---
 summary: The SQLite schema as shipped on 2026-10-16, with the push subscriptions, reminder column and sent log added on 2026-10-27. Calendars, events (one-offs, series and exceptions in one table, timed as UTC ms or all-day as dates, the tzid that anchors repeats, exdates as JSON, reminder_minutes) and user settings; push_subscriptions; reminders_sent; the CHECKs and indexes; the wire format for instants, dates and occurrence keys; why there is no CHECK on colour or reminder; and how every row is scoped to a user.
-updated: 2026-11-01
+updated: 2026-11-12
 ---
 
 # Data model
@@ -46,7 +46,7 @@ day). The allowed reminders are checked by zod only (`TIMED_REMINDERS`,
 `ALL_DAY_REMINDERS`), as colours are. An exception carries its own reminder,
 like its title. Deleting a series cascades to its exceptions. Deleting a
 calendar first keeps the rest consistent (`removeCalendar` in
-`server/src/recurrence/scopes.ts`): an exception in another calendar whose
+`server/src/features/events/service.ts`): an exception in another calendar whose
 series goes becomes a one-off, an exception that goes adds its key to its
 series' `exdates` elsewhere, and a series left with no occurrence goes too.
 

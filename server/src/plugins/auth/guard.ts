@@ -5,7 +5,7 @@ import { ApiError } from "../../lib/api-error.js";
 import { sendError } from "../errors.js";
 
 /**
- * Almanac's half of the guard. The vendored `wardAuth` plugin (`app.ts`,
+ * Almanac's half of the guard. The vendored `wardAuth` plugin (`plugins/auth/index.ts`,
  * registered before any route) is the other half: one root `onRequest` hook
  * that answers `401 { error: "unauthorized" }` to every route without a live
  * session except `GET /api/health`, judged by route pattern, and its own

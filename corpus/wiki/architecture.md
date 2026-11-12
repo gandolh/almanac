@@ -1,6 +1,6 @@
 ---
 summary: How Almanac is put together, built on 2026-10-16. Shelfmark's three workspaces (shared, server, web), what each owns, the API routes, request paths behind Caddy, dev and production ports (API 8809, Vite 5177, VPS 8797), time zones on both sides, where data lives, where the reminder timer runs, and secrets.
-updated: 2026-11-11
+updated: 2026-11-12
 ---
 
 # Architecture
@@ -14,11 +14,17 @@ TypeScript strict, Vitest, ESLint:
 
 - `shared`: zod schemas for every route, the repeat presets and their RRULEs,
   date helpers both sides use.
-- `server`: Fastify + better-sqlite3. The store (the only module that runs
-  SQL, apart from the vendored auth library), occurrence expansion with
-  rrule-temporal ([recurrence.md](recurrence.md)), search, and the `/api/*`
-  and `/auth/*` routes. The Ward auth library is vendored the way Shelfmark
-  does it (`shelfmark/server/vendor/ward`).
+- `server`: Fastify + better-sqlite3, grouped by feature
+  ([decisions.md](decisions.md), "The server in the house code structure"):
+  `server.ts` listens, `app.ts` builds, `config.ts` reads the environment,
+  `plugins/` holds errors, the JSON body and sign-in, `features/<name>/` holds
+  health, calendars, events, occurrences, search, settings, push and
+  reminders (each with its store, the only module that runs SQL, apart from
+  the vendored auth library), and `lib/` holds the pure helpers. Occurrence
+  expansion is `features/events/expand.ts` with rrule-temporal
+  ([recurrence.md](recurrence.md)). The `/api/*` routes declare their zod
+  schemas through `@fastify/type-provider-zod`. The Ward auth library is
+  vendored the way Shelfmark does it (`shelfmark/server/vendor/ward`).
 - `web`: Vite + React. FullCalendar v7 (`daygrid`, `timegrid`, `interaction`)
   for day, week and month; our own year view; Tailwind 4 (one stylesheet,
   the tokens in `@theme`, utilities on the markup), with a Light / Dark /
@@ -41,7 +47,7 @@ TypeScript strict, Vitest, ESLint:
 Every query is scoped to the signed-in user. Every route but `GET
 /api/health` needs a session: the Ward plugin's root `onRequest` hook answers
 `401 unauthorized` first, so an unknown path without a session is a 401, not
-a 404. `server/src/auth/guard.ts` adds a 403 for a write sent from another
+a 404. `server/src/plugins/auth/guard.ts` adds a 403 for a write sent from another
 origin (the `SameSite=Lax` cookie would still ride along from a sibling
 subdomain), and routes read the user with `currentUserId(request)`.
 
@@ -86,7 +92,7 @@ re-includes that folder with `!web/src/data/`.
 ## Reminders
 
 Since 2026-10-27 a tick a minute inside the API process sends due reminders
-(`server/src/reminders/`), started by `buildApp` while push is on and
+(`server/src/features/reminders/`), started by `buildApp` while push is on and
 `REMINDER_TIMER` isn't `off`. One process sends; a second on the same database
 sets `REMINDER_TIMER=off`. How it works: [notifications.md](notifications.md).
 

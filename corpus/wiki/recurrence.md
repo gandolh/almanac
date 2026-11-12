@@ -1,11 +1,11 @@
 ---
 summary: How repeating events work in Almanac, as built on 2026-10-16. The repeat presets, storing a series as one row with an RRULE plus exception rows, expanding occurrences on the server with rrule-temporal in the zone each series was created in, and what each edit scope (this, this and following, all) does to the stored rows.
-updated: 2026-11-01
+updated: 2026-11-12
 ---
 
 # Recurrence
 
-Built on 2026-10-16 (`shared/src/repeat.ts`, `server/src/recurrence/`). The
+Built on 2026-10-16 (`shared/src/repeat.ts`, `server/src/features/events/`). The
 decision is in [decisions.md](decisions.md); the words are in [glossary.md](glossary.md). This is the RFC 5545 model that Google's API
 and ilamy-calendar also use ([research.md](research.md)).
 

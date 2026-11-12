@@ -26,7 +26,7 @@ export interface EventRoutesOptions {
 
 /**
  * The event writes, each scoped to the signed-in user and run as one
- * transaction by `recurrence/scopes.ts`, which says what each edit scope
+ * transaction by `service.ts`, which says what each edit scope
  * does. The calendar must be the user's (404 otherwise, as for an event).
  * New rows take `tzid` from the user's display time zone, and so does a
  * one-off that becomes a series; a series keeps its own.

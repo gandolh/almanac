@@ -1,6 +1,6 @@
 ---
 summary: How Almanac's phone notifications work end to end, built 2026-10-27. The VAPID config and the push routes, why a push goes out at high urgency with a one-hour TTL, the push-only service worker and what a tap opens, the Notifications dialog's states, the reminder field and how kind switches and edit scopes treat it, how a due time is worked out (all-day ones on the wall clock), the minute tick's window, claim-before-send, the message text, and what has not been tried on a real phone.
-updated: 2026-11-01
+updated: 2026-11-12
 ---
 
 # Notifications
@@ -29,7 +29,7 @@ it disagree.
   204, so a browser can always drop its subscription (the owner's call,
   2026-10-27).
 - **Sending.** `PushService.sendToUser(userId, payload)` in
-  `server/src/push/push.ts` sends to each of the user's subscriptions, deletes
+  `server/src/features/push/service.ts` sends to each of the user's subscriptions, deletes
   any the push service answers 404 or 410 for, and never throws. `sender.ts`
   is Satchel's with **urgency high and a one-hour TTL** instead of normal and
   24 hours: a phone saving battery holds back a normal push, and a reminder
@@ -69,7 +69,7 @@ The choices are `TIMED_REMINDERS` and `ALL_DAY_REMINDERS` in
 list is a 400 naming the choices.
 
 - **Switching kind.** A patch that turns an event all-day or timed without a
-  `reminderMinutes` sets it to none (`apply` in `recurrence/scopes.ts`); one
+  `reminderMinutes` sets it to none (`apply` in `features/events/service.ts`); one
   that gives a reminder has it checked against the new kind. The form's All
   day box and a drag between the all-day row and the time grid reset it too.
 - **Edit scopes** treat it like the title: "all" changes the series and every
@@ -82,7 +82,7 @@ list is a 400 naming the choices.
 
 ## Sending due reminders
 
-`server/src/reminders/`: `due.ts` (`dueAt`, `findDue`), `message.ts`,
+`server/src/features/reminders/`: `due.ts` (`dueAt`, `findDue`), `message.ts`,
 `sent-log.ts` (`reminders_sent`) and `timer.ts` (`createReminders`,
 `startReminderTimer`).
 
