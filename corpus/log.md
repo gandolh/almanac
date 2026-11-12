@@ -377,3 +377,57 @@ Theme… row in the account menu, the hover state a tap no longer leaves, and tw
 pixels under a link. Built, main CSS 45.28 kB (8.61 gzip) to 57.29 kB (11.31
 gzip), the calendar's CSS 20.59 kB (4.52 gzip) to 19.34 kB (4.14 gzip), main JS
 666.39 kB (214.20 gzip) to 717.71 kB (230.70 gzip).
+
+## [2026-11-12] build | Brief 04: the server in the house code structure
+
+Built on `main`, one commit per step. `server/src/` is now `server.ts` (the
+only file that listens: `close-with-grace`, `connectionTimeout` 10 s,
+`requestTimeout` 30 s, `keepAliveTimeout` 125 s, `trustProxy` loopback plus
+`AUTH_TRUSTED_PROXIES`), `app.ts`, `config.ts` (the only reader of the
+environment, now also of `.env`, the data folder and the seed settings),
+`plugins/` (errors, the JSON body and sign-in, `fastify-plugin` wrapped,
+registered in that order), `features/` (health, calendars, events,
+occurrences, search, settings, push, reminders; each with an `index.ts` and
+its own options type) and `lib/` (`ApiError`, `idParamsSchema`, the env-file
+helper). The 16 routes declare their params, querystring, body and response
+through `@fastify/type-provider-zod` 1.0.3 (with its peers `@fastify/swagger`
+9.9.3 and `openapi-types` 12.1.3, `fastify-plugin` 6.0.1 and `close-with-grace`
+2.5.0); Fastify stays on 5.12.7. zod moved 4.5.4 to 4.6.7 (the root override
+too), one copy in the lockfile. `shared/` gained `storedRepeatSchema`, which
+`occurrenceSchema` now uses; the input schemas are unchanged.
+`check-structure`: before 31 errors and 4 warnings (rule-1 1, rule-3 4,
+rule-6 26, rule-11 4), after 0 errors and 4 warnings (rule-11 4: three web
+files and `features/events/service.ts`, 610 lines, left as the brief says); it
+runs strict, and no `conventions.json` exception was needed. dependency-cruiser
+has no override (no `no-circular` warning, 7 cycles before, none now);
+`n/no-process-env` is an error. A deliberate import of
+`features/events/store.js` from `features/search/` fails it.
+
+The before-and-after JSON comparison: 70 replies captured through the built app
+on a scratch database (every route, success and error, a weekly series with
+chosen days created, edited with each scope, listed and searched, push on and
+off), compared byte for byte, status, content type and length. 64 are
+identical. **No field was dropped.** Six differ in one message: a request with
+no body (nothing, or `Content-Type: application/json` with an empty body) to
+a route that takes one used to answer "Invalid input: expected object,
+received undefined" and now answers "...received null", because the provider
+turns a missing body into `null`. `web/src/api.ts` never sends a bodyless
+request to those routes. Two orderings also changed, on requests the web
+doesn't make: a bad body on a missing or non-numeric id (`PATCH
+/api/calendars/:id`, `PATCH /api/events/:id`) is now a 400 rather than a 404,
+and a bad body on `PUT /api/push/subscriptions` with push off is a 400 rather
+than a 404 (validation runs before the handler). New tests: the weekly
+`byDay` round trip on `POST` and `PATCH /api/events`, `GET /api/occurrences`
+and `GET /api/search`; a stripped field and a 500 `internal` with the fixed
+message, and a thrown message kept out of the reply, for settings, calendars
+and push (through `featureApp` on a faked store, and once on the real database
+with a colour outside the palette); the health test; the shared schema's
+encode test. 796 tests became 817.
+
+The sign-in code moved in commit `ceb06ab` (moves and import paths only) and its
+plugin wrapper in `0e66d87`; `server/vendor/` is untouched.
+`docker build` was not run (local Docker gives an I/O error on builds). In its
+place the built `server/dist/server.js` ran from a scratch folder with every
+setting pinned: health 200, a signed-out request 401, SIGTERM exit 0 read from
+the node PID. `npm run build` writes `server/dist/server.js`; the Dockerfile's
+`CMD` names it.

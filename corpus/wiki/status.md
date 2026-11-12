@@ -1,13 +1,13 @@
 ---
-summary: Snapshot as of 2026-11-11, per area. v1 built 2026-10-16 and reviewed; Base UI under the overlays 2026-10-23; phone notifications (push worker, a reminder on each event, the minute sender) 2026-10-27; the estate's conventions (house style, Base UI rules, Tailwind, the server structure) filed as briefs 01-04 on 2026-11-09, the house style and its harness (brief 01) built 2026-11-11, Base UI by the conventions (brief 02) and the whole web app on Tailwind with a Light / Dark / System switch (brief 03) built 2026-11-11. Pushed to GitHub through 2026-11-01, nothing deployed, no phone has shown a notification. What waits on the owner, open bugs, accepted known issues, and the todos.
-updated: 2026-11-11
+summary: Snapshot as of 2026-11-12, per area. v1 built 2026-10-16 and reviewed; Base UI under the overlays 2026-10-23; phone notifications (push worker, a reminder on each event, the minute sender) 2026-10-27; the estate's conventions (house style, Base UI rules, Tailwind, the server structure) filed as briefs 01-04 on 2026-11-09, the house style and its harness (brief 01) built 2026-11-11, Base UI by the conventions (brief 02) and the whole web app on Tailwind with a Light / Dark / System switch (brief 03) built 2026-11-11, the server grouped by feature with a schema on every route (brief 04) built 2026-11-12. Pushed to GitHub through 2026-11-01, nothing deployed, no phone has shown a notification. What waits on the owner, open bugs, accepted known issues, and the todos.
+updated: 2026-11-12
 ---
 
 # Status
 
 _2026-11-09_. Everything below is on `main` and pushed to
 `https://github.com/<owner>/almanac.git` as of 2026-11-01. Nothing is
-deployed. Briefs 01-03 are built (2026-11-11) and brief 04 is open; brief numbering
+deployed. Briefs 01-04 are built (01-03 on 2026-11-11, 04 on 2026-11-12); brief numbering
 restarted at 01 on 2026-11-01 (see [log.md](../log.md)).
 
 ## By area
@@ -44,7 +44,8 @@ restarted at 01 on 2026-11-01 (see [log.md](../log.md)).
   03 (the whole web app on Tailwind 4.3.5, one stylesheet, the Light / Dark /
   System switch) are built; `check-base-ui` runs strict with two recorded
   exceptions (FullCalendar's sheet, the calendar colour). Brief 04 (the server
-  layout) is open. Base UI is pinned at 1.9.0.
+  layout) is built (2026-11-12): features/, plugins/, a schema on every route,
+  `check-structure` and dependency-cruiser strict. Base UI is pinned at 1.9.0.
 - **Sibling repos** (2026-10-27). The stale app lists in `wzd_auth` and
   `shelfmark` that the deploy work left behind were fixed; both are pushed.
 
