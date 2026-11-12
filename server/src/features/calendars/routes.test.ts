@@ -8,7 +8,9 @@ import {
 } from "@almanac/shared";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { databasePath, openDb } from "../../db/open.js";
+import { featureApp } from "../../testing/featureApp.js";
 import { startSignedInApp, type SignedInTestApp } from "../../testing/testApp.js";
+import { calendarRoutes } from "./routes.js";
 
 let t: SignedInTestApp;
 
@@ -273,5 +275,80 @@ describe("another user", () => {
     expect(theirs).toEqual([expect.objectContaining({ name: "Personal" })]);
     expect(theirs.some((calendar) => calendar.id === work.id)).toBe(false);
     expect((await list()).map((calendar) => calendar.name)).toEqual(["Personal", "Work"]);
+  });
+});
+
+describe("the reply schemas", () => {
+  const stored: Calendar = {
+    id: 1,
+    name: "Personal",
+    color: "blue",
+    visible: true,
+    position: 0,
+    createdAt: "2026-11-12T10:00:00.000Z",
+    updatedAt: "2026-11-12T10:00:00.000Z",
+  };
+
+  /** The calendar routes alone, on a store that answers with `row`. */
+  const withRow = (row: unknown) =>
+    featureApp(calendarRoutes, {
+      db: undefined as never,
+      events: undefined as never,
+      calendars: {
+        list: () => [row as Calendar],
+        get: () => row as Calendar,
+        create: () => row as Calendar,
+        update: () => row as Calendar,
+        remove: () => true,
+        ensureDefault: () => false,
+      },
+    });
+
+  it("strips a field the schema doesn't name, from the list and from one calendar", async () => {
+    const bare = await withRow({ ...stored, userId: "u-1", internal: true });
+    const list = await bare.inject({ method: "GET", url: "/api/calendars" });
+    expect(list.statusCode).toBe(200);
+    expect(list.json()).toEqual({ calendars: [stored] });
+    const one = await bare.inject({ method: "PATCH", url: "/api/calendars/1", payload: { name: "Personal" } });
+    expect(one.json()).toEqual(stored);
+    await bare.close();
+  });
+
+  it("answers 500 with the fixed message when a stored value fails the schema", async () => {
+    const bare = await withRow({ ...stored, color: "plaid" });
+    const res = await bare.inject({ method: "GET", url: "/api/calendars" });
+    expect(res.statusCode).toBe(500);
+    expect(res.json()).toEqual({ error: { code: "internal", message: "Something went wrong on the server." } });
+    await bare.close();
+  });
+
+  it("answers 500 for a stored colour that is not in the palette, through the whole app", async () => {
+    await t.inject({ method: "GET", url: "/api/calendars" });
+    const db = openDb(databasePath(t.dataDir));
+    try {
+      db.prepare("UPDATE calendars SET color = 'plaid'").run();
+    } finally {
+      db.close();
+    }
+    const res = await t.inject({ method: "GET", url: "/api/calendars" });
+    expect(res.statusCode).toBe(500);
+    expect(res.json()).toEqual({ error: { code: "internal", message: "Something went wrong on the server." } });
+  });
+
+  it("keeps a thrown message out of the reply", async () => {
+    const bare = await featureApp(calendarRoutes, {
+      db: undefined as never,
+      events: undefined as never,
+      calendars: {
+        list: () => {
+          throw new Error("SQLITE_ERROR: no such table: calendars");
+        },
+        ensureDefault: () => false,
+      } as never,
+    });
+    const res = await bare.inject({ method: "GET", url: "/api/calendars" });
+    expect(res.statusCode).toBe(500);
+    expect(res.body).not.toContain("SQLITE");
+    await bare.close();
   });
 });

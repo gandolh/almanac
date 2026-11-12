@@ -1,14 +1,12 @@
-import { calendarCreateSchema, calendarPatchSchema, type CalendarList } from "@almanac/shared";
-import type { FastifyPluginAsync } from "fastify";
+import { calendarCreateSchema, calendarListSchema, calendarPatchSchema, calendarSchema } from "@almanac/shared";
+import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
+import { z } from "zod";
 import type { Db } from "../../db/open.js";
 import { ApiError } from "../../lib/api-error.js";
+import { idParamsSchema } from "../../lib/id-params.js";
 import { currentUserId } from "../../plugins/auth/guard.js";
 import { removeCalendar, type EventStore } from "../events/index.js";
 import type { CalendarStore } from "./store.js";
-
-interface IdParams {
-  Params: { id: string };
-}
 
 const noSuchCalendar = () => new ApiError("not_found", "There is no such calendar.");
 
@@ -33,31 +31,43 @@ export interface CalendarRoutesOptions {
  * last one cannot be deleted (409 `conflict`). Deleting one takes its events,
  * and keeps the repeating events in other calendars whole (`removeCalendar`).
  */
-export const calendarRoutes: FastifyPluginAsync<CalendarRoutesOptions> = async (app, { db, calendars, events }) => {
-  app.get("/api/calendars", (request): CalendarList => {
+export const calendarRoutes: FastifyPluginAsyncZod<CalendarRoutesOptions> = async (app, { db, calendars, events }) => {
+  app.get("/api/calendars", { schema: { response: { 200: calendarListSchema } } }, (request) => {
     const userId = currentUserId(request);
     calendars.ensureDefault(userId);
     return { calendars: calendars.list(userId) };
   });
 
-  app.post("/api/calendars", (request, reply) => {
-    const userId = currentUserId(request);
-    const input = calendarCreateSchema.parse(request.body);
-    reply.code(201);
-    return calendars.create(userId, input);
-  });
+  app.post(
+    "/api/calendars",
+    { schema: { body: calendarCreateSchema, response: { 201: calendarSchema } } },
+    (request, reply) => {
+      const userId = currentUserId(request);
+      reply.code(201);
+      return calendars.create(userId, request.body);
+    },
+  );
 
-  app.patch<IdParams>("/api/calendars/:id", (request) => {
-    const userId = currentUserId(request);
-    const id = calendarId(request.params.id);
-    const calendar = calendars.update(userId, id, calendarPatchSchema.parse(request.body));
-    if (!calendar) throw noSuchCalendar();
-    return calendar;
-  });
+  app.patch(
+    "/api/calendars/:id",
+    { schema: { params: idParamsSchema, body: calendarPatchSchema, response: { 200: calendarSchema } } },
+    (request) => {
+      const userId = currentUserId(request);
+      const id = calendarId(request.params.id);
+      const calendar = calendars.update(userId, id, request.body);
+      if (!calendar) throw noSuchCalendar();
+      return calendar;
+    },
+  );
 
-  app.delete<IdParams>("/api/calendars/:id", (request, reply) => {
-    const userId = currentUserId(request);
-    if (!removeCalendar({ db, calendars, events }, userId, calendarId(request.params.id))) throw noSuchCalendar();
-    return reply.code(204).send();
-  });
+  app.delete(
+    "/api/calendars/:id",
+    { schema: { params: idParamsSchema, response: { 204: z.null() } } },
+    (request, reply) => {
+      const userId = currentUserId(request);
+      if (!removeCalendar({ db, calendars, events }, userId, calendarId(request.params.id))) throw noSuchCalendar();
+      reply.code(204);
+      return null;
+    },
+  );
 };
