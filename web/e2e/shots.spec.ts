@@ -98,7 +98,7 @@ const SHOTS: Shot[] = [
     path: "week/2026/11/11",
     steps: async (page, phone) => {
       if (phone) await OPEN.drawer(page);
-      await page.getByRole("button", { name: "Options for Work" }).click({ force: true });
+      await optionsOfWork(page);
       await page.getByRole("menu").waitFor();
     },
   },
@@ -107,7 +107,7 @@ const SHOTS: Shot[] = [
     path: "week/2026/11/11",
     steps: async (page, phone) => {
       if (phone) await OPEN.drawer(page);
-      await page.getByRole("button", { name: "Options for Work" }).click({ force: true });
+      await optionsOfWork(page);
       await page.getByRole("menuitem", { name: /^Colour/ }).click();
       await page.getByRole("dialog", { name: "Colour of Work" }).waitFor();
     },
@@ -117,7 +117,7 @@ const SHOTS: Shot[] = [
     path: "week/2026/11/11",
     steps: async (page, phone) => {
       if (phone) await OPEN.drawer(page);
-      await page.getByRole("button", { name: "Options for Work" }).click({ force: true });
+      await optionsOfWork(page);
       await page.getByRole("menuitem", { name: "Delete" }).click();
       await page.getByRole("alertdialog").waitFor();
     },
@@ -170,6 +170,12 @@ const SHOTS: Shot[] = [
     },
   },
 ];
+
+/** The ⋮ of the Work row, which shows under the pointer or the keyboard: focus the row's checkbox first. */
+async function optionsOfWork(page: Page): Promise<void> {
+  await page.getByRole("checkbox", { name: "Work" }).focus();
+  await page.getByRole("button", { name: "Options for Work" }).click();
+}
 
 /** The details' Edit: the form for Design review, which has every field. */
 async function editForm(page: Page): Promise<void> {
