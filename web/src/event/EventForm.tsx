@@ -212,8 +212,9 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
       onClose={onClose}
       title={occurrence ? "Edit event" : "New event"}
       size="large"
-      // Hung from 16 px under the top of the window, as the board draws it, not centred.
-      className="md:mt-4 md:mb-auto"
+      // Hung from 16 px under the top of the window, as the board draws it, not centred. On a phone the
+      // fields sit on a card over the page ground, between the surface title band and footer.
+      className="max-md:bg-ground md:mt-4 md:mb-auto max-md:[&>div>footer]:bg-surface max-md:[&>div>header]:border-b max-md:[&>div>header]:border-hairline max-md:[&>div>header]:bg-surface"
       // A form with typing in it: a stray press on the backdrop must not lose it.
       dismissOnBackdrop={false}
       footer={
@@ -239,7 +240,13 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
         </>
       }
     >
-      <form id={formId} ref={formRef} className="flex flex-col gap-3" onSubmit={onSubmit} noValidate>
+      <form
+        id={formId}
+        ref={formRef}
+        className="flex flex-col gap-3 max-md:-mx-2 max-md:rounded-card max-md:border max-md:border-hairline max-md:bg-surface max-md:p-4 max-md:pb-5 max-md:shadow-card"
+        onSubmit={onSubmit}
+        noValidate
+      >
         <div className="flex flex-col gap-1">
           <label className={LABEL} htmlFor={titleId}>
             Title

@@ -113,7 +113,8 @@ bottom sheet (`components/ui/Sheet.tsx`) with 48 px buttons. The event form is
 a 640 px dialog with a visible label over each field, 40 px fields, 12 px gaps,
 Reminder and Repeat on one row, Calendar and Location on the next, a scrolling
 body and a footer that stays (Delete, Cancel, Save). Save is on the first screen
-at 1280 x 800.
+at 1280 x 800. On a phone the form fills the screen: the title band and the
+footer on the surface, the fields on a card over the page ground.
 
 ## Screens the board never drew
 
