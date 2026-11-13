@@ -112,4 +112,4 @@ three lanes.
 
 ## Todos
 
-None open.
+- [Almanac's events on the phone's calendar](../todos/almanac-events-on-the-phone-calendar.md) (2026-11-13, later): a read-only feed or CalDAV, to grill at promotion.
