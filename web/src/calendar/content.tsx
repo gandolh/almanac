@@ -94,6 +94,11 @@ const TWO_LINES_FROM_MINUTES = 45;
 /** From this long the time line is the 12 px one; below it, a 45-minute block's 11 px. */
 const FULL_TIME_FROM_MINUTES = 60;
 
+/** "10:00" of "10:00 – 11:00". */
+function startOf(timeText: string): string {
+  return timeText.split(RANGE_DASH)[0] ?? timeText;
+}
+
 /** The minutes an event lasts, 30 when FullCalendar has no end. */
 function minutesOf(event: EventContentArg["event"]): number {
   if (!event.start || !event.end) return 30;
@@ -125,13 +130,14 @@ export function eventContent(info: EventContentArg) {
   if (info.event.allDay || !info.view.type.startsWith("timeGrid")) return true;
   const minutes = minutesOf(info.event);
   if (minutes >= TWO_LINES_FROM_MINUTES) {
-    return <TwoLines title={info.event.title} time={info.timeText} short={minutes < FULL_TIME_FROM_MINUTES} />;
+    const short = minutes < FULL_TIME_FROM_MINUTES;
+    return <TwoLines title={info.event.title} time={short ? startOf(info.timeText) : info.timeText} short={short} />;
   }
   return (
     <div className="flex h-full min-w-0 items-center gap-1 px-[5px] whitespace-nowrap">
       <span className="text-event leading-[18px] font-semibold">{info.event.title}</span>
       <span className="hidden font-num text-event-time leading-4 font-medium @min-[120px]/ev:inline">
-        {info.timeText.split(RANGE_DASH)[0]}
+        {startOf(info.timeText)}
       </span>
     </div>
   );
