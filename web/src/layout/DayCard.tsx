@@ -51,7 +51,7 @@ export function DayCard({ date, today }: DayCardProps) {
           className="mt-2 flex items-center justify-between gap-2 border-t border-hairline pt-2 text-small text-muted"
           role="status"
         >
-          <span>This day's events couldn't be loaded.</span>
+          <span>Your events couldn't be loaded.</span>
           <Button variant="quiet" size="compact" onClick={retry}>
             Try again
           </Button>

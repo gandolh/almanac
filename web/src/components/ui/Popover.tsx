@@ -32,7 +32,7 @@ export interface PopoverProps {
 }
 
 const POPUP_CLASS =
-  "max-h-[calc(100dvh-16px)] w-max max-w-[min(var(--width-popover),calc(100vw-16px))] overflow-auto rounded-control bg-surface text-ink shadow-float focus:outline-none motion-safe:animate-float-in";
+  "max-h-[calc(100dvh-16px)] w-max max-w-[min(var(--width-popover),calc(100vw-16px))] overflow-auto rounded-card border border-hairline bg-surface text-ink shadow-float focus:outline-none motion-safe:animate-float-in";
 
 const GAP = 8; // between the anchor and the panel
 const MARGIN = 8; // the panel never comes closer to the window's edge than this

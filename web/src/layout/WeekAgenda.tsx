@@ -117,7 +117,7 @@ export function WeekAgenda({ date, today, onNavigate }: WeekAgendaProps) {
             className="flex items-center justify-between gap-2 rounded-card border border-hairline bg-surface p-4 text-body text-ink shadow-card"
             role="status"
           >
-            <span>This week's events couldn't be loaded.</span>
+            <span>Your events couldn't be loaded.</span>
             <Button variant="quiet" size="compact" onClick={retry}>
               Try again
             </Button>

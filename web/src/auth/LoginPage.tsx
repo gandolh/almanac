@@ -141,7 +141,7 @@ export function LoginView({
               >
                 or
               </p>
-              <Button variant="secondary" pill size="large" block disabled={wardPending} onClick={onWard}>
+              <Button variant="secondary" size="large" block disabled={wardPending} onClick={onWard}>
                 {wardPending ? "Opening Ward…" : "Sign in with Ward"}
               </Button>
               {wardError !== null && (

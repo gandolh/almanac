@@ -4,9 +4,9 @@ import { CloseIcon } from "../icons";
 const VIEWPORT_CLASS =
   "pointer-events-none fixed bottom-6 left-6 z-toast flex max-w-[min(var(--container-toast),calc(100vw-48px))] max-md:right-2 max-md:bottom-[max(8px,env(safe-area-inset-bottom))] max-md:left-2 max-md:max-w-none";
 const TOAST_CLASS =
-  "pointer-events-auto flex min-h-12 [translate:var(--toast-swipe-movement-x,0)_var(--toast-swipe-movement-y,0)] items-center gap-1 rounded-small bg-toast-surface py-1.5 pr-2 pl-4 text-meta leading-tight text-toast-ink shadow-float motion-safe:animate-toast-in data-limited:hidden max-md:flex-1 [&_:focus-visible]:outline-toast-action";
+  "pointer-events-auto flex min-h-12 [translate:var(--toast-swipe-movement-x,0)_var(--toast-swipe-movement-y,0)] items-center gap-1 rounded-control bg-toast-surface py-1.5 pr-2 pl-4 text-meta leading-tight text-toast-ink shadow-float motion-safe:animate-toast-in data-limited:hidden max-md:flex-1 [&_:focus-visible]:outline-toast-action";
 const ACTION_CLASS =
-  "min-h-9 rounded-small bg-transparent px-3 text-meta font-medium text-toast-action hover:bg-toast-hover";
+  "min-h-9 rounded-small bg-transparent px-3 text-meta font-semibold text-toast-action hover:bg-toast-hover";
 const CLOSE_CLASS =
   "flex size-9 flex-none items-center justify-center rounded-pill bg-transparent p-0 text-toast-ink hover:bg-toast-hover";
 

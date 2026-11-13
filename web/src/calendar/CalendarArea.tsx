@@ -283,7 +283,7 @@ const OPTIONS: CalendarOptions = {
   // Events in month and the all-day row end in "…" when they don't fit; a timed block in day and week never
   // does (`eventContent` writes its own lines).
   eventTitleClass: "min-w-0 overflow-hidden text-ellipsis whitespace-nowrap",
-  eventTimeClass: "min-w-0 overflow-hidden text-ellipsis whitespace-nowrap",
+  eventTimeClass: "shrink-0 whitespace-nowrap",
   eventClass: (info) => (info.isMirror ? "cal-mirror shadow-raised" : undefined),
   rowEventClass: "rounded-event",
   // A timed block: solid fill, 6 px corners, holding at least one line (a 15-minute event is as tall as a half hour).

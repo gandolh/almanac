@@ -248,7 +248,7 @@ describe("an event's inside", () => {
     expect(eventContent({ ...block, isMirror: false, event: { ...standup, allDay: true }, view: week })).toBe(true);
   });
 
-  it("puts the time range on a second line from 45 minutes, in 11 px under an hour", () => {
+  it("puts the time on a second line from 45 minutes: the range from an hour, the start in 11 px under it", () => {
     const hour = markup(
       eventContent({ ...block, isMirror: false, event: timed("Design review", at(11, 0), at(12, 0)), view: week }),
     );
@@ -259,6 +259,8 @@ describe("an event's inside", () => {
       eventContent({ ...block, isMirror: false, event: timed("Groceries", at(17, 30), at(18, 15)), view: week }),
     );
     expect(short).toContain("text-[11px]");
+    expect(short).toContain(">10:00<");
+    expect(short).not.toContain("11:00");
     expect(short).not.toContain("@min-[120px]");
   });
 

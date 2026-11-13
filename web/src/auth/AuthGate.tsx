@@ -80,7 +80,7 @@ export function GateScreen({ state, onRetry }: GateScreenProps) {
         </header>
         {state === "unreachable" && (
           <div className="flex flex-wrap gap-3">
-            <Button variant="secondary" pill onClick={onRetry}>
+            <Button variant="secondary" onClick={onRetry}>
               Try again
             </Button>
           </div>

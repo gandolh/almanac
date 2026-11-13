@@ -3,7 +3,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { EventDetails, type EventDetailsProps } from "./DetailsPopover";
-import { whenText } from "./occurrence-text";
+import { whenLines, whenText } from "./occurrence-text";
 import { SCOPE_LABELS, ScopeDialog, answerOnce, scopeChoices, scopeTitle } from "./scope";
 
 // Base UI's dialog portal needs a DOM; this renders the dialog in place.
@@ -79,24 +79,54 @@ describe("whenText", () => {
   });
 });
 
+describe("whenLines", () => {
+  it("puts the date first and the time on its own line, with no middle dot", () => {
+    expect(whenLines(standup, BUCHAREST)).toEqual({ date: "Friday, 16 October", time: "10:00 – 11:00" });
+    expect(whenLines({ allDay: true, start: "2026-10-16", end: "2026-10-17" }, BUCHAREST)).toEqual({
+      date: "Friday, 16 October",
+      time: "All day",
+    });
+  });
+
+  it("keeps one line for an event that spans days", () => {
+    const spanning = { allDay: true, start: "2026-10-16", end: "2026-10-19" };
+    expect(whenLines(spanning, BUCHAREST)).toEqual({
+      date: "Friday, 16 October – Sunday, 18 October",
+      time: null,
+    });
+  });
+});
+
 describe("EventDetails", () => {
-  it("shows the reminder in words, and nothing when there is none", () => {
+  it("shows the reminder in words under its label, and nothing when there is none", () => {
     expect(details()).not.toContain("Reminder");
-    expect(details({ occurrence: { ...standup, reminderMinutes: 10 } })).toContain(">Reminder: 10 minutes before</p>");
-    expect(details({ occurrence: { ...standup, reminderMinutes: 0 } })).toContain(">Reminder: at the start</p>");
+    expect(details({ occurrence: { ...standup, reminderMinutes: 10 } })).toMatch(
+      />Reminder<\/p><p[^>]*>10 minutes before<\/p>/,
+    );
+    expect(details({ occurrence: { ...standup, reminderMinutes: 0 } })).toContain(">at the start</p>");
     const nameDay = { ...standup, allDay: true, start: "2026-10-16", end: "2026-10-17", reminderMinutes: 900 };
-    expect(details({ occurrence: nameDay })).toContain(">Reminder: the day before at 09:00</p>");
+    expect(details({ occurrence: nameDay })).toContain(">the day before at 09:00</p>");
   });
 
   it("shows the title, the time, the calendar and the actions", () => {
     const html = details();
     expect(html).toMatch(/<h2 id="title"[^>]*>Standup<\/h2>/);
-    expect(html).toContain("Friday, 16 October · 10:00 – 11:00");
+    expect(html).toMatch(/>Friday, 16 October<\/p><p[^>]*>10:00 – 11:00<\/p>/);
+    expect(html).not.toContain("·");
     expect(html).toContain('style="--calendar-color:var(--color-cal-teal)"');
     expect(html).toMatch(/<p[^>]*>Work<\/p>/);
     for (const label of ["Edit event", "Delete event", "Close"]) expect(html).toContain(`aria-label="${label}"`);
-    // Every icon at 20 px, the size the rows are laid out for.
-    expect(html.match(/<svg width="(\d+)"/g)).toEqual(Array(4).fill('<svg width="20"'));
+    // Delete and Edit are labelled buttons, Delete the danger one.
+    expect(html).toMatch(/aria-label="Delete event"[^>]*>(<svg[^>]*>.*?<\/svg>)?Delete<\/button>/);
+    expect(html).toMatch(/aria-label="Edit event"[^>]*>(<svg[^>]*>.*?<\/svg>)?Edit<\/button>/);
+    expect(html).toContain("text-danger");
+    // The close button and the calendar row's icons are 20 px, the buttons' 18.
+    expect(html.match(/<svg width="(\d+)"/g)).toEqual([
+      '<svg width="20"',
+      '<svg width="20"',
+      '<svg width="18"',
+      '<svg width="18"',
+    ]);
     expect(html).not.toContain("Weekly");
     expect(html).not.toContain("Location");
   });

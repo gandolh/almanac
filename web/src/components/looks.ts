@@ -18,9 +18,9 @@ export const ICON_BUTTON_SMALL = [
   "max-md:before:absolute max-md:before:inset-[calc((var(--size-icon-button-small)-var(--size-touch))/2)]",
 ].join(" ");
 
-/** An error or failure under a form: ink, semibold, with the drawn mark (no danger colour). */
+/** An error or failure under a form: danger-coloured, semibold, on `field`, with the drawn mark and always its words. */
 export const ERROR_NOTE =
-  "flex items-start gap-2 rounded-control bg-field px-3 py-2.5 text-meta leading-tight font-semibold text-ink";
+  "flex items-start gap-2 rounded-control bg-field px-3 py-2.5 text-meta leading-tight font-semibold text-danger";
 
 /** The words inside an `ERROR_NOTE`. */
 export const ERROR_NOTE_TEXT = "min-w-0 flex-1";
@@ -31,7 +31,7 @@ export const DIALOG = {
   // Centred by the margins: fixed, as tall as its content. Menus and popovers opened from inside share its
   // z-index and open later, so they sit above. A phone gets the whole screen.
   popup:
-    "fixed inset-0 z-float m-auto flex h-fit overflow-hidden rounded-sheet bg-surface p-0 text-ink shadow-dialog max-md:h-full max-md:w-full max-md:rounded-none max-md:shadow-none",
+    "fixed inset-0 z-float m-auto flex h-fit overflow-hidden rounded-container border border-hairline bg-surface p-0 text-ink shadow-dialog max-md:h-full max-md:w-full max-md:rounded-none max-md:border-0 max-md:shadow-none",
   small: "w-[min(var(--container-dialog-small),calc(100vw-32px))]",
   medium: "w-[min(var(--container-dialog-medium),calc(100vw-32px))]",
   large: "w-[min(var(--container-dialog-large),calc(100vw-32px))]",
@@ -41,11 +41,11 @@ export const DIALOG = {
     "max-md:max-h-none max-md:pt-[env(safe-area-inset-top)] max-md:pr-[env(safe-area-inset-right)] max-md:pl-[env(safe-area-inset-left)] max-md:motion-safe:animate-sheet-in",
   ].join(" "),
   head: "flex flex-none items-center gap-2 pt-4 pr-3 pb-2 pl-6 max-md:flex-row-reverse max-md:p-2 max-md:pr-4",
-  title: "min-w-0 flex-1 text-heading leading-tight font-regular text-ink",
+  title: "min-w-0 flex-1 text-range leading-tight font-semibold text-ink",
   body: "min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pt-2 pb-4 max-md:px-gutter-phone",
   footer: [
-    "flex flex-none items-center justify-end gap-2 px-6 pt-2 pb-5",
-    "max-md:border-t max-md:border-divider max-md:px-gutter-phone max-md:pt-3 max-md:pb-[max(12px,env(safe-area-inset-bottom))]",
+    "flex flex-none items-center justify-end gap-2 border-t border-divider px-6 pt-3.5 pb-3.5",
+    "max-md:px-gutter-phone max-md:pt-3 max-md:pb-[max(12px,env(safe-area-inset-bottom))]",
   ].join(" "),
 } as const;
 

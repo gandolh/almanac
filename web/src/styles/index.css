@@ -169,7 +169,7 @@
 
   /* Sizes */
   --size-touch: 44px; /* the smallest target on a phone */
-  --height-control: 34px; /* buttons on the desktop */
+  --height-control: 36px; /* buttons on the desktop */
   --height-control-large: 48px; /* a large primary action */
   --size-icon-button: 40px; /* round icon buttons: menu, ‹ › */
   --size-icon-button-small: 36px; /* the mini-month's ‹ ›, the calendars' + and ⋮ */
@@ -194,7 +194,7 @@
   --container-menu: 224px;
   --container-dialog-small: 400px;
   --container-dialog-medium: 560px;
-  --container-dialog-large: 720px;
+  --container-dialog-large: 640px;
   --container-toast: 568px;
   --spacing-gutter-desktop: 8px; /* the header band's ends */
   --spacing-gutter-phone: 16px;
@@ -209,7 +209,7 @@
 
   /* The event editor */
   --height-editor-field: 40px; /* a field on the desktop (a phone's is --touch) */
-  --spacing-editor-lead: 44px; /* the icon column of a form row */
+  --spacing-editor-lead: 34px; /* the icon column of a form row, and its gap */
   --width-date-field: 148px;
   --width-time-field: 88px; /* 112 px on a phone */
   --width-count-field: 72px;

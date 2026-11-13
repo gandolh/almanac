@@ -13,7 +13,7 @@ import { isApiError } from "../api";
 import { occurrencePatch } from "../calendar/events";
 import { Button } from "../components/Button";
 import { Dialog } from "../components/ui/Dialog";
-import { BellIcon, CalendarIcon, ClockIcon, NotesIcon, PlaceIcon, RepeatIcon } from "../components/icons";
+import { BellIcon, CalendarIcon, ClockIcon, DeleteIcon, NotesIcon, PlaceIcon, RepeatIcon } from "../components/icons";
 import { showToast } from "../components/ui/Toast";
 import { calendarColor, useCalendars } from "../data/calendars";
 import { createEvent, updateEvent } from "../data/occurrences";
@@ -53,7 +53,7 @@ import { RepeatPicker } from "./RepeatPicker";
 import { askScope } from "./scope";
 import { TimeField } from "./TimeField";
 import { cn } from "../lib/cn";
-import { CHECK, CHECK_BOX, ERROR, INPUT, NOTES, SELECT_CALENDAR, SELECT_WIDE, TITLE } from "./looks";
+import { CHECK, CHECK_BOX, ERROR, INPUT, LABEL, NOTES, SELECT_CALENDAR, SELECT_WIDE, TITLE } from "./looks";
 
 /**
  * The event form (glossary: event form), Google's full editor: a dialog,
@@ -110,6 +110,7 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
   const formId = useId();
   const whenErrorId = useId();
   const saveId = useId();
+  const titleId = useId();
   const deleteId = useId();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -216,7 +217,14 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
       footer={
         <>
           {occurrence && (
-            <Button id={deleteId} variant="quiet" className="me-auto" onClick={() => void remove()} disabled={busy}>
+            <Button
+              id={deleteId}
+              variant="danger"
+              className="me-auto"
+              icon={<DeleteIcon size={18} />}
+              onClick={() => void remove()}
+              disabled={busy}
+            >
               Delete
             </Button>
           )}
@@ -229,75 +237,83 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
         </>
       }
     >
-      <form id={formId} ref={formRef} className="flex flex-col gap-4" onSubmit={onSubmit} noValidate>
-        <input
-          type="text"
-          className={TITLE}
-          aria-label="Title"
-          placeholder="Add title"
-          value={draft.title}
-          maxLength={EVENT_TITLE_MAX}
-          autoComplete="off"
-          data-autofocus=""
-          onChange={(event) => setDraft((current) => ({ ...current, title: event.target.value }))}
-        />
-
-        <Row icon={<ClockIcon size={ICON} />} label="When">
-          <div className="flex flex-wrap items-center gap-2 max-md:grid max-md:grid-cols-[minmax(0,1fr)_var(--width-time-field)]">
-            <input
-              type="date"
-              className={cn(INPUT, DATE, "max-md:col-start-1 max-md:row-start-1")}
-              aria-label="Start date"
-              aria-invalid={shown.start !== undefined || undefined}
-              aria-describedby={whenError ? whenErrorId : undefined}
-              value={draft.startDate}
-              onChange={(event) => setDraft((current) => withStart(current, { startDate: event.target.value }))}
-            />
-            {!draft.allDay && (
-              <div className="max-md:col-start-2 max-md:row-start-1">
-                <TimeField
-                  label="Start time"
-                  value={draft.startTime}
-                  options={startTimeOptions}
-                  invalid={shown.start !== undefined}
-                  onChange={(startTime) => setDraft((current) => withStart(current, { startTime }))}
-                />
-              </div>
-            )}
-            <span className="text-ink-2 max-md:hidden" aria-hidden="true">
-              –
-            </span>
-            {!draft.allDay && (
-              <div className="max-md:col-start-2 max-md:row-start-2">
-                <TimeField
-                  label="End time"
-                  value={draft.endTime}
-                  options={() => endTimeOptions(draft)}
-                  invalid={shown.end !== undefined}
-                  describedBy={whenError ? whenErrorId : undefined}
-                  onChange={(endTime) => setDraft((current) => withEnd(current, { endTime }))}
-                />
-              </div>
-            )}
-            <input
-              type="date"
-              className={cn(INPUT, DATE, "max-md:col-start-1 max-md:row-start-2")}
-              aria-label="End date"
-              aria-invalid={shown.end !== undefined || undefined}
-              aria-describedby={whenError ? whenErrorId : undefined}
-              value={draft.endDate}
-              onChange={(event) => setDraft((current) => withEnd(current, { endDate: event.target.value }))}
-            />
-          </div>
-          <label className={CHECK}>
-            <input
-              type="checkbox"
-              className={CHECK_BOX}
-              checked={draft.allDay}
-              onChange={(event) => setDraft((current) => withAllDay(current, event.target.checked))}
-            />
-            <span>All day</span>
+      <form id={formId} ref={formRef} className="flex flex-col gap-3" onSubmit={onSubmit} noValidate>
+        <div className="flex flex-col gap-1">
+          <label className={LABEL} htmlFor={titleId}>
+            Title
           </label>
+          <input
+            id={titleId}
+            type="text"
+            className={TITLE}
+            placeholder="Add title"
+            value={draft.title}
+            maxLength={EVENT_TITLE_MAX}
+            autoComplete="off"
+            data-autofocus=""
+            onChange={(event) => setDraft((current) => ({ ...current, title: event.target.value }))}
+          />
+        </div>
+
+        <Row icon={<ClockIcon size={ICON} />} label="When" hideLabel>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-2 max-md:grid-cols-1">
+            <div className="flex min-w-0 flex-col gap-1">
+              <span className={LABEL}>Starts</span>
+              <div className="grid grid-cols-[minmax(0,1fr)_var(--width-time-field)] gap-2 max-md:grid-cols-[minmax(0,1fr)_112px]">
+                <input
+                  type="date"
+                  className={cn(INPUT, "font-num")}
+                  aria-label="Start date"
+                  aria-invalid={shown.start !== undefined || undefined}
+                  aria-describedby={whenError ? whenErrorId : undefined}
+                  value={draft.startDate}
+                  onChange={(event) => setDraft((current) => withStart(current, { startDate: event.target.value }))}
+                />
+                {!draft.allDay && (
+                  <TimeField
+                    label="Start time"
+                    value={draft.startTime}
+                    options={startTimeOptions}
+                    invalid={shown.start !== undefined}
+                    onChange={(startTime) => setDraft((current) => withStart(current, { startTime }))}
+                  />
+                )}
+              </div>
+            </div>
+            <div className="flex min-w-0 flex-col gap-1">
+              <span className={LABEL}>Ends</span>
+              <div className="grid grid-cols-[minmax(0,1fr)_var(--width-time-field)] gap-2 max-md:grid-cols-[minmax(0,1fr)_112px]">
+                <input
+                  type="date"
+                  className={cn(INPUT, "font-num")}
+                  aria-label="End date"
+                  aria-invalid={shown.end !== undefined || undefined}
+                  aria-describedby={whenError ? whenErrorId : undefined}
+                  value={draft.endDate}
+                  onChange={(event) => setDraft((current) => withEnd(current, { endDate: event.target.value }))}
+                />
+                {!draft.allDay && (
+                  <TimeField
+                    label="End time"
+                    value={draft.endTime}
+                    options={() => endTimeOptions(draft)}
+                    invalid={shown.end !== undefined}
+                    describedBy={whenError ? whenErrorId : undefined}
+                    onChange={(endTime) => setDraft((current) => withEnd(current, { endTime }))}
+                  />
+                )}
+              </div>
+            </div>
+            <label className={cn(CHECK, "col-span-2 max-md:col-span-1")}>
+              <input
+                type="checkbox"
+                className={CHECK_BOX}
+                checked={draft.allDay}
+                onChange={(event) => setDraft((current) => withAllDay(current, event.target.checked))}
+              />
+              <span>All day</span>
+            </label>
+          </div>
           {whenError && (
             <p id={whenErrorId} className={ERROR} role="alert">
               {whenError}
@@ -305,62 +321,64 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
           )}
         </Row>
 
-        <Row icon={<BellIcon size={ICON} />} label="Reminder">
-          <select
-            className={SELECT_WIDE}
-            aria-label="Reminder"
-            value={reminderValue(draft.reminderMinutes)}
-            onChange={(event) =>
-              setDraft((current) => ({ ...current, reminderMinutes: reminderOfValue(event.target.value) }))
-            }
-          >
-            {reminderOptions(draft.allDay).map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </Row>
+        <div className="grid grid-cols-2 gap-x-3 gap-y-3 max-md:grid-cols-1">
+          <Row icon={<BellIcon size={ICON} />} label="Reminder">
+            <select
+              className={SELECT_WIDE}
+              aria-label="Reminder"
+              value={reminderValue(draft.reminderMinutes)}
+              onChange={(event) =>
+                setDraft((current) => ({ ...current, reminderMinutes: reminderOfValue(event.target.value) }))
+              }
+            >
+              {reminderOptions(draft.allDay).map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </Row>
 
-        <Row icon={<RepeatIcon size={ICON} />} label="Repeat">
-          <RepeatPicker
-            repeat={draft.repeat}
-            labelDate={repeatLabelDate(draft)}
-            startDate={draft.startDate}
-            timeZone={timeZone}
-            summary={repeatSummary(draft, timeZone)}
-            error={repeatError}
-            onChange={(repeat) => setDraft((current) => ({ ...current, repeat, repeatTouched: true }))}
-          />
-        </Row>
+          <Row icon={<RepeatIcon size={ICON} />} label="Repeat">
+            <RepeatPicker
+              repeat={draft.repeat}
+              labelDate={repeatLabelDate(draft)}
+              startDate={draft.startDate}
+              timeZone={timeZone}
+              summary={repeatSummary(draft, timeZone)}
+              error={repeatError}
+              onChange={(repeat) => setDraft((current) => ({ ...current, repeat, repeatTouched: true }))}
+            />
+          </Row>
 
-        <Row icon={<CalendarIcon size={ICON} />} label="Calendar">
-          <CalendarSelect
-            calendars={calendars}
-            value={calendarId}
-            onChange={(id) => setDraft((current) => ({ ...current, calendarId: id }))}
-          />
-        </Row>
+          <Row icon={<CalendarIcon size={ICON} />} label="Calendar">
+            <CalendarSelect
+              calendars={calendars}
+              value={calendarId}
+              onChange={(id) => setDraft((current) => ({ ...current, calendarId: id }))}
+            />
+          </Row>
 
-        <Row icon={<PlaceIcon size={ICON} />} label="Location">
-          <input
-            type="text"
-            className={INPUT}
-            aria-label="Location"
-            placeholder="Add location"
-            value={draft.location}
-            maxLength={EVENT_LOCATION_MAX}
-            autoComplete="off"
-            onChange={(event) => setDraft((current) => ({ ...current, location: event.target.value }))}
-          />
-        </Row>
+          <Row icon={<PlaceIcon size={ICON} />} label="Location">
+            <input
+              type="text"
+              className={INPUT}
+              aria-label="Location"
+              placeholder="Add location"
+              value={draft.location}
+              maxLength={EVENT_LOCATION_MAX}
+              autoComplete="off"
+              onChange={(event) => setDraft((current) => ({ ...current, location: event.target.value }))}
+            />
+          </Row>
+        </div>
 
         <Row icon={<NotesIcon size={ICON} />} label="Notes">
           <textarea
             className={NOTES}
             aria-label="Notes"
             placeholder="Add notes"
-            rows={4}
+            rows={3}
             value={draft.notes}
             maxLength={EVENT_NOTES_MAX}
             onChange={(event) => setDraft((current) => ({ ...current, notes: event.target.value }))}
@@ -368,12 +386,12 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
         </Row>
 
         {failure !== null && place === "general" && (
-          <p ref={showError} className={cn(ERROR, "ps-editor-lead max-md:ps-9")} role="alert">
+          <p ref={showError} className={cn(ERROR, "ps-editor-lead max-md:ps-8")} role="alert">
             {failure}
           </p>
         )}
         {deleteFailure !== null && (
-          <p ref={showError} className={cn(ERROR, "ps-editor-lead max-md:ps-9")} role="alert">
+          <p ref={showError} className={cn(ERROR, "ps-editor-lead max-md:ps-8")} role="alert">
             {deleteFailure}
           </p>
         )}
@@ -382,25 +400,35 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
   );
 }
 
-/** The rows' icons: 20 px, in the column the rows keep for them (44 px, 36 on a phone). */
+/** The rows' icons: 20 px, in the column the rows keep for them. */
 const ICON = 20;
 
-function Row({ icon, label, children }: { icon: ReactNode; label: string; children: ReactNode }) {
+function Row({
+  icon,
+  label,
+  hideLabel = false,
+  children,
+}: {
+  icon: ReactNode;
+  label: string;
+  /** The row's controls carry their own labels (Starts, Ends): its name is for the screen reader only. */
+  hideLabel?: boolean;
+  children: ReactNode;
+}) {
   return (
-    <div className="grid grid-cols-[var(--spacing-editor-lead)_minmax(0,1fr)] items-start max-md:grid-cols-[36px_minmax(0,1fr)]">
-      <span className="flex pt-[calc((var(--height-editor-field)-20px)/2)] text-ink-2 max-md:pt-[calc((var(--size-touch)-20px)/2)]">
+    <div className="grid grid-cols-[20px_minmax(0,1fr)] items-start gap-3.5 max-md:gap-3">
+      <span className="flex pt-[calc(18px+4px+(var(--height-editor-field)-20px)/2)] text-muted max-md:pt-[calc(18px+4px+(var(--size-touch)-20px)/2)]">
         {icon}
-        <span className="sr-only">{label}</span>
       </span>
-      <div className="flex min-w-0 flex-col gap-2">{children}</div>
+      <div className="flex min-w-0 flex-col gap-1">
+        <span className={hideLabel ? "sr-only" : LABEL}>{label}</span>
+        {children}
+      </div>
     </div>
   );
 }
 
 // --- The calendar picker (quick create has it too) -------------------------------------------------
-
-/** The date fields beside their times: a fixed width on the desktop, the column on a phone. */
-const DATE = "w-date-field max-md:w-full";
 
 export interface CalendarSelectProps {
   calendars: readonly Calendar[];

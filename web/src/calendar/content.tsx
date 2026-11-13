@@ -104,8 +104,8 @@ function minutesOf(event: EventContentArg["event"]): number {
  * FullCalendar's `eventContent`. A timed block in day and week keeps every
  * start time and never an ellipsis:
  *
- * - 45 minutes or more: the title, then the time range on a second line
- *   (11/14 under an hour, 12/16 from it);
+ * - 45 minutes or more: the title, then the time on a second line: the
+ *   start in 11/14 under an hour, the range in 12/16 from it;
  * - shorter: one line, the title then the start time, and the time drops
  *   out (the title stays) where the block is under 120 px wide.
  *

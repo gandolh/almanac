@@ -2,8 +2,8 @@ import { useId, type InputHTMLAttributes, type Ref } from "react";
 
 /**
  * The error mark beside a field or form error: a 24-unit grid, round caps,
- * coloured by `currentColor`. There is no danger colour: an error is ink,
- * semibold, with this mark. Decorative; the text says it.
+ * coloured by `currentColor`. An error is
+ * danger-coloured and semibold, with this mark and always its words. Decorative; the text says it.
  */
 export function AlertIcon({ size = 18 }: { size?: number }) {
   return (
@@ -29,10 +29,9 @@ export function AlertIcon({ size = 18 }: { size?: number }) {
 
 /** One field height with the event editor; 16 px type, so iOS doesn't zoom into it. */
 const INPUT_CLASS = [
-  "h-editor-field w-full appearance-none rounded-field bg-field px-3 text-input-phone text-ink max-md:h-(--size-touch)",
-  "focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-focus-ring",
-  "aria-invalid:outline-[1.5px] aria-invalid:-outline-offset-[1.5px] aria-invalid:outline-ink-2",
-  "aria-invalid:focus-visible:outline-2 aria-invalid:focus-visible:outline-offset-0 aria-invalid:focus-visible:outline-focus-ring",
+  "h-editor-field w-full appearance-none rounded-field border border-outline bg-field px-3 text-input-phone text-ink max-md:h-(--size-touch)",
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring",
+  "aria-invalid:border-danger",
 ].join(" ");
 
 export interface AuthFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "className"> {
@@ -54,7 +53,7 @@ export function AuthField({ label, error, hint, ref, ...input }: AuthFieldProps)
   const note = error ?? hint;
   return (
     <div className="flex min-w-0 flex-col gap-1.5">
-      <label className="text-label leading-tight font-semibold text-muted" htmlFor={id}>
+      <label className="text-small leading-tight font-semibold text-muted" htmlFor={id}>
         {label}
       </label>
       <input
@@ -66,7 +65,7 @@ export function AuthField({ label, error, hint, ref, ...input }: AuthFieldProps)
         aria-describedby={note ? noteId : undefined}
       />
       {error !== undefined ? (
-        <p id={noteId} className="flex items-start gap-1.5 text-small leading-tight font-semibold text-ink">
+        <p id={noteId} className="flex items-start gap-1.5 text-small leading-tight font-semibold text-danger">
           <AlertIcon size={16} />
           {error}
         </p>

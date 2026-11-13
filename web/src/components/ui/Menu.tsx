@@ -40,10 +40,10 @@ export interface MenuProps {
 const LABEL_CLASS =
   "inline-flex flex-col items-center after:invisible after:pointer-events-none after:h-0 after:overflow-hidden after:font-semibold after:select-none after:content-[attr(data-label)]";
 const POPUP_CLASS =
-  "flex max-w-[calc(100vw-16px)] min-w-menu flex-col rounded-control bg-surface py-2 text-ink shadow-float outline-none motion-safe:animate-float-in";
+  "flex max-w-[calc(100vw-16px)] min-w-menu flex-col rounded-control border border-hairline bg-surface py-2 text-ink shadow-float outline-none motion-safe:animate-float-in";
 const LABEL_HEAD_CLASS = "px-4 pt-1.5 pb-0.5 text-label font-semibold text-muted";
 const ITEM_CLASS =
-  "flex min-h-10 cursor-default items-center gap-3 bg-transparent px-4 text-left text-meta text-ink select-none not-data-disabled:data-highlighted:bg-hover focus-visible:-outline-offset-2 data-disabled:text-muted max-md:min-h-(--size-touch) max-md:text-body";
+  "flex min-h-10 cursor-default items-center gap-3 bg-transparent px-4 text-left text-meta text-ink select-none not-data-disabled:data-highlighted:bg-accent-tint-soft focus-visible:-outline-offset-2 data-disabled:text-muted max-md:min-h-(--size-touch) max-md:text-body";
 
 const GAP = 4; // between the button and the menu
 const MARGIN = 8; // the menu never comes closer to the window's edge than this
