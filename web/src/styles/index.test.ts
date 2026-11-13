@@ -33,11 +33,11 @@ describe("the one stylesheet", () => {
     expect(order).toBeLessThan(source.indexOf("@import"));
   });
 
-  it("defines exactly the 145 tokens", () => {
+  it("defines exactly the 142 tokens", () => {
     const theme = /@theme static \{([\s\S]*?)\n\}/.exec(source)?.[1] ?? "";
     const plain = /\n:root \{([\s\S]*?)\n\}/.exec(source)?.[1] ?? "";
     const count = (css: string) => css.match(/^\s*--[a-z0-9-]+:/gm)?.length ?? 0;
-    expect(count(theme) + count(plain)).toBe(145);
+    expect(count(theme) + count(plain)).toBe(142);
   });
 
   it("makes Almanac's tokens into utilities", async () => {
