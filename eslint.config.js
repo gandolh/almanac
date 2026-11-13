@@ -18,6 +18,8 @@ export default [
     // to the person running them.
     console: ["server/src/server.ts", "server/src/seed.ts", "server/src/vapid-keys.ts"],
     ignores: ["data/**"],
+    // The browser tests: they get the test relaxations and the vitest rules leave them alone.
+    playwright: ["web/e2e/**/*.ts"],
     // `expectError` is the tests' own assertion helper, so a test that calls it asserts.
     assertFunctionNames: ["expect", "expectTypeOf", "expectError"],
   }),

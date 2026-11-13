@@ -23,3 +23,7 @@ data/
 
 # Deploy secrets
 infrastructure/.env
+
+# Playwright output
+web/test-results/
+web/playwright-report/

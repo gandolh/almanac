@@ -260,16 +260,14 @@ const OPTIONS: CalendarOptions = {
   // The label sits across its hour's line, small and muted, in Condensed; Monarch's own margin and size lose to these.
   slotHeaderInnerClass: "top-[-0.5em] my-0 font-num text-mini leading-none font-medium text-muted",
   // A full line on the hours, a faint one on the half hours.
-  slotLaneClass: (info) =>
-    info.isMinor ? "border-[color-mix(in_srgb,var(--color-hairline)_30%,transparent)]" : undefined,
+  slotLaneClass: (info) => (info.isMinor ? "border-hairline/30" : undefined),
   slotHeaderClass: (info) => (info.isMinor ? "border-transparent" : undefined),
   // 48 px an hour (--height-hour), the same at every width. (FullCalendar measures the
   // labels first; rows that change height later would leave 08:00 scrolled wrong.)
   slotMinHeight: 24,
   // Today: its head on the accent tint, its column washed in it.
   dayHeaderClass: (info) => (info.isToday ? "bg-accent-tint" : undefined),
-  dayLaneClass: (info) =>
-    info.isToday ? "bg-[color-mix(in_srgb,var(--color-accent-tint)_42%,transparent)]" : undefined,
+  dayLaneClass: (info) => (info.isToday ? "bg-accent-tint/40" : undefined),
   // The now line is 2 px with a chip in the hour gutter and no dot.
   nowIndicatorDotClass: "hidden",
   nowIndicatorLineClass: "border-t-2",
@@ -317,10 +315,14 @@ const OPTIONS: CalendarOptions = {
   views: {
     timeGrid: {
       dayHeaderFormat: { weekday: "short", day: "numeric" },
-      // The head is 56 px (DayHead): no margin round its link. The all-day row is a band on `field`.
-      navLinkClass: "m-0",
+      // The head is 56 px (DayHead): no margin round its link. (Monarch takes the link's own outline off and draws
+      // a ring on its content, so DayHead draws it.) The all-day row is a band on `field`.
+      navLinkClass:
+        "m-0 rounded-control focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-focus-ring",
       dayCellClass: "bg-field",
       allDayHeaderClass: "bg-field",
+      // The row is 32 px with an event in it (a 24 px block and 4 px above and below), not 41.
+      dayCellBottomClass: "h-1 min-h-0",
     },
     // The day view heads its one column from the left.
     timeGridDay: { dayHeaderAlign: "start" },

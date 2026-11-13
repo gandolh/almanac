@@ -10,7 +10,8 @@ import { cn } from "../lib/cn";
 /** A filled field: text, select, date and the time field's input. An invalid one has a danger edge as well as the words under it, never colour alone. */
 export const INPUT = [
   "box-border h-editor-field w-full min-w-0 rounded-field border border-outline bg-field px-3 text-input-phone text-ink max-md:h-(--size-touch)",
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring",
+  // `focus-within` too: a date field keeps its focus in its day, month and year parts, which `:focus-visible` on the field misses.
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-focus-ring",
   "aria-invalid:border-danger",
 ].join(" ");
 

@@ -54,7 +54,7 @@ export interface DayHeadProps {
 export function DayHead({ dow, dayNumber, today }: DayHeadProps) {
   return (
     <span
-      className={`group flex flex-col items-center justify-center gap-0.5 ${dayNumber === "" ? "h-9" : "h-14 max-md:h-12"}`}
+      className={`group flex flex-col items-center justify-center gap-0.5 rounded-control in-focus-visible:outline-2 in-focus-visible:-outline-offset-2 in-focus-visible:outline-focus-ring in-focus-visible:outline-solid ${dayNumber === "" ? "h-9" : "h-14 max-md:h-12"}`}
       data-today={today || undefined}
     >
       <span className="text-small leading-4 font-medium text-muted group-data-today:font-bold group-data-today:text-accent-ink">
