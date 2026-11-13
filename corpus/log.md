@@ -431,3 +431,12 @@ place the built `server/dist/server.js` ran from a scratch folder with every
 setting pinned: health 200, a signed-out request 401, SIGTERM exit 0 read from
 the node PID. `npm run build` writes `server/dist/server.js`; the Dockerfile's
 `CMD` names it.
+
+## [2026-11-13] decision | Brief 05: the owner approved the redesign direction
+
+The owner approved the redesign direction "The week and its day" on the estate
+redesign board, with every question on the board standing as proposed. Its
+desktop is ruled back to the familiar layout (a header band over a left column
+and the grid); the runner-up was "Ultramarine week". The reopened decisions
+(Google's layout and look, the fixed calendar colours, the shell) are recorded
+in [decisions.md](wiki/decisions.md) when the build lands.
