@@ -149,12 +149,32 @@ export interface StubOptions {
   slow?: boolean;
 }
 
-/** Answers every API call from the fixture; writes are accepted and change nothing. */
+/** The links the stubbed calendar feed hands out, one per "New link", in turn. */
+export const FEED_TOKENS = ["A", "B", "C", "D"].map((letter) => letter.repeat(43));
+
+/**
+ * Answers every API call from the fixture; writes are accepted and change nothing, but for the
+ * calendar feed, whose state (on, off, which link) lives as long as the page.
+ */
 export async function stubApi(page: Page, options: StubOptions = {}): Promise<void> {
+  const feed = { on: false, made: 0 };
   await page.route(API, async (route) => {
     const request = route.request();
     const url = new URL(request.url());
     const path = url.pathname.replace(/^\/almanac-api/, "");
+    if (path === "/api/feed") {
+      if (request.method() === "POST") {
+        const token = FEED_TOKENS[feed.made % FEED_TOKENS.length] ?? "";
+        feed.on = true;
+        feed.made++;
+        return json(route, { url: `${url.origin}/almanac-api/api/feed/${token}/almanac.ics`, createdAt: NOW_ISO }, 201);
+      }
+      if (request.method() === "DELETE") {
+        feed.on = false;
+        return route.fulfill({ status: 204 });
+      }
+      return json(route, { on: feed.on, createdAt: feed.on ? NOW_ISO : null });
+    }
     if (path === "/auth/session") {
       return options.signedOut
         ? json(route, { user: null, session: null, ward: { enabled: false, linked: false } })

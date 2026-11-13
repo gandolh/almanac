@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "../../vendor/ward/ward-auth-react.js";
 import { changePassword, linkWard, signOut, unlinkWard, useWardLink, useWardNotice } from "../account/actions";
+import { CalendarFeedDialog } from "../account/CalendarFeed";
 import { NotificationsDialog } from "../account/Notifications";
 import { THEME_LABELS, ThemeDialog } from "../account/ThemeDialog";
 import { TimeZoneDialog } from "../account/TimeZoneDialog";
@@ -29,7 +30,8 @@ export function initialOf(username: string): string {
 /**
  * The account button and its menu, in place of a Settings page
  * (corpus/wiki/features.md "Account menu"): Change password, Sign in with
- * Ward (link or unlink), Time zone…, Theme…, Notifications, then Sign out.
+ * Ward (link or unlink), Time zone…, Theme…, Notifications, Calendar feed…,
+ * then Sign out.
  * The button is a 44 px target round a 32 px disc with the username's initial.
  */
 export function AccountMenu() {
@@ -41,6 +43,7 @@ export function AccountMenu() {
   const [zoneOpen, setZoneOpen] = useState(false);
   const [themeOpen, setThemeOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [feedOpen, setFeedOpen] = useState(false);
   const [notice, setNotice] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   // A Ward link comes back to the app with its result; it shows here like an action's, then goes.
@@ -82,6 +85,7 @@ export function AccountMenu() {
         { label: "Time zone…", detail: zoneCity(timeZone), onSelect: () => setZoneOpen(true) },
         { label: "Theme…", detail: THEME_LABELS[theme], onSelect: () => setThemeOpen(true) },
         { label: "Notifications", onSelect: () => setNotificationsOpen(true) },
+        { label: "Calendar feed…", onSelect: () => setFeedOpen(true) },
       ],
     },
     { items: [{ label: "Sign out", onSelect: run(signOut) }] },
@@ -118,6 +122,7 @@ export function AccountMenu() {
       <TimeZoneDialog open={zoneOpen} onClose={() => setZoneOpen(false)} />
       <ThemeDialog open={themeOpen} onClose={() => setThemeOpen(false)} />
       <NotificationsDialog open={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
+      <CalendarFeedDialog open={feedOpen} onClose={() => setFeedOpen(false)} />
     </div>
   );
 }

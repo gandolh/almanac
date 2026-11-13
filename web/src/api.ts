@@ -13,12 +13,13 @@ export { API_BASE } from "./base";
  * aborted call rethrows the abort reason unchanged.
  */
 
-/** The server's codes (server/src/errors.ts), then the client's own. */
+/** The server's codes (server/src/lib/api-error.ts), then the client's own. */
 export type ApiErrorCode =
   | "validation"
   | "unauthorized"
   | "forbidden"
   | "not_found"
+  | "rate_limited"
   | "internal"
   | "signed_out"
   | "network"

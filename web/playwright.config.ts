@@ -7,10 +7,12 @@ import { defineConfig } from "@playwright/test";
  * projects, one per theme choice: light (the first visit), dark, and system
  * (which follows the browser's colour scheme, dark here).
  *
- * `npx playwright test --workers=2` from `web/`. `SHOTS_DIR=<folder> npx
+ * `npx playwright test --workers=2` from `web/`; `E2E_PORT=<port>` for a port
+ * other than 5177. `SHOTS_DIR=<folder> npx
  * playwright test shots` also writes the screen captures (never in git).
  */
-const PORT = 5177;
+// `E2E_PORT` runs the tests against a Vite server on another port, one already started or one this starts.
+const PORT = Number(process.env.E2E_PORT ?? 5177);
 const BASE = "/almanac/";
 
 export default defineConfig({

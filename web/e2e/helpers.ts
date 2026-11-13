@@ -24,6 +24,11 @@ export const OPEN = {
     await page.getByRole("menuitem", { name: /^Theme/ }).click();
     await page.getByRole("dialog", { name: "Theme" }).waitFor();
   },
+  feed: async (page: Page) => {
+    await OPEN.account(page);
+    await page.getByRole("menuitem", { name: "Calendar feed…" }).click();
+    await page.getByRole("dialog", { name: "Calendar feed" }).waitFor();
+  },
   drawer: async (page: Page) => {
     await page.getByRole("button", { name: "Main menu" }).click();
     await page.getByRole("dialog", { name: "Calendars" }).waitFor();
