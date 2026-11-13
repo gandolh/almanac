@@ -60,7 +60,9 @@ stored. The calendar app expands the rules; the server expands nothing.
   exist.
 - `GET` and `HEAD` only. Another method finds no route; without a session the
   sign-in library's guard answers 401 first. A token over the router's
-  100-character limit misses the route too and gets the same 401.
+  100-character limit gets Fastify's own `414` (`FST_ERR_MAX_PARAM_LENGTH`),
+  whose body repeats the path to whoever sent it; the log still shows
+  `<token>`.
 - 30 requests a minute per address (`@fastify/rate-limit`), wrong tokens
   included, then `429 rate_limited` with `Retry-After`.
 - `Content-Type: text/calendar; charset=utf-8`, `Cache-Control: private,

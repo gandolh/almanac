@@ -28,6 +28,10 @@ test("turning the feed on shows the link once, to copy", async ({ app: page }) =
   await expect(dialog.getByRole("status")).toHaveText("Copied.");
   expect(await page.evaluate(() => navigator.clipboard.readText())).toContain(FIRST);
 
+  // A press beside the dialog doesn't close it: the link would be gone.
+  await page.mouse.click(8, 400);
+  await expect(link).toBeVisible();
+
   // Closed and opened again, the feed is on and the link is gone for good.
   await dialog.getByRole("button", { name: "Done" }).click();
   await OPEN.feed(page);

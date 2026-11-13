@@ -166,6 +166,8 @@ export function CalendarFeedDialog({ open, onClose }: CalendarFeedDialogProps) {
       onClose={onClose}
       title="Calendar feed"
       size="small"
+      // The link is shown once: a stray press beside the dialog mustn't lose it. Esc, the ✕ and Done close it.
+      dismissOnBackdrop={false}
       footer={
         <Button variant="quiet" onClick={onClose}>
           Done

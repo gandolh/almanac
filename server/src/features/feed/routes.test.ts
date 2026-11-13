@@ -209,6 +209,15 @@ describe("GET /api/feed/:token/almanac.ics", () => {
     expect((await t.inject({ method: "POST", url: path })).statusCode).toBe(404);
   });
 
+  it("leaves a token past the router's 100-character limit to Fastify's own 414", async () => {
+    await turnOn();
+    const res = await fetchFeed(`/api/feed/${"a".repeat(101)}/almanac.ics`);
+    expect(res.statusCode).toBe(414);
+    expect(res.body).not.toContain("BEGIN:VCALENDAR");
+    // At the limit it is still the route, and a plain 404.
+    expect((await fetchFeed(`/api/feed/${"a".repeat(100)}/almanac.ics`)).json()).toEqual(NOT_FOUND);
+  });
+
   it("never shows one user's events in another's feed", async () => {
     const other = await t.signInAs("other");
     await create({
@@ -279,10 +288,14 @@ describe("the feed's token in the log", () => {
       const token = path.split("/")[3] ?? "";
       expect((await logged.app.inject({ method: "GET", url: path })).statusCode).toBe(200);
       expect((await logged.app.inject({ method: "GET", url: `${path.slice(0, -4)}` })).statusCode).toBe(401);
+      // A token past the router's limit misses the route, and is still kept out of the log.
+      const long = `${token}${"x".repeat(80)}`;
+      expect((await logged.app.inject({ method: "GET", url: `/api/feed/${long}/almanac.ics` })).statusCode).toBe(414);
       const log = lines.join("");
       expect(log).toContain('"url":"/api/feed/<token>/almanac.ics"');
       expect(token).toHaveLength(43);
       expect(log).not.toContain(token);
+      expect(log).not.toContain(long);
     } finally {
       await logged.close();
     }
