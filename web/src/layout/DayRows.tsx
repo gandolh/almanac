@@ -51,7 +51,7 @@ export function DayRows({ occurrences, calendars, timeZone, now = null, phone = 
                 type="button"
                 className={
                   phone
-                    ? "grid min-h-12 w-full grid-cols-[104px_12px_minmax(0,1fr)] items-start gap-x-2.5 bg-transparent py-3 text-left text-action-large leading-[22px] text-ink hover:bg-hover"
+                    ? "grid min-h-[47px] w-full grid-cols-[104px_12px_minmax(0,1fr)] items-start gap-x-2.5 bg-transparent py-3 text-left text-action-large leading-[22px] text-ink hover:bg-hover"
                     : "grid w-full grid-cols-[90px_12px_minmax(0,1fr)] items-start gap-x-2.5 rounded-small bg-transparent py-1.5 text-left text-body leading-5 text-ink hover:bg-hover"
                 }
                 style={{ "--calendar-color": colors.get(occurrence.calendarId) } as CSSProperties}

@@ -212,6 +212,8 @@ export function EventFormDialog({ seed, occurrence, onClose, timeZone }: EventFo
       onClose={onClose}
       title={occurrence ? "Edit event" : "New event"}
       size="large"
+      // Hung from 16 px under the top of the window, as the board draws it, not centred.
+      className="md:mt-4 md:mb-auto"
       // A form with typing in it: a stray press on the backdrop must not lose it.
       dismissOnBackdrop={false}
       footer={

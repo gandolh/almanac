@@ -158,14 +158,15 @@ function TwoLines({ title, time, short }: { title: string; time: string; short: 
     const line = titleEl.current;
     if (!box || !line) return;
     const timeHeight = short ? 14 : 16;
-    const check = () => setFits(line.offsetTop + line.offsetHeight + timeHeight <= box.clientHeight);
+    // A block under an hour centres its two lines; from an hour they hang from a 4 px top padding.
+    const check = () => setFits((short ? 0 : line.offsetTop) + line.offsetHeight + timeHeight <= box.clientHeight);
     check();
     const observer = new ResizeObserver(check);
     observer.observe(box);
     return () => observer.disconnect();
   }, [title, short]);
   return (
-    <div ref={root} className="flex h-full min-w-0 flex-col px-[5px] pt-1">
+    <div ref={root} className={`flex h-full min-w-0 flex-col px-[5px] ${short ? "justify-center" : "pt-1"}`}>
       <div ref={titleEl} className="text-event leading-[18px] font-semibold wrap-break-word">
         {title}
       </div>

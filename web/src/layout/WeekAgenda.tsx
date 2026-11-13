@@ -111,7 +111,7 @@ export function WeekAgenda({ date, today, onNavigate }: WeekAgendaProps) {
           })}
         </div>
       </div>
-      <div className="flex flex-col gap-2 px-2 pb-[calc(var(--size-fab)+48px)]">
+      <div className="flex flex-col gap-2 px-2 pb-[104px]">
         {status === "error" && (
           <div
             className="flex items-center justify-between gap-2 rounded-card border border-hairline bg-surface p-4 text-body text-ink shadow-card"
@@ -130,7 +130,7 @@ export function WeekAgenda({ date, today, onNavigate }: WeekAgendaProps) {
             <section
               key={dateKey(day)}
               data-day={dateKey(day)}
-              className="rounded-card border border-hairline bg-surface px-4 pt-3 pb-1 shadow-card"
+              className="rounded-card border border-hairline bg-surface px-4 pt-3 pb-0 shadow-card"
               aria-label={formatDayLong(day)}
               aria-busy={status === "loading" || undefined}
             >

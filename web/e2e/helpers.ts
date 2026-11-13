@@ -3,7 +3,9 @@ import type { Page } from "@playwright/test";
 /** Opens an overlay or state on the page the fixtures built, for the specs and the captures that walk them. */
 export const OPEN = {
   details: async (page: Page) => {
+    // The block in the view (or the row in the phone's agenda), not the left column's day card.
     await page
+      .locator("[data-view]")
       .getByRole("button", { name: /Design review/ })
       .first()
       .click();

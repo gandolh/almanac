@@ -151,7 +151,15 @@ const SHOTS: Shot[] = [
     },
   },
   { name: "theme", path: "week/2026/11/11", steps: async (page) => OPEN.theme(page) },
-  { name: "drawer", path: "week/2026/11/11", steps: async (page) => OPEN.drawer(page) },
+  {
+    name: "drawer",
+    path: "week/2026/11/11",
+    steps: async (page, phone) => {
+      // From 1100 px the column is beside the view: the drawer is shown at the width where it is one.
+      if (!phone) await page.setViewportSize({ width: 1024, height: 768 });
+      await OPEN.drawer(page);
+    },
+  },
   {
     name: "toast",
     path: "week/2026/11/11",
@@ -188,7 +196,8 @@ for (const { width, height } of WIDTHS) {
         await page.waitForTimeout(900);
         await shot.steps?.(page, width < 768);
         await page.waitForTimeout(500);
-        await page.screenshot({ path: `${DIR}/${shot.name}-${theme}-${width}.png` });
+        const shown = page.viewportSize()?.width ?? width;
+        await page.screenshot({ path: `${DIR}/${shot.name}-${theme}-${shown}.png` });
       });
     }
   });

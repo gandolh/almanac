@@ -283,7 +283,7 @@ const OPTIONS: CalendarOptions = {
   eventTitleClass: "min-w-0 overflow-hidden text-ellipsis whitespace-nowrap",
   eventTimeClass: "shrink-0 whitespace-nowrap",
   eventClass: (info) => (info.isMirror ? "cal-mirror shadow-raised" : undefined),
-  rowEventClass: "rounded-event",
+  rowEventClass: "rounded-event text-event font-semibold",
   // A timed block: solid fill, 6 px corners, holding at least one line (a 15-minute event is as tall as a half hour).
   columnEventClass: "@container/ev rounded-event",
   columnEventInnerClass: "h-full min-w-0 p-0",

@@ -90,7 +90,7 @@ popovers take `shadow-float`.
   per event, up to six) over one card per day; tapping a chip moves the address to
   that day and the agenda scrolls to its card. The time grid stays in Day. A
   bottom bar (`ViewBar`) holds the four views; Create floats above it, extended,
-  or a 56 px round button under 380 px. The list pads so the last row sits 32 px
+  or a 56 px round button under 380 px. The list pads (104 px under the last card) so the last row sits 32 px
   clear of Create. A sideways swipe steps the view.
 
 ## The grid
