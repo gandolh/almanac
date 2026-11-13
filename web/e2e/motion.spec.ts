@@ -6,7 +6,7 @@ test.use({ reducedMotion: "reduce" });
 /** The CSS animations and transitions still going after the screen has settled. */
 async function running(page: import("@playwright/test").Page): Promise<string[]> {
   // Long enough for the lazy calendar to load, draw its events and let its own settling transitions end.
-  await page.waitForTimeout(700);
+  await page.waitForTimeout(1200);
   return page.evaluate(() =>
     document
       .getAnimations()

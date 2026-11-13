@@ -1,13 +1,13 @@
 ---
-summary: Snapshot as of 2026-11-12, per area. v1 built 2026-10-16 and reviewed; Base UI under the overlays 2026-10-23; phone notifications (push worker, a reminder on each event, the minute sender) 2026-10-27; the estate's conventions (house style, Base UI rules, Tailwind, the server structure) filed as briefs 01-04 on 2026-11-09, the house style and its harness (brief 01) built 2026-11-11, Base UI by the conventions (brief 02) and the whole web app on Tailwind with a Light / Dark / System switch (brief 03) built 2026-11-11, the server grouped by feature with a schema on every route (brief 04) built 2026-11-12. Pushed to GitHub through 2026-11-01, nothing deployed, no phone has shown a notification. What waits on the owner, open bugs, accepted known issues, and the todos.
-updated: 2026-11-12
+summary: Snapshot as of 2026-11-13, per area. v1 built 2026-10-16 and reviewed; Base UI under the overlays 2026-10-23; phone notifications (push worker, a reminder on each event, the minute sender) 2026-10-27; the estate's conventions (house style, Base UI rules, Tailwind, the server structure) filed as briefs 01-04 on 2026-11-09, the house style and its harness (brief 01) built 2026-11-11, Base UI by the conventions (brief 02) and the whole web app on Tailwind with a Light / Dark / System switch (brief 03) built 2026-11-11, the server grouped by feature with a schema on every route (brief 04) built 2026-11-12, the redesign (brief 05: Almanac's own look on the familiar layout, a phone week strip and bottom bar, Playwright specs) built 2026-11-13. Pushed to GitHub through 2026-11-01, nothing deployed, no phone has shown a notification. What waits on the owner, open bugs, accepted known issues, and the todos.
+updated: 2026-11-13
 ---
 
 # Status
 
 _2026-11-09_. Everything below is on `main` and pushed to
 `https://github.com/<owner>/almanac.git` as of 2026-11-01. Nothing is
-deployed. Briefs 01-04 are built (01-03 on 2026-11-11, 04 on 2026-11-12); brief numbering
+deployed. Briefs 01-05 are built (01-03 on 2026-11-11, 04 on 2026-11-12, 05 on 2026-11-13); brief numbering
 restarted at 01 on 2026-11-01 (see [log.md](../log.md)).
 
 ## By area
@@ -46,6 +46,14 @@ restarted at 01 on 2026-11-01 (see [log.md](../log.md)).
   exceptions (FullCalendar's sheet, the calendar colour). Brief 04 (the server
   layout) is built (2026-11-12): features/, plugins/, a schema on every route,
   `check-structure` and dependency-cruiser strict. Base UI is pinned at 1.9.0.
+- **Redesign** (2026-11-13). Brief 05 gave the web app its own look: olive
+  greys on raised cards, a moss accent, Sofia Sans and Sofia Sans Condensed,
+  per-theme calendar colours, a 56 px header band over a 276 px column with the
+  chosen day's list, a phone week strip over an agenda with a bottom view bar,
+  the details as a bottom sheet on a phone, and the event form with visible
+  labels. Recorded in [web/DESIGN.md](../../web/DESIGN.md) and
+  [decisions.md](decisions.md). Playwright specs (`web/e2e`, three theme
+  projects) and `scripts/contrast.mjs` came with it. Built, not deployed.
 - **Sibling repos** (2026-10-27). The stale app lists in `wzd_auth` and
   `shelfmark` that the deploy work left behind were fixed; both are pushed.
 
@@ -75,15 +83,20 @@ three lanes.
    Notifications on in a desktop browser and on the iPhone's Home Screen app,
    and press "Send a test". Then give a real event two minutes out the
    reminder "At the start" and check it shows on time.
+6. The redesign (brief 05) is web-only: `node cli.ts almanac deploy` from the
+   `vps-deploy` checkout ships it. Look at the week on a phone and the details
+   sheet on Android first.
 
 ## Open
 
 - On a phone the search field covers the top bar, but the bar's buttons
   under it stay in tab order: `TopBar` has no `inert` while search is open.
-- The dark theme's values are a first pass in Google's dark palette; brief 05 (the
-  redesign) refines them. The tick on a calendar's checkbox and swatch is
-  `on-accent`, which turns dark in the dark theme: on red, purple and graphite
-  it falls below 3:1.
+- The README's images still show the old look (the redesign came after the
+  last retake, 2026-10-31); retake them with `docs/images/shots.md`.
+- The calendar keys other than blue, green, orange and
+  purple (teal, olive, yellow, red, pink, graphite) take their per-theme colours
+  from the OKLCH recipe, not from a drawn comp; `shared/src/calendar.ts` still
+  holds Google's shades.
 
 ## Known and accepted
 
@@ -94,7 +107,7 @@ three lanes.
   deleted dates, as Google does.
 - Esc from search returns to the last calendar view visited.
 - Date fields in the event form follow the browser's locale format.
-- In a font wider than Roboto or San Francisco, a phone week title across
+- In a font wider than Sofia Sans or San Francisco, a phone week title across
   two years ("Dec ’26–Jan ’27") can lose a few pixels at the end.
 - `npm run dev` can fail with `ENOSPC` when VS Code holds most file
   watchers; the polling workaround is in

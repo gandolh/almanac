@@ -440,3 +440,7 @@ desktop is ruled back to the familiar layout (a header band over a left column
 and the grid); the runner-up was "Ultramarine week". The reopened decisions
 (Google's layout and look, the fixed calendar colours, the shell) are recorded
 in [decisions.md](wiki/decisions.md) when the build lands.
+
+## [2026-11-13] build | Brief 05: the redesign
+
+Almanac has its own look on the familiar layout: olive greys on raised cards, a moss accent, Sofia Sans and Sofia Sans Condensed, per-theme calendar colours (the store keeps the key; the web maps it), a 56 px header band over a 276 px column with the chosen day's list, a phone week strip over an agenda with a bottom view bar, the details as a bottom sheet on a phone, and the event form with visible labels. Recorded in [web/DESIGN.md](../web/DESIGN.md) and [decisions.md](wiki/decisions.md). Playwright specs (`web/e2e`) and `scripts/contrast.mjs` came with it; `npm run check` passes (824 tests, 66 contrast pairs). Not deployed. The outcome note is in [the brief](briefs/done/05-a-redesign-with-hallmark-on-the-estate-board.md).
