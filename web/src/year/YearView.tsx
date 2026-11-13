@@ -38,8 +38,7 @@ function yearSpan(year: number): DateSpan {
 }
 
 /**
- * The year on one page, Google's year view with what Google leaves out: a
- * dot under every day that has events.
+ * The year on one page, on one raised card, with a dot under every day that has events.
  *
  * - Twelve `MonthGrid`s, four across on a wide screen and fewer as the room
  *   shrinks; a month's name opens that month.
@@ -84,7 +83,11 @@ export function YearView({ year, onOpenDay, onOpenMonth }: YearViewProps) {
   };
 
   return (
-    <section ref={rootRef} className="@container/year px-6 pt-3 pb-4" aria-label="Year view">
+    <section
+      ref={rootRef}
+      className="@container/year min-h-0 flex-1 overflow-auto rounded-card border border-hairline bg-surface px-6 pt-4 pb-5 shadow-card"
+      aria-label="Year view"
+    >
       <div className={MONTHS_CLASS}>
         {Array.from({ length: 12 }, (_, index) => (
           <YearMonth
@@ -134,7 +137,7 @@ function YearMonth({ month, today, marked, onPickDay, onOpenMonth }: YearMonthPr
       <button
         type="button"
         id={titleId}
-        className="h-7 self-stretch rounded-control bg-transparent px-1.5 text-left text-meta font-medium text-ink transition-[background-color] duration-(--duration-fast) ease-out hover:bg-hover"
+        className="h-7 self-stretch rounded-control bg-transparent px-1.5 text-left text-body font-semibold text-ink transition-[background-color] duration-(--duration-fast) ease-out hover:bg-hover"
         onClick={() => onOpenMonth(month.toPlainDate({ day: 1 }))}
       >
         {monthName(month.month)}

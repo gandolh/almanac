@@ -25,7 +25,7 @@ export interface SearchResultsProps {
 }
 
 /**
- * The search results, Google's list: matches grouped by the date they start
+ * The search results: one raised card with the matches grouped by the date they start
  * on, the date at left, then each event's calendar colour, its time, its
  * title and location, and under the title how it repeats. A click opens the
  * day. Searching again after every change to the events (`onOccurrencesChanged`),
@@ -93,7 +93,7 @@ interface Answer {
 function ResultsMessage({ role, children }: { role?: "status" | "alert"; children: ReactNode }) {
   return (
     <section
-      className="mx-auto flex w-full max-w-search-content flex-1 items-start justify-center px-6 pt-[72px] pb-8 max-md:px-gutter-phone max-md:pt-12 max-md:pb-6"
+      className="mx-auto flex w-full max-w-search-content flex-1 items-start justify-center rounded-card border border-hairline bg-surface px-6 pt-[72px] pb-8 shadow-card max-md:px-gutter-phone max-md:pt-12 max-md:pb-6"
       aria-label="Search results"
     >
       <div
@@ -126,7 +126,7 @@ export function ResultsView({ query, results, timeZone, calendars }: ResultsView
   const byId = new Map(calendars.map((calendar) => [calendar.id, calendar]));
   return (
     <section
-      className="mx-auto w-full max-w-search-content flex-none px-6 pt-2 pb-8 max-md:px-gutter-phone max-md:pt-0 max-md:pb-6"
+      className="mx-auto w-full max-w-search-content flex-none rounded-card border border-hairline bg-surface px-3 py-2 shadow-card max-md:px-gutter-phone max-md:py-1"
       aria-label="Search results"
     >
       <ol>
@@ -135,7 +135,7 @@ export function ResultsView({ query, results, timeZone, calendars }: ResultsView
             key={day.key}
             className="grid grid-cols-[var(--search-date-column)_minmax(0,1fr)] border-t border-divider py-2 first:border-t-0 max-md:grid-cols-[minmax(0,1fr)] max-md:pt-3 max-md:pb-1"
           >
-            <h2 className="pt-3 pl-3 text-small font-medium tracking-[0.04em] text-ink uppercase max-md:pt-0 max-md:pb-1 max-md:pl-0">
+            <h2 className="pt-3 pl-3 font-num text-meta font-semibold text-ink max-md:pt-0 max-md:pb-1 max-md:pl-0">
               <time dateTime={day.key}>{dateLabel(day.date)}</time>
             </h2>
             <ul>
@@ -184,12 +184,12 @@ function ResultRow({ occurrence, day, calendar, timeZone }: ResultRowProps) {
         style={dot}
         aria-hidden="true"
       />
-      <span className="whitespace-nowrap text-ink-2 tabular-nums [grid-area:1/2]">
+      <span className="font-num font-medium whitespace-nowrap text-muted tabular-nums [grid-area:1/2]">
         {timeText(occurrence, timeZone)}
       </span>
       <span className="flex min-w-0 flex-col gap-0.5 [grid-area:1/3] max-md:[grid-area:2/2]">
         <span className="flex flex-wrap gap-x-3">
-          <span className="font-medium wrap-anywhere">{displayTitle(occurrence.title)}</span>
+          <span className="font-semibold wrap-anywhere">{displayTitle(occurrence.title)}</span>
           {occurrence.location !== "" && <span className="wrap-anywhere text-muted">{occurrence.location}</span>}
         </span>
         {repeat !== null && <span className="text-small wrap-anywhere text-muted">{repeat}</span>}
@@ -225,7 +225,7 @@ export function groupResults(results: readonly Occurrence[], timeZone: string): 
   return days;
 }
 
-/** A group's date: "16 Oct 2026, Fri". The stylesheet capitals it, as Google does ("16 OCT 2026, FRI"). */
+/** A group's date: "16 Oct 2026, Fri". */
 export function dateLabel(date: Temporal.PlainDate): string {
   return `${formatDate(date)}, ${weekdayShort(date.dayOfWeek)}`;
 }

@@ -32,9 +32,9 @@
     --fc-monarch-tertiary-over: var(--color-accent-press);
     --fc-monarch-tertiary-down: var(--color-accent-press);
 
-    /* calendar content: an event without a colour, the selection, the time now */
-    --fc-monarch-event: var(--color-accent);
-    --fc-monarch-event-contrast: var(--color-on-accent);
+    /* calendar content: an event without a colour (the block a selection draws; the accent never marks an event), the selection, the time now */
+    --fc-monarch-event: var(--color-ink-2);
+    --fc-monarch-event-contrast: var(--color-surface);
     --fc-monarch-highlight: color-mix(in srgb, var(--color-accent-tint) 60%, transparent);
     --fc-monarch-now: var(--color-now-line);
 

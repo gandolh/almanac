@@ -77,7 +77,7 @@ export function LoginView({
     <main className={GATE_CLASS} aria-busy={pending || wardPending || undefined}>
       <div className="flex w-full max-w-[380px] flex-col gap-6">
         <header className="flex flex-col gap-1.5 px-1">
-          <h1 className="text-title leading-tight font-bold tracking-title text-ink max-md:text-title-phone">
+          <h1 className="font-num text-title leading-tight font-bold tracking-title text-ink max-md:text-title-phone">
             Almanac
           </h1>
           <p className="text-body leading-tight text-muted">Sign in to your calendar.</p>
