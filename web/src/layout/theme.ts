@@ -15,7 +15,7 @@ export const THEMES: readonly Theme[] = ["light", "dark", "system"];
 export const THEME_KEY = "almanac.theme";
 
 /** The page's ground in each scheme, for the browser bar (`theme-color`): the `--color-ground` values in styles/index.css, which a test keeps equal. */
-export const THEME_COLORS = { light: "#ffffff", dark: "#131314" } as const;
+export const THEME_COLORS = { light: "#edede8", dark: "#11110d" } as const;
 
 const DARK_QUERY = "(prefers-color-scheme: dark)";
 

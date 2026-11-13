@@ -137,7 +137,7 @@ describe("ResultsView", () => {
     expect(html).toMatch(/href="[^"]*\/day\/2026\/10\/16"/);
     expect(html).toMatch(/href="[^"]*\/day\/2026\/10\/20"/);
     // Teal, from its calendar.
-    expect(html).toContain("--calendar-color:#009688");
+    expect(html).toContain("--calendar-color:var(--color-cal-teal)");
     expect(html.indexOf("16 Oct 2026")).toBeLessThan(html.indexOf("20 Oct 2026"));
   });
 

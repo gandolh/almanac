@@ -1,7 +1,7 @@
-import { CALENDAR_COLORS, CALENDAR_COLOR_KEYS, type CalendarColor } from "@almanac/shared";
+import { CALENDAR_COLOR_KEYS, type CalendarColor } from "@almanac/shared";
 import type { CSSProperties } from "react";
-import { eventInk } from "../calendar/events";
 import { CheckIcon } from "../components/icons";
+import { calendarColor, calendarInk } from "../data/calendars";
 import { ToggleGroup, ToggleItem } from "../components/ui/ToggleGroup";
 
 /** "blue" → "Blue": a colour's name for the screen reader and the tooltip. */
@@ -19,7 +19,7 @@ export interface ColorPickerProps {
 }
 
 /**
- * The calendar palette (`CALENDAR_COLORS`, in its order) as two rows of
+ * The calendar palette (`CALENDAR_COLOR_KEYS`, in its order) as two rows of
  * round swatches, the chosen one ticked. A guarded toggle group: one swatch
  * stays pressed, the arrow keys only move focus between swatches, and Enter,
  * Space or a click chooses (so a picker that saves at once is not flooded).
@@ -42,9 +42,7 @@ export function ColorPicker({ value, onChange, label = "Colour", autoFocus = fal
             title={colorName(color)}
             data-autofocus={autoFocus && chosen ? "" : undefined}
             className="flex size-8 items-center justify-center rounded-pill bg-(color:--swatch) p-0 text-(color:--on-calendar) transition-[box-shadow] duration-(--duration-fast) ease-out hover:shadow-[0_0_0_4px_color-mix(in_srgb,var(--swatch)_24%,transparent)] focus-visible:outline-offset-3 max-md:size-touch"
-            style={
-              { "--swatch": CALENDAR_COLORS[color], "--on-calendar": eventInk(CALENDAR_COLORS[color]) } as CSSProperties
-            }
+            style={{ "--swatch": calendarColor({ color }), "--on-calendar": calendarInk(color) } as CSSProperties}
           >
             {chosen && <CheckIcon size={18} strokeWidth={3} />}
           </ToggleItem>

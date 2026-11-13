@@ -229,12 +229,12 @@ describe("the calendars store", () => {
     expect(store.resource.store.getState().value).toEqual([personal]);
   });
 
-  it("sorts by position, then id, and colours from the palette", () => {
+  it("sorts by position, then id, and colours from the tokens", () => {
     const a = makeCalendar(3, "A", { position: 0 });
     const b = makeCalendar(1, "B", { position: 0 });
     expect(sortCalendars([work, a, b]).map((c) => c.id)).toEqual([1, 3, 2]);
-    expect(calendarColor(work)).toBe("#009688");
-    expect(calendarColor(personal)).toBe("#4285F4");
+    expect(calendarColor(work)).toBe("var(--color-cal-teal)");
+    expect(calendarColor(personal)).toBe("var(--color-cal-blue)");
   });
 });
 

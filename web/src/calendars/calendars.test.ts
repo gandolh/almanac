@@ -54,7 +54,7 @@ describe("CalendarRow", () => {
     const html = row();
     expect(tagWith(html, "input", 'type="checkbox"')).toContain('type="checkbox"');
     expect(tagWith(html, "input", 'type="checkbox"')).toContain('checked=""');
-    expect(html).toContain("--calendar-color:#33B679");
+    expect(html).toContain("--calendar-color:var(--color-cal-green)");
     expect(html).toContain(">Work</span>");
   });
 

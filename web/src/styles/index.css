@@ -9,9 +9,13 @@
    unlayered rule beats every layered one, so it is imported into the
    `fullcalendar` layer; that sits under `components` and `utilities`, so the
    utilities passed through its class-name options win. */
-@layer theme, base, fullcalendar, components, utilities;
+@layer theme, base, vendor, fullcalendar, components, utilities;
 
 @import "tailwindcss";
+
+/* The fonts: self-hosted variable files from @fontsource, in the `vendor` layer (after `base`, so the page's own rules win). */
+@import "@fontsource-variable/sofia-sans/wght.css" layer(vendor);
+@import "@fontsource-variable/sofia-sans-condensed/wght.css" layer(vendor);
 
 /* dark: follows the theme switch, never the system alone: Dark always, System only while the system is dark. */
 @custom-variant dark {
@@ -42,76 +46,102 @@
 }
 
 /*
- * The 117 tokens. Static, so every one is in the page whether or not a
- * utility uses it: the calendar's sheet loads later and reads them.
- * Google Calendar's look, played straight (corpus/wiki/decisions.md): white
- * surfaces, #1f1f1f text, one #0b57d0 accent, a 64 px top bar over a 256 px
- * left column, the system font with Roboto where it is installed. Each colour
- * is light-dark(light, dark): the dark values are a first pass, in Google's
- * dark palette, that the redesign refines; each text and icon pair clears 4.5:1.
+ * The tokens. Static, so every one is in the page whether or not a utility
+ * uses it: the calendar's sheet loads later and reads them. Almanac's own
+ * look (web/DESIGN.md): olive-tinted neutrals on a ground, raised cards, one
+ * moss accent that marks only the chosen view and day, Create, links and
+ * focus (never an event), Sofia Sans with Sofia Sans Condensed for every date
+ * and time. Each colour is light-dark(light, dark), picked by `color-scheme`
+ * on :root; only the shadows differ by theme, in the block after this one.
+ * Each text and icon pair clears 4.5:1 (scripts/contrast.mjs).
  */
 @theme static {
-  /* Colour */
-  --color-ground: light-dark(#ffffff, #131314); /* page background */
-  --color-surface: light-dark(#ffffff, #1e1f20); /* panels, menus, popovers, dialogs */
-  --color-control: light-dark(#e9eef6, #2d2f31); /* secondary buttons */
-  --color-field: light-dark(#f0f4f9, #282a2c); /* filled text fields */
-  --color-hairline: light-dark(#dadce0, #3c4043); /* borders between surfaces, the grid's lines */
-  --color-divider: light-dark(#dadce0, #444746); /* rules inside a surface */
-  --color-outline: light-dark(#747775, #8e918f); /* outlined buttons: Today, the view switcher */
-  --color-ink: light-dark(#1f1f1f, #e3e3e3); /* primary text */
-  --color-ink-2: light-dark(#444746, #c4c7c5); /* secondary text, icons */
-  --color-muted: light-dark(#5f6368, #a0a4a8); /* captions, labels, other months' days (6.3:1 on white) */
-  --color-accent: light-dark(#0b57d0, #a8c7fa); /* the one interactive colour, and today */
-  --color-accent-press: light-dark(#0842a0, #d3e3fd); /* pressed, link hover */
-  --color-accent-ink: light-dark(#041e49, #d3e3fd); /* text on the accent tint: the chosen view */
-  --color-accent-tint: light-dark(#d3e3fd, #0842a0); /* the chosen view, the shown date, an open menu button */
-  --color-accent-tint-soft: light-dark(#e8f0fe, #1a2a47); /* a menu row under the pointer, a notice */
-  --color-toast-surface: light-dark(#303030, #e3e3e3); /* the snackbar */
-  --color-toast-ink: light-dark(#f2f2f2, #1f1f1f);
-  --color-toast-action: light-dark(#a8c7fa, #0b57d0);
-  --color-now-line: light-dark(#ea4335, #f28b82); /* the current time across day and week, Google's red */
+  /* Colour: olive-tinted neutrals and one moss accent */
+  --color-ground: light-dark(#edede8, #11110d); /* the page behind the cards */
+  --color-surface: light-dark(#fdfdfa, #22231e); /* cards, the header band, menus, popovers, dialogs */
+  --color-control: light-dark(#e4e4de, #2c2d27); /* secondary fills: a control under the pointer, the segmented track */
+  --color-field: light-dark(#e4e4de, #090907); /* the search field, fields in the dialog, the all-day row */
+  --color-hairline: light-dark(#d6d6cf, #3f3f38); /* a card's edge, the grid's lines */
+  --color-divider: light-dark(#d6d6cf, #3f3f38); /* rules inside a surface */
+  --color-outline: light-dark(#808178, #808178); /* edges that must be seen: buttons, fields, checkboxes */
+  --color-ink: light-dark(#1a1b14, #eaeae4); /* primary text */
+  --color-ink-2: light-dark(#3d3e35, #cfcfc7); /* secondary text, icons */
+  --color-muted: light-dark(#5d5f56, #abaca3); /* hours, weekday names, other months' days */
+  --color-accent: light-dark(#516312, #bdd18f); /* Create, the chosen view and day, links, focus */
+  --color-accent-press: light-dark(#3d4c0c, #d4e3b0); /* pressed, link hover */
+  --color-accent-ink: light-dark(#344106, #e2eec9); /* text on the accent tint */
+  --color-accent-tint: light-dark(#e4efce, #333c1e); /* the shown week, today's head, the chosen segment */
+  --color-accent-tint-soft: light-dark(#eff4e0, #272d17); /* a menu row under the pointer, a notice */
+  --color-toast-surface: light-dark(#1a1b14, #eaeae4); /* the snackbar */
+  --color-toast-ink: light-dark(#f2f2ec, #1a1b14);
+  --color-toast-action: light-dark(#bdd18f, #516312);
+  --color-now-line: light-dark(#c1351e, #fa8467); /* the now line, its 10:30 chip, the list's now rule */
+  --color-on-now: light-dark(#fdfdfa, #2a0e06); /* text on the 10:30 chip */
+  --color-danger: light-dark(#b02a2d, #f47a79); /* Delete and error text, always with a label */
+
+  /* The calendar colours: the store keeps a key (shared/src/calendar.ts), the web maps each key to a solid
+     fill and the text on it, per theme. Light: OKLCH (0.50, 0.13, hue) with the page's light ink on it;
+     dark: (0.80, 0.11, hue) with (0.22, 0.04, hue) on it. Blue, green, orange and purple are the board's own. */
+  --color-cal-blue: light-dark(#2863ab, #8dc1ff);
+  --color-on-cal-blue: light-dark(#fdfdfa, #0d1b2d);
+  --color-cal-teal: light-dark(#00787a, #57d4d4);
+  --color-on-cal-teal: light-dark(#fdfdfa, #002020);
+  --color-cal-green: light-dark(#137738, #89d298);
+  --color-on-cal-green: light-dark(#fdfdfa, #0b2010);
+  --color-cal-olive: light-dark(#5a6d00, #b4c875);
+  --color-on-cal-olive: light-dark(#fdfdfa, #181d06);
+  --color-cal-yellow: light-dark(#805e00, #d9bb66);
+  --color-on-cal-yellow: light-dark(#fdfdfa, #221a03);
+  --color-cal-orange: light-dark(#9d4616, #f9a782);
+  --color-on-cal-orange: light-dark(#fdfdfa, #2a140a);
+  --color-cal-red: light-dark(#a03f3c, #fda19a);
+  --color-on-cal-red: light-dark(#fdfdfa, #2b1311);
+  --color-cal-pink: light-dark(#9c3e60, #f89fbb);
+  --color-on-cal-pink: light-dark(#fdfdfa, #29121a);
+  --color-cal-purple: light-dark(#7f4995, #d9a8ef);
+  --color-on-cal-purple: light-dark(#fdfdfa, #221527);
+  --color-cal-graphite: light-dark(#606369, #babec4);
+  --color-on-cal-graphite: light-dark(#fdfdfa, #181b1f);
 
   /* Derived: mixes and aliases of the above, never a new hue */
-  --color-on-accent: var(--color-surface); /* text on the accent */
+  --color-on-accent: light-dark(#fdfdfa, #192003); /* text on the accent */
   --color-control-hover: color-mix(in srgb, var(--color-control) 92%, var(--color-ink));
   --color-control-press: color-mix(in srgb, var(--color-control) 84%, var(--color-ink));
-  /* Google's state layers: ink at 8% under the pointer, 12% pressed. */
+  /* State layers: ink at 8% under the pointer, 12% pressed. */
   --color-hover: color-mix(in srgb, var(--color-ink-2) 8%, transparent);
   --color-press: color-mix(in srgb, var(--color-ink-2) 12%, transparent);
   --color-field-placeholder: var(--color-muted);
   --color-focus-ring: var(--color-accent);
   --color-selection: var(--color-accent-tint);
   --color-scrollbar-thumb: color-mix(in srgb, var(--color-muted) 40%, var(--color-ground));
-  --color-scrim: light-dark(
-    color-mix(in srgb, var(--color-ink) 32%, transparent),
-    rgb(0 0 0 / 0.6)
-  ); /* behind a dialog or the drawer */
+  --color-scrim: light-dark(rgb(26 27 20 / 0.5), rgb(0 0 0 / 0.62)); /* behind a dialog or the drawer */
   --color-toast-hover: color-mix(
     in srgb,
     var(--color-toast-ink) 8%,
     transparent
   ); /* the toast's buttons under the pointer */
 
-  /* Type */
-  --font-sans: Roboto, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  /* Type: Sofia Sans, and Sofia Sans Condensed for every date and time. Six sizes: 12 13 14 16 18 22. */
+  --font-sans: "Sofia Sans Variable", system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-num: "Sofia Sans Condensed Variable", "Sofia Sans Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
   --text-title: 34px; /* the login page's wordmark, 700, -0.02em */
   --text-title-phone: 32px;
-  --text-brand: 22px; /* "Almanac" in the top bar */
-  --text-range: 22px; /* "October 2026" in the top bar */
-  --text-range-phone: 17px;
-  --text-heading: 18px; /* a dialog's title */
-  --text-action-large: 16px; /* a large primary action, 600 */
+  --text-brand: 22px; /* "Almanac" in the header band, Condensed 700 */
+  --text-range: 22px; /* "9 – 15 Nov 2026" in the header band, Condensed 600 */
+  --text-range-phone: 22px;
+  --text-heading: 18px; /* a card's or a dialog's title, 600 */
+  --text-action-large: 16px; /* a large primary action, 600; a phone list's titles */
   --text-input-phone: 16px; /* fields: below 16 px iOS zooms in */
-  --text-body: 15px;
+  --text-body: 14px; /* the UI and list rows */
   --text-meta: 14px; /* controls on the desktop, menu rows, Create */
-  --text-small: 13px; /* hints and field errors */
-  --text-label: 12px; /* field labels, 600; the year view's days */
-  --text-mini: 11px; /* the mini-month's days and weekday initials */
+  --text-small: 13px; /* event titles, hints and field errors */
+  --text-label: 12px; /* weekday names, hours, All day, field labels, 600 */
+  --text-mini: 12px; /* the mini-month's weekday initials, the hour labels */
   --text-badge: 9px; /* the day's number on the phone's Today icon, 700 */
-  --text-day-number: 26px; /* the date under a weekday in day and week */
-  --text-day-number-phone: 18px;
-  --text-event: 12px; /* events and the hour labels in the views */
+  --text-day-number: 22px; /* the date under a weekday in day and week, Condensed 600 */
+  --text-day-number-phone: 22px;
+  --text-event: 13px; /* an event's title */
+  --text-event-time: 12px; /* an event's time line, Condensed 500 */
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -123,52 +153,50 @@
 
   /* Radii */
   --radius-small: 4px; /* a menu row, a colour swatch */
-  --radius-control: 8px; /* buttons, notices, popovers, menus */
+  --radius-event: 6px; /* an event block */
+  --radius-control: 10px; /* buttons, notices, popovers, menus */
   --radius-field: 10px; /* text fields */
-  --radius-container: 16px; /* the login panel, the Create button */
-  --radius-sheet: 20px; /* dialogs */
+  --radius-card: 12px; /* every card: the grid, the day, the calendars */
+  --radius-container: 16px; /* the login panel, dialogs */
+  --radius-sheet: 20px; /* the phone's bottom sheet */
   --radius-pill: 999px;
 
-  /* Elevation: only what floats casts a shadow */
-  /* Google's level 1: the Create button at rest. */
-  --shadow-raised: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
-  /* Level 2: the Create button under the pointer, the round phone button. */
-  --shadow-raised-hover: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
-  /* Menus, popovers, the toast. */
-  --shadow-float: 0 4px 8px 3px rgba(60, 64, 67, 0.15), 0 1px 3px rgba(60, 64, 67, 0.3);
-  /* Dialogs. */
-  --shadow-dialog:
-    0 24px 38px 3px rgba(60, 64, 67, 0.14), 0 9px 46px 8px rgba(60, 64, 67, 0.12),
-    0 11px 15px -7px rgba(60, 64, 67, 0.2);
+  /* Elevation: a card has a hairline and a soft shadow in light; dark drops the shadow and keeps the edge. */
+  --shadow-card: 0 1px 2px rgb(26 27 20 / 0.07), 0 4px 14px rgb(26 27 20 / 0.06);
+  --shadow-raised: 0 1px 2px rgb(26 27 20 / 0.12), 0 2px 6px rgb(26 27 20 / 0.08); /* the dragged event's block */
+  --shadow-float: 0 8px 28px rgb(26 27 20 / 0.18), 0 0 0 1px var(--color-hairline); /* menus, popovers, the toast */
+  --shadow-dialog: var(--shadow-float);
 
   /* Sizes */
   --size-touch: 44px; /* the smallest target on a phone */
   --height-control: 34px; /* buttons on the desktop */
   --height-control-large: 48px; /* a large primary action */
-  --size-icon-button: 40px; /* round icon buttons: ☰ ‹ › */
+  --size-icon-button: 40px; /* round icon buttons: menu, ‹ › */
   --size-icon-button-small: 28px; /* the mini-month's ‹ › */
   --height-outlined: 36px; /* Today, the view switcher */
-  --height-topbar: 64px;
-  --width-sidebar: 256px;
+  --height-topbar: 56px; /* the header band */
+  --width-sidebar: 276px;
   --width-drawer: 304px;
-  --height-create: 56px;
-  --size-fab: 56px;
+  --height-create: 44px;
+  --size-fab: 52px; /* the phone's extended Create is 52 px tall */
+  --height-bottom-bar: 64px; /* the phone's view bar, plus the gesture inset */
+  --height-hour: 48px; /* one hour of the week grid */
   --size-account-disc: 32px;
   --size-mini-cell: 32px; /* a mini-month column */
-  --size-mini-day: 24px; /* its day circle */
+  --size-mini-day: 28px; /* its day tab */
   --size-year-cell: 32px; /* a year view column */
   --size-year-day: 28px; /* its day circle */
   --size-day-dot: 4px; /* the "has events" dot */
   --size-swatch: 14px; /* a calendar's colour square in the left column */
-  --width-popover: 448px;
-  --size-day-disc: 46px; /* the circle round a date in day and week's heads; today's is filled */
+  --width-popover: 340px;
+  --size-day-disc: 46px; /* the date's tab in day and week's heads; today's is filled */
   --size-day-disc-phone: 32px;
   --container-menu: 224px;
   --container-dialog-small: 400px;
   --container-dialog-medium: 560px;
   --container-dialog-large: 720px;
   --container-toast: 568px;
-  --spacing-gutter-desktop: 8px; /* the top bar's ends */
+  --spacing-gutter-desktop: 8px; /* the header band's ends */
   --spacing-gutter-phone: 16px;
 
   /* Search */
@@ -180,10 +208,10 @@
   --container-search-content: 880px; /* the results' reading width */
 
   /* The event editor */
-  --height-editor-field: 36px; /* a field on the desktop (a phone's is --touch) */
+  --height-editor-field: 40px; /* a field on the desktop (a phone's is --touch) */
   --spacing-editor-lead: 44px; /* the icon column of a form row */
   --width-date-field: 148px;
-  --width-time-field: 88px;
+  --width-time-field: 88px; /* 112 px on a phone */
   --width-count-field: 72px;
   --height-time-list: 240px; /* the time list scrolls past this */
   --size-day-toggle: 32px; /* a weekday's round toggle in "Custom days…" */
@@ -196,6 +224,21 @@
 
   /* Motion: state changes only, short, ease-out */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Colour-scheme cannot switch a shadow, so the dark theme (and System while the system is dark) says its own. */
+:root[data-theme="dark"] {
+  --shadow-card: none;
+  --shadow-raised: 0 1px 3px rgb(0 0 0 / 0.5);
+  --shadow-float: 0 0 0 1px var(--color-hairline);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="system"] {
+    --shadow-card: none;
+    --shadow-raised: 0 1px 3px rgb(0 0 0 / 0.5);
+    --shadow-float: 0 0 0 1px var(--color-hairline);
+  }
 }
 
 /* Enter animations (state changes only, short, ease-out). There are no exit animations. */
@@ -285,7 +328,12 @@
     color-scheme: light dark;
   }
 
-  /* The app's 15 px lives on body; html keeps the reader's own size. */
+  /* The page's ground sits on html and body both, so no overscroll or short page shows another colour. The app's
+     14 px lives on body; html keeps the reader's own size. */
+  html {
+    background: var(--color-ground);
+  }
+
   body {
     min-height: 100dvh;
     background: var(--color-ground);

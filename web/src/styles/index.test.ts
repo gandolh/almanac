@@ -13,6 +13,8 @@ async function build(candidates: string[]): Promise<string> {
   const compiler = await compile(source, {
     base: here,
     async loadStylesheet(id, base) {
+      // The fonts' @font-face files add no rule these tests read: they stay empty.
+      if (id.startsWith("@fontsource")) return { path: id, base, content: "" };
       const path = id === "tailwindcss" ? resolve(tailwindDir, "index.css") : resolve(base, id);
       return { path, base: dirname(path), content: readFileSync(path, "utf8") };
     },
@@ -26,16 +28,16 @@ const hasRule = (css: string, name: string) =>
 
 describe("the one stylesheet", () => {
   it("fixes the layer order before anything else is read", () => {
-    const order = source.indexOf("@layer theme, base, fullcalendar, components, utilities;");
+    const order = source.indexOf("@layer theme, base, vendor, fullcalendar, components, utilities;");
     expect(order).toBeGreaterThanOrEqual(0);
     expect(order).toBeLessThan(source.indexOf("@import"));
   });
 
-  it("defines exactly the 117 tokens", () => {
+  it("defines exactly the 145 tokens", () => {
     const theme = /@theme static \{([\s\S]*?)\n\}/.exec(source)?.[1] ?? "";
     const plain = /\n:root \{([\s\S]*?)\n\}/.exec(source)?.[1] ?? "";
     const count = (css: string) => css.match(/^\s*--[a-z0-9-]+:/gm)?.length ?? 0;
-    expect(count(theme) + count(plain)).toBe(117);
+    expect(count(theme) + count(plain)).toBe(145);
   });
 
   it("makes Almanac's tokens into utilities", async () => {

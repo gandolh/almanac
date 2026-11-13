@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="light" />
     <meta name="description" content="A personal calendar." />
     <!-- The ground of the light theme, as the manifest's; the script below and layout/theme.ts change both metas with the theme. -->
-    <meta name="theme-color" content="#FFFFFF" />
+    <meta name="theme-color" content="#EDEDE8" />
     <!-- The saved theme before the first paint, so a dark choice never flashes light; light on a first visit.
          The colours are --color-ground's two values in styles/index.css (a test keeps them equal). -->
     <script>
@@ -22,7 +22,7 @@
           theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
         document.documentElement.dataset.theme = theme;
         document.querySelector('meta[name="color-scheme"]').content = theme === "system" ? "light dark" : theme;
-        document.querySelector('meta[name="theme-color"]').content = dark ? "#131314" : "#FFFFFF";
+        document.querySelector('meta[name="theme-color"]').content = dark ? "#11110d" : "#EDEDE8";
       })();
     </script>
     <!-- The home-screen icon. No offline: the service worker is for Web Push only and caches nothing (corpus/wiki/decisions.md). -->

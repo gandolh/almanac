@@ -1,6 +1,6 @@
 import type { Calendar, EditScope, Occurrence } from "@almanac/shared";
 import type { EventInput } from "@fullcalendar/react";
-import { calendarColor } from "../data/calendars";
+import { calendarColor, calendarInk } from "../data/calendars";
 import type { EventPatchBody } from "../data/occurrences";
 import { Temporal, wireInstant, type CalendarView } from "../dates";
 
@@ -35,35 +35,12 @@ export function displayTitle(title: string): string {
   return title.trim() === "" ? "(No title)" : title;
 }
 
-// --- Colour ------------------------------------------------------------------------------------
-
-/** WCAG relative luminance of `#RRGGBB`. */
-function luminance(hex: string): number {
-  const channels = [1, 3, 5].map((at) => Number.parseInt(hex.slice(at, at + 2), 16) / 255);
-  const [r = 0, g = 0, b = 0] = channels.map((c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-}
-
-/** The text on an event: white, and the light theme's ink where white can't be read. */
-const INK = { light: "#ffffff", dark: "#1f1f1f" } as const;
-
-/**
- * The text colour on an event of `hex`: white, as Google writes on its
- * event colours, except on the palette's light yellow, where white can't be
- * read and dark ink is used. The calendar colours are data and the same in
- * both themes, so the text on them is fixed too: a theme token would turn
- * light with the dark theme and vanish on the yellow.
- */
-export function eventInk(hex: string): string {
-  return luminance(hex) > 0.5 ? INK.dark : INK.light;
-}
-
 // --- Occurrences in ------------------------------------------------------------------------------
 
 /**
  * FullCalendar's events for `occurrences`: only those on a visible calendar
  * the list knows (a calendar still loading, or just deleted, shows nothing),
- * each in its calendar's colour, with the occurrence itself in
+ * each in its calendar's colour (a token per theme, with the text colour made for it), with the occurrence itself in
  * `extendedProps.occurrence` for the clicks and drags to read back.
  */
 export function toEventInputs(occurrences: readonly Occurrence[], calendars: readonly Calendar[]): EventInput[] {
@@ -80,7 +57,7 @@ export function toEventInputs(occurrences: readonly Occurrence[], calendars: rea
       end: occurrence.end,
       allDay: occurrence.allDay,
       color,
-      contrastColor: eventInk(color),
+      contrastColor: calendarInk(calendar.color),
       extendedProps: { occurrence },
     });
   }

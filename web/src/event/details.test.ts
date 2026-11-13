@@ -92,7 +92,7 @@ describe("EventDetails", () => {
     const html = details();
     expect(html).toMatch(/<h2 id="title"[^>]*>Standup<\/h2>/);
     expect(html).toContain("Friday, 16 October · 10:00 – 11:00");
-    expect(html).toContain('style="--calendar-color:#009688"');
+    expect(html).toContain('style="--calendar-color:var(--color-cal-teal)"');
     expect(html).toMatch(/<p[^>]*>Work<\/p>/);
     for (const label of ["Edit event", "Delete event", "Close"]) expect(html).toContain(`aria-label="${label}"`);
     // Every icon at 20 px, the size the rows are laid out for.

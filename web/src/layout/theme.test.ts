@@ -25,7 +25,7 @@ function mockSystem(initiallyDark: boolean) {
 }
 
 function page() {
-  document.head.innerHTML = '<meta name="color-scheme" content="light" /><meta name="theme-color" content="#FFFFFF" />';
+  document.head.innerHTML = '<meta name="color-scheme" content="light" /><meta name="theme-color" content="#EDEDE8" />';
   delete document.documentElement.dataset.theme;
   return {
     theme: () => document.documentElement.dataset.theme,
@@ -82,9 +82,9 @@ describe("the stored choice", () => {
 
 describe("setTheme", () => {
   it.each([
-    ["light", "light", "light", "#ffffff"],
-    ["dark", "dark", "dark", "#131314"],
-    ["system", "system", "light dark", "#ffffff"],
+    ["light", "light", "light", "#edede8"],
+    ["dark", "dark", "dark", "#11110d"],
+    ["system", "system", "light dark", "#edede8"],
   ] as const)("%s sets data-theme, the color-scheme meta and the bar", async (choice, attribute, scheme, bar) => {
     mockSystem(false);
     const html = page();
@@ -99,13 +99,13 @@ describe("setTheme", () => {
     const html = page();
     const { setTheme, getTheme } = await load();
     setTheme("system");
-    expect(html.bar()).toBe("#ffffff");
+    expect(html.bar()).toBe("#edede8");
     setSystemDark(true);
-    expect(html.bar()).toBe("#131314");
+    expect(html.bar()).toBe("#11110d");
     expect(html.theme()).toBe("system");
     expect(getTheme()).toBe("system");
     setSystemDark(false);
-    expect(html.bar()).toBe("#ffffff");
+    expect(html.bar()).toBe("#edede8");
   });
 
   it("leaves a fixed choice alone when the system changes", async () => {
@@ -113,7 +113,7 @@ describe("setTheme", () => {
     const html = page();
     (await load()).setTheme("light");
     setSystemDark(true);
-    expect(html.bar()).toBe("#ffffff");
+    expect(html.bar()).toBe("#edede8");
   });
 
   it("keeps the choice for the tab when storage is blocked", async () => {

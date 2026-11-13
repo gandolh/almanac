@@ -1,5 +1,4 @@
 import {
-  CALENDAR_COLORS,
   calendarListSchema,
   calendarSchema,
   type Calendar,
@@ -147,7 +146,15 @@ export function currentCalendars(): readonly Calendar[] {
   return calendarsStore.resource.store.getState().value;
 }
 
-/** A calendar's colour as a hex value (`#4285F4`), from the shared palette. */
+/**
+ * A calendar's colour as the CSS value the views use: its key's solid fill in the current theme
+ * (`var(--color-cal-blue)`, styles/index.css). The store keeps the key; the web maps it to its own tokens.
+ */
 export function calendarColor(calendar: { color: CalendarColor }): string {
-  return CALENDAR_COLORS[calendar.color];
+  return `var(--color-cal-${calendar.color})`;
+}
+
+/** The text colour on a calendar's solid fill (`var(--color-on-cal-blue)`): light ink on the light theme's solids, near-black on the dark theme's. */
+export function calendarInk(color: CalendarColor): string {
+  return `var(--color-on-cal-${color})`;
 }

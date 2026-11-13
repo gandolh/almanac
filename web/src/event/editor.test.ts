@@ -126,7 +126,7 @@ describe("CalendarSelect", () => {
     );
     expect(html).toContain('<option value="1">Work</option>');
     expect(html).toContain('<option value="2" selected="">Gym</option>');
-    expect(html).toContain("--calendar-color:#F6BF26");
+    expect(html).toContain("--calendar-color:var(--color-cal-yellow)");
   });
 
   it("waits for the calendars to load", () => {

@@ -301,8 +301,8 @@ describe("DayList", () => {
       occurrence("e1", { title: "  ", calendarId: 1 }),
       occurrence("e2", { title: "Dinner", calendarId: 2, start: "2026-10-16T16:00:00Z", end: "2026-10-16T17:00:00Z" }),
     ]);
-    expect(html).toContain("--calendar-color:#009688");
-    expect(html).toContain("--calendar-color:#F6BF26");
+    expect(html).toContain("--calendar-color:var(--color-cal-teal)");
+    expect(html).toContain("--calendar-color:var(--color-cal-yellow)");
     expect(rows(html)).toEqual(["10:00 (No title)", "19:00 Dinner"]);
   });
 

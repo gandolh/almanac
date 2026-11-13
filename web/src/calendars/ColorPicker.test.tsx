@@ -15,7 +15,7 @@ describe("ColorPicker", () => {
     expect(swatches.map((swatch) => swatch.getAttribute("aria-label"))).toEqual(
       CALENDAR_COLOR_KEYS.map((color) => color.charAt(0).toUpperCase() + color.slice(1)),
     );
-    expect(swatches[0]?.style.getPropertyValue("--swatch")).toBe("#4285F4");
+    expect(swatches[0]?.style.getPropertyValue("--swatch")).toBe("var(--color-cal-blue)");
     expect(screen.getAllByRole("button", { pressed: true })).toHaveLength(1);
     expect(screen.getByRole("button", { name: "Green", pressed: true }).querySelector("svg")).not.toBeNull();
     expect(document.querySelectorAll("svg")).toHaveLength(1);
