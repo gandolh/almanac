@@ -10,6 +10,9 @@ import { useCallback, useSyncExternalStore } from "react";
 /** From here up the layout is the desktop one. */
 export const DESKTOP_QUERY = "(min-width: 768px)";
 
+/** From here up the left column sits beside the view (below it, the column is the drawer). */
+export const WIDE_QUERY = "(min-width: 1100px)";
+
 /** Whether a media query matches now; re-renders when that changes. */
 export function useMediaQuery(query: string): boolean {
   const subscribe = useCallback(
@@ -30,4 +33,9 @@ export function useMediaQuery(query: string): boolean {
 /** True on the desktop layout (768 px and wider), false on a phone. */
 export function useIsDesktop(): boolean {
   return useMediaQuery(DESKTOP_QUERY);
+}
+
+/** True from 1100 px: the left column beside the view, the view switch in the header band. */
+export function useIsWide(): boolean {
+  return useMediaQuery(WIDE_QUERY);
 }

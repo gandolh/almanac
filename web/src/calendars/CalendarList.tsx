@@ -24,7 +24,7 @@ function reason(error: unknown, fallback: string): string {
 }
 
 /**
- * The left column's "My calendars" (corpus/wiki/features.md "Calendars"):
+ * The left column's "My calendars" card (corpus/wiki/features.md "Calendars"):
  * each calendar with its show/hide checkbox and a ⋮ menu to rename, recolour
  * or delete it, and a "+" to make a new one. Every change shows at once
  * (data/calendars.ts) and is undone, with a toast, when the server refuses.
@@ -55,16 +55,16 @@ export function CalendarList() {
 
   return (
     <section
-      className="flex flex-col gap-0.5 pr-2 pl-4"
+      className="flex flex-col gap-0.5 rounded-card border border-hairline bg-surface p-3 shadow-card"
       aria-labelledby={headingId}
       aria-busy={status === "loading" || undefined}
     >
-      <header className="flex min-h-9 items-center justify-between pl-1">
-        <h2 id={headingId} className="text-meta leading-tight font-medium text-ink">
+      <header className="mb-1 flex min-h-9 items-center justify-between pl-1">
+        <h2 id={headingId} className="text-heading leading-tight font-semibold text-ink">
           My calendars
         </h2>
         <button type="button" className={ICON_BUTTON_SMALL} aria-label="New calendar" onClick={() => setCreating(true)}>
-          <PlusIcon size={20} />
+          <PlusIcon size={22} />
         </button>
       </header>
       {status === "error" && (

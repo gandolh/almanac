@@ -14,7 +14,7 @@ export interface MiniMonthProps {
 }
 
 /**
- * The left column's month, for jumping to a date: its own ‹ › page through
+ * The left column's month card, for jumping to a date: its own ‹ › page through
  * months without moving the main view; a click on a day (the next or last
  * month's too) moves the main view there. It opens on the main view's month
  * and follows it (the shell keys it by the date, so a new date starts it
@@ -24,9 +24,16 @@ export function MiniMonth({ date, today, onPick }: MiniMonthProps) {
   const [month, setMonth] = useState(() => date.toPlainYearMonth());
   const titleId = useId();
   return (
-    <section className="flex flex-col gap-1 px-4" aria-labelledby={titleId}>
-      <header className="flex items-center justify-between pl-1">
-        <h2 id={titleId} className="text-meta leading-tight font-medium text-ink" aria-live="polite">
+    <section
+      className="flex flex-col gap-1 rounded-card border border-hairline bg-surface p-3 shadow-card"
+      aria-labelledby={titleId}
+    >
+      <header className="mb-1 flex items-center justify-between pl-1">
+        <h2
+          id={titleId}
+          className="font-num text-heading leading-tight font-semibold text-ink tabular-nums"
+          aria-live="polite"
+        >
           {monthTitle(month)}
         </h2>
         <div className="flex gap-1">
@@ -36,7 +43,7 @@ export function MiniMonth({ date, today, onPick }: MiniMonthProps) {
             aria-label="Previous month"
             onClick={() => setMonth(month.subtract({ months: 1 }))}
           >
-            <ChevronLeftIcon size={18} />
+            <ChevronLeftIcon size={20} />
           </button>
           <button
             type="button"
@@ -44,7 +51,7 @@ export function MiniMonth({ date, today, onPick }: MiniMonthProps) {
             aria-label="Next month"
             onClick={() => setMonth(month.add({ months: 1 }))}
           >
-            <ChevronRightIcon size={18} />
+            <ChevronRightIcon size={20} />
           </button>
         </div>
       </header>

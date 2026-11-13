@@ -30,7 +30,7 @@ export function initialOf(username: string): string {
  * The account button and its menu, in place of a Settings page
  * (corpus/wiki/features.md "Account menu"): Change password, Sign in with
  * Ward (link or unlink), Time zone…, Theme…, Notifications, then Sign out.
- * The button is a disc with the username's initial, as Google's is with a photo.
+ * The button is a 44 px target round a 32 px disc with the username's initial.
  */
 export function AccountMenu() {
   const session = useSession();
@@ -92,11 +92,11 @@ export function AccountMenu() {
       <Menu
         label="Account"
         triggerLabel={username ? `Account: ${username}` : "Account"}
-        triggerClassName="flex size-icon-button items-center justify-center rounded-pill bg-transparent p-0 transition-[background-color] duration-(--duration-fast) ease-out hover:bg-hover aria-expanded:bg-hover"
+        triggerClassName="flex size-touch items-center justify-center rounded-pill bg-transparent p-0 transition-[background-color] duration-(--duration-fast) ease-out hover:bg-hover aria-expanded:bg-hover"
         align="end"
         trigger={
           <span
-            className="flex size-account-disc items-center justify-center rounded-pill bg-accent text-meta leading-none font-medium text-on-accent select-none"
+            className="flex size-account-disc items-center justify-center rounded-pill bg-accent-tint text-meta leading-none font-semibold text-accent-ink select-none"
             aria-hidden="true"
           >
             {initialOf(username)}

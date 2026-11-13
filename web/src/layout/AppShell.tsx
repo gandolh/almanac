@@ -27,8 +27,10 @@ import { runCommand } from "./commands";
 import { useShortcuts, type Shortcut } from "./shortcuts";
 import { useSwipe } from "./swipe";
 import { Sidebar } from "./Sidebar";
-import { TopBar } from "./TopBar";
-import { useIsDesktop } from "../components/viewport";
+import { TopBar, type BarLayout } from "./TopBar";
+import { ViewBar } from "./ViewSwitcher";
+import { WeekAgenda } from "./WeekAgenda";
+import { useIsDesktop, useIsWide } from "../components/viewport";
 import { cn } from "../lib/cn";
 
 // FullCalendar is most of the bundle: the views load on first use, the year view and search don't need it.
@@ -72,11 +74,17 @@ function writeColumnPref(open: boolean): void {
 }
 
 /**
- * The signed-in app, Google Calendar's layout: the top bar over the left
- * column and the view. 768 px and up the column sits beside the view (the
- * menu button hides it, remembered per browser); below, it is a drawer over
- * the view, Create is a round button in the corner, and a sideways swipe
- * on the view steps it (the phone's bar has no room for ‹ ›).
+ * The signed-in app: the header band over the left column and the view.
+ *
+ * - From 1100 px the column (Create, the mini-month, My calendars, the chosen
+ *   day) sits beside the view and scrolls on its own; the menu button hides
+ *   it, remembered per browser.
+ * - From 768 to 1099 px the column is a drawer over the view and the view
+ *   switch is a row under the header.
+ * - Below 768 px the drawer stays, the week is a strip of seven day chips over
+ *   an agenda (the time grid stays in Day), a bottom bar holds the views,
+ *   Create floats above it, and a sideways swipe on the view steps it (the
+ *   phone's bar has no room for ‹ ›).
  *
  * The address is the truth: `/` (and any address the app doesn't have, or an
  * impossible date) goes on to this month in the display time zone, once the
@@ -89,6 +97,7 @@ export function AppShell() {
   const pathname = usePathname();
   const query = useQueryParam("q");
   const desktop = useIsDesktop();
+  const wide = useIsWide();
   const { status: settingsStatus } = useSettings();
   const today = useToday();
   const editor = useEventEditor();
@@ -143,12 +152,15 @@ export function AppShell() {
 
   // The phone's ‹ ›.
   useSwipe(mainRef, !desktop && place.kind === "view", (by) => go(view, stepDate(view, date, by)));
+  const agenda = !desktop && place.kind === "view" && place.view === "week";
 
-  const drawerShown = !desktop && drawerOpen;
+  const barLayout: BarLayout = wide ? "wide" : desktop ? "tablet" : "phone";
+  const drawerShown = !wide && drawerOpen;
   const sidebar = (
     <Sidebar
       date={date}
       today={today}
+      showDay={desktop}
       onPickDate={(picked) => {
         if (drawerShown) closeDrawer();
         go(view, picked);
@@ -167,6 +179,8 @@ export function AppShell() {
           onOpenDay={(day) => go("day", day)}
           onOpenMonth={(first) => go("month", first)}
         />
+      ) : shown === "week" && !desktop ? (
+        <WeekAgenda date={place.date} today={today} onNavigate={go} />
       ) : (
         <Suspense fallback={<div />}>
           <CalendarArea view={shown} date={place.date} onNavigate={go} />
@@ -199,11 +213,11 @@ export function AppShell() {
                 ? "Search"
                 : ""
           }
-          compact={!desktop}
-          sidebarOpen={desktop ? columnOpen : drawerShown}
+          layout={barLayout}
+          sidebarOpen={wide ? columnOpen : drawerShown}
           menuButtonRef={menuButton}
           onMenu={() => {
-            if (desktop) {
+            if (wide) {
               writeColumnPref(!columnOpen);
               setColumnOpen(!columnOpen);
             } else setDrawerOpen(true);
@@ -213,10 +227,10 @@ export function AppShell() {
         />
       </div>
       <div className="flex min-h-0 flex-1">
-        {desktop && (
+        {wide && (
           <aside
             id="sidebar"
-            className="flex w-sidebar flex-none flex-col overflow-y-auto overscroll-contain"
+            className="w-[calc(var(--width-sidebar)+28px)] flex-none overflow-y-auto overscroll-contain pt-4 pb-7 pl-7"
             aria-label="Calendars"
             hidden={!columnOpen}
           >
@@ -226,7 +240,13 @@ export function AppShell() {
         <main
           ref={mainRef}
           id="main"
-          className="flex min-w-0 flex-1 flex-col overflow-auto focus:outline-none"
+          className={cn(
+            "flex min-w-0 flex-1 flex-col overflow-auto focus:outline-none",
+            desktop ? "p-4" : "p-2",
+            wide && "pt-3 pr-7 pb-1",
+            wide && !columnOpen && "pl-7",
+            agenda && "p-0",
+          )}
           tabIndex={-1}
         >
           {main}
@@ -235,15 +255,24 @@ export function AppShell() {
       <Drawer open={drawerShown} onClose={closeDrawer} returnFocus={menuButton}>
         {sidebar}
       </Drawer>
-      {!desktop && !drawerShown && (
-        <button
-          type="button"
-          className="fixed right-[max(16px,env(safe-area-inset-right))] bottom-[max(16px,env(safe-area-inset-bottom))] z-bar flex size-fab items-center justify-center rounded-container bg-surface p-0 text-accent shadow-raised-hover active:bg-accent-tint-soft"
-          aria-label="Create"
-          onClick={() => editor.openCreate()}
-        >
-          <PlusIcon size={26} />
-        </button>
+      {!desktop && (
+        <>
+          {!drawerShown && (
+            <button
+              type="button"
+              className="fixed right-[max(16px,env(safe-area-inset-right))] bottom-[calc(var(--height-bottom-bar)+max(16px,env(safe-area-inset-bottom))+16px)] z-bar flex h-13 items-center justify-center gap-2 rounded-[14px] bg-accent pr-5 pl-4 text-action-large font-semibold text-on-accent shadow-card hover:bg-accent-press active:bg-accent-press max-[379px]:size-14 max-[379px]:rounded-[16px] max-[379px]:p-0"
+              aria-label="Create"
+              aria-keyshortcuts="c"
+              onClick={() => editor.openCreate()}
+            >
+              <PlusIcon size={24} />
+              <span className="max-[379px]:hidden">Create</span>
+            </button>
+          )}
+          <div className="flex-none">
+            <ViewBar view={place.kind === "view" ? place.view : null} date={date} />
+          </div>
+        </>
       )}
       <Toaster />
     </div>

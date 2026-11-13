@@ -31,3 +31,17 @@ export function whenText(occurrence: Pick<Occurrence, "allDay" | "start" | "end"
   }
   return `${formatDayLong(startDay)}, ${formatTime(start)}${RANGE_DASH}${formatDayLong(endDay)}, ${formatTime(end)}`;
 }
+
+/**
+ * `whenText` in two lines, as the details popover writes it: the date first, the time on its own line.
+ * "Wednesday, 11 November" over "11:00 – 12:00" (or "All day"); an event that spans days keeps its one line, as `whenText` writes it.
+ */
+export function whenLines(
+  occurrence: Pick<Occurrence, "allDay" | "start" | "end">,
+  timeZone: string,
+): { date: string; time: string | null } {
+  const text = whenText(occurrence, timeZone);
+  const at = text.indexOf(DOT);
+  if (at < 0) return { date: text, time: null };
+  return { date: text.slice(0, at), time: text.slice(at + DOT.length) };
+}

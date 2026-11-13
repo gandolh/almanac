@@ -54,7 +54,7 @@ export function rowMenuSections(calendar: Calendar, isOnly: boolean, actions: Ro
   ];
 }
 
-/** Three dots, stacked: Google's "options" mark (the shared icons have none). */
+/** Three dots, stacked: the "options" mark (the shared icons have none). */
 function MoreIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
@@ -259,7 +259,7 @@ export function CalendarRow({ calendar, isOnly, onVisibleChange, onRename, onRec
           onChange={(event) => onVisibleChange(event.currentTarget.checked)}
         />
         <span
-          className="flex size-swatch flex-none items-center justify-center rounded-small border-2 border-(color:--calendar-color) text-(color:--on-calendar) peer-checked:bg-(color:--calendar-color) peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus-ring [&>svg]:opacity-0 peer-checked:[&>svg]:opacity-100"
+          className="flex size-5 flex-none items-center justify-center rounded-event border-2 border-(color:--calendar-color) text-(color:--on-calendar) peer-checked:bg-(color:--calendar-color) peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus-ring [&>svg]:opacity-0 peer-checked:[&>svg]:opacity-100"
           aria-hidden="true"
         >
           <CheckIcon size={12} strokeWidth={3.5} />

@@ -38,7 +38,7 @@ export function Drawer({ open, onClose, returnFocus, children }: DrawerProps) {
           <BaseDrawer.Popup
             ref={popupRef}
             id="sidebar"
-            className="fixed inset-y-0 left-0 z-drawer w-[min(var(--width-drawer),85vw)] translate-x-[var(--drawer-swipe-movement-x,0px)] overflow-y-auto overscroll-contain bg-surface pt-[env(safe-area-inset-top)] pr-0 pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] shadow-dialog focus:outline-none data-swiping:select-none motion-safe:animate-drawer-in"
+            className="fixed inset-y-0 left-0 z-drawer w-[min(var(--width-drawer),85vw)] translate-x-[var(--drawer-swipe-movement-x,0px)] overflow-y-auto overscroll-contain bg-ground pt-[env(safe-area-inset-top)] pr-0 pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] shadow-dialog focus:outline-none data-swiping:select-none motion-safe:animate-drawer-in"
             finalFocus={returnFocus}
             initialFocus={() =>
               popupRef.current?.querySelector<HTMLElement>("[data-autofocus]") ??
@@ -47,8 +47,7 @@ export function Drawer({ open, onClose, returnFocus, children }: DrawerProps) {
             }
           >
             <BaseDrawer.Title className="sr-only">Calendars</BaseDrawer.Title>
-            {/* The column inside is a little further from the top here. */}
-            <BaseDrawer.Content className="[&>*]:pt-4">{children}</BaseDrawer.Content>
+            <BaseDrawer.Content>{children}</BaseDrawer.Content>
           </BaseDrawer.Popup>
         </BaseDrawer.Viewport>
       </BaseDrawer.Portal>

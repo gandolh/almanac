@@ -4,16 +4,16 @@
  * where every target is 44 px.
  */
 
-/** The round 40 px icon button (☰ ‹ ›), with a 44 px target on a phone. */
+/** The 40 px icon button (☰ ‹ ›), with a 44 px target on a phone. */
 export const ICON_BUTTON = [
-  "relative inline-flex size-icon-button flex-none items-center justify-center rounded-pill bg-transparent p-0 text-ink-2",
+  "relative inline-flex size-icon-button flex-none items-center justify-center rounded-control bg-transparent p-0 text-ink-2",
   "transition-[background-color] duration-(--duration-fast) ease-out hover:bg-hover active:bg-press",
   "max-md:before:absolute max-md:before:inset-[calc((var(--size-icon-button)-var(--size-touch))/2)]",
 ].join(" ");
 
-/** The mini-month's smaller round button. */
+/** The mini-month's and the calendars' smaller icon button, 36 px. */
 export const ICON_BUTTON_SMALL = [
-  "relative inline-flex size-icon-button-small flex-none items-center justify-center rounded-pill bg-transparent p-0 text-ink-2",
+  "relative inline-flex size-icon-button-small flex-none items-center justify-center rounded-control bg-transparent p-0 text-ink-2",
   "transition-[background-color] duration-(--duration-fast) ease-out hover:bg-hover active:bg-press",
   "max-md:before:absolute max-md:before:inset-[calc((var(--size-icon-button-small)-var(--size-touch))/2)]",
 ].join(" ");

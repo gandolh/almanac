@@ -8,8 +8,9 @@ import { WEEKDAY_INITIALS, WEEKDAY_NAMES, dateKey, formatDayFull, monthWeeks, sa
  * month is the same height: the left column's mini-month (`size: "mini"`)
  * and each of the year view's twelve (`size: "year"`).
  *
- * - Today is a filled accent circle; `selected` (the date the main view is
- *   on) a light accent one.
+ * - Today is a filled accent tab (a rounded square); `selected` (the date the
+ *   main view is on) an accent edge, and in `mini` its whole week sits on the
+ *   accent tint, the week the view shows.
  * - `marked` holds `YYYY-MM-DD` keys (`dateKey`): a dot under the number,
  *   for days with events.
  * - `mini` shows the days of the months either side, muted, and they can be
@@ -32,22 +33,25 @@ export interface MonthGridProps {
 
 /** The cell and the day circle are variables, so a container query in the year view can resize them. */
 const GRID: Record<MonthGridProps["size"], string> = {
-  mini: "w-[calc(var(--cell)*7)] text-mini [--cell:var(--size-mini-cell)] [--day:var(--size-mini-day)]",
+  mini: "w-full text-meta [--cell:auto] [--day:var(--size-mini-day)]",
   year: "w-[calc(var(--cell)*7)] text-label @max-[472px]/year:text-meta [--cell:var(--size-year-cell)] [--day:var(--size-year-day)]",
 };
 
 const cellClass = (size: MonthGridProps["size"]) =>
-  size === "year" ? "h-[calc(var(--day)+2px)] w-(--cell) p-0 text-center" : "h-(--day) w-(--cell) p-0 text-center";
+  size === "year" ? "h-[calc(var(--day)+2px)] w-(--cell) p-0 text-center" : "h-(--day) p-0 text-center";
+
+/** The cells of the shown week (mini): the accent tint, rounded at the week's two ends. */
+const BAND = "bg-accent-tint first:rounded-l-[8px] last:rounded-r-[8px]";
 
 const DAY_CLASS = [
-  "group relative inline-flex size-(--day) items-center justify-center rounded-pill bg-transparent p-0 leading-none font-medium text-ink",
+  "group relative inline-flex h-(--day) w-full items-center justify-center rounded-[8px] bg-transparent p-0 leading-none font-medium text-ink",
   "transition-[background-color] duration-(--duration-fast) ease-out hover:bg-hover focus-visible:outline-offset-0",
   // Another month's day, in the mini-month.
   "data-outside:font-regular data-outside:text-muted",
-  // The date the main view is on: a light accent circle.
-  "data-selected:bg-accent-tint data-selected:text-accent-ink data-selected:hover:bg-accent-tint",
-  // Today: the filled accent circle, everywhere.
-  "data-today:bg-accent data-today:text-on-accent data-today:hover:bg-accent-press",
+  // The date the main view is on: an accent edge (the week's band is on the cell).
+  "data-selected:font-semibold data-selected:text-accent-ink data-selected:shadow-[inset_0_0_0_1.5px_var(--color-accent)]",
+  // Today: the filled accent tab, everywhere.
+  "data-today:bg-accent data-today:font-bold data-today:text-on-accent data-today:hover:bg-accent-press",
 ].join(" ");
 
 const STEPS: Readonly<Record<string, number>> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
@@ -89,7 +93,7 @@ export function MonthGrid({ month, today, selected, marked, onPickDay, size, lab
               key={index}
               scope="col"
               abbr={WEEKDAY_NAMES[index]}
-              className="h-(--day) w-(--cell) p-0 text-center font-medium text-ink-2"
+              className="h-(--day) p-0 text-center text-mini font-medium text-muted"
             >
               {initial}
             </th>
@@ -101,12 +105,13 @@ export function MonthGrid({ month, today, selected, marked, onPickDay, size, lab
           <tr key={dateKey(week[0] ?? today)}>
             {week.map((date) => {
               const key = dateKey(date);
+              const banded = size === "mini" && selected !== undefined && week.some((day) => sameDate(day, selected));
               if (!pickable(date)) return <td key={key} className={cellClass(size)} />;
               const isToday = sameDate(date, today);
               const isSelected = selected !== undefined && sameDate(date, selected);
               const hasEvents = marked?.has(key) ?? false;
               return (
-                <td key={key} className={cellClass(size)}>
+                <td key={key} className={cn(cellClass(size), banded && BAND)}>
                   <button
                     type="button"
                     className={DAY_CLASS}

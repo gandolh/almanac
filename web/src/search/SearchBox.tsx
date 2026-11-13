@@ -7,27 +7,28 @@ import { goBack, lastViewRoute, navigateToSearch, usePathname, useQueryParam, us
 import { normalizeQuery } from "./search-api";
 import { ICON_BUTTON } from "../components/looks";
 
-/** The field lifts and whitens on focus, in the focus ring's place. On a phone it is the top bar: back arrow, the field, ✕. */
+/** The field in the header band: 36 px on `field` with an outline edge; on a phone it is the whole bar: back arrow, the field, ✕. */
 const FORM_CLASS = [
-  "flex h-control-large w-search-field flex-none items-center gap-0.5 rounded-pill bg-field px-1",
-  "transition-[background-color,box-shadow] duration-(--duration-fast) ease-out focus-within:bg-surface focus-within:shadow-raised",
+  "flex h-9 w-search-field flex-none items-center gap-0.5 rounded-control border border-outline bg-field px-1",
+  "focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-focus-ring",
   "max-[1200px]:w-search-field-narrow max-[900px]:w-search-field-narrowest",
-  "max-md:absolute max-md:inset-0 max-md:z-[1] max-md:h-auto max-md:w-auto max-md:rounded-none max-md:bg-ground max-md:pr-gutter-phone max-md:pl-2 max-md:shadow-none max-md:focus-within:bg-ground max-md:focus-within:shadow-none",
+  "max-md:absolute max-md:inset-0 max-md:z-[1] max-md:h-auto max-md:w-auto max-md:rounded-none max-md:border-0 max-md:bg-surface max-md:pr-gutter-phone max-md:pl-2 max-md:focus-within:outline-0",
 ].join(" ");
 
 /** Without the browser's own ✕: ours clears and keeps the focus. 16 px on a phone, so iOS doesn't zoom in. */
 const INPUT_CLASS =
-  "h-full min-w-0 flex-1 appearance-none rounded-pill bg-transparent px-2 text-body text-ink focus-visible:outline-none max-md:text-input-phone [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:hidden [&::-webkit-search-decoration]:appearance-none";
+  "h-full min-w-0 flex-1 appearance-none rounded-control bg-transparent px-2 text-body text-ink focus-visible:outline-none max-md:text-input-phone [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:hidden [&::-webkit-search-decoration]:appearance-none";
 
 /**
- * The top bar's search: a magnifier that opens into a field (on a phone the
- * field covers the whole bar). Enter shows the results at `/search?q=…`;
+ * The header band's search: a magnifier that opens into a field (from 1100 px
+ * the closed state is drawn as the field itself, so the band keeps its shape;
+ * on a phone the open field covers the whole bar). Enter shows the results at `/search?q=…`;
  * Esc or the back arrow closes the field and returns to the last calendar
  * view. The `/` key opens it (the "focusSearch" command). On the results'
  * address the field is open and holds the query, so a link to a search
  * arrives filled in.
  */
-export function SearchBox() {
+export function SearchBox({ wide = false }: { wide?: boolean }) {
   const route = useRoute();
   const pathname = usePathname();
   const query = useQueryParam("q");
@@ -105,7 +106,11 @@ export function SearchBox() {
       <button
         ref={opener}
         type="button"
-        className={ICON_BUTTON}
+        className={
+          wide
+            ? "flex h-9 w-search-field flex-none items-center gap-2 rounded-control border border-outline bg-field px-2.5 text-meta text-muted transition-[background-color] duration-(--duration-fast) ease-out hover:bg-control-hover max-[1200px]:w-search-field-narrow"
+            : ICON_BUTTON
+        }
         aria-label="Search"
         title="Search (/)"
         aria-keyshortcuts="/"
@@ -114,7 +119,8 @@ export function SearchBox() {
           setOpenedAt(pathname);
         }}
       >
-        <SearchIcon />
+        <SearchIcon size={wide ? 18 : 24} />
+        {wide && <span>Search</span>}
       </button>
     );
   }

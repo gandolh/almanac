@@ -172,7 +172,7 @@
   --height-control: 34px; /* buttons on the desktop */
   --height-control-large: 48px; /* a large primary action */
   --size-icon-button: 40px; /* round icon buttons: menu, ‹ › */
-  --size-icon-button-small: 28px; /* the mini-month's ‹ › */
+  --size-icon-button-small: 36px; /* the mini-month's ‹ ›, the calendars' + and ⋮ */
   --height-outlined: 36px; /* Today, the view switcher */
   --height-topbar: 56px; /* the header band */
   --width-sidebar: 276px;
@@ -202,8 +202,8 @@
   /* Search */
   --size-search-dot: 10px; /* a result's (and a day list's) calendar colour dot */
   --width-day-popover: 320px; /* the year view's day list */
-  --width-search-field: 360px; /* the open field in the desktop bar */
-  --width-search-field-narrow: 240px; /* ... under 1200 px */
+  --width-search-field: 224px; /* the field in the header band */
+  --width-search-field-narrow: 192px; /* ... under 1200 px */
   --width-search-field-narrowest: 160px; /* ... under 900 px */
   --container-search-content: 880px; /* the results' reading width */
 
