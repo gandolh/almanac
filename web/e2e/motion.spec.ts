@@ -3,14 +3,22 @@ import { OPEN } from "./helpers";
 
 test.use({ reducedMotion: "reduce" });
 
-/** The CSS animations and transitions still going after the screen has settled. */
+/**
+ * The CSS animations and transitions that still move after the screen has settled: any that runs
+ * longer than the reduced-motion 1 ms or repeats. A 1 ms one caught mid-flight on a busy machine
+ * doesn't count, since it is over before it shows.
+ */
 async function running(page: import("@playwright/test").Page): Promise<string[]> {
   // Long enough for the lazy calendar to load, draw its events and let its own settling transitions end.
   await page.waitForTimeout(1200);
   return page.evaluate(() =>
     document
       .getAnimations()
-      .filter((animation) => animation.playState === "running")
+      .filter((animation) => {
+        if (animation.playState !== "running") return false;
+        const timing = animation.effect?.getComputedTiming();
+        return timing?.iterations === Infinity || Number(timing?.duration ?? 0) > 1;
+      })
       .map(
         (animation) =>
           `${animation.constructor.name} ${(animation as CSSAnimation).animationName ?? (animation as CSSTransition).transitionProperty}`,
