@@ -16,6 +16,13 @@
       "path": "web/src",
       "match": "--calendar-color",
       "reason": "A calendar's colour and a palette swatch's arrive from data as the inline --calendar-color and --swatch properties (EventForm, DetailsPopover, SearchResults, DayList, ColorPicker, CalendarRow); utilities read them with bg-(color:--calendar-color). It is data, not a design colour."
+    },
+    {
+      "check": "structure",
+      "rule": 6,
+      "path": "server/src/features/feed/routes.ts",
+      "match": "/api/feed/:token/almanac.ics",
+      "reason": "The calendar feed answers text/calendar as a string, which skips the serializer, so the route declares its params and no response schema (Q53)."
     }
   ]
 }

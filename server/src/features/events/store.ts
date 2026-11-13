@@ -39,6 +39,8 @@ export interface EventStore {
   listExceptions(userId: string, seriesId: number): EventRecord[];
   /** Every row whose title, location or notes contain `query`, case and diacritics folded (`foldSearchText`), by id. */
   search(userId: string, query: string): EventRecord[];
+  /** Every row the user has (one-off events, series and exceptions), by id: the calendar feed writes them all. */
+  listAll(userId: string): EventRecord[];
 
   // Low-level writes for the edit scopes (`features/events/service.ts`). Each is one statement; the caller holds the transaction.
 
@@ -258,6 +260,7 @@ export function createEventStore(db: Db, now: () => Date = () => new Date()): Ev
   const exceptionsOf = db.prepare<[string, number], EventRow>(
     `${SELECT} WHERE user_id = ? AND series_id = ? ORDER BY original_start`,
   );
+  const allRows = db.prepare<[string], EventRow>(`${SELECT} WHERE user_id = ? ORDER BY id`);
   const searchRows = db.prepare<[string, string], EventRow>(
     `${SELECT} WHERE user_id = ? AND instr(search_text, ?) > 0 ORDER BY id`,
   );
@@ -362,6 +365,7 @@ export function createEventStore(db: Db, now: () => Date = () => new Date()): Ev
     listSeries: (userId, { to, dates }) => seriesBefore.all(userId, to, dates.end).map(toRecord),
     listExceptions: (userId, seriesId) => exceptionsOf.all(userId, seriesId).map(toRecord),
     search,
+    listAll: (userId) => allRows.all(userId).map(toRecord),
     setExdates,
     setRrule,
     insertException: (userId, seriesId, originalStart, content) =>

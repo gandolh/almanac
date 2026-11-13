@@ -4,6 +4,12 @@ import fp from "fastify-plugin";
 import { z } from "zod";
 import { ERROR_STATUS, ApiError, errorBody, type ErrorCode } from "../lib/api-error.js";
 
+/** What a route that doesn't exist answers; the calendar feed answers it too, for a link that doesn't. */
+export const NOT_FOUND_MESSAGE = "There is no such route.";
+
+/** The 404 handler's limit per address. */
+const NOT_FOUND_RATE_LIMIT = { max: 60, timeWindow: "1 minute" } as const;
+
 /** Answer with an error. Returns the reply, so a hook can `return sendError(...)`. */
 export function sendError(reply: FastifyReply, code: ErrorCode, message: string): FastifyReply {
   return reply.code(ERROR_STATUS[code]).send(errorBody(code, message));
@@ -13,6 +19,13 @@ export function sendError(reply: FastifyReply, code: ErrorCode, message: string)
 function describeIssue(path: string, message: string | undefined): string {
   const text = message ?? "The request is not valid.";
   return path ? `${path}: ${text}` : text;
+}
+
+/** The code for a 4xx that Fastify or a plugin raised. */
+function clientErrorCode(status: number): ErrorCode {
+  if (status === 404) return "not_found";
+  if (status === 429) return "rate_limited";
+  return "validation";
 }
 
 function statusOf(error: unknown): number | undefined {
@@ -32,9 +45,9 @@ function statusOf(error: unknown): number | undefined {
  *   thrown by `@almanac/shared`'s zod.
  * - A reply that fails its response schema → 500 `internal`, logged with the
  *   method and URL; the client never sees it.
- * - A 4xx Fastify raised itself (bad JSON, a body too large, an unsupported
- *   content type) keeps its status, with `not_found` for 404 and
- *   `validation` for the rest.
+ * - A 4xx Fastify or a plugin raised itself (bad JSON, a body too large, an
+ *   unsupported content type, a rate limit) keeps its status, with
+ *   `not_found` for 404, `rate_limited` for 429 and `validation` for the rest.
  * - Anything else → 500 `internal`, logged; the message carries no details.
  */
 const errorHandling: FastifyPluginAsync = async (app) => {
@@ -56,7 +69,7 @@ const errorHandling: FastifyPluginAsync = async (app) => {
     const status = statusOf(error);
     if (status !== undefined && status >= 400 && status < 500) {
       const message = error instanceof Error ? error.message : "The request is not valid.";
-      return reply.code(status).send(errorBody(status === 404 ? "not_found" : "validation", message));
+      return reply.code(status).send(errorBody(clientErrorCode(status), message));
     }
 
     if (isResponseSerializationError(error)) {
@@ -68,7 +81,11 @@ const errorHandling: FastifyPluginAsync = async (app) => {
     return sendError(reply, "internal", "Something went wrong on the server.");
   });
 
-  app.setNotFoundHandler((_request, reply) => sendError(reply, "not_found", "There is no such route."));
+  // Rate-limited: a scanner walking unknown paths gets 429s, not a free 404 per guess.
+  app.setNotFoundHandler({ preHandler: app.rateLimit(NOT_FOUND_RATE_LIMIT) }, (_request, reply) =>
+    sendError(reply, "not_found", NOT_FOUND_MESSAGE),
+  );
 };
 
-export const errors = fp(errorHandling, { name: "errors" });
+/** `@fastify/rate-limit` must be registered first: the 404 handler uses its `rateLimit`. */
+export const errors = fp(errorHandling, { name: "errors", dependencies: ["@fastify/rate-limit"] });

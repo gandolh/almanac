@@ -3,7 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { FastifyInstance, InjectOptions, LightMyRequestResponse } from "fastify";
-import { buildApp } from "../app.js";
+import { buildApp, type BuildAppOptions } from "../app.js";
 import { openAccounts, seedUser } from "../plugins/auth/accounts.js";
 import { SESSION_COOKIE } from "../plugins/auth/index.js";
 import { AUTH_ROUTE_PREFIX, loadConfig, type Config } from "../config.js";
@@ -84,11 +84,12 @@ function madeUpPassword(): string {
   return randomBytes(12).toString("base64url");
 }
 
-export async function startTestApp(overrides: NodeJS.ProcessEnv = {}): Promise<TestApp> {
+/** `options` reach `buildApp`: a test that reads the log passes a logger with its own stream. */
+export async function startTestApp(overrides: NodeJS.ProcessEnv = {}, options: BuildAppOptions = {}): Promise<TestApp> {
   const dataDir = await mkdtemp(join(tmpdir(), "almanac-test-"));
   try {
     const config = loadConfig({ DATA_DIR: dataDir, ...overrides });
-    const app = await buildApp(config);
+    const app = await buildApp(config, options);
     const owner: TestUser = { username: "owner", password: madeUpPassword() };
     // By username as given; one password each, kept for as long as the app runs.
     const users = new Map<string, TestUser>([[owner.username, owner]]);

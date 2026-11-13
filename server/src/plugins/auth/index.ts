@@ -16,8 +16,12 @@ export interface AuthOptions {
 /** The session cookie's name. Unique in the estate: every app shares one origin. */
 export const SESSION_COOKIE = "almanac_session";
 
-/** The only routes with no session, as `"METHOD /pattern"`. The plugin adds its own public `/auth/*` routes. */
-export const PUBLIC_ROUTES: readonly string[] = ["GET /api/health"];
+/**
+ * The only routes with no session, as `"METHOD /pattern"`. The plugin adds its own public `/auth/*` routes.
+ * The calendar feed's link (`features/feed/routes.ts`) is answered from the token in its
+ * path, never from a session: a calendar app has no cookie. A `HEAD` counts as the `GET`.
+ */
+export const PUBLIC_ROUTES: readonly string[] = ["GET /api/health", "GET /api/feed/:token/almanac.ics"];
 
 /**
  * Accounts and the guard. The vendored `wardAuth` plugin keeps the

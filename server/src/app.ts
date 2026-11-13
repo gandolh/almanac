@@ -1,3 +1,4 @@
+import rateLimit from "@fastify/rate-limit";
 import { serializerCompiler, validatorCompiler } from "@fastify/type-provider-zod";
 import Fastify, { type FastifyInstance, type FastifyServerOptions } from "fastify";
 import type { Config } from "./config.js";
@@ -7,6 +8,7 @@ import { errors } from "./plugins/errors.js";
 import { jsonBodyParser } from "./plugins/json-body.js";
 import { calendarRoutes, createCalendarStore, type CalendarStore } from "./features/calendars/index.js";
 import { createEventStore, eventRoutes, type EventStore } from "./features/events/index.js";
+import { createFeedTokenStore, feedRoutes } from "./features/feed/index.js";
 import { healthRoutes } from "./features/health/index.js";
 import { occurrenceRoutes } from "./features/occurrences/index.js";
 import {
@@ -58,6 +60,7 @@ const FEATURES: Feature[] = [
   (app, ctx) => app.register(searchRoutes, ctx),
   (app, ctx) => app.register(settingsRoutes, ctx),
   (app, ctx) => app.register(pushRoutes, ctx),
+  (app, ctx) => app.register(feedRoutes, { ...ctx, feedTokens: createFeedTokenStore(ctx.db) }),
 ];
 
 /** Fastify's options that belong to the process. `server.ts` sets them; a test leaves them out. */
@@ -74,7 +77,7 @@ export interface BuildAppOptions {
 /**
  * The app, not listening, with `<dataDir>/almanac.db` open and migrated (the
  * accounts' tables too). Closing the app closes the database. Every route but
- * `GET /api/health` needs a session (`signIn` above).
+ * `GET /api/health` and the calendar feed's link needs a session (`plugins/auth`).
  */
 export async function buildApp(config: Config, options: BuildAppOptions = {}): Promise<FastifyInstance> {
   const app = Fastify({ logger: false, ...options.server });
@@ -84,7 +87,11 @@ export async function buildApp(config: Config, options: BuildAppOptions = {}): P
     db.close();
   });
 
-  // 1. The app's own plugins, `fastify-plugin` wrapped so they reach everything after them. Errors
+  // 1. External plugins. The rate limiter isn't global: it limits the 404 handler and the routes
+  // that ask for it (the calendar feed), each by the client's address.
+  await app.register(rateLimit, { global: false });
+
+  // 2. The app's own plugins, `fastify-plugin` wrapped so they reach everything after them. Errors
   // go first, so every plugin and feature inherits the one handler.
   await app.register(errors);
   await app.register(jsonBodyParser);
@@ -106,7 +113,7 @@ export async function buildApp(config: Config, options: BuildAppOptions = {}): P
     pushSubscriptions,
     push: config.push && createPushService({ vapid: config.push, subscriptions: pushSubscriptions, log: app.log }),
   };
-  // 2. The features.
+  // 3. The features.
   for (const feature of FEATURES) await feature(app, ctx);
   startReminders(app, ctx);
 

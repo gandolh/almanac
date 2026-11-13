@@ -13,6 +13,8 @@ export const ERROR_STATUS = {
   not_found: 404,
   /** The change would break a rule about what is already stored: deleting the user's last calendar. */
   conflict: 409,
+  /** Too many requests from one address in a while: the calendar feed's limit, or the 404 handler's. */
+  rate_limited: 429,
   internal: 500,
 } as const satisfies Record<string, number>;
 

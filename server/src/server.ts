@@ -1,6 +1,7 @@
 import closeWithGrace from "close-with-grace";
 import { buildApp } from "./app.js";
 import { ConfigError, loadConfig, loadEnvFile, resolveDataDir, type Config } from "./config.js";
+import { LOG_REDACT } from "./lib/log.js";
 
 // The process: settings, the app, shutdown, listen. Nothing else in the server listens.
 const envFile = loadEnvFile();
@@ -18,7 +19,8 @@ const app = await buildApp(
   { ...config, dataDir: resolveDataDir(config.dataDir) },
   {
     server: {
-      logger: true,
+      // JSON lines, with a calendar feed link's secret replaced in every logged URL.
+      logger: { redact: LOG_REDACT },
       // Loopback (the Vite dev proxy, a server on loopback) plus the proxy's network in a container,
       // so `request.ip` in the logs is the client. Ward's login lockout reads the socket itself.
       trustProxy: ["loopback", ...config.trustedProxies],

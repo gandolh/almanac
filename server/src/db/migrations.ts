@@ -113,6 +113,16 @@ export const migrations: readonly string[] = [
   );
   CREATE INDEX reminders_sent_at ON reminders_sent (sent_at);
   `,
+  // A user's calendar feed: the SHA-256 of the secret in its link, never the
+  // secret itself, so a copy of this file opens no feed. One row per user; no
+  // row is a feed that is off. A new link replaces the hash, which ends the old one.
+  `
+  CREATE TABLE feed_tokens (
+    user_id     TEXT PRIMARY KEY NOT NULL REFERENCES auth_users (id) ON DELETE CASCADE,
+    token_hash  TEXT NOT NULL UNIQUE CHECK (length(token_hash) = 64),
+    created_at  TEXT NOT NULL
+  );
+  `,
 ];
 
 /**

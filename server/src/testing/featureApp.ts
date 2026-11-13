@@ -1,3 +1,4 @@
+import rateLimit from "@fastify/rate-limit";
 import { serializerCompiler, validatorCompiler } from "@fastify/type-provider-zod";
 import Fastify, { type FastifyInstance, type FastifyPluginAsync } from "fastify";
 import type { AuthContext } from "../../vendor/ward/ward-auth.js";
@@ -18,6 +19,8 @@ export async function featureApp<Options extends object>(
   const app = Fastify();
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
+  // The error plugin's 404 handler is rate-limited, so the limiter goes first, as in `buildApp`.
+  await app.register(rateLimit, { global: false });
   await app.register(errors);
   app.decorateRequest("auth", null);
   app.addHook("onRequest", async (request) => {

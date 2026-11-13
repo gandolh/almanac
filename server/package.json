@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@almanac/shared": "0.1.0",
+    "@fastify/rate-limit": "11.2.2",
     "@fastify/swagger": "9.9.3",
     "@fastify/type-provider-zod": "1.0.3",
     "better-sqlite3": "13.0.3",
@@ -29,6 +30,7 @@
   "devDependencies": {
     "@types/better-sqlite3": "9.6.0",
     "@types/web-push": "3.6.4",
+    "ical.js": "2.2.1",
     "tsx": "4.23.13"
   },
   "exports": {
