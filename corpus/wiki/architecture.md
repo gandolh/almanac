@@ -1,6 +1,6 @@
 ---
-summary: How Almanac is put together, built on 2026-10-16. Shelfmark's three workspaces (shared, server, web), what each owns, the API routes, request paths behind Caddy, dev and production ports (API 8809, Vite 5177, VPS 8797), time zones on both sides, where data lives, where the reminder timer runs, and secrets.
-updated: 2026-11-12
+summary: How Almanac is put together, built on 2026-10-16. Shelfmark's three workspaces (shared, server, web), what each owns, the API routes (the calendar feed's public link since 2026-11-13), the rate limits, request paths behind Caddy, dev and production ports (API 8809, Vite 5177, VPS 8797), time zones on both sides, where data lives, where the reminder timer runs, and secrets.
+updated: 2026-11-13
 ---
 
 # Architecture
@@ -15,11 +15,11 @@ TypeScript strict, Vitest, ESLint:
 - `shared`: zod schemas for every route, the repeat presets and their RRULEs,
   date helpers both sides use.
 - `server`: Fastify + better-sqlite3, grouped by feature
-  ([decisions.md](decisions.md), "The server in the house code structure"):
+  ([decisions-conventions.md](decisions-conventions.md), "The server in the house code structure"):
   `server.ts` listens, `app.ts` builds, `config.ts` reads the environment,
   `plugins/` holds errors, the JSON body and sign-in, `features/<name>/` holds
-  health, calendars, events, occurrences, search, settings, push and
-  reminders (each with its store, the only module that runs SQL, apart from
+  health, calendars, events, occurrences, search, settings, push,
+  reminders and feed (each with its store, the only module that runs SQL, apart from
   the vendored auth library), and `lib/` holds the pure helpers. Occurrence
   expansion is `server/src/features/events/expand.ts` with rrule-temporal
   ([recurrence.md](recurrence.md)). The `/api/*` routes declare their zod
@@ -42,14 +42,22 @@ TypeScript strict, Vitest, ESLint:
 | `GET /api/search?q` | the user's events matching title, location or notes |
 | `GET`, `PATCH /api/settings` | display time zone |
 | `GET /api/push/key`, `PUT`, `DELETE /api/push/subscriptions`, `POST /api/push/test` | Web Push: the server's key, this browser's subscription, a test notification ([notifications.md](notifications.md)) |
+| `GET`, `POST`, `DELETE /api/feed` | the calendar feed: on or off, a new link (shown once), off ([calendar-feed.md](calendar-feed.md)) |
+| `GET /api/feed/:token/almanac.ics` | the feed itself, `text/calendar`, answered from the token in the path with no session |
 | `/auth/*` | the vendored Ward auth plugin: local login and Sign in with Ward |
 
 Every query is scoped to the signed-in user. Every route but `GET
-/api/health` needs a session: the Ward plugin's root `onRequest` hook answers
-`401 unauthorized` first, so an unknown path without a session is a 401, not
-a 404. `server/src/plugins/auth/guard.ts` adds a 403 for a write sent from another
+/api/health` and the feed's link (`PUBLIC_ROUTES` in
+`server/src/plugins/auth/index.ts`) needs a session: the Ward plugin's root
+`onRequest` hook answers `401 unauthorized` first, so an unknown path without a
+session is a 401, not a 404. `server/src/plugins/auth/guard.ts` adds a 403 for a write sent from another
 origin (the `SameSite=Lax` cookie would still ride along from a sibling
 subdomain), and routes read the user with `currentUserId(request)`.
+
+Since 2026-11-13 `@fastify/rate-limit` is registered first, not globally: the
+feed's link takes 30 requests a minute per address and the 404 handler 60, and
+a 429 is `rate_limited`. The address is `request.ip`, the client only while
+`trustProxy` (loopback plus `AUTH_TRUSTED_PROXIES`) names the proxy.
 
 ## Request paths
 

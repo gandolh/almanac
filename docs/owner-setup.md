@@ -196,6 +196,30 @@ everything else works as before.
 Keep the pair. A new one turns notifications off on every device until each
 turns them on again.
 
+## 9. See your events in the phone's calendar
+
+Almanac can hand a phone's calendar app a private, read-only link to every
+event in all your calendars ([the calendar feed](../corpus/wiki/calendar-feed.md)).
+It carries no reminders: Notifications stay the reminder.
+
+1. **Deploy** (`node cli.ts almanac all`): the feed needs the server and the
+   web app from the same build. The first start adds one table.
+2. **In Almanac:** the account menu, then Calendar feed…. Turn it on and press
+   Copy link. The link is shown this once; if you lose it, press New link,
+   which stops the old one.
+3. **On Android:** install ICSx⁵ (free, on F-Droid or Google Play). Tap +,
+   paste the link, leave the user name and password empty, give it a name and
+   a colour, and save. In ICSx⁵'s settings pick how often it checks (an hour
+   is plenty). The events show in the phone's calendar app; edit them in
+   Almanac, and the phone shows the change at its next check.
+4. **Check the rate limit's address,** once: the feed allows 30 fetches a
+   minute per address, and it sees the visitor's address only when the proxy
+   is trusted, as for the login lockout in step 5. The same
+   `X-Forwarded-For ignored` check applies.
+
+Anyone with the link can read your events: keep it out of chats and
+screenshots. Turning the feed off, or New link, ends the old link at once.
+
 ## Local development
 
 Moved to [getting-started.md](getting-started.md): install, the seed, `npm run

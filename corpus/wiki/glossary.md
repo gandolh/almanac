@@ -1,6 +1,6 @@
 ---
-summary: Almanac's vocabulary, one word per concept with the synonyms it replaces. User, calendar, event, series, occurrence, exception, edit scope, reminder, view, display time zone, quick create and event form. Use these words in code, UI copy and briefs.
-updated: 2026-10-27
+summary: Almanac's vocabulary, one word per concept with the synonyms it replaces. User, calendar, event, series, occurrence, exception, edit scope, reminder, calendar feed, view, display time zone, quick create and event form. Use these words in code, UI copy and briefs.
+updated: 2026-11-13
 ---
 
 # Glossary
@@ -47,6 +47,12 @@ _Avoid_: mode, edit type
 When an event's notification is due: a number of minutes before it starts, or
 before 00:00 of an all-day event's first day. An event has at most one.
 _Avoid_: alert, alarm, notification (the notification is what a reminder shows)
+
+**Calendar feed**:
+A user's one private link that a phone's calendar app subscribes to, holding
+every event of all their calendars, read-only and without reminders.
+_Avoid_: subscription (that is a browser's Web Push subscription), sync,
+export, iCal link, ICS URL, CalDAV
 
 ## Screens
 

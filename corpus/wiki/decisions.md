@@ -1,5 +1,5 @@
 ---
-summary: Locked calls for Almanac, each with date, rejected alternatives and reason. React + Fastify + SQLite on Shelfmark's layout; FullCalendar v7 for day, week and month with a year view of our own; several users, each with a private calendar and no sign-up; named calendars; Base UI under the dialogs, popovers and menus, styled with Tailwind; common repeats with three edit scopes, expanded on the server; no import; one reminder per event by Web Push (since 2026-10-27, none in v1); one display time zone per user, Bucharest by default; phone browser without offline; deployed on the VPS; Google Calendar's layout, with a Light / Dark / System switch, light on a first visit; the house style, formatted and checked (Prettier at 120, vendored configs, one gate); the server grouped by feature, a schema on every route, the error body unchanged.
+summary: Locked calls for Almanac, each with date, rejected alternatives and reason. React + Fastify + SQLite on Shelfmark's layout; FullCalendar v7 for day, week and month with a year view of our own; several users, each with a private calendar and no sign-up; named calendars; Base UI under the dialogs, popovers and menus, styled with Tailwind; common repeats with three edit scopes, expanded on the server; no import; a read-only calendar feed out, with the secret in its URL and no alarms (2026-11-13); one reminder per event by Web Push (since 2026-10-27, none in v1); one display time zone per user, Bucharest by default; phone browser without offline; deployed on the VPS; Google Calendar's layout, with a Light / Dark / System switch, light on a first visit; the house style and the server's code structure are on decisions-conventions.md.
 updated: 2026-11-13
 ---
 
@@ -8,6 +8,11 @@ updated: 2026-11-13
 Each entry passed three tests: hard to reverse, surprising without context, and
 a real trade-off. Changing one needs an explicit revisit and a `log.md` entry.
 All of these came out of the owner's grill on 2026-10-16.
+
+The estate's conventions as Almanac adopted them (the house style, the
+server's code structure) are on [decisions-conventions.md](decisions-conventions.md),
+split from this page on 2026-11-13 when it passed 200 lines; they count as
+decisions the same way.
 
 ## React + Fastify + SQLite, on Shelfmark's layout
 _2026-10-16_. The owner chose Fastify and React. The layout, the vendored Ward
@@ -64,6 +69,37 @@ rrule.js (no release since 2023, time-zone quirks). Model: [recurrence.md](recur
 ## No import; events are typed in
 _2026-10-16_. The owner creates every event by hand. Rejected: one-off `.ics`
 import and subscribed ICS feeds, both offered and turned down.
+
+## A calendar feed out: read-only, every calendar, no alarms, the secret in the URL
+_2026-11-13_, the owner's answer to the backlog grill ("go with recommended";
+the questions are in the todo the brief came from). Each user can turn on one
+private `.ics` link that a phone's calendar app (ICSx⁵ on Android) subscribes
+to. It holds every event of every one of the user's calendars, the hidden ones
+too, as stored: a series as its `RRULE` in its own zone, deleted occurrences as
+`EXDATE`, exceptions as `RECURRENCE-ID`s. It writes no `VALARM`: the reminder
+stays Web Push's, so a phone never alerts twice. Edits happen in Almanac and
+reach the phone at the app's next refresh. This sends events out; it doesn't
+reopen import (the entry above).
+
+The secret is in the URL because a calendar app can't do Almanac's cookie
+sign-in and Google Calendar's "From URL" can't send a password; Google's own
+"secret address in iCal format" works the same way. It is 256 bits from the
+CSPRNG, kept only as its SHA-256 (looked up by the hash, compared with
+`timingSafeEqual`), so a copy of the database opens no feed, and the link is
+shown once, when it is made. A new link replaces the hash and ends the old one;
+off deletes it; a wrong, old or malformed token is the same plain 404 as a
+route that doesn't exist. The link is limited to 30 requests a minute per
+address and kept out of the request log. Changing the password doesn't end it.
+
+Rejected: CalDAV, which would make Almanac a two-way CalDAV server, far bigger
+work for edits the owner can make in Almanac; only the ticked calendars, since
+hiding one tidies the web view and would empty the phone's copy; alarms in the
+feed (two alerts per reminder) and dropping Web Push; HTTP Basic (Google can't
+send it, and it is a second password); a readable stored token, which would
+show the link again at the cost of every link in a database copy;
+ical-generator, which needs another package for `VTIMEZONE` and whose folding
+would need checking anyway (the writer is Almanac's own, in
+`server/src/features/feed/`). How it works: [calendar-feed.md](calendar-feed.md).
 
 ## Reminders by Web Push, one per event
 _2026-10-16_, v1: no reminders, to keep v1 small; Web Push (Satchel's code)
@@ -153,52 +189,3 @@ the "a side panel without swipe is a positioned Dialog" call above. No
 `SwipeArea`, which would fight the swipe on the view. Native text, date and
 time inputs and selects stay native (Q16). `Button` and tooltips stay as
 they were (decision 4 of the brief). Styling moved to Tailwind afterwards (above).
-
-## The house style, formatted and checked
-_2026-11-11_, the owner's grilling of 2026-11-10. Almanac holds a copy of the
-skills library's `house-style` folder in `vendor/house-style/` (version
-header inside, refreshed by `npm run house-style:sync`, never edited), and its
-configs extend it: Prettier at width 120 with trailing commas, double quotes
-and semicolons; a thin ESLint config with six typed rules; knip and
-dependency-cruiser presets; `npm run check` as the gate and `check:fast` as
-its subset. The reformat is one commit, listed in `.git-blame-ignore-revs`.
-Markdown stays out of Prettier. `tsconfig.base.json` carries the house flags
-itself instead of extending the copy, because the image build copies only
-that file before `tsc -b server`. Rejected: width 130, which churns the least
-(333 lines against 502) but gives the estate two widths; a git or tarball
-dependency, which needs `git` in the Docker `deps` stage; and committing
-hooks to `.claude/settings.json`, since the plugin carries them. Two rules
-started softer: `n/no-process-env` and dependency-cruiser's `no-circular` were
-warnings until the server took its settings from `config.ts` and each feature
-had its own options type (both are errors since 2026-11-12), and the two
-convention checkers ran `--warn-only` until the Base UI, Tailwind and server
-layout work landed (both strict since 2026-11-12).
-
-## The server in the house code structure
-_2026-11-12_, the owner's call of 2026-11-09, grilled 2026-11-10; the
-`code-structure` skill. `server/src/` has `server.ts` (the only file that
-listens: settings, `buildApp`, `close-with-grace`, then `listen`), `app.ts`
-(`buildApp(config, options)`, which never listens), `config.ts` (the only
-reader of the environment, and of the `.env` file and the data folder),
-`plugins/` (errors, the JSON body, sign-in: each wrapped in `fastify-plugin`,
-registered in that order, errors first), `features/<name>/` (health,
-calendars, events, occurrences, search, settings, push, reminders: each with an
-`index.ts`, its own options type, its routes and its store, and used by others
-through the index only), `lib/` (the `ApiError` class, `idParamsSchema`, the
-env-file helper; no Fastify import) and `db/`. Every route declares its
-params, querystring and body, and a `response` for each status it sends,
-through `@fastify/type-provider-zod`: a field a schema doesn't name never
-leaves the server. The error body stays `{ error: { code, message } }`, which
-`web/src/api.ts` parses; a reply that fails its schema is a 500 `internal`
-with a fixed message, logged with the method and URL. `occurrenceSchema`
-uses `storedRepeatSchema` (no `.transform()`), because zod throws when it
-encodes through one; the input schemas keep the sorting `repeatSchema`.
-`check-structure` and every dependency-cruiser rule are strict. The process
-sets `trustProxy` (loopback plus `AUTH_TRUSTED_PROXIES`), `connectionTimeout`
-10 s, `requestTimeout` 30 s and `keepAliveTimeout` 125 s (above Caddy's
-two-minute idle keep-alive); these are defaults, still open for the owner.
-Rejected: Shelfmark's layer split (a feature's change should stay in one
-folder), `@fastify/autoload` (the registration order is the architecture, and
-a feature registered by name is found with grep), and TypeBox (the shared
-schemas are zod and the web imports them). The before-and-after JSON comparison is in
-[log.md](../log.md).

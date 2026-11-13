@@ -1,5 +1,5 @@
 ---
-summary: What Almanac v1 does, screen by screen, as settled with the owner on 2026-10-16. The familiar calendar layout in Almanac's own look (header band, left column with mini-month, calendars and the day's list; a phone's week strip), the four views with month as default, mouse interactions and keyboard shortcuts, event fields, search, the account menu, date and time format, and what is deliberately left out. Read before writing or promoting any brief.
+summary: What Almanac v1 does, screen by screen, as settled with the owner on 2026-10-16. The familiar calendar layout in Almanac's own look (header band, left column with mini-month, calendars and the day's list; a phone's week strip), the four views with month as default, mouse interactions and keyboard shortcuts, event fields, search, the account menu (with the calendar feed since 2026-11-13), date and time format, and what is deliberately left out. Read before writing or promoting any brief.
 updated: 2026-11-13
 ---
 
@@ -70,7 +70,9 @@ starts with one calendar.
 Change password, link or unlink Sign in with Ward, display time zone (starts
 at Europe/Bucharest), sign out. No Settings page. Since 2026-10-27 it also has
 Notifications (turn push on in this browser, send a test). Since 2026-11-11
-also Theme… (Light, Dark or System, kept on this device).
+also Theme… (Light, Dark or System, kept on this device). Since 2026-11-13
+also Calendar feed… (a private link a phone's calendar app subscribes to,
+shown once when made, with New link and off; [calendar-feed.md](calendar-feed.md)).
 
 ## Left out of v1
 

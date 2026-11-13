@@ -16,6 +16,7 @@ A self-hosted calendar that works like Google Calendar, for one person or a few 
 - Keeps events in named, coloured calendars you can show or hide one at a time, and finds them by title, location or notes.
 - Shows every time in one display time zone you choose (Europe/Bucharest to start), whatever zone the device is in.
 - Reminds you before an event with a push notification on your phone or desktop browser, from 1 day to the start time, once you turn Notifications on in the account menu.
+- Shows your events in your phone's own calendar app through a private, read-only link (with ICSx⁵ on Android), once you turn on Calendar feed in the account menu.
 - Fits a phone screen and can be added to its home screen. The keyboard shortcuts are Google's: `c`, `t`, `d` `w` `m` `y`, the arrow keys and `/`.
 
 Google Calendar does all of this. Almanac keeps the layout and the habits but runs on your own server, and each user sees only their own calendars. There is no sharing and no sign-up page. The only accounts are the ones you create with the seed or let in through Ward. It has no import, guests, attachments, dark mode or offline use, so you type every event in. Reminders need the server's VAPID keys, made with one command.

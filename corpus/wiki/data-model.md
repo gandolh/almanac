@@ -1,13 +1,14 @@
 ---
-summary: The SQLite schema as shipped on 2026-10-16, with the push subscriptions, reminder column and sent log added on 2026-10-27. Calendars, events (one-offs, series and exceptions in one table, timed as UTC ms or all-day as dates, the tzid that anchors repeats, exdates as JSON, reminder_minutes) and user settings; push_subscriptions; reminders_sent; the CHECKs and indexes; the wire format for instants, dates and occurrence keys; why there is no CHECK on colour or reminder; and how every row is scoped to a user.
-updated: 2026-11-12
+summary: The SQLite schema as shipped on 2026-10-16, with the push subscriptions, reminder column and sent log added on 2026-10-27 and the calendar feed's token hashes on 2026-11-13. Calendars, events (one-offs, series and exceptions in one table, timed as UTC ms or all-day as dates, the tzid that anchors repeats, exdates as JSON, reminder_minutes) and user settings; push_subscriptions; reminders_sent; feed_tokens; the CHECKs and indexes; the wire format for instants, dates and occurrence keys; why there is no CHECK on colour or reminder; and how every row is scoped to a user.
+updated: 2026-11-13
 ---
 
 # Data model
 
 Migration 1 in `server/src/db/migrations.ts` (2026-10-16); migrations 2-4
 (2026-10-27) add `push_subscriptions`, `events.reminder_minutes` and
-`reminders_sent` for [notifications.md](notifications.md). The vendored Ward
+`reminders_sent` for [notifications.md](notifications.md); migration 5
+(2026-11-13) adds `feed_tokens` for [calendar-feed.md](calendar-feed.md). The vendored Ward
 library keeps its own tables (`auth_users`, `auth_sessions`,
 `auth_ward_links`) and its own version table; `openDb` runs its migration
 first so the foreign keys below always have a target. Both runners go in one
@@ -65,6 +66,12 @@ A push service's 404 or 410 deletes the row.
 generates, the row's own start for a one-off or an exception), `sent_at`
 (epoch ms, indexed). The primary key is the first two, so a reminder is
 claimed once, before it is sent. Rows older than three days are dropped.
+
+**`feed_tokens`**: `user_id` primary key → `auth_users(id)` ON DELETE
+CASCADE, `token_hash` (unique, 64 hex characters: the SHA-256 of the secret in
+the user's feed link, never the secret), `created_at` (ISO text, when the link
+was made). One row per user while the feed is on; no row is off. A new link
+replaces the hash in one statement, so the old link stops at once.
 
 ## Wire format
 
