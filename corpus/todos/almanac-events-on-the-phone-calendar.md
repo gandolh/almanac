@@ -1,11 +1,13 @@
 ---
 title: Almanac's events on the phone's calendar
 created: 2026-11-13
-status: open
+status: promoted
 tags: [later, phone]
 ---
 
 # Almanac's events on the phone's calendar
+
+**Promoted** on 2026-11-13 to [brief 06](../briefs/todo/06-almanac-events-on-the-phone-calendar.md): a read-only feed of all the user's calendars, no alarms, Web Push the one reminder (the owner's answer of 2026-11-13).
 
 The owner asked for this on 2026-11-13, grilling the self-hosted tools
 research in `vps-deploy` (its `self-hosted-tools-adopt-or-borrow.md`, the
