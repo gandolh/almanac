@@ -9,6 +9,7 @@ import FullCalendar, {
   type EventInput,
   type EventSourceFuncInfo,
   type MoreLinkHandler,
+  type NowIndicatorHeaderInfo,
   type PluginInput,
 } from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/react/daygrid";
@@ -23,7 +24,7 @@ import { showToast } from "../components/ui/Toast";
 import { currentCalendars, useCalendars } from "../data/calendars";
 import { fetchOccurrences, onOccurrencesChanged, updateEvent } from "../data/occurrences";
 import { useSettings } from "../data/settings";
-import { Temporal, VIEW_LABELS, dateKey, wireInstant, type CalendarView, type View } from "../dates";
+import { Temporal, VIEW_LABELS, dateKey, formatTime, wireInstant, type CalendarView, type View } from "../dates";
 import { DetailsPopover } from "../event/DetailsPopover";
 import { useEventEditor, type EventEditor } from "../event/EventEditor";
 import { askScope } from "../event/scope";
@@ -49,8 +50,8 @@ export interface CalendarAreaProps {
 }
 
 /**
- * Day, week and month: FullCalendar v7 with its Monarch theme (Material,
- * the closest to Google Calendar) in Almanac's colours (fullcalendar.css).
+ * Day, week and month: FullCalendar v7 with its Monarch theme in Almanac's
+ * colours (fullcalendar.css), on one raised card.
  *
  * - The address is the truth: the view and date come from the props and the
  *   calendar follows them; a day number or "2 more" asks the shell to move
@@ -191,12 +192,20 @@ export function CalendarArea({ view, date, onNavigate }: CalendarAreaProps) {
     latest.current.onNavigate("day", plainDateOf(info.date, latest.current.timeZone));
     return VIEW_TYPES.day;
   }, []);
+  // The chip in the hour gutter at the now line: the time now, in the display zone.
+  const nowChip = useCallback(
+    (info: NowIndicatorHeaderInfo) =>
+      formatTime(
+        Temporal.Instant.fromEpochMilliseconds(info.date.getTime()).toZonedDateTimeISO(latest.current.timeZone),
+      ),
+    [],
+  );
   const fetchFailed = useCallback((error: unknown) => fetchFailure(error, () => api()?.refetchEvents()), [api]);
 
   return (
     <section
       ref={rootRef}
-      className="flex min-h-0 min-w-0 flex-1 flex-col bg-ground"
+      className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-card border border-hairline bg-surface shadow-card"
       aria-label={`${VIEW_LABELS[view]} view`}
       data-view={view}
     >
@@ -205,6 +214,7 @@ export function CalendarArea({ view, date, onNavigate }: CalendarAreaProps) {
         plugins={PLUGINS}
         {...OPTIONS}
         colorScheme={colorScheme}
+        nowIndicatorHeaderContent={nowChip}
         initialView={VIEW_TYPES[view]}
         initialDate={dateKey(date)}
         timeZone={timeZone}
@@ -240,39 +250,55 @@ const OPTIONS: CalendarOptions = {
   height: "100%",
   // `colorScheme` follows the theme, as a prop of <FullCalendar>.
   className: "min-h-0 flex-1 font-sans text-event leading-tight text-ink",
-  // Flush with the page, as Google's grid is: no frame round the view.
+  // No frame of its own: the card round the view is the frame.
   borderless: true,
   // Time: 30-minute rows labelled each hour, 15-minute snapping, a line at now.
   slotDuration: "00:30:00",
   snapDuration: "00:15:00",
   slotHeaderInterval: "01:00:00",
   slotHeaderFormat: slotLabel,
-  // The label sits across its hour's line, small and muted; Monarch's own margin and size lose to these.
-  slotHeaderInnerClass: "top-[-0.5em] my-0 text-mini leading-none text-muted",
-  // Lines on the hours only, as Google draws them.
-  slotLaneClass: (info) => (info.isMinor ? "border-transparent" : undefined),
+  // The label sits across its hour's line, small and muted, in Condensed; Monarch's own margin and size lose to these.
+  slotHeaderInnerClass: "top-[-0.5em] my-0 font-num text-mini leading-none font-medium text-muted",
+  // A full line on the hours, a faint one on the half hours.
+  slotLaneClass: (info) =>
+    info.isMinor ? "border-[color-mix(in_srgb,var(--color-hairline)_30%,transparent)]" : undefined,
   slotHeaderClass: (info) => (info.isMinor ? "border-transparent" : undefined),
-  // Google's 48 px an hour, the same at every width. (FullCalendar measures the
+  // 48 px an hour (--height-hour), the same at every width. (FullCalendar measures the
   // labels first; rows that change height later would leave 08:00 scrolled wrong.)
   slotMinHeight: 24,
+  // Today: its head on the accent tint, its column washed in it.
+  dayHeaderClass: (info) => (info.isToday ? "bg-accent-tint" : undefined),
+  dayLaneClass: (info) =>
+    info.isToday ? "bg-[color-mix(in_srgb,var(--color-accent-tint)_42%,transparent)]" : undefined,
+  // The now line is 2 px with a chip in the hour gutter and no dot.
+  nowIndicatorDotClass: "hidden",
+  nowIndicatorLineClass: "border-t-2",
+  nowIndicatorHeaderClass:
+    "m-0 rounded-[6px] bg-now-line px-[5px] py-0.5 font-num text-label leading-4 font-semibold text-on-now",
   // Opened at 08:00 with its label whole: the label sits across its hour's
   // line (the label's -0.5em), so the top is 15 minutes (12 px) above the line.
   scrollTime: "07:45:00",
   scrollTimeReset: false,
   nowIndicator: true,
-  // Events: titles and times end in "…" when they don't fit, as Google's do.
+  // Events in month and the all-day row end in "…" when they don't fit; a timed block in day and week never
+  // does (`eventContent` writes its own lines).
   eventTitleClass: "min-w-0 overflow-hidden text-ellipsis whitespace-nowrap",
   eventTimeClass: "min-w-0 overflow-hidden text-ellipsis whitespace-nowrap",
-  // Day and week: Monarch keeps an event under 50 px to one line, title then
-  // time. Google gives an hour (48 px) two, the title over the time, and two
-  // lines take 44 px; from 45 minutes (36 px) down, one line.
+  eventClass: (info) => (info.isMirror ? "cal-mirror shadow-raised" : undefined),
+  rowEventClass: "rounded-event",
+  // A timed block: solid fill, 6 px corners, holding at least one line (a 15-minute event is as tall as a half hour).
+  columnEventClass: "@container/ev rounded-event",
+  columnEventInnerClass: "h-full min-w-0 p-0",
+  eventMinHeight: 24,
   eventShortHeight: 40,
   eventContent,
   eventTimeFormat: eventTimeText,
   allDayText: "All day",
-  // The all-day row's label, quiet as Google's gutter.
+  // The all-day row's label, quiet in the gutter.
   allDayHeaderInnerClass: "text-mini text-muted",
   dayHeaderContent,
+  // Month: a day's number is a rounded tab, today's on the accent.
+  dayCellTopInnerClass: "rounded-[8px] font-num font-medium",
   // Month: only the weeks the month touches, "2 more" when a day is full.
   fixedWeekCount: false,
   moreLinkText: (count: number) => `${count} more`,
@@ -285,13 +311,18 @@ const OPTIONS: CalendarOptions = {
   unselectCancel: "[role=dialog], dialog",
   // Both classes are markers the selection code looks for (`selectionElement`); the mirror also carries its shadow.
   highlightClass: "cal-highlight",
-  eventClass: (info) => (info.isMirror ? "cal-mirror shadow-raised" : undefined),
   eventDidMount: (info) => {
     info.el.dataset.noSwipe = "";
   },
   views: {
-    timeGrid: { dayHeaderFormat: { weekday: "short", day: "numeric" } },
-    // The day view heads its one column from the left, as Google's does.
+    timeGrid: {
+      dayHeaderFormat: { weekday: "short", day: "numeric" },
+      // The head is 56 px (DayHead): no margin round its link. The all-day row is a band on `field`.
+      navLinkClass: "m-0",
+      dayCellClass: "bg-field",
+      allDayHeaderClass: "bg-field",
+    },
+    // The day view heads its one column from the left.
     timeGridDay: { dayHeaderAlign: "start" },
     // Month moves events between days; their length stays.
     dayGridMonth: { dayHeaderFormat: { weekday: "short" }, dayMaxEvents: true, eventDurationEditable: false },

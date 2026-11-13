@@ -49,8 +49,8 @@
     --fc-monarch-popover: var(--color-surface);
     --fc-monarch-popover-foreground: var(--color-ink);
 
-    /* neutral backgrounds: Google's state layers */
-    --fc-monarch-background: var(--color-ground);
+    /* neutral backgrounds: state layers */
+    --fc-monarch-background: var(--color-surface);
     --fc-monarch-faint: color-mix(in srgb, var(--color-ink-2) 5%, transparent);
     --fc-monarch-muted: var(--color-hover);
     --fc-monarch-strong: var(--color-press);

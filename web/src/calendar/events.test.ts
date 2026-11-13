@@ -219,15 +219,15 @@ describe("the views' words", () => {
     expect(eventTimeText({ date: at(9, 5), start: at(9, 5), end: null })).toBe("09:05");
   });
 
-  it("heads the columns MON to SUN, with today's date marked", () => {
-    expect([1, 2, 3, 4, 5, 6, 0].map(weekdayHead)).toEqual(["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]);
+  it("heads the columns Mon to Sun, with today's date marked", () => {
+    expect([1, 2, 3, 4, 5, 6, 0].map(weekdayHead)).toEqual(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]);
     const html = renderToStaticMarkup(createElement(DayHead, { dow: 1, dayNumber: "19", today: true }));
     expect(html).toContain('data-today="true"');
-    expect(html).toMatch(/>MON<\/span>/);
+    expect(html).toMatch(/>Mon<\/span>/);
     expect(html).toMatch(/>19<\/span>/);
     // Month's heads name the weekday only, and a day that isn't today carries no mark.
     const sunday = renderToStaticMarkup(createElement(DayHead, { dow: 0, dayNumber: "", today: false }));
-    expect(sunday).toMatch(/>SUN<\/span>/);
+    expect(sunday).toMatch(/>Sun<\/span>/);
     expect(sunday).not.toContain("data-today=");
     expect(sunday.match(/<span/g)).toHaveLength(2);
   });
@@ -235,14 +235,49 @@ describe("the views' words", () => {
 
 describe("an event's inside", () => {
   const block = { timeText: "10:00 – 11:00", timeClass: "time", titleClass: "title" };
+  const week = { type: "timeGridWeek" };
+  const at = (hour: number, minute: number) => new Date(Date.UTC(2026, 10, 11, hour, minute));
+  const timed = (title: string, start: Date, end: Date) => ({ title, allDay: false, start, end });
+  const markup = (inside: ReturnType<typeof eventContent>) =>
+    renderToStaticMarkup(createElement(Fragment, null, inside as ReactNode));
 
-  it("is FullCalendar's own for events, dragged ones too", () => {
-    expect(eventContent({ ...block, isMirror: false, event: { title: "Standup" } })).toBe(true);
-    expect(eventContent({ ...block, isMirror: true, event: { title: "Standup" } })).toBe(true);
+  it("is FullCalendar's own in month and the all-day row, dragged ones too", () => {
+    const standup = timed("Standup", at(10, 0), at(11, 0));
+    expect(eventContent({ ...block, isMirror: false, event: standup, view: { type: "dayGridMonth" } })).toBe(true);
+    expect(eventContent({ ...block, isMirror: true, event: standup, view: { type: "dayGridMonth" } })).toBe(true);
+    expect(eventContent({ ...block, isMirror: false, event: { ...standup, allDay: true }, view: week })).toBe(true);
+  });
+
+  it("puts the time range on a second line from 45 minutes, in 11 px under an hour", () => {
+    const hour = markup(
+      eventContent({ ...block, isMirror: false, event: timed("Design review", at(11, 0), at(12, 0)), view: week }),
+    );
+    expect(hour).toContain("Design review");
+    expect(hour).toContain("10:00 – 11:00");
+    expect(hour).toContain("text-event-time");
+    const short = markup(
+      eventContent({ ...block, isMirror: false, event: timed("Groceries", at(17, 30), at(18, 15)), view: week }),
+    );
+    expect(short).toContain("text-[11px]");
+    expect(short).not.toContain("@min-[120px]");
+  });
+
+  it("keeps a short block to one line, its start time dropping out where it is narrow", () => {
+    const standup = markup(
+      eventContent({ ...block, isMirror: false, event: timed("Team standup", at(9, 30), at(10, 0)), view: week }),
+    );
+    expect(standup).toContain("Team standup");
+    expect(standup).toContain("@min-[120px]/ev:inline");
+    expect(standup).toContain(">10:00<");
   });
 
   it("writes (No title) over the time of a selection's block", () => {
-    const inside = eventContent({ ...block, isMirror: true, event: { title: "" } });
+    const inside = eventContent({
+      ...block,
+      isMirror: true,
+      event: { title: "", allDay: false, start: null, end: null },
+      view: week,
+    });
     expect(inside).not.toBe(true);
     expect(renderToStaticMarkup(createElement(Fragment, null, inside as ReactNode))).toBe(
       '<div class="time">10:00 – 11:00</div><div class="title">(No title)</div>',
