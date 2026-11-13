@@ -444,3 +444,34 @@ in [decisions.md](wiki/decisions.md) when the build lands.
 ## [2026-11-13] build | Brief 05: the redesign
 
 Almanac has its own look on the familiar layout: olive greys on raised cards, a moss accent, Sofia Sans and Sofia Sans Condensed, per-theme calendar colours (the store keeps the key; the web maps it), a 56 px header band over a 276 px column with the chosen day's list, a phone week strip over an agenda with a bottom view bar, the details as a bottom sheet on a phone, and the event form with visible labels. Recorded in [web/DESIGN.md](../web/DESIGN.md) and [decisions.md](wiki/decisions.md). Playwright specs (`web/e2e`) and `scripts/contrast.mjs` came with it; `npm run check` passes (824 tests, 66 contrast pairs). Not deployed. The outcome note is in [the brief](briefs/done/05-a-redesign-with-hallmark-on-the-estate-board.md).
+
+## [2026-11-13] decision | The calendar feed: a read-only link out, no alarms
+
+The owner's answer 5 of the backlog grill ("go with recommended") pulled the
+todo forward: a private, read-only `.ics` feed of all the user's calendars,
+alarms stripped, Web Push the one reminder. Promoted to
+[brief 06](briefs/done/06-almanac-events-on-the-phone-calendar.md), with the
+token, route, rate-limit, caching and writer calls written in. Recorded in
+[decisions.md](wiki/decisions.md). That page passed 200 lines with the entry,
+so its two conventions entries ("The house style, formatted and checked" and
+"The server in the house code structure") moved unchanged to
+[decisions-conventions.md](wiki/decisions-conventions.md); `corpus/CLAUDE.md`
+still names only `decisions.md` as the one that wins over status.
+
+## [2026-11-13] build | Brief 06: the calendar feed
+
+Each user can turn on one private link, `/api/feed/<token>/almanac.ics`, from
+the account menu's Calendar feed…; a phone's calendar app (ICSx⁵ on Android)
+subscribes to it without a session. It holds every row as stored: one-offs in
+UTC, all-day events as dates, series in their own zone with their `RRULE`,
+`EXDATE`s and exceptions as `RECURRENCE-ID`s, a `VTIMEZONE` per zone from the
+runtime's zone data, and never a `VALARM`. The token is 32 random bytes, kept
+as its SHA-256 (`feed_tokens`, migration 5) and shown once; New link and off
+end the old one; a wrong token is the plain 404. 30 fetches a minute per
+address (`@fastify/rate-limit`, which now limits the 404 handler too), an
+`ETag` and `304`, and the token redacted from the log. ical.js expands a
+fixture week of the feed to exactly what `GET /api/occurrences` answers.
+`npm run check` passes (882 tests); the Playwright feed spec passes. Not
+deployed: `node cli.ts almanac all`. How it works:
+[calendar-feed.md](wiki/calendar-feed.md); the outcome note is in
+[the brief](briefs/done/06-almanac-events-on-the-phone-calendar.md).

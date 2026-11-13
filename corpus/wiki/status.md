@@ -1,5 +1,5 @@
 ---
-summary: Snapshot as of 2026-11-13, per area. v1 built 2026-10-16 and reviewed; Base UI under the overlays 2026-10-23; phone notifications (push worker, a reminder on each event, the minute sender) 2026-10-27; the estate's conventions (house style, Base UI rules, Tailwind, the server structure) filed as briefs 01-04 on 2026-11-09, the house style and its harness (brief 01) built 2026-11-11, Base UI by the conventions (brief 02) and the whole web app on Tailwind with a Light / Dark / System switch (brief 03) built 2026-11-11, the server grouped by feature with a schema on every route (brief 04) built 2026-11-12, the redesign (brief 05: Almanac's own look on the familiar layout, a phone week strip and bottom bar, Playwright specs) built 2026-11-13. Pushed to GitHub through 2026-11-01, nothing deployed, no phone has shown a notification. What waits on the owner, open bugs, accepted known issues, and the todos.
+summary: Snapshot as of 2026-11-13, per area. v1 built 2026-10-16 and reviewed; Base UI under the overlays 2026-10-23; phone notifications (push worker, a reminder on each event, the minute sender) 2026-10-27; the estate's conventions (house style, Base UI rules, Tailwind, the server structure) filed as briefs 01-04 on 2026-11-09, the house style and its harness (brief 01) built 2026-11-11, Base UI by the conventions (brief 02) and the whole web app on Tailwind with a Light / Dark / System switch (brief 03) built 2026-11-11, the server grouped by feature with a schema on every route (brief 04) built 2026-11-12, the redesign (brief 05: Almanac's own look on the familiar layout, a phone week strip and bottom bar, Playwright specs) built 2026-11-13, the calendar feed (brief 06: a private read-only .ics link per user for a phone's calendar app) built 2026-11-13. Pushed to GitHub through 2026-11-01, nothing deployed, no phone has shown a notification. What waits on the owner, open bugs, accepted known issues, and the todos.
 updated: 2026-11-13
 ---
 
@@ -7,7 +7,7 @@ updated: 2026-11-13
 
 _2026-11-09_. Everything below is on `main` and pushed to
 `https://github.com/<owner>/almanac.git` as of 2026-11-01. Nothing is
-deployed. Briefs 01-05 are built (01-03 on 2026-11-11, 04 on 2026-11-12, 05 on 2026-11-13); brief numbering
+deployed. Briefs 01-06 are built (01-03 on 2026-11-11, 04 on 2026-11-12, 05 and 06 on 2026-11-13); brief numbering
 restarted at 01 on 2026-11-01 (see [log.md](../log.md)).
 
 ## By area
@@ -54,6 +54,11 @@ restarted at 01 on 2026-11-01 (see [log.md](../log.md)).
   labels. Recorded in [web/DESIGN.md](../../web/DESIGN.md) and
   [decisions.md](decisions.md). Playwright specs (`web/e2e`, three theme
   projects) and `scripts/contrast.mjs` came with it. Built, not deployed.
+- **Calendar feed** (2026-11-13). Brief 06: Calendar feed… in the account
+  menu turns on one private, read-only `.ics` link per user that a phone's
+  calendar app subscribes to (every calendar, no alarms, the link shown once
+  and kept as a hash, 30 fetches a minute per address). Built, not deployed;
+  no phone has subscribed yet ([calendar-feed.md](calendar-feed.md)).
 - **Sibling repos** (2026-10-27). The stale app lists in `wzd_auth` and
   `shelfmark` that the deploy work left behind were fixed; both are pushed.
 
@@ -86,6 +91,13 @@ three lanes.
 6. The redesign (brief 05) is web-only: `node cli.ts almanac deploy` from the
    `vps-deploy` checkout ships it. Look at the week on a phone and the details
    sheet on Android first.
+7. The calendar feed (brief 06) changes both halves and adds a table:
+   `node cli.ts almanac all` from the `vps-deploy` checkout (it ships brief
+   05's web app too). Then [docs/owner-setup.md](../../docs/owner-setup.md)
+   step 9: turn it on, copy the link, add it in ICSx⁵ on the Android phone,
+   and check an event and a repeating one show at the right times. Answer the
+   board's question on almanac-06: keep the link shown once, or show it again
+   any time.
 
 ## Open
 
@@ -125,4 +137,4 @@ three lanes.
 
 ## Todos
 
-- [Almanac's events on the phone's calendar](../todos/almanac-events-on-the-phone-calendar.md) (2026-11-13, later): a read-only feed or CalDAV, to grill at promotion.
+- [Almanac's events on the phone's calendar](../todos/almanac-events-on-the-phone-calendar.md) (2026-11-13): promoted to brief 06 the same day and built.
