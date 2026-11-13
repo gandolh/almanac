@@ -1,6 +1,6 @@
 ---
-summary: How Almanac's web app is put together, as built 2026-10-16. The hand-rolled router and its URL scheme, the external-store data layer and the occurrences-changed signal, commands and keyboard shortcuts, the shell on desktop and phone (drawer, swipe, data-no-swipe), how FullCalendar is wired (its CSS in a layer and the Monarch palette on :root, in a sheet that loads with the lazy chunk; utilities through its class-name options; slots and snapping), and the rules the event editor, year view, calendar list, time zone dialog and search follow that the code alone doesn't explain.
-updated: 2026-11-11
+summary: How Almanac's web app is put together, as built 2026-10-16. The hand-rolled router and its URL scheme, the external-store data layer and the occurrences-changed signal, commands and keyboard shortcuts, the shell at three widths since brief 05 (header band and column from 1100 px, drawer, the phone's week strip, bottom bar and swipe, data-no-swipe), how FullCalendar is wired (its CSS in a layer and the Monarch palette on :root, in a sheet that loads with the lazy chunk; utilities through its class-name options; slots and snapping), and the rules the event editor, year view, calendar list, time zone dialog and search follow that the code alone doesn't explain.
+updated: 2026-11-13
 ---
 
 # Web app
@@ -43,13 +43,24 @@ inputs, with modifiers, or while a dialog or popover is open are ignored.
 
 ## Shell
 
-- Desktop: a 64 px top bar over a 256 px left column (`--sidebar-width`). The
-  column's open state is remembered per browser in `localStorage`.
-- Below 768 px (`DESKTOP_QUERY`): the column is a drawer, the view switcher a
-  menu, Today an icon, and Create a round button. The phone bar has no ‹ ›; a
-  sideways swipe steps the view instead, as in Google's app
-  (`layout/swipe.ts`). Anything that must not swipe (events, for one) carries
-  `data-no-swipe`.
+- From 1100 px (`WIDE_QUERY`, `useIsWide`): a 56 px header band over a 276 px
+  left column (`--width-sidebar`) that scrolls on its own: Create, the
+  mini-month, My calendars and `DayCard` (the chosen day's rows and the now
+  rule, `DayRows`). No rail, no right pane. The column's open state is
+  remembered per browser in `localStorage`. The header's search is drawn as
+  the field when closed, and opens on a click as before.
+- From 768 px (`DESKTOP_QUERY`) to 1099 px: the column is a drawer (the menu
+  button opens it) and the view switch (`ViewSwitcher`) is a row under the
+  band. The week is the FullCalendar time grid.
+- Below 768 px: the same drawer; the band has no wordmark and no ‹ › (a
+  sideways swipe steps the view, `layout/swipe.ts`; anything that must not swipe
+  carries `data-no-swipe`); Today is an icon. Week is `WeekAgenda`, not
+  FullCalendar: a sticky strip of seven chips (a tick per event, up to six) and
+  one card per day through Sunday, built from the same occurrences
+  (`useOccurrenceSpan`). The address's date is the chosen day; a chip moves the
+  address and the agenda scrolls to that day's card. Day, Month and Year stay as
+  they are. `ViewBar` is the bottom bar of views; Create floats above it
+  (extended, or a 56 px round button under 380 px).
 - `CalendarArea` is lazy-loaded in `AppShell.tsx`, so the shell, year view and
   search load without FullCalendar, which is most of the bundle.
 
@@ -62,17 +73,18 @@ so they load with the lazy chunk only. The two FullCalendar imports sit in a
 cascade layer (`fullcalendar`, under `components` and `utilities`), because
 their own CSS is unlayered and would beat any utility. So the overrides are
 utilities passed through FullCalendar's class-name options
-(`slotHeaderInnerClass`, `eventTitleClass`, `allDayHeaderInnerClass`, the
+(`slotHeaderInnerClass`, `eventTitleClass`, `columnEventClass`, the
 `className` on its root) and Almanac's own markup (`calendar/content.tsx`),
 and only the palette stays CSS. The palette is on `:root`, set in
 `@layer base` from the tokens, rather than on the view, because a dragged
 event leaves the view's subtree and would lose the colours. Two classes stay
 as markers the selection code queries: `cal-mirror` and `cal-highlight`. The
-text on an event is white, or dark on the palette's yellow, in both themes
-(`eventInk`), and FullCalendar's `colorScheme` follows the theme. No FullCalendar toolbar; the shell's is
+text on an event is the per-theme `on-cal-<key>` token beside its solid fill
+(`calendarColor`, `calendarInk` in `data/calendars.ts`), and FullCalendar's
+`colorScheme` follows the theme. No FullCalendar toolbar; the shell's is
 the only one, and FullCalendar's own navigation (day-number links, "+N more")
 reports back through `onNavigate`. 30-minute slots, 15-minute snapping,
-scrolled to 07:45. A click on the hours selects one hour, as Google does.
+scrolled to 07:45. A click on the hours selects one hour.
 Quick create holds the selection until it calls `releaseSelection()`
 (`calendar/selection.ts`) on closing. A drag or resize on a series occurrence
 asks the edit scope first; cancel or a server error reverts it.

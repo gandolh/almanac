@@ -1,6 +1,6 @@
 ---
 summary: How Almanac's dialogs, popovers, menus, phone drawer, toast, switch, confirm, time zone list, weekday toggles and colour palette sit on Base UI (overlays since 2026-10-23, the rest since 2026-11-11). Every wrapper lives in web/src/components/ui/. What each maps to, the behaviours that needed explicit code (Esc a control already handled, rename from a menu via finalFocus, a press on a popover's anchor, Home and End in the radio group, the guarded toggle group), the dialog stub and the jsdom tests, what stayed native, and the visual differences that were kept.
-updated: 2026-11-11
+updated: 2026-11-13
 ---
 
 # Overlays
@@ -60,6 +60,16 @@ gone.
 Native selects, checkboxes and radios stay native. So does `TimeField`'s list:
 it renders inline, not portalled, so it already works inside a Base UI dialog,
 and its commit-on-blur and Esc rules are tested.
+
+## The phone's sheet
+
+Since brief 05 (2026-11-13) the event details are a bottom sheet below 768 px:
+`components/ui/Sheet.tsx`, a modal Base UI `Dialog` that comes up from the bottom
+edge over the scrim, with a grab mark, rounded top corners and the gesture inset
+under its last row. It keeps the dialog's guards: Esc a control inside already
+used isn't the sheet's, focus goes to the first `[data-autofocus]`, and it returns
+to what had it. `DetailsPopover` chooses the popover or the sheet by
+`useIsDesktop()`; the desktop popover and its content are unchanged.
 
 ## Behaviours that needed code
 

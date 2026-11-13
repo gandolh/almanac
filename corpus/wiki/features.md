@@ -1,21 +1,28 @@
 ---
-summary: What Almanac v1 does, screen by screen, as settled with the owner on 2026-10-16. The Google-style layout (top bar, left column with mini-month and calendars), the four views with month as default, mouse interactions and keyboard shortcuts, event fields, search, the account menu, date and time format, and what is deliberately left out. Read before writing or promoting any brief.
-updated: 2026-11-11
+summary: What Almanac v1 does, screen by screen, as settled with the owner on 2026-10-16. The familiar calendar layout in Almanac's own look (header band, left column with mini-month, calendars and the day's list; a phone's week strip), the four views with month as default, mouse interactions and keyboard shortcuts, event fields, search, the account menu, date and time format, and what is deliberately left out. Read before writing or promoting any brief.
+updated: 2026-11-13
 ---
 
 # Features
 
-The model is Google Calendar played straight, with a Light / Dark / System
-switch and light on a first visit ([decisions.md](decisions.md)). Words follow [glossary.md](glossary.md).
+The layout is the familiar calendar's, in Almanac's own look since brief 05
+(2026-11-13): olive greys, raised cards, a moss accent, Sofia Sans
+([web/DESIGN.md](../../web/DESIGN.md)). A Light / Dark / System switch, light on
+a first visit ([decisions.md](decisions.md)). Words follow [glossary.md](glossary.md).
 
 ## Layout
 
-- Top bar: menu button (collapses the left column), the app name, Today, ‹ ›,
-  the current range ("October 2026"), search, the view switcher, the account
-  button.
-- Left column: a Create button, a mini-month for jumping to a date, and the
-  user's calendars, each with its colour and a show/hide checkbox.
-- On a phone the left column becomes a drawer and the views fill the screen.
+- Header band, 56 px and raised: the menu button (collapses the left column),
+  the app name, Today, ‹ ›, the current range ("9 – 15 Nov 2026"), search, the
+  Day / Week / Month / Year switch and the account button.
+- Left column, from 1100 px, scrolling on its own: a Create button, a
+  mini-month for jumping to a date (the shown week on the accent tint), My
+  calendars (each with its colour and a show/hide checkbox), then the chosen
+  day as a list, with a rule at the time now.
+- From 768 to 1099 px the column is a drawer and the view switch a row under
+  the band. On a phone the drawer stays; Week is a strip of seven day chips
+  (a tick per event) over an agenda through Sunday, the time grid stays in Day,
+  a bottom bar holds the four views and Create floats above it.
 
 ## Views
 
@@ -49,7 +56,7 @@ switch and light on a first visit ([decisions.md](decisions.md)). Words follow [
 
 ## Search
 
-A box in the top bar finds the user's events by title, location or notes and
+A field in the header band finds the user's events by title, location or notes and
 lists the matches by date. Clicking one opens that day.
 
 ## Calendars

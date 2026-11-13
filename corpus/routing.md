@@ -10,7 +10,7 @@ Read by the `orchestrate` skill at the start of a work request.
 | Capture | `corpus-flow` |
 | Query knowledge | `corpus-flow` §5 |
 | Settle a design before briefs | `grill-me`, one question at a time |
-| Design / UI | Google Calendar's layout played straight ([wiki/features.md](wiki/features.md)); `impeccable` only for polish, no direction round |
+| Design / UI | The familiar calendar layout in Almanac's own look ([web/DESIGN.md](../web/DESIGN.md), [wiki/features.md](wiki/features.md)); `impeccable` only for polish, no direction round |
 | Browser checks | `ui-test-plans` once the web app exists |
 | Review | inline (no project reviewer yet) |
 | Pre-PR | none (no remote yet) |
