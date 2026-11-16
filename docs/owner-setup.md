@@ -154,8 +154,8 @@ Home Screen. The icon opens Almanac without the browser's address bar.
 ## 8. Turn on notifications
 
 Almanac can show a notification on a phone or a computer with the app closed:
-"Send a test" in the account menu's Notifications now, event reminders once
-those are built. The server signs every push with a VAPID key pair. Without
+"Send a test" in the account menu's Notifications, and a reminder before any
+event that has one. The server signs every push with a VAPID key pair. Without
 the pair it starts with notifications off and says so once in its log;
 everything else works as before.
 

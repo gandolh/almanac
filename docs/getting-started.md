@@ -14,14 +14,17 @@ separate, hand-run step in [owner-setup.md](owner-setup.md).
 ## Install
 
 ```bash
-npm install
+npm ci
 ```
+
+This installs the exact versions in `package-lock.json`.
 
 ## Configure
 
 Copy `.env.example` to `.env`, which git ignores. The server reads it at
-start-up, and the Vite dev server reads it for the API port. Every key is
-optional; an empty value counts as not set.
+start-up, and the Vite dev server reads it for the API port. A variable
+already set in the environment wins over the file. Every key is optional; an
+empty value counts as not set.
 
 | Variable | Purpose | Default or source |
 |---|---|---|
@@ -34,6 +37,7 @@ optional; an empty value counts as not set.
 | `AUTH_TRUSTED_PROXIES` | Peers besides loopback whose `X-Forwarded-For` the login lockout believes. Empty is right locally | empty |
 | `WARD_OIDC_ISSUER`, `WARD_OIDC_CLIENT_ID`, `WARD_OIDC_CLIENT_KEY`, `WARD_OIDC_REDIRECT_URI`, `WARD_OIDC_POST_LOGOUT_REDIRECT_URI` | Optional. "Sign in with Ward". The key is a secret | Ward's local seed writes all five |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Optional. Push notifications: all three or none. The private key is a secret | `npm run vapid-keys -w @almanac/server` writes all three |
+| `REMINDER_TIMER` | `off` stops this process sending due reminders, for a second process on the same database | `on` |
 
 ## Create an account
 
@@ -96,11 +100,28 @@ added to the Home Screen first.
 ## Test, typecheck, lint, build
 
 ```bash
+npm run check       # the whole gate: typecheck, lint, format check, conventions, tests
 npm test            # vitest, every workspace
 npm run typecheck
 npm run lint
 npm run build       # tsc for shared and server, then the web app
 ```
+
+`npm run check` also runs knip, dependency-cruiser, the house style's two
+convention checkers and `npm run contrast`, which measures every text and icon
+colour pair of both themes. `npm run format` rewrites every file Prettier
+covers; Markdown stays out of it.
+
+The browser tests run headless Chromium against the Vite dev server with the
+API stubbed from a fixed week, so they need no server, database or account:
+
+```bash
+npm run test:e2e    # Playwright, in light, dark and system
+```
+
+It starts Vite on port 5177 unless one is already running there; set
+`E2E_PORT=<port>` to use another. Playwright needs its Chromium build
+installed.
 
 ## Common problems
 
@@ -114,7 +135,18 @@ npm run build       # tsc for shared and server, then the web app
 - **The server names a `VAPID_*` key.** Only some of the three are set, or the
   two keys aren't one pair. Set all three from one `npm run vapid-keys` run,
   or empty all three to run without notifications.
-- **Port 5177 is in use.** The dev server won't pick another port. Stop
-  whatever holds it.
+- **Port 5177 or 8809 is in use.** Neither half moves to a free port by
+  itself. Stop whatever holds it, or run the two halves on ports you choose.
+  Export the same values in both terminals, so the dev proxy and the server
+  agree:
+
+  ```bash
+  export PORT=6101 PUBLIC_ORIGIN=http://localhost:6100
+  npx tsc -b shared
+  npm run dev -w @almanac/server                             # terminal 1, the API
+  npm run dev -w @almanac/web -- --port 6100 --strictPort    # terminal 2, the app
+  ```
+
+  Then open <http://localhost:6100/almanac/>.
 - **The login page has no Ward button.** `WARD_OIDC_ISSUER` is not set in
   `.env`. Local accounts still work.
