@@ -1,6 +1,6 @@
 ---
 summary: Snapshot as of 2026-11-13, per area. v1 built 2026-10-16 and reviewed; Base UI under the overlays 2026-10-23; phone notifications (push worker, a reminder on each event, the minute sender) 2026-10-27; the estate's conventions (house style, Base UI rules, Tailwind, the server structure) filed as briefs 01-04 on 2026-11-09, the house style and its harness (brief 01) built 2026-11-11, Base UI by the conventions (brief 02) and the whole web app on Tailwind with a Light / Dark / System switch (brief 03) built 2026-11-11, the server grouped by feature with a schema on every route (brief 04) built 2026-11-12, the redesign (brief 05: Almanac's own look on the familiar layout, a phone week strip and bottom bar, Playwright specs) built 2026-11-13, the calendar feed (brief 06: a private read-only .ics link per user for a phone's calendar app) built 2026-11-13. Pushed to GitHub through 2026-11-01, nothing deployed, no phone has shown a notification. What waits on the owner, open bugs, accepted known issues, and the todos.
-updated: 2026-11-13
+updated: 2026-11-19
 ---
 
 # Status
@@ -67,14 +67,22 @@ reviewers and browser walkthroughs on 2026-10-16, the findings fixed in
 three lanes.
 745 tests; typecheck, lint and build clean.
 
+- **Ward 1.1.0 vendored** (2026-11-19, brief 07). Linking or unlinking Ward asks
+  for the account's password; a username can be changed from the account menu,
+  and a new or changed name that looks like another user's (`AIice` against
+  `alice`) is refused as taken. Nothing is keyed by the username (rows hang off
+  the user id), so the rename route stays on. Not deployed.
+
 ## Next (owner)
 
 1. Register Almanac in production Ward and write
    `vps-deploy/secrets/almanac.env` with `WARD_OIDC_CLIENT_KEY` (the only
    key), then deploy, following [docs/owner-setup.md](../../docs/owner-setup.md).
 2. Create your account with the seed inside the container. Sign in locally
-   first, then link Ward from the account menu, or Ward creates a second,
-   empty user.
+   first, then link Ward from the account menu (it asks for your password),
+   or Ward creates a second, empty user. If you rename the account (account
+   menu, Change username), run the seed with the new name from then on: the
+   seed matches by name and would make a second user under the old one.
 3. Grant your Ward account (and anyone else who should have a calendar) the
    `almanac` app in Ward's console.
 4. Not tried here: the "Sign in with Ward" round trip, locally (needs the

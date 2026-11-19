@@ -67,7 +67,9 @@ starts with one calendar.
 
 ## Account menu
 
-Change password, link or unlink Sign in with Ward, display time zone (starts
+Change username (since 2026-11-19), change password, link or unlink Sign in
+with Ward (each asks for the current password in a small dialog, since
+2026-11-19; a refusal shows beside the field), display time zone (starts
 at Europe/Bucharest), sign out. No Settings page. Since 2026-10-27 it also has
 Notifications (turn push on in this browser, send a test). Since 2026-11-11
 also Theme… (Light, Dark or System, kept on this device). Since 2026-11-13

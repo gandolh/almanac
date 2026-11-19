@@ -49,3 +49,16 @@ What the update changes here:
 - [ ] Both vendored copies at the new version; the tests above pass; `npm run check` exit 0; `bash corpus/lint.sh` OK.
 - [ ] The outcome note lists each CHANGELOG entry this app crossed and what it needed, and the username check's finding.
 - [ ] End move `ready_for_deploy` with the app's deploy step (server and web both change).
+
+## Outcome (2026-11-19)
+
+Built on `main` by almanac-07: the code commit `afbb37b`, then this closeout. Not deployed: `node cli.ts almanac all` from the `vps-deploy` checkout.
+
+- **Vendored.** ward-auth 1.1.0 in `server/vendor/ward` and `web/vendor/ward` (six files each, `sha256sum -c` against the staged `SHA256SUMS` OK in both), from wzd_auth 66998b7.
+- **CHANGELOG entries crossed (0.3.1 to 1.1.0).** 0.4.0: the rename route is on by default; kept, with the new Change username dialog (`useRenameUser`); the seed matches by name, so the seed must get the new name after a rename (owner step in `wiki/status.md`). 0.5.0 `usernameFor`, 0.6.0 migration 4 and disabling, 0.6.1 exports, 0.7.0 `returnTo`, 0.7.1, 0.7.2: nothing needed (no route, hook or disable call in the app; the login page keeps `signIn()` without `returnTo`). 1.0.0: link and unlink take `currentPassword` (dialog, `AccountActionError` carries the code); tests send it. 1.1.0: migration 5 ran on first boot with no shared-key line; nothing to change in code.
+- **Username check.** Nothing stores or matches by username except sign-in and the seed script; calendars, events, settings, push, feed tokens and reminders hang off the user id. The rename is safe, so `allowRename` stays default and the screen was built.
+- **Web.** `account/WardLinkDialog.tsx` (password field, "Current password", `type="password"`, `autocomplete="current-password"`, refusals beside the field with focus kept, "Set a password" for an account with none), `account/ChangeUsername.tsx` (`username_taken` covers a look-alike), menu entries in `layout/AccountMenu.tsx`, new words in `auth/messages.ts`.
+- **Tests.** Server: link without, wrong and right password; unlink the same with a hand-inserted link row and a password sign-in after; the 409 before the body; rename works and signs in under the new name; `alice` against `ALICE`, `AIice`, `a1ice` answer `username_taken`. Web: the actions send the password, the dialog tests, the username dialog tests. A Ward sign-in of a linked user is not exercised (needs a Ward).
+- **Checks.** `npm run check` exit 0 (900 tests); `bash corpus/lint.sh` run at closeout.
+- **Shots.** Dev servers on a scratch database (API 6201, Vite 5177), Playwright with the session and link routes stubbed (Ward enabled, link 401 `invalid_credentials`, rename 409): the menu, the Link Ward dialog with the error and the Change username dialog with `username_taken`, at 1280 light and 390 dark. Read: no clipping, the field keeps focus, the error sits under it. Kept in the build scratch folder, not the repo.
+- **Not run.** The Playwright e2e suite; docker; a real Ward round trip.

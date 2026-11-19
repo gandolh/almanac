@@ -475,3 +475,7 @@ fixture week of the feed to exactly what `GET /api/occurrences` answers.
 deployed: `node cli.ts almanac all`. How it works:
 [calendar-feed.md](wiki/calendar-feed.md); the outcome note is in
 [the brief](briefs/done/06-almanac-events-on-the-phone-calendar.md).
+
+## [2026-11-19] build | Brief 07: Ward 1.1.0, the password to link, a username that can change
+
+Vendored ward-auth 1.1.0 (server and web copies, from 0.3.1). Link Ward and Unlink Ward open a small dialog that asks for the current password; Change username is a new account-menu dialog. Nothing is keyed by the username, so the rename route stays on. Not deployed: `node cli.ts almanac all`. The outcome note is in [the brief](briefs/done/07-linking-ward-asks-for-the-password-and-a-username-can-change.md).
