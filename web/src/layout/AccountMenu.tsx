@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "../../vendor/ward/ward-auth-react.js";
-import { changePassword, linkWard, signOut, unlinkWard, useWardLink, useWardNotice } from "../account/actions";
+import { changePassword, signOut, useWardLink, useWardNotice } from "../account/actions";
+import { ChangeUsernameDialog } from "../account/ChangeUsername";
 import { CalendarFeedDialog } from "../account/CalendarFeed";
 import { NotificationsDialog } from "../account/Notifications";
 import { THEME_LABELS, ThemeDialog } from "../account/ThemeDialog";
 import { TimeZoneDialog } from "../account/TimeZoneDialog";
+import { WardLinkDialog, type WardLinkMode } from "../account/WardLinkDialog";
 import { AlertIcon } from "../components/Field";
 import { Menu, type MenuSection } from "../components/ui/Menu";
 import { useSettings } from "../data/settings";
@@ -29,8 +31,8 @@ export function initialOf(username: string): string {
 
 /**
  * The account button and its menu, in place of a Settings page
- * (corpus/wiki/features.md "Account menu"): Change password, Sign in with
- * Ward (link or unlink), Time zone…, Theme…, Notifications, Calendar feed…,
+ * (corpus/wiki/features.md "Account menu"): Change username…, Change password, Sign in with
+ * Ward (link or unlink, each asking for the password), Time zone…, Theme…, Notifications, Calendar feed…,
  * then Sign out.
  * The button is a 44 px target round a 32 px disc with the username's initial.
  */
@@ -44,6 +46,8 @@ export function AccountMenu() {
   const [themeOpen, setThemeOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [feedOpen, setFeedOpen] = useState(false);
+  const [usernameOpen, setUsernameOpen] = useState(false);
+  const [wardMode, setWardMode] = useState<WardLinkMode | null>(null);
   const [notice, setNotice] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   // A Ward link comes back to the app with its result; it shows here like an action's, then goes.
@@ -72,13 +76,14 @@ export function AccountMenu() {
   const sections: MenuSection[] = [
     {
       items: [
+        { label: "Change username…", onSelect: () => setUsernameOpen(true) },
         { label: "Change password", onSelect: run(changePassword) },
         ...(ward.available
           ? [
               {
                 label: "Sign in with Ward",
                 detail: ward.linked ? "Linked" : "Not linked",
-                onSelect: run(ward.linked ? unlinkWard : linkWard),
+                onSelect: () => setWardMode(ward.linked ? "unlink" : "link"),
               },
             ]
           : []),
@@ -123,6 +128,17 @@ export function AccountMenu() {
       <ThemeDialog open={themeOpen} onClose={() => setThemeOpen(false)} />
       <NotificationsDialog open={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
       <CalendarFeedDialog open={feedOpen} onClose={() => setFeedOpen(false)} />
+      {usernameOpen && <ChangeUsernameDialog onClose={() => setUsernameOpen(false)} />}
+      {wardMode !== null && (
+        <WardLinkDialog
+          mode={wardMode}
+          onClose={() => setWardMode(null)}
+          onSetPassword={() => {
+            setWardMode(null);
+            run(changePassword)();
+          }}
+        />
+      )}
     </div>
   );
 }

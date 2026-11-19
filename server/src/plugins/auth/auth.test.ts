@@ -1,6 +1,7 @@
 import { generateKeyPairSync } from "node:crypto";
 import type { FastifyInstance } from "fastify";
 import { afterEach, describe, expect, it } from "vitest";
+import { databasePath, openDb } from "../../db/open.js";
 import { PUBLIC_ROUTES, SESSION_COOKIE } from "./index.js";
 import {
   sessionCookieFrom,
@@ -368,4 +369,114 @@ describe("Sign in with Ward", () => {
     expect(start.statusCode).toBe(503);
     expect(start.json()).toEqual({ error: "ward_unavailable" });
   });
+
+  it("asks for the current password to link: none is 400, a wrong one 401, the right one goes on to Ward", async () => {
+    const app = await signedIn(wardSettings());
+    const link = (payload?: object) =>
+      app.inject({ method: "POST", url: "/auth/ward/link", ...(payload === undefined ? {} : { payload }) });
+    const missing = await link({});
+    expect(missing.statusCode).toBe(400);
+    expect(missing.json()).toEqual({ error: "invalid_request" });
+    const wrong = await link({ currentPassword: "not the password" });
+    expect(wrong.statusCode).toBe(401);
+    expect(wrong.json()).toEqual({ error: "invalid_credentials" });
+    // Right password: the link starts, and only Ward (nothing listens at the issuer) is missing.
+    const right = await link({ currentPassword: app.owner.password });
+    expect(right.statusCode).toBe(503);
+    expect(right.json()).toEqual({ error: "ward_unavailable" });
+  });
+
+  it("asks for the current password to unlink, and the account still signs in with it after", async () => {
+    const app = await signedIn(wardSettings());
+    const userId = await userIdOf(app, app.owner.username);
+    const db = openDb(databasePath(app.dataDir));
+    try {
+      db.prepare("INSERT INTO auth_ward_links (subject, user_id, linked_at) VALUES ('ward-subject', ?, 0)").run(userId);
+    } finally {
+      db.close();
+    }
+    expect((await app.inject({ method: "GET", url: "/auth/session" })).json()).toMatchObject({
+      ward: { enabled: true, linked: true },
+    });
+    const unlink = (payload?: object) =>
+      app.inject({ method: "POST", url: "/auth/ward/unlink", ...(payload === undefined ? {} : { payload }) });
+    expect((await unlink({})).statusCode).toBe(400);
+    const wrong = await unlink({ currentPassword: "not the password" });
+    expect(wrong.statusCode).toBe(401);
+    expect(wrong.json()).toEqual({ error: "invalid_credentials" });
+    expect((await unlink({ currentPassword: app.owner.password })).statusCode).toBe(200);
+    expect((await app.inject({ method: "GET", url: "/auth/session" })).json()).toMatchObject({
+      ward: { enabled: true, linked: false },
+    });
+    const again = await app.app.inject({ method: "POST", url: "/auth/login", payload: app.owner });
+    expect(again.statusCode).toBe(200);
+  });
+
+  it("answers the 409s before it looks at the body", async () => {
+    const app = await signedIn(wardSettings());
+    const res = await app.inject({ method: "POST", url: "/auth/ward/unlink", payload: {} });
+    expect(res.statusCode).toBe(409);
+    expect(res.json()).toEqual({ error: "not_linked" });
+  });
 });
+
+describe("changing the username", () => {
+  async function rename(app: SignedInTestApp, username: string) {
+    return app.inject({ method: "POST", url: "/auth/username", payload: { username } });
+  }
+
+  it("renames, and the account signs in under the new name only", async () => {
+    const app = await signedIn();
+    const before = await userIdOf(app, app.owner.username);
+    const res = await rename(app, "Renamed");
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toMatchObject({ user: { id: before, username: "Renamed" } });
+    // The session carries on; nothing is keyed by the old name.
+    expect((await app.inject({ method: "GET", url: "/auth/session" })).json()).toMatchObject({
+      user: { id: before, username: "Renamed" },
+    });
+    const fresh = await app.app.inject({
+      method: "POST",
+      url: "/auth/login",
+      payload: { username: "Renamed", password: app.owner.password },
+    });
+    expect(fresh.statusCode).toBe(200);
+    expect(fresh.json()).toMatchObject({ user: { id: before, username: "Renamed" } });
+    const old = await app.app.inject({ method: "POST", url: "/auth/login", payload: app.owner });
+    expect(old.statusCode).toBe(401);
+  });
+
+  it("refuses a name another user holds, in any case, and one that looks like it", async () => {
+    const app = await signedIn();
+    await app.createUser("alice");
+    for (const name of ["alice", "ALICE", "AIice", "a1ice"]) {
+      const res = await rename(app, name);
+      expect({ name, status: res.statusCode, body: res.json<unknown>() }).toEqual({
+        name,
+        status: 409,
+        body: { error: "username_taken" },
+      });
+    }
+    // The owner's own name is still the owner's.
+    expect((await app.inject({ method: "GET", url: "/auth/session" })).json()).toMatchObject({
+      user: { username: app.owner.username },
+    });
+  });
+
+  it("refuses an empty name", async () => {
+    const app = await signedIn();
+    const res = await rename(app, "   ");
+    expect(res.statusCode).toBe(400);
+    expect(res.json()).toEqual({ error: "invalid_username" });
+  });
+});
+
+/** A user's id by name, read from the app's database. */
+async function userIdOf(app: TestApp, username: string): Promise<string> {
+  const db = openDb(databasePath(app.dataDir));
+  try {
+    return (db.prepare("SELECT id FROM auth_users WHERE username = ?").get(username) as { id: string }).id;
+  } finally {
+    db.close();
+  }
+}

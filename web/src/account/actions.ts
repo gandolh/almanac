@@ -1,8 +1,18 @@
-import { useSession, useWardResult, type SessionState } from "../../vendor/ward/ward-auth-react.js";
+import { useSession, useWardResult, type AuthError, type SessionState } from "../../vendor/ward/ward-auth-react.js";
 import { accountMessage } from "../auth/messages";
 import { authClient } from "../auth/session";
 import { LOGIN, pathFor } from "../router";
 import { openChangePassword } from "./ChangePassword";
+
+/** A refused account action: `message` is the app's words, `code` what the server named, for the control to place it. */
+export class AccountActionError extends Error {
+  readonly code: AuthError["code"];
+  constructor(error: AuthError) {
+    super(accountMessage(error));
+    this.name = "AccountActionError";
+    this.code = error.code;
+  }
+}
 
 /**
  * What the account menu does (`layout/AccountMenu.tsx` calls these). Each
@@ -35,24 +45,26 @@ export async function changePassword(): Promise<void> {
 }
 
 /**
- * Link this account to a Ward account, so "Sign in with Ward" works: off to
- * Ward, which comes back to home with the result (`useWardNotice`).
- * Rejects only when it couldn't get to Ward.
+ * Link this account to a Ward account, so "Sign in with Ward" works: with the
+ * account's current password, then off to Ward, which comes back to home with
+ * the result (`useWardNotice`). Rejects (`AccountActionError`) when the
+ * password is wrong or refused, or it couldn't get to Ward.
  */
-export async function linkWard(): Promise<void> {
-  const result = await authClient().startWardLink();
-  if (!result.ok) throw new Error(accountMessage(result.error));
+export async function linkWard(currentPassword: string): Promise<void> {
+  const result = await authClient().startWardLink(currentPassword);
+  if (!result.ok) throw new AccountActionError(result.error);
 }
 
 /**
- * Unlink Ward from this account; the password still signs in. Refused until
- * the account has a password. A session that began with Ward ends with it,
+ * Unlink Ward from this account, with its current password; the password
+ * still signs in. Refused until the account has a password
+ * (`AccountActionError` with `no_local_password`). A session that began with Ward ends with it,
  * and then the login page loads afresh, as on signing out.
  */
-export async function unlinkWard(): Promise<void> {
+export async function unlinkWard(currentPassword: string): Promise<void> {
   const client = authClient();
-  const result = await client.unlinkWard();
-  if (!result.ok) throw new Error(accountMessage(result.error));
+  const result = await client.unlinkWard(currentPassword);
+  if (!result.ok) throw new AccountActionError(result.error);
   if (client.getState().status === "signed_out") window.location.replace(pathFor(LOGIN));
 }
 

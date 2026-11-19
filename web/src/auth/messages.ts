@@ -77,6 +77,12 @@ export function accountMessage(error: AuthError): string {
   switch (error.code) {
     case "invalid_credentials":
       return "That isn't your current password.";
+    case "username_taken":
+      return "That username is taken, or looks too much like one that is. Pick another.";
+    case "invalid_username":
+      return "Use 1 to 256 characters for a username.";
+    case "invalid_request":
+      return "Enter your current password.";
     case "password_too_short":
       return "Use at least 8 characters.";
     case "password_too_long":

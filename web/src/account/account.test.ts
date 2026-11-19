@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { linkWard, signOut, unlinkWard, wardLinkOf } from "./actions";
+import { AccountActionError, linkWard, signOut, unlinkWard, wardLinkOf } from "./actions";
 import { checkPasswords } from "./ChangePassword";
 
 const SIGNED_IN = {
@@ -55,11 +55,15 @@ describe("the account actions", () => {
   });
 
   function serve(status: number, body?: unknown) {
-    const calls: { url: string; method: string | undefined }[] = [];
+    const calls: { url: string; method: string | undefined; body?: unknown }[] = [];
     vi.stubGlobal(
       "fetch",
       vi.fn(async (url: string, init?: RequestInit) => {
-        calls.push({ url, method: init?.method });
+        calls.push({
+          url,
+          method: init?.method,
+          body: typeof init?.body === "string" ? JSON.parse(init.body) : undefined,
+        });
         return body === undefined ? new Response(null, { status }) : Response.json(body, { status });
       }),
     );
@@ -71,7 +75,7 @@ describe("the account actions", () => {
     vi.stubGlobal("window", { location: { replace } });
     const calls = serve(204);
     await signOut();
-    expect(calls).toEqual([{ url: "/almanac-api/auth/logout", method: "POST" }]);
+    expect(calls).toMatchObject([{ url: "/almanac-api/auth/logout", method: "POST" }]);
     expect(replace).toHaveBeenCalledWith("/almanac/login");
   });
 
@@ -88,19 +92,37 @@ describe("the account actions", () => {
 
   it("says when Ward can't be reached to link", async () => {
     serve(503, { error: "ward_unavailable" });
-    await expect(linkWard()).rejects.toThrow("Ward isn't answering right now. Try again later.");
+    await expect(linkWard("my password")).rejects.toThrow("Ward isn't answering right now. Try again later.");
+  });
+
+  it("sends the current password with a link, and says when it is wrong", async () => {
+    const calls = serve(401, { error: "invalid_credentials" });
+    const refused = await linkWard("wrong").catch((error: unknown) => error);
+    expect(refused).toBeInstanceOf(AccountActionError);
+    expect(refused).toMatchObject({ code: "invalid_credentials", message: "That isn't your current password." });
+    expect(calls).toMatchObject([
+      { url: "/almanac-api/auth/ward/link", method: "POST", body: { currentPassword: "wrong" } },
+    ]);
+  });
+
+  it("waits out too many tries, with the wait", async () => {
+    serve(429, { error: "too_many_attempts", retryAfterSeconds: 45 });
+    await expect(linkWard("again")).rejects.toThrow("Too many tries. Wait 45 seconds, then try again.");
   });
 
   it("unlinks, and when this session began with Ward and ends with it, loads the login page afresh", async () => {
     const replace = vi.fn();
     vi.stubGlobal("window", { location: { replace } });
-    serve(200, { signedOut: true });
-    await unlinkWard();
+    const calls = serve(200, { signedOut: true });
+    await unlinkWard("my password");
+    expect(calls).toMatchObject([
+      { url: "/almanac-api/auth/ward/unlink", method: "POST", body: { currentPassword: "my password" } },
+    ]);
     expect(replace).toHaveBeenCalledWith("/almanac/login");
   });
 
   it("says a password must come before unlinking", async () => {
     serve(409, { error: "no_local_password" });
-    await expect(unlinkWard()).rejects.toThrow("Set an Almanac password first");
+    await expect(unlinkWard("my password")).rejects.toThrow("Set an Almanac password first");
   });
 });
