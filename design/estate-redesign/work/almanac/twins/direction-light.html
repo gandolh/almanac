@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Almanac direction (twin)</title>
+<meta name="description" content="A plain-HTML twin of the direction sheet.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sofia+Sans:wght@400;500;600;700&amp;family=Sofia+Sans+Condensed:wght@500;600;700&amp;display=swap">
+<style>
+/* Hallmark · shape: app screen · genre: calendar utility · theme: brand · redesign: full
+ * paper: #edede8 olive grey · accent: #516312 moss · display: Sofia Sans Condensed · body: Sofia Sans
+ * nav: kept (labelled Create, mini-month, My calendars, four views, phone drawer) · signature: the chosen day as a list beside the week, its now rule mirroring the grid's now line · states: empty week, loading, load error, save error
+ * axes: olive-tinted neutrals/humanist sans plus condensed numerals/one moss · posture: restrained · modes: light+dark · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: V, the moss and the condensed numerals carry the look, so the event fills stay today's solid blocks */
+/* Hallmark · answered F4 · one filled accent button per screen: Create in the header and column, Save in the form; Edit and Cancel are outlined */
+/* Hallmark · waive 24b · padding 6px 10px 14px and gaps of 6, 10, 14 off the 4px scale · half steps between the tokens, kept so 20px icons centre in 44px fields and the 48px hour grid lines up with its half lines */
+/* Hallmark · waive 72 · a.ev and div.ga text 5px from the box edge · event blocks hold a title and its start time in a 123px column, so they pad 5px; nothing is clipped, and a block too narrow for both shows its title alone */
+/* Hallmark · waive 39b · button.chip 76px tall · the phone's day chip holds the weekday, the date and its event ticks and is the strip's only touch target */
+[data-theme="light"]{color-scheme:light;--color-ground:#edede8;--color-surface:#fdfdfa;--color-sunk:#e4e4de;--color-ink:#1a1b14;--color-muted:#5d5f56;--color-line:#d6d6cf;--color-outline:#808178;--color-accent:#516312;--color-on-accent:#fdfdfa;--color-accent-tint:#e4efce;--color-on-accent-tint:#344106;--color-now:#c1351e;--color-on-now:#fdfdfa;--color-danger:#b02a2d;--color-focus:#516312;--color-blue:#2863ab;--color-on-blue:#fdfdfa;--color-green:#137738;--color-on-green:#fdfdfa;--color-orange:#9d4616;--color-on-orange:#fdfdfa;--color-purple:#7f4995;--color-on-purple:#fdfdfa;--color-scrim:rgb(26 27 20 / .5);--font-ui:'Sofia Sans',system-ui,-apple-system,'Segoe UI',sans-serif;--font-num:'Sofia Sans Condensed','Sofia Sans',system-ui,sans-serif;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-12:48px;--color-accent-ink:var(--color-on-accent);--radius-event:6px;--radius-control:10px;--radius-card:12px;--radius-sheet:20px;--inset:16px;--shadow:0 1px 2px rgb(26 27 20 / .07),0 4px 14px rgb(26 27 20 / .06);--shadow-float:0 8px 28px rgb(26 27 20 / .18),0 0 0 1px var(--color-line);}
+[data-theme="dark"]{color-scheme:dark;--color-ground:#11110d;--color-surface:#22231e;--color-sunk:#090907;--color-ink:#eaeae4;--color-muted:#abaca3;--color-line:#3f3f38;--color-outline:#808178;--color-accent:#bdd18f;--color-on-accent:#192003;--color-accent-tint:#333c1e;--color-on-accent-tint:#e2eec9;--color-now:#fa8467;--color-on-now:#2a0e06;--color-danger:#f47a79;--color-focus:#bdd18f;--color-blue:#8dc1ff;--color-on-blue:#0d1b2d;--color-green:#89d298;--color-on-green:#0b2010;--color-orange:#f9a782;--color-on-orange:#2a140a;--color-purple:#d9a8ef;--color-on-purple:#221527;--color-scrim:rgb(0 0 0 / .62);--font-ui:'Sofia Sans',system-ui,-apple-system,'Segoe UI',sans-serif;--font-num:'Sofia Sans Condensed','Sofia Sans',system-ui,sans-serif;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-12:48px;--color-accent-ink:var(--color-on-accent);--radius-event:6px;--radius-control:10px;--radius-card:12px;--radius-sheet:20px;--inset:16px;--shadow:none;--shadow-float:0 0 0 1px var(--color-line);}
+
+html,body{overflow-x:clip}
+.al{scrollbar-color:var(--color-outline) transparent;caret-color:var(--color-accent);container:page/inline-size;background:var(--color-ground);color:var(--color-ink);font-family:var(--font-ui);font-size:14px;line-height:20px;font-variant-numeric:tabular-nums;font-synthesis:none;-webkit-font-smoothing:antialiased}
+.al *,.al *::before,.al *::after{box-sizing:border-box}
+.al :where(h1,h2,h3,p,ol,ul,dl,dd){margin:0;padding:0}
+.al :where(ol,ul){list-style:none}
+.al :where(h1,h2){text-wrap:balance}
+.al :where(button,input,select,textarea){font:inherit;color:inherit}
+.al button{cursor:pointer}
+.al a{text-decoration:none}
+.al :where(a){color:inherit}
+.al ::selection{background:var(--color-accent-tint);color:var(--color-ink)}
+.al .ic{flex:none;display:block}
+.al .num,.al .word,.al .title,.al .dd,.al .hr,.al .lt,.al .tm,.al .nchip,.al .cd,.al .md,.al .pop-tm{font-family:var(--font-num)}
+.al .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.al .sp{flex:1}
+.app{position:relative;transform:translateZ(0);min-height:100dvh;display:flex;flex-direction:column}
+.card{color:var(--color-ink);background:var(--color-surface);border:1px solid var(--color-line);border-radius:var(--radius-card);box-shadow:var(--shadow)}
+.c-blue{--c:var(--color-blue);--on:var(--color-on-blue)}
+.c-green{--c:var(--color-green);--on:var(--color-on-green)}
+.c-orange{--c:var(--color-orange);--on:var(--color-on-orange)}
+.c-purple{--c:var(--color-purple);--on:var(--color-on-purple)}
+
+/* header band */
+@container page (min-width:760px){.hd.dk{position:sticky;inset-block-start:0}}
+.hd{position:static;z-index:20;height:56px;background:var(--color-surface);border-bottom:1px solid var(--color-line);box-shadow:var(--shadow);display:flex;align-items:center;gap:var(--space-2);padding:0 var(--space-4)}
+.word{font-weight:700;font-size:22px;line-height:26px;letter-spacing:.01em;margin:0 var(--space-3) 0 var(--space-1)}
+.btn{height:36px;border-radius:var(--radius-control);border:1px solid var(--color-outline);background:var(--color-surface);padding:0 14px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);white-space:nowrap}
+.btn:hover{background:var(--color-sunk)}
+.btn:active{background:var(--color-line)}
+.create:active{background:color-mix(in srgb,var(--color-accent) 76%,var(--color-ink))}
+.icb:active,.sg:active,.md:active{background:var(--color-line)}
+.al [aria-disabled="true"],.al :disabled{background:var(--color-sunk);color:var(--color-muted);cursor:not-allowed}
+.btn.quiet{border-color:transparent;background:transparent;padding:0 10px}
+.btn.danger{color:var(--color-danger)}
+.btn.quiet:hover{background:var(--color-sunk)}
+.icb{width:36px;height:36px;border-radius:var(--radius-control);border:0;background:transparent;display:inline-flex;align-items:center;justify-content:center;padding:0;flex:none}
+.icb:hover{background:var(--color-sunk)}
+.title{font-weight:600;font-size:22px;line-height:26px;margin:0 0 0 var(--space-2);white-space:nowrap}
+.sf{display:flex;align-items:center;gap:var(--space-2);height:36px;width:224px;border:1px solid var(--color-outline);border-radius:var(--radius-control);background:var(--color-sunk);padding:0 10px;color:var(--color-muted);position:relative}
+.sf input{flex:1;min-width:0;border:0;background:transparent;outline:0;color:var(--color-ink)}
+.sf input::placeholder{color:var(--color-muted);opacity:1}
+.sf:focus-within{outline:2px solid var(--color-focus);outline-offset:2px}
+.seg{display:inline-flex;gap:2px;padding:2px;border:1px solid var(--color-outline);border-radius:12px;background:var(--color-surface)}
+.sg{height:30px;padding:0 14px;border:0;border-radius:9px;background:transparent;font-weight:500;color:var(--color-ink)}
+.sg:hover{background:var(--color-sunk)}
+.sg[aria-pressed="true"]{background:var(--color-accent-tint);color:var(--color-on-accent-tint);font-weight:600;box-shadow:inset 0 0 0 1px var(--color-accent)}
+.create{height:36px;border-radius:var(--radius-control);border:0;background:var(--color-accent);color:var(--color-accent-ink);padding:0 var(--space-4) 0 var(--space-3);font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.create:hover{background:color-mix(in srgb,var(--color-accent) 88%,var(--color-ink))}
+.create.wide{width:100%;height:44px;font-size:16px}
+.create.sv{padding:0 22px}
+.disc{width:44px;height:44px;border:0;background:transparent;display:inline-flex;align-items:center;justify-content:center;padding:0;flex:none}
+.disc span{width:32px;height:32px;border-radius:50%;background:var(--color-accent-tint);color:var(--color-accent-ink);font-weight:600;display:inline-flex;align-items:center;justify-content:center}
+.hd .sib,.tools{display:none}
+.hd.ph,.phb{display:none}
+
+/* desktop body */
+.pg{display:grid;grid-template-columns:304px minmax(0,1fr);gap:var(--space-4);padding:var(--space-4) 28px 28px 0;align-items:start;flex:1}
+.col1{display:flex;flex-direction:column;gap:var(--space-3);min-width:0;padding-left:28px;position:sticky;top:72px;max-height:calc(100dvh - 88px);overflow-y:auto;overscroll-behavior:contain}
+.cw,.gridw,.mm,.dcard{position:relative}
+.grid{overflow:hidden}
+.gh,.ga,.gb{display:grid;grid-template-columns:44px repeat(7,minmax(0,1fr))}
+.dh{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:56px;border-left:1px solid var(--color-line)}
+.dn{font-size:13px;line-height:16px;color:var(--color-muted);font-weight:500}
+.dd{font-weight:600;font-size:22px;line-height:26px;min-width:34px;text-align:center}
+.dh.today{background:var(--color-accent-tint)}
+.dh.today .dn{color:var(--color-on-accent-tint);font-weight:700}
+.dd.tab{background:var(--color-accent);color:var(--color-on-accent);border-radius:8px;padding:0 6px;font-weight:700}
+.ga{background:var(--color-sunk);border-top:1px solid var(--color-line);border-bottom:1px solid var(--color-line);min-height:32px}
+.ga .lab{font-size:12px;line-height:16px;color:var(--color-muted);display:flex;align-items:center;justify-content:flex-end;padding-right:6px}
+.ga .cell{border-left:1px solid var(--color-line);padding:var(--space-1) 3px}
+.ad{display:flex;align-items:center;height:24px;border-radius:var(--radius-event);padding:0 6px;background:var(--c);color:var(--on);font-weight:600;font-size:13px;line-height:18px;white-space:nowrap}
+.gb{position:relative;height:636px}
+.gut{position:relative}
+.hr{position:absolute;right:6px;transform:translateY(-50%);font-weight:500;font-size:12px;line-height:16px;color:var(--color-muted)}
+.hl{position:absolute;left:44px;right:0;height:1px;background:var(--color-line);pointer-events:none}
+.hl.half{background:color-mix(in srgb,var(--color-line) 30%,transparent)}
+.col{position:relative;border-left:1px solid var(--color-line)}
+.col.today{background:color-mix(in srgb,var(--color-accent-tint) 42%,transparent)}
+.ev{position:absolute;left:2px;right:2px;border-radius:var(--radius-event);background:var(--c);color:var(--on);overflow:hidden;display:flex;min-width:0}
+.ev.two{flex-direction:column;justify-content:flex-start;padding:var(--space-1) 5px 0}
+.ev.one{flex-direction:row;align-items:center;gap:var(--space-1);padding:0 5px;white-space:nowrap}
+.ev .t{font-weight:600;font-size:13px;line-height:18px}
+.ev .tm{font-weight:500;font-size:12px;line-height:16px}
+.ev.mid{padding:0 var(--space-1) 0 5px;justify-content:center}
+.ev.mid .tm{line-height:14px}
+.ev.one{container:ev/inline-size}
+@container ev (max-width:119px){.tm{display:none}}
+.ev.sel{outline:2px solid var(--color-ink);outline-offset:2px;z-index:3}
+.nowline{position:absolute;left:0;right:0;height:2px;background:var(--color-now);z-index:2;pointer-events:none;top:132px}
+.nchip{font-weight:600;font-size:12px;line-height:16px;background:var(--color-now);color:var(--color-on-now);border-radius:6px;padding:2px 5px}
+.gchip{position:absolute;right:3px;transform:translateY(-50%);z-index:3}
+
+/* the left column */
+.ph2{display:flex;align-items:center;gap:var(--space-1);margin-bottom:var(--space-2)}
+.ph2 h2{font-size:18px;line-height:24px;font-weight:600;flex:1}
+.ph2 h2.num{font-weight:600}
+.mm,.cc{padding:var(--space-3)}
+.mh,.mw{display:grid;grid-template-columns:repeat(7,1fr)}
+.mh span{font-size:12px;line-height:16px;color:var(--color-muted);text-align:center;padding:var(--space-1) 0;font-weight:500}
+.mw{border-radius:8px}
+.mw.shown{background:var(--color-accent-tint)}
+.md{height:28px;border:0;background:transparent;border-radius:8px;font-weight:500;font-size:14px;line-height:20px;padding:0}
+.md.out{color:var(--color-muted)}
+.mw.shown .md{color:var(--color-on-accent-tint)}
+.mw .md.is-today{background:var(--color-accent);color:var(--color-on-accent);font-weight:700}
+.dcard{padding:var(--space-3) var(--space-3) var(--space-1)}
+.dhd{display:flex;align-items:center;gap:var(--space-2)}
+.dcard .dh2{font-size:16px;line-height:22px}
+.dh2{font-size:18px;line-height:24px;font-weight:600}
+.pill{font-size:12px;line-height:16px;font-weight:600;background:var(--color-accent-tint);color:var(--color-on-accent-tint);border-radius:999px;padding:2px var(--space-2)}
+.list{margin:var(--space-2) 0 0}
+.lr{display:grid;grid-template-columns:90px 12px minmax(0,1fr);column-gap:10px;align-items:start;padding:6px 0;border-top:1px solid var(--color-line)}
+.lt{font-weight:500;font-size:14px;line-height:20px;color:var(--color-muted);white-space:nowrap}
+.mk{width:12px;height:12px;border-radius:4px;background:var(--c);margin-top:var(--space-1);display:block;flex:none}
+.mk.lg{width:14px;height:14px;margin-top:0}
+.lb{display:flex;flex-direction:column;min-width:0}
+.lti{font-weight:600;font-size:14px;line-height:20px;overflow-wrap:break-word}
+.ll{display:flex;align-items:center;gap:var(--space-1);font-size:13px;line-height:18px;color:var(--color-muted)}
+.nr{display:flex;align-items:center;padding:6px 0;border-top:1px solid var(--color-line)}
+.nr .nchip{width:90px;text-align:right;background:transparent;color:var(--color-now);padding:0;margin-right:10px;font-size:13px;font-weight:700}
+.nr .nline{flex:1;height:2px;background:var(--color-now);border-radius:2px}
+.cr{display:flex;align-items:center;gap:var(--space-3);min-height:36px;position:relative;font-size:14px}
+.cr input{position:absolute;opacity:0;width:20px;height:20px;margin:0;left:0}
+.cb{width:20px;height:20px;border-radius:6px;border:2px solid var(--c);background:var(--c);color:var(--on);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.cb .ic{width:14px;height:14px;stroke-width:2.5}
+.cr input:focus-visible + .cb{outline:2px solid var(--color-focus);outline-offset:2px}
+.cb.box{border:2px solid var(--color-outline);background:var(--color-sunk);color:transparent}
+.cr input:checked + .cb.box{background:var(--color-accent);border-color:var(--color-accent);color:var(--color-on-accent)}
+
+/* callouts: in the page gutter, 1280 only */
+.co{display:none;position:absolute;width:22px;height:22px;border-radius:50%;background:var(--color-ink);color:var(--color-ground);font-family:var(--font-num);font-weight:700;font-size:13px;line-height:22px;text-align:center}
+@container page (min-width:1200px){.co{display:block}}
+
+/* details popover */
+.pop{position:fixed;z-index:6;width:340px;padding:var(--space-4) var(--space-4) var(--space-3);box-shadow:var(--shadow-float)}
+.pop-top{display:flex;align-items:center;gap:10px}
+.pop-t{flex:1;font-size:22px;line-height:28px;font-weight:600}
+.pop-d{margin-top:6px;font-size:16px;line-height:22px;font-weight:600;padding-left:var(--space-6)}
+.pop-tm{font-size:16px;line-height:22px;font-weight:500;color:var(--color-muted);padding-left:var(--space-6)}
+.dt-rows{margin-top:var(--space-3);display:flex;flex-direction:column;gap:10px}
+.dt-r{display:grid;grid-template-columns:20px minmax(0,1fr);gap:var(--space-3);align-items:start;color:var(--color-muted)}
+.dt-r > span{display:flex;flex-direction:column}
+.dt-k{font-size:12px;line-height:16px;color:var(--color-muted);font-weight:500}
+.dt-v{font-size:14px;line-height:20px;color:var(--color-ink)}
+.pop-f{display:flex;align-items:center;gap:var(--space-2);margin-top:14px;padding-top:10px;border-top:1px solid var(--color-line)}
+.scrim{position:fixed;inset:0;background:var(--color-scrim);z-index:30}
+.sheetw{display:none}
+
+/* the form */
+.dlg{position:fixed;z-index:40;left:50%;top:16px;max-height:calc(100dvh - 32px);transform:translateX(-50%);width:640px;max-width:calc(100% - 32px);background:var(--color-surface);border:1px solid var(--color-line);border-radius:16px;box-shadow:var(--shadow-float);display:flex;flex-direction:column}
+.dlg-h{display:flex;align-items:center;padding:var(--space-3) var(--space-4) var(--space-1) var(--space-6)}
+.dlg-t{flex:1;font-size:22px;line-height:26px;font-weight:600}
+.dlg-b{padding:var(--space-2) var(--space-6) var(--space-4);display:flex;flex-direction:column;gap:var(--space-3);overflow-y:auto;min-height:0}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)}
+.dlg-f,.fbar{display:flex;align-items:center;gap:var(--space-2);padding:14px var(--space-6);border-top:1px solid var(--color-line)}
+.frow{display:grid;grid-template-columns:20px minmax(0,1fr);gap:14px;align-items:start}
+.frow .fi{margin-top:30px;color:var(--color-muted)}
+.fld{display:flex;flex-direction:column;gap:var(--space-1);min-width:0}
+.fl{font-size:13px;line-height:18px;font-weight:600;color:var(--color-muted)}
+.inp{height:40px;width:100%;min-width:0;border:1px solid var(--color-outline);border-radius:var(--radius-control);background:var(--color-sunk);padding:0 var(--space-3);color:var(--color-ink);font-size:16px}
+.inp:focus-visible{outline:2px solid var(--color-focus);outline-offset:2px}
+.inp-title{height:48px;font-size:22px;font-weight:600}
+.ta{height:auto;min-height:72px;padding:10px var(--space-3);resize:vertical;line-height:22px}
+.when{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2) var(--space-3);min-width:0}
+.when .ad-cb{grid-column:1 / -1}
+.when .fld{display:flex;flex-direction:column}
+.dt{display:grid;grid-template-columns:minmax(0,1fr) 88px;gap:var(--space-2)}
+.dt .tm{font-family:var(--font-num);font-size:16px}
+.selw{position:relative;display:block}
+.selw select{appearance:none;-webkit-appearance:none;padding-right:38px}
+.selw select.has-mk{padding-left:34px}
+.selw .chv{position:absolute;right:10px;top:11px;pointer-events:none;color:var(--color-muted)}
+.selmk{position:absolute;left:12px;top:14px;margin:0}
+.ad-cb{min-height:36px}
+input[type="date"],input[type="time"]{font-family:var(--font-num)}
+.fbody,.fbar,.form-h{display:none}
+.fm-desk{display:flex;flex-direction:column;flex:1}
+.pop{top:316px;left:min(calc(364px + (100% - 392px) * 3 / 7 + 10px),calc(100% - 356px))}
+
+/* tablet: the column is the drawer */
+@container page (max-width:1099px){
+  .pg{grid-template-columns:minmax(0,1fr);padding:var(--space-3) var(--space-4) var(--space-6)}
+  .col1{display:none}
+  .hd .menu,.hd .sib{display:inline-flex}
+  .hd .sf,.hd .sdk{display:none}
+  .tools{display:flex;align-items:center;gap:var(--space-2);padding:10px var(--space-4) 0}
+  .co{display:none!important}
+  .pop{top:362px;left:min(calc(60px + (100% - 76px) * 3 / 7 + 10px),calc(100% - 356px))}
+}
+/* phone */
+@container page (max-width:759px){
+  .hd.dk,.tools,.pg{display:none}
+  .hd.ph{display:flex;position:sticky;top:0;padding:0 var(--space-2);gap:var(--space-1)}
+  .hd.ph .icb{width:44px;height:44px;border-radius:12px}
+  .hd.ph .title{font-size:22px;margin:0 0 0 var(--space-1);flex:1}
+  .phb{display:block;flex:1}
+  .strip{position:sticky;top:64px;z-index:10;margin:var(--space-2);padding:6px var(--space-1) var(--space-2);display:flex;gap:2px;border-radius:12px}
+  .chip{flex:1;min-width:0;border:0;background:transparent;padding:0;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:76px}
+  .cbk{width:100%;height:54px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .cn{font-size:12px;line-height:16px;font-weight:500;color:var(--color-muted)}
+  .cd{font-weight:600;font-size:22px;line-height:26px;color:var(--color-ink)}
+  .chip.on .cbk{background:var(--color-accent)}
+  .chip.on .cn,.chip.on .cd{color:var(--color-on-accent)}
+  .chip.on .cd{font-weight:700}
+  .tk{display:flex;gap:2px;align-items:flex-end;height:14px}
+  .tk i{display:block;width:4px;height:14px;border-radius:2px;background:var(--c)}
+  .agenda{display:flex;flex-direction:column;gap:var(--space-2);padding:0 var(--space-2) var(--space-4)}
+  .agenda .list{margin-top:var(--space-1)}
+  .agenda .dcard .dh2{font-size:18px;line-height:24px}
+  .agenda .dcard{padding:var(--space-3) var(--space-4) 0;scroll-margin-top:152px}
+  .dh2{font-size:18px}
+  .lr{grid-template-columns:104px 12px minmax(0,1fr);padding:var(--space-3) 0;min-height:48px}
+  .lt{font-size:16px;line-height:22px}
+  .lti{font-size:16px;line-height:22px}
+  .ll{font-size:14px;line-height:20px}
+  .mk{margin-top:5px}
+  .nr .nchip{width:104px;font-size:14px}
+  .fabw{position:sticky;bottom:calc(64px + var(--inset) + 16px);height:52px;margin-bottom:var(--space-4);display:flex;justify-content:flex-end;padding-right:var(--space-4);z-index:12;pointer-events:none}
+  .fab{pointer-events:auto;height:52px;border-radius:14px;padding:0 var(--space-5) 0 var(--space-4);font-size:16px;box-shadow:var(--shadow)}
+  .bar{position:sticky;bottom:0;z-index:14;display:flex;background:var(--color-surface);border-top:1px solid var(--color-line);box-shadow:var(--shadow);height:calc(64px + var(--inset));padding:var(--space-1) var(--space-2) var(--inset);gap:var(--space-1)}
+  .ri{flex:1;min-height:56px;border:0;background:transparent;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:13px;line-height:16px;color:var(--color-muted);font-weight:500}
+  .ri.on{background:var(--color-accent-tint);color:var(--color-on-accent-tint);font-weight:600;box-shadow:inset 0 0 0 1px var(--color-accent)}
+  .ov .app{height:844px;overflow:hidden}
+  .ov .pop{display:none}
+  .sheetw{display:block}
+  .sheet{position:fixed;z-index:40;left:0;right:0;bottom:0;background:var(--color-surface);border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;border:1px solid var(--color-line);border-bottom:0;box-shadow:var(--shadow-float);padding:var(--space-2) var(--space-5) calc(var(--inset) + var(--space-2))}
+  .sheet .pop-d,.sheet .pop-tm{padding-left:var(--space-6)}
+  .sheet .pop-f{margin-top:14px}
+  .sheet .btn{height:48px;padding:0 18px}
+  .sheet .btn.quiet{padding:0 var(--space-3)}
+  .sheet .icb{width:44px;height:44px}
+  .grab{display:block;width:40px;height:4px;border-radius:2px;background:var(--color-outline);margin:0 auto var(--space-2)}
+  .dlg{display:none}
+  .hd.form-h{display:flex}
+  .fbody{display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-4) var(--space-4) var(--space-5);margin:var(--space-2) var(--space-2) var(--space-4);flex:1;background:var(--color-surface);border:1px solid var(--color-line);border-radius:var(--radius-card);box-shadow:var(--shadow)}
+  .fbar{display:flex;position:sticky;bottom:0;z-index:14;background:var(--color-surface);padding:var(--space-3) var(--space-4) calc(var(--inset) + var(--space-1));gap:var(--space-2)}
+  .fbar .btn,.fbar .create{height:48px}
+  .frow{grid-template-columns:20px minmax(0,1fr);gap:var(--space-3)}
+  .selw{max-width:none}
+  .inp{height:44px}
+  .inp-title{height:52px}
+  .pair,.when{grid-template-columns:1fr}
+  .dt{grid-template-columns:minmax(0,1fr) 112px}
+  .cr.ad-cb{min-height:44px}
+  .cb.box{width:24px;height:24px}
+  .fm-desk{display:none}
+  .fm-ph{display:flex;flex-direction:column;flex:1}
+}
+.sc .app{height:844px;overflow:hidden}
+.sc .hd{position:fixed;left:0;right:0;top:0}
+.sc .strip{position:fixed;left:8px;right:8px;top:64px;margin:0}
+.sc .band{color:var(--color-ink);position:fixed;left:0;right:0;top:56px;height:112px;background:var(--color-ground);z-index:9}
+.sc .clip{position:absolute;inset:0;overflow:hidden}
+.sc .bar{position:fixed;left:0;right:0;bottom:0}
+.sc .fabw{position:fixed;right:0;bottom:96px;margin:0}
+@container page (max-width:379px){.fab{width:56px;height:56px;padding:0;justify-content:center;border-radius:16px}.fab span{display:none}.fabw{height:56px}}
+@container page (min-width:760px){.grab{display:none}.fm-ph{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.dr{width:1440px;padding:48px 56px 64px;display:flex;flex-direction:column;gap:40px;background:var(--color-ground);color:var(--color-ink)}
+.dr h2.sec{font-size:24px;line-height:30px;font-weight:700;margin-bottom:4px}
+.dr .lead{font-size:18px;line-height:26px;max-width:70ch}
+.dr .cap{font-size:13px;line-height:18px;color:var(--color-muted)}
+.dr .two{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.dr .three{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.dr .panel{background:var(--color-ground);color:var(--color-ink);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px;border:1px solid var(--color-line)}
+.dr .pt{font-size:16px;line-height:22px;font-weight:700}
+.dr .sws{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.dr .sw{display:flex;flex-direction:column;gap:6px;min-width:0}
+.dr .chip{height:44px;border-radius:10px;border:1px solid var(--color-line)}
+.dr .sw b{font-size:13px;line-height:16px;font-weight:600;overflow-wrap:anywhere}
+.dr .sw span{font-family:var(--font-num);font-size:13px;line-height:16px;color:var(--color-muted)}
+.dr .use{font-size:12px;line-height:16px;color:var(--color-muted)}
+.dr .wm{font-family:var(--font-num);font-weight:700;font-size:48px;line-height:56px}
+.dr .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dr .scale{display:grid;grid-template-columns:120px 1fr;gap:6px 16px;align-items:baseline}
+.dr .scale code{font-family:var(--font-num);font-size:13px;color:var(--color-muted)}
+.dr .bar{display:block;height:16px;background:var(--color-accent);border-radius:4px}
+.dr .elev{height:84px;border-radius:12px;background:var(--color-surface);border:1px solid var(--color-line);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--color-muted)}
+.dr table{border-collapse:collapse;width:100%;font-size:13px;line-height:18px}
+.dr th,.dr td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--color-line)}
+.dr td.n{font-family:var(--font-num);text-align:right}
+.dr th{font-weight:600;color:var(--color-muted)}
+.dr .ok{font-weight:600}
+.dr .st{display:flex;flex-direction:column;gap:10px;align-items:flex-start;padding:16px;border-radius:12px;background:var(--color-surface);border:1px solid var(--color-line);min-height:150px}
+.dr .st h3{font-size:16px;line-height:22px;font-weight:600}
+.dr .st p{font-size:14px;line-height:20px;color:var(--color-muted)}
+.dr .sk{display:block;border-radius:6px;background:var(--color-sunk)}
+.dr .err{display:flex;gap:6px;align-items:flex-start;color:var(--color-danger);font-size:13px;line-height:18px;font-weight:600}
+.dr .menu{background:var(--color-surface);border:1px solid var(--color-line);border-radius:12px;box-shadow:var(--shadow-float);padding:6px;width:240px;display:flex;flex-direction:column}
+.dr .mi{height:40px;border:0;background:transparent;text-align:left;border-radius:8px;padding:0 12px;font-size:14px;display:flex;align-items:center}
+.dr .mi.hov{background:var(--color-accent-tint);color:var(--color-on-accent-tint)}
+.dr .mi.sep{border-top:1px solid var(--color-line);border-radius:0;margin-top:4px;padding-top:4px}
+.dr .toast{display:flex;align-items:center;gap:12px;min-height:48px;padding:0 8px 0 16px;border-radius:10px;background:var(--color-ink);color:var(--color-ground);width:max-content}
+.dr .toast .ta2{height:36px;border:0;background:transparent;font-weight:600;color:var(--color-ground);text-decoration:underline;padding:0 12px}
+.dr .ring{outline:2px solid var(--color-focus);outline-offset:2px}
+.dr .dim{opacity:1;background:var(--color-sunk);color:var(--color-muted);border:1px solid var(--color-line)}
+.dr .ev-s{position:relative;display:flex;flex-direction:column;border-radius:6px;background:var(--c);color:var(--on);padding:4px 5px;width:150px;min-height:50px}
+.dr .ev-s .t{font-weight:600;font-size:13px;line-height:18px}
+.dr .ev-s .tm{font-size:12px;line-height:16px;font-family:var(--font-num);font-weight:500}
+body{margin:0}
+</style>
+</head>
+<body>
+<div data-theme="light" class="al" style="width: 1440px">
+<div class="dr">
+<div style="display:flex;flex-direction:column;gap:8px"><span class="cap" style="font-weight:600">Almanac · redesign direction</span><div class="wm">The week and its day</div>
+<p class="lead">A week grid of solid blocks beside the chosen day as a list, both carrying the same now mark, in a moss accent and olive-tinted neutrals with condensed numerals.</p></div>
+<section><h2 class="sec">Palette</h2><p class="cap" style="margin-bottom:12px">By role. Every value is used in the screens; nothing is borrowed from another product.</p><div class="two"><div data-theme="light" class="panel "><div class="pt">Light</div><div class="sws"><div class="sw"><span class="chip" style="background:#edede8"></span><b>--color-ground</b><span>#edede8</span><span class="use">the page behind the cards</span></div><div class="sw"><span class="chip" style="background:#fdfdfa"></span><b>--color-surface</b><span>#fdfdfa</span><span class="use">cards, the header band, menus, dialogs</span></div><div class="sw"><span class="chip" style="background:#e4e4de"></span><b>--color-sunk</b><span>#e4e4de</span><span class="use">the all-day row, the search field, fields in a dialog</span></div><div class="sw"><span class="chip" style="background:#1a1b14"></span><b>--color-ink</b><span>#1a1b14</span><span class="use">titles and primary text</span></div><div class="sw"><span class="chip" style="background:#5d5f56"></span><b>--color-muted</b><span>#5d5f56</span><span class="use">hours, captions, weekday names, the outside days</span></div><div class="sw"><span class="chip" style="background:#d6d6cf"></span><b>--color-line</b><span>#d6d6cf</span><span class="use">card edges and the grid's hairlines</span></div><div class="sw"><span class="chip" style="background:#808178"></span><b>--color-outline</b><span>#808178</span><span class="use">edges that must be seen: buttons, fields, checkboxes</span></div><div class="sw"><span class="chip" style="background:#516312"></span><b>--color-accent</b><span>#516312</span><span class="use">Create, the chosen view and day, links, focus</span></div><div class="sw"><span class="chip" style="background:#fdfdfa"></span><b>--color-on-accent</b><span>#fdfdfa</span><span class="use">text and icons on the accent</span></div><div class="sw"><span class="chip" style="background:#e4efce"></span><b>--color-accent-tint</b><span>#e4efce</span><span class="use">the shown week, today's head, the chosen segment</span></div><div class="sw"><span class="chip" style="background:#344106"></span><b>--color-on-accent-tint</b><span>#344106</span><span class="use">text on the tint</span></div><div class="sw"><span class="chip" style="background:#c1351e"></span><b>--color-now</b><span>#c1351e</span><span class="use">the now line, its 10:30 chip and the list's now rule</span></div><div class="sw"><span class="chip" style="background:#fdfdfa"></span><b>--color-on-now</b><span>#fdfdfa</span><span class="use">text on the now chip</span></div><div class="sw"><span class="chip" style="background:#b02a2d"></span><b>--color-danger</b><span>#b02a2d</span><span class="use">Delete and error text, always with a label</span></div><div class="sw"><span class="chip" style="background:#516312"></span><b>--color-focus</b><span>#516312</span><span class="use">the focus ring</span></div><div class="sw"><span class="chip" style="background:#2863ab"></span><b>--color-blue</b><span>#2863ab</span><span class="use">Personal: the calendar's solid</span></div><div class="sw"><span class="chip" style="background:#fdfdfa"></span><b>--color-on-blue</b><span>#fdfdfa</span><span class="use">text on blue</span></div><div class="sw"><span class="chip" style="background:#137738"></span><b>--color-green</b><span>#137738</span><span class="use">Work</span></div><div class="sw"><span class="chip" style="background:#fdfdfa"></span><b>--color-on-green</b><span>#fdfdfa</span><span class="use">text on green</span></div><div class="sw"><span class="chip" style="background:#9d4616"></span><b>--color-orange</b><span>#9d4616</span><span class="use">Home</span></div><div class="sw"><span class="chip" style="background:#fdfdfa"></span><b>--color-on-orange</b><span>#fdfdfa</span><span class="use">text on orange</span></div><div class="sw"><span class="chip" style="background:#7f4995"></span><b>--color-purple</b><span>#7f4995</span><span class="use">Fitness</span></div><div class="sw"><span class="chip" style="background:#fdfdfa"></span><b>--color-on-purple</b><span>#fdfdfa</span><span class="use">text on purple</span></div><div class="sw"><span class="chip" style="background:rgb(26 27 20 / .5)"></span><b>--color-scrim</b><span>rgb 26 27 20 / .5</span><span class="use">behind a dialog or a sheet</span></div></div></div><div data-theme="dark" class="panel "><div class="pt">Dark</div><div class="sws"><div class="sw"><span class="chip" style="background:#11110d"></span><b>--color-ground</b><span>#11110d</span><span class="use">the page behind the cards</span></div><div class="sw"><span class="chip" style="background:#22231e"></span><b>--color-surface</b><span>#22231e</span><span class="use">cards, the header band, menus, dialogs</span></div><div class="sw"><span class="chip" style="background:#090907"></span><b>--color-sunk</b><span>#090907</span><span class="use">the all-day row, the search field, fields in a dialog</span></div><div class="sw"><span class="chip" style="background:#eaeae4"></span><b>--color-ink</b><span>#eaeae4</span><span class="use">titles and primary text</span></div><div class="sw"><span class="chip" style="background:#abaca3"></span><b>--color-muted</b><span>#abaca3</span><span class="use">hours, captions, weekday names, the outside days</span></div><div class="sw"><span class="chip" style="background:#3f3f38"></span><b>--color-line</b><span>#3f3f38</span><span class="use">card edges and the grid's hairlines</span></div><div class="sw"><span class="chip" style="background:#808178"></span><b>--color-outline</b><span>#808178</span><span class="use">edges that must be seen: buttons, fields, checkboxes</span></div><div class="sw"><span class="chip" style="background:#bdd18f"></span><b>--color-accent</b><span>#bdd18f</span><span class="use">Create, the chosen view and day, links, focus</span></div><div class="sw"><span class="chip" style="background:#192003"></span><b>--color-on-accent</b><span>#192003</span><span class="use">text and icons on the accent</span></div><div class="sw"><span class="chip" style="background:#333c1e"></span><b>--color-accent-tint</b><span>#333c1e</span><span class="use">the shown week, today's head, the chosen segment</span></div><div class="sw"><span class="chip" style="background:#e2eec9"></span><b>--color-on-accent-tint</b><span>#e2eec9</span><span class="use">text on the tint</span></div><div class="sw"><span class="chip" style="background:#fa8467"></span><b>--color-now</b><span>#fa8467</span><span class="use">the now line, its 10:30 chip and the list's now rule</span></div><div class="sw"><span class="chip" style="background:#2a0e06"></span><b>--color-on-now</b><span>#2a0e06</span><span class="use">text on the now chip</span></div><div class="sw"><span class="chip" style="background:#f47a79"></span><b>--color-danger</b><span>#f47a79</span><span class="use">Delete and error text, always with a label</span></div><div class="sw"><span class="chip" style="background:#bdd18f"></span><b>--color-focus</b><span>#bdd18f</span><span class="use">the focus ring</span></div><div class="sw"><span class="chip" style="background:#8dc1ff"></span><b>--color-blue</b><span>#8dc1ff</span><span class="use">Personal: the calendar's solid</span></div><div class="sw"><span class="chip" style="background:#0d1b2d"></span><b>--color-on-blue</b><span>#0d1b2d</span><span class="use">text on blue</span></div><div class="sw"><span class="chip" style="background:#89d298"></span><b>--color-green</b><span>#89d298</span><span class="use">Work</span></div><div class="sw"><span class="chip" style="background:#0b2010"></span><b>--color-on-green</b><span>#0b2010</span><span class="use">text on green</span></div><div class="sw"><span class="chip" style="background:#f9a782"></span><b>--color-orange</b><span>#f9a782</span><span class="use">Home</span></div><div class="sw"><span class="chip" style="background:#2a140a"></span><b>--color-on-orange</b><span>#2a140a</span><span class="use">text on orange</span></div><div class="sw"><span class="chip" style="background:#d9a8ef"></span><b>--color-purple</b><span>#d9a8ef</span><span class="use">Fitness</span></div><div class="sw"><span class="chip" style="background:#221527"></span><b>--color-on-purple</b><span>#221527</span><span class="use">text on purple</span></div><div class="sw"><span class="chip" style="background:rgb(0 0 0 / .62)"></span><b>--color-scrim</b><span>rgb 0 0 0 / .62</span><span class="use">behind a dialog or a sheet</span></div></div></div></div></section>
+<section><h2 class="sec">Calendar colours</h2><div class="two" style="margin-top:12px"><div data-theme="light" class="panel "><div class="pt">Light</div><div class="row"><div class="ev-s c-blue"><span class="t">Personal event</span><span class="tm">09:30 ‒ 10:30</span></div><div class="ev-s c-green"><span class="t">Work event</span><span class="tm">09:30 ‒ 10:30</span></div><div class="ev-s c-orange"><span class="t">Home event</span><span class="tm">09:30 ‒ 10:30</span></div><div class="ev-s c-purple"><span class="t">Fitness event</span><span class="tm">09:30 ‒ 10:30</span></div></div><div class="cap">The solid is the calendar's colour from the checkbox to the event. Text on a solid is white in light and a near-black of the same hue in dark, 5.6:1 or more. The other six keys follow the same recipe and are not drawn.</div></div><div data-theme="dark" class="panel "><div class="pt">Dark</div><div class="row"><div class="ev-s c-blue"><span class="t">Personal event</span><span class="tm">09:30 ‒ 10:30</span></div><div class="ev-s c-green"><span class="t">Work event</span><span class="tm">09:30 ‒ 10:30</span></div><div class="ev-s c-orange"><span class="t">Home event</span><span class="tm">09:30 ‒ 10:30</span></div><div class="ev-s c-purple"><span class="t">Fitness event</span><span class="tm">09:30 ‒ 10:30</span></div></div><div class="cap">The solid is the calendar's colour from the checkbox to the event. Text on a solid is white in light and a near-black of the same hue in dark, 5.6:1 or more. The other six keys follow the same recipe and are not drawn.</div></div></div></section>
+<section><h2 class="sec">Type</h2><div class="two" style="margin-top:12px">
+<div data-theme="light" class="panel "><div class="pt">Sofia Sans for the interface, Sofia Sans Condensed for every date and time, tabular figures</div>
+<div class="scale"><code>12 / 16</code><span style="font-size:12px;line-height:16px">Weekday names, hours, All day, the 10:30 chip</span>
+<code>13 / 18</code><span style="font-size:13px;line-height:18px;font-weight:600">Event titles, field labels, calendar rows</span>
+<code>14 / 20</code><span style="font-size:14px;line-height:20px">Controls and the day card's rows at 1280</span>
+<code>16 / 22</code><span style="font-size:16px;line-height:22px;font-weight:600">List titles at 390</span>
+<code>18 / 24</code><span style="font-size:18px;line-height:24px;font-weight:600">Card heads: My calendars</span>
+<code>20 / 24</code><span style="font-size:20px;line-height:24px;font-weight:700;font-family:var(--font-num)">Almanac, the wordmark, in Condensed 700</span>
+<code>22 / 26</code><span style="font-size:22px;line-height:26px;font-weight:600;font-family:var(--font-num)">9 ‒ 15 Nov 2026 &nbsp; 11 &nbsp; 11:00 ‒ 12:00</span></div></div>
+<div data-theme="dark" class="panel "><div class="pt">Weights in use</div>
+<div class="scale"><code>Sofia 400</code><span style="font-size:16px;line-height:22px">Notes, body in the details</span>
+<code>Sofia 500</code><span style="font-size:16px;line-height:22px;font-weight:500">Weekday names, the chosen view's neighbours</span>
+<code>Sofia 600</code><span style="font-size:16px;line-height:22px;font-weight:600">Titles, buttons, the chosen view</span>
+<code>Sofia 700</code><span style="font-size:16px;line-height:22px;font-weight:700">Today's head and the chosen day</span>
+<code>Condensed 500</code><span style="font-size:16px;line-height:22px;font-weight:500;font-family:var(--font-num)">07:00 ‒ 07:45 &nbsp; 08:00 &nbsp; 17:30</span>
+<code>Condensed 600</code><span style="font-size:16px;line-height:22px;font-weight:600;font-family:var(--font-num)">9 10 11 12 13 14 15</span>
+<code>Condensed 700</code><span style="font-size:16px;line-height:22px;font-weight:700;font-family:var(--font-num)">Almanac &nbsp; 11 on the today square</span></div>
+<div class="cap">Today's Roboto is Google Calendar's face; both Sofia faces are on Google Fonts and cover the Latin Extended range the app's text needs.</div></div></div></section>
+<section><h2 class="sec">Spacing, radii, elevation</h2><div class="three" style="margin-top:12px">
+<div data-theme="light" class="panel "><div class="pt">Spacing, in px</div><div class="row" style="gap:12px;flex-wrap:nowrap"><span class="cap num" style="width:28px;font-family:var(--font-num)">4</span><span class="bar" style="width:12px"></span></div><div class="row" style="gap:12px;flex-wrap:nowrap"><span class="cap num" style="width:28px;font-family:var(--font-num)">8</span><span class="bar" style="width:24px"></span></div><div class="row" style="gap:12px;flex-wrap:nowrap"><span class="cap num" style="width:28px;font-family:var(--font-num)">12</span><span class="bar" style="width:36px"></span></div><div class="row" style="gap:12px;flex-wrap:nowrap"><span class="cap num" style="width:28px;font-family:var(--font-num)">16</span><span class="bar" style="width:48px"></span></div><div class="row" style="gap:12px;flex-wrap:nowrap"><span class="cap num" style="width:28px;font-family:var(--font-num)">24</span><span class="bar" style="width:72px"></span></div><div class="row" style="gap:12px;flex-wrap:nowrap"><span class="cap num" style="width:28px;font-family:var(--font-num)">32</span><span class="bar" style="width:96px"></span></div><div class="row" style="gap:12px;flex-wrap:nowrap"><span class="cap num" style="width:28px;font-family:var(--font-num)">48</span><span class="bar" style="width:144px"></span></div></div>
+<div data-theme="light" class="panel "><div class="pt">Radii</div><div class="row" style="gap:16px;align-items:flex-end"><div style="display:flex;flex-direction:column;gap:6px;align-items:center"><span style="width:64px;height:64px;background:var(--color-surface);border:1px solid var(--color-outline);border-radius:6px"></span><span class="cap">6 event</span></div><div style="display:flex;flex-direction:column;gap:6px;align-items:center"><span style="width:64px;height:64px;background:var(--color-surface);border:1px solid var(--color-outline);border-radius:10px"></span><span class="cap">10 control</span></div><div style="display:flex;flex-direction:column;gap:6px;align-items:center"><span style="width:64px;height:64px;background:var(--color-surface);border:1px solid var(--color-outline);border-radius:12px"></span><span class="cap">12 card</span></div><div style="display:flex;flex-direction:column;gap:6px;align-items:center"><span style="width:64px;height:64px;background:var(--color-surface);border:1px solid var(--color-outline);border-radius:20px"></span><span class="cap">20 sheet</span></div></div><div class="cap">Hairlines 1 px. The today numeral sits on a 8 px square.</div></div>
+<div data-theme="light" class="panel "><div class="pt">Elevation</div><div class="elev" style="box-shadow:var(--shadow)">Card, light: a hairline and a soft shadow</div><div data-theme="dark" class="panel " style="padding:12px"><div class="elev" style="box-shadow:var(--shadow)">Card, dark: lighter surface and the hairline, no shadow</div></div><div class="elev" style="box-shadow:var(--shadow-float)">Popover and dialog</div></div></div></section>
+<section><h2 class="sec">Components</h2><div class="two" style="margin-top:12px"><div data-theme="light" class="panel ">
+<div class="pt">Light</div>
+<div class="row"><button class="create" type="button"><svg class="ic " viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg><span>Create</span></button><button class="create" type="button" style="background:color-mix(in srgb,var(--color-accent) 88%,var(--color-ink))">Hover</button><button class="create ring" type="button">Focus</button><button class="create" type="button" aria-disabled="true" style="background:var(--color-sunk);color:var(--color-muted)">Disabled</button></div>
+<div class="row"><button class="btn" type="button">Today</button><button class="btn" type="button">Cancel</button><button class="btn quiet danger" type="button"><svg class="ic " viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14M10 7V4.5h4V7M7 7l.8 12.5h8.4L17 7M10.2 11v5M13.8 11v5"></path></svg><span>Delete</span></button>
+<div class="seg" role="group" aria-label="View"><button class="sg" type="button" aria-pressed="false">Day</button><button class="sg" type="button" aria-pressed="true">Week</button><button class="sg" type="button" aria-pressed="false">Month</button></div></div>
+<div class="row" style="align-items:flex-start;gap:20px">
+<div style="display:flex;flex-direction:column;gap:4px;width:250px"><label class="fl" for="dr-t-theme-light">Title</label><input id="dr-t-theme-light" class="inp" value="Design review"></div>
+<div style="display:flex;flex-direction:column;gap:4px;width:250px"><label class="fl" for="dr-e-theme-light">Ends</label><input id="dr-e-theme-light" class="inp" value="09:00" aria-invalid="true" aria-describedby="dr-m-theme-light" style="border-color:var(--color-danger)"><p class="err" id="dr-m-theme-light"><svg class="ic " viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5v5M12 16v.5"></path></svg>The end must be after the start.</p></div></div>
+<div class="row" style="align-items:flex-start;gap:20px">
+<div class="card" style="width:300px;padding:4px 16px"><ol class="list" style="margin:0"><li class="lr" style="border-top:0;grid-template-columns:90px 12px minmax(0,1fr)"><span class="lt num">11:00 ‒ 12:00</span><span class="mk c-green"></span><span class="lb"><span class="lti">Design review</span><span class="ll"><svg class="ic " viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"></path><circle cx="12" cy="10" r="2.2"></circle></svg>Room 2</span></span></li><li class="nr"><span class="nchip">10:30</span><span class="nline"></span></li><li class="lr" style="grid-template-columns:90px 12px minmax(0,1fr)"><span class="lt num">17:30 to 18:15</span><span class="mk c-orange"></span><span class="lb"><span class="lti">Groceries</span></span></li></ol></div>
+<div class="menu" role="menu" aria-label="Account"><button class="mi" role="menuitem" type="button">Time zone…</button><button class="mi hov" role="menuitem" type="button">Theme…</button><button class="mi" role="menuitem" type="button">Notifications</button><button class="mi sep" role="menuitem" type="button">Sign out</button></div></div>
+<div class="toast" role="status"><span>Event deleted</span><button class="ta2" type="button">Close</button></div>
+</div><div data-theme="dark" class="panel ">
+<div class="pt">Dark</div>
+<div class="row"><button class="create" type="button"><svg class="ic " viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg><span>Create</span></button><button class="create" type="button" style="background:color-mix(in srgb,var(--color-accent) 88%,var(--color-ink))">Hover</button><button class="create ring" type="button">Focus</button><button class="create" type="button" aria-disabled="true" style="background:var(--color-sunk);color:var(--color-muted)">Disabled</button></div>
+<div class="row"><button class="btn" type="button">Today</button><button class="btn" type="button">Cancel</button><button class="btn quiet danger" type="button"><svg class="ic " viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14M10 7V4.5h4V7M7 7l.8 12.5h8.4L17 7M10.2 11v5M13.8 11v5"></path></svg><span>Delete</span></button>
+<div class="seg" role="group" aria-label="View"><button class="sg" type="button" aria-pressed="false">Day</button><button class="sg" type="button" aria-pressed="true">Week</button><button class="sg" type="button" aria-pressed="false">Month</button></div></div>
+<div class="row" style="align-items:flex-start;gap:20px">
+<div style="display:flex;flex-direction:column;gap:4px;width:250px"><label class="fl" for="dr-t-theme-dark">Title</label><input id="dr-t-theme-dark" class="inp" value="Design review"></div>
+<div style="display:flex;flex-direction:column;gap:4px;width:250px"><label class="fl" for="dr-e-theme-dark">Ends</label><input id="dr-e-theme-dark" class="inp" value="09:00" aria-invalid="true" aria-describedby="dr-m-theme-dark" style="border-color:var(--color-danger)"><p class="err" id="dr-m-theme-dark"><svg class="ic " viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5v5M12 16v.5"></path></svg>The end must be after the start.</p></div></div>
+<div class="row" style="align-items:flex-start;gap:20px">
+<div class="card" style="width:300px;padding:4px 16px"><ol class="list" style="margin:0"><li class="lr" style="border-top:0;grid-template-columns:90px 12px minmax(0,1fr)"><span class="lt num">11:00 ‒ 12:00</span><span class="mk c-green"></span><span class="lb"><span class="lti">Design review</span><span class="ll"><svg class="ic " viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"></path><circle cx="12" cy="10" r="2.2"></circle></svg>Room 2</span></span></li><li class="nr"><span class="nchip">10:30</span><span class="nline"></span></li><li class="lr" style="grid-template-columns:90px 12px minmax(0,1fr)"><span class="lt num">17:30 to 18:15</span><span class="mk c-orange"></span><span class="lb"><span class="lti">Groceries</span></span></li></ol></div>
+<div class="menu" role="menu" aria-label="Account"><button class="mi" role="menuitem" type="button">Time zone…</button><button class="mi hov" role="menuitem" type="button">Theme…</button><button class="mi" role="menuitem" type="button">Notifications</button><button class="mi sep" role="menuitem" type="button">Sign out</button></div></div>
+<div class="toast" role="status"><span>Event deleted</span><button class="ta2" type="button">Close</button></div>
+</div></div></section>
+<section><h2 class="sec">States</h2><div class="two" style="margin-top:12px"><div data-theme="light" class="panel "><div class="pt">States, light. Proposed. The app's own words are kept where it has them: the end and save errors, Event deleted.</div>
+<div class="cap" style="font-weight:600">Week</div>
+<div class="three">
+<div class="st"><h3>Nothing this week</h3><p>Events you add show up here.</p><button class="create" type="button"><svg class="ic " viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg><span>Create</span></button></div>
+<div class="st" aria-busy="true"><h3>Loading the week</h3><span class="sk" style="width:80%;height:16px"></span><span class="sk" style="width:60%;height:16px"></span><span class="sk" style="width:70%;height:16px"></span></div>
+<div class="st"><h3>The week didn't load</h3><p>Check your connection and try again.</p><button class="btn" type="button"><svg class="ic " viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 11A7.5 7.5 0 0 0 6 7.2L4.5 9M4.5 5v4h4M4.5 13A7.5 7.5 0 0 0 18 16.8l1.5-1.8M19.5 19v-4h-4"></path></svg><span>Try again</span></button></div>
+</div>
+<div class="cap" style="font-weight:600">Event details</div>
+<div class="three">
+<div class="st" aria-busy="true"><h3>Loading the event</h3><span class="sk" style="width:70%;height:22px"></span><span class="sk" style="width:50%;height:16px"></span></div>
+<div class="st"><h3>The event isn't there any more</h3><p>It may have been deleted from another device.</p><button class="btn" type="button">Close</button></div>
+<div class="st"><h3>Event deleted</h3><p>Shown as a toast with a Close button, as today.</p></div>
+</div>
+<div class="cap" style="font-weight:600">Event form</div>
+<div class="three">
+<div class="st"><h3>End before start</h3><p></p><p class="err"><svg class="ic " viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5v5M12 16v.5"></path></svg>The end must be after the start.</p></div>
+<div class="st"><h3>Saving</h3><p>Save is disabled while the request runs.</p><button class="create" type="button" aria-disabled="true" style="background:var(--color-sunk);color:var(--color-muted)">Saving…</button></div>
+<div class="st"><h3>Save failed</h3><p></p><p class="err"><svg class="ic " viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5v5M12 16v.5"></path></svg>The event couldn't be saved. Try again.</p></div>
+</div></div><div data-theme="dark" class="panel "><div class="pt">States, dark. Proposed. The app's own words are kept where it has them: the end and save errors, Event deleted.</div>
+<div class="cap" style="font-weight:600">Week</div>
+<div class="three">
+<div class="st"><h3>Nothing this week</h3><p>Events you add show up here.</p><button class="create" type="button"><svg class="ic " viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg><span>Create</span></button></div>
+<div class="st" aria-busy="true"><h3>Loading the week</h3><span class="sk" style="width:80%;height:16px"></span><span class="sk" style="width:60%;height:16px"></span><span class="sk" style="width:70%;height:16px"></span></div>
+<div class="st"><h3>The week didn't load</h3><p>Check your connection and try again.</p><button class="btn" type="button"><svg class="ic " viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 11A7.5 7.5 0 0 0 6 7.2L4.5 9M4.5 5v4h4M4.5 13A7.5 7.5 0 0 0 18 16.8l1.5-1.8M19.5 19v-4h-4"></path></svg><span>Try again</span></button></div>
+</div>
+<div class="cap" style="font-weight:600">Event details</div>
+<div class="three">
+<div class="st" aria-busy="true"><h3>Loading the event</h3><span class="sk" style="width:70%;height:22px"></span><span class="sk" style="width:50%;height:16px"></span></div>
+<div class="st"><h3>The event isn't there any more</h3><p>It may have been deleted from another device.</p><button class="btn" type="button">Close</button></div>
+<div class="st"><h3>Event deleted</h3><p>Shown as a toast with a Close button, as today.</p></div>
+</div>
+<div class="cap" style="font-weight:600">Event form</div>
+<div class="three">
+<div class="st"><h3>End before start</h3><p></p><p class="err"><svg class="ic " viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5v5M12 16v.5"></path></svg>The end must be after the start.</p></div>
+<div class="st"><h3>Saving</h3><p>Save is disabled while the request runs.</p><button class="create" type="button" aria-disabled="true" style="background:var(--color-sunk);color:var(--color-muted)">Saving…</button></div>
+<div class="st"><h3>Save failed</h3><p></p><p class="err"><svg class="ic " viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5v5M12 16v.5"></path></svg>The event couldn't be saved. Try again.</p></div>
+</div></div></div></section>
+<section><h2 class="sec">Contrast</h2><p class="cap" style="margin-bottom:12px">WCAG 2. Text needs 4.5, icons, edges and the focus ring 3. A card needs 1.09 against the page or a 1 px edge of 1.3; both are met.</p><table><thead><tr><th>Pair</th><th>Need</th><th class="n">Light</th><th class="n">Dark</th><th>Result</th></tr></thead><tbody><tr><td>ink on ground</td><td class="n" style="text-align:left">4.5</td><td class="n">14.77</td><td class="n">15.67</td><td class="ok">pass</td></tr><tr><td>ink on surface</td><td class="n" style="text-align:left">4.5</td><td class="n">17.02</td><td class="n">13.1</td><td class="ok">pass</td></tr><tr><td>ink on sunk (search, all-day row)</td><td class="n" style="text-align:left">4.5</td><td class="n">13.59</td><td class="n">16.5</td><td class="ok">pass</td></tr><tr><td>ink on accent-tint</td><td class="n" style="text-align:left">4.5</td><td class="n">14.48</td><td class="n">9.63</td><td class="ok">pass</td></tr><tr><td>muted on ground</td><td class="n" style="text-align:left">4.5</td><td class="n">5.52</td><td class="n">8.25</td><td class="ok">pass</td></tr><tr><td>muted on surface (hours, weekday names)</td><td class="n" style="text-align:left">4.5</td><td class="n">6.37</td><td class="n">6.9</td><td class="ok">pass</td></tr><tr><td>muted on sunk (All day, placeholder)</td><td class="n" style="text-align:left">4.5</td><td class="n">5.08</td><td class="n">8.69</td><td class="ok">pass</td></tr><tr><td>muted on accent-tint (mini-month outside days)</td><td class="n" style="text-align:left">4.5</td><td class="n">5.42</td><td class="n">5.07</td><td class="ok">pass</td></tr><tr><td>accent text on surface (links, focus)</td><td class="n" style="text-align:left">4.5</td><td class="n">6.56</td><td class="n">9.55</td><td class="ok">pass</td></tr><tr><td>accent text on ground</td><td class="n" style="text-align:left">4.5</td><td class="n">5.69</td><td class="n">11.43</td><td class="ok">pass</td></tr><tr><td>on-accent-tint on accent-tint (chosen view, Today pill)</td><td class="n" style="text-align:left">4.5</td><td class="n">9.21</td><td class="n">9.58</td><td class="ok">pass</td></tr><tr><td>on-accent on accent (Create, today numeral, chosen day)</td><td class="n" style="text-align:left">4.5</td><td class="n">6.56</td><td class="n">10.15</td><td class="ok">pass</td></tr><tr><td>now on surface (10:30 text in the list)</td><td class="n" style="text-align:left">4.5</td><td class="n">5.43</td><td class="n">6.45</td><td class="ok">pass</td></tr><tr><td>on-now on now (10:30 chip in the grid)</td><td class="n" style="text-align:left">4.5</td><td class="n">5.43</td><td class="n">7.36</td><td class="ok">pass</td></tr><tr><td>danger on surface (Delete, with its label)</td><td class="n" style="text-align:left">4.5</td><td class="n">6.41</td><td class="n">5.96</td><td class="ok">pass</td></tr><tr><td>danger on sunk (error under a field)</td><td class="n" style="text-align:left">4.5</td><td class="n">5.12</td><td class="n">7.5</td><td class="ok">pass</td></tr><tr><td>on-blue on blue (event text)</td><td class="n" style="text-align:left">4.5</td><td class="n">5.95</td><td class="n">9.25</td><td class="ok">pass</td></tr><tr><td>on-green on green (event text)</td><td class="n" style="text-align:left">4.5</td><td class="n">5.53</td><td class="n">9.55</td><td class="ok">pass</td></tr><tr><td>on-orange on orange (event text)</td><td class="n" style="text-align:left">4.5</td><td class="n">6.2</td><td class="n">9.04</td><td class="ok">pass</td></tr><tr><td>on-purple on purple (event text)</td><td class="n" style="text-align:left">4.5</td><td class="n">6.26</td><td class="n">8.96</td><td class="ok">pass</td></tr><tr><td>outline on surface (button, checkbox edge)</td><td class="n" style="text-align:left">3</td><td class="n">3.87</td><td class="n">4.02</td><td class="ok">pass</td></tr><tr><td>outline on sunk (search and dialog fields)</td><td class="n" style="text-align:left">3</td><td class="n">3.09</td><td class="n">5.06</td><td class="ok">pass</td></tr><tr><td>focus ring on ground</td><td class="n" style="text-align:left">3</td><td class="n">5.69</td><td class="n">11.43</td><td class="ok">pass</td></tr><tr><td>focus ring on surface</td><td class="n" style="text-align:left">3</td><td class="n">6.56</td><td class="n">9.55</td><td class="ok">pass</td></tr><tr><td>focus ring on accent-tint</td><td class="n" style="text-align:left">3</td><td class="n">5.58</td><td class="n">7.02</td><td class="ok">pass</td></tr><tr><td>focus ring on sunk</td><td class="n" style="text-align:left">3</td><td class="n">5.23</td><td class="n">12.03</td><td class="ok">pass</td></tr><tr><td>accent (today square) on accent-tint (the shown week band)</td><td class="n" style="text-align:left">3</td><td class="n">5.58</td><td class="n">7.02</td><td class="ok">pass</td></tr><tr><td>now line on accent-tint (today's column wash)</td><td class="n" style="text-align:left">3</td><td class="n">4.62</td><td class="n">4.74</td><td class="ok">pass</td></tr><tr><td>blue mark on surface</td><td class="n" style="text-align:left">3</td><td class="n">5.95</td><td class="n">8.44</td><td class="ok">pass</td></tr><tr><td>green mark on surface</td><td class="n" style="text-align:left">3</td><td class="n">5.53</td><td class="n">8.84</td><td class="ok">pass</td></tr><tr><td>orange mark on surface</td><td class="n" style="text-align:left">3</td><td class="n">6.2</td><td class="n">8.2</td><td class="ok">pass</td></tr><tr><td>purple mark on surface</td><td class="n" style="text-align:left">3</td><td class="n">6.26</td><td class="n">8.14</td><td class="ok">pass</td></tr><tr><td>green event on accent-tint (today's wash, edge of the block)</td><td class="n" style="text-align:left">3</td><td class="n">4.71</td><td class="n">6.5</td><td class="ok">pass</td></tr><tr><td>surface on ground (card against the page; needs 1.09 or an edge)</td><td class="n" style="text-align:left">1.09</td><td class="n">1.15</td><td class="n">1.2</td><td class="ok">pass</td></tr><tr><td>line on surface (the card's 1px edge; needs 1.3)</td><td class="n" style="text-align:left">1.3</td><td class="n">1.43</td><td class="n">1.49</td><td class="ok">pass</td></tr></tbody></table></section>
+</div>
+</div>
+</body>
+</html>

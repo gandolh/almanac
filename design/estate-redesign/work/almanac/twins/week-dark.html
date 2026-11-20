@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Almanac week, proposed (dark twin)</title>
+<meta name="description" content="A plain-HTML twin of the board comp, for the local Floor checks.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sofia+Sans:wght@400;500;600;700&amp;family=Sofia+Sans+Condensed:wght@500;600;700&amp;display=swap">
+<style>
+/* Hallmark · shape: app screen · genre: calendar utility · theme: brand · redesign: full
+ * paper: #edede8 olive grey · accent: #516312 moss · display: Sofia Sans Condensed · body: Sofia Sans
+ * nav: kept (labelled Create, mini-month, My calendars, four views, phone drawer) · signature: the chosen day as a list beside the week, its now rule mirroring the grid's now line · states: empty week, loading, load error, save error
+ * axes: olive-tinted neutrals/humanist sans plus condensed numerals/one moss · posture: restrained · modes: light+dark · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: V, the moss and the condensed numerals carry the look, so the event fills stay today's solid blocks */
+/* Hallmark · answered F4 · one filled accent button per screen: Create in the header and column, Save in the form; Edit and Cancel are outlined */
+/* Hallmark · waive 24b · padding 6px 10px 14px and gaps of 6, 10, 14 off the 4px scale · half steps between the tokens, kept so 20px icons centre in 44px fields and the 48px hour grid lines up with its half lines */
+/* Hallmark · waive 72 · a.ev and div.ga text 5px from the box edge · event blocks hold a title and its start time in a 123px column, so they pad 5px; nothing is clipped, and a block too narrow for both shows its title alone */
+/* Hallmark · waive 39b · button.chip 76px tall · the phone's day chip holds the weekday, the date and its event ticks and is the strip's only touch target */
+[data-theme="light"]{color-scheme:light;--color-ground:#edede8;--color-surface:#fdfdfa;--color-sunk:#e4e4de;--color-ink:#1a1b14;--color-muted:#5d5f56;--color-line:#d6d6cf;--color-outline:#808178;--color-accent:#516312;--color-on-accent:#fdfdfa;--color-accent-tint:#e4efce;--color-on-accent-tint:#344106;--color-now:#c1351e;--color-on-now:#fdfdfa;--color-danger:#b02a2d;--color-focus:#516312;--color-blue:#2863ab;--color-on-blue:#fdfdfa;--color-green:#137738;--color-on-green:#fdfdfa;--color-orange:#9d4616;--color-on-orange:#fdfdfa;--color-purple:#7f4995;--color-on-purple:#fdfdfa;--color-scrim:rgb(26 27 20 / .5);--font-ui:'Sofia Sans',system-ui,-apple-system,'Segoe UI',sans-serif;--font-num:'Sofia Sans Condensed','Sofia Sans',system-ui,sans-serif;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-12:48px;--color-accent-ink:var(--color-on-accent);--radius-event:6px;--radius-control:10px;--radius-card:12px;--radius-sheet:20px;--inset:16px;--shadow:0 1px 2px rgb(26 27 20 / .07),0 4px 14px rgb(26 27 20 / .06);--shadow-float:0 8px 28px rgb(26 27 20 / .18),0 0 0 1px var(--color-line);}
+[data-theme="dark"]{color-scheme:dark;--color-ground:#11110d;--color-surface:#22231e;--color-sunk:#090907;--color-ink:#eaeae4;--color-muted:#abaca3;--color-line:#3f3f38;--color-outline:#808178;--color-accent:#bdd18f;--color-on-accent:#192003;--color-accent-tint:#333c1e;--color-on-accent-tint:#e2eec9;--color-now:#fa8467;--color-on-now:#2a0e06;--color-danger:#f47a79;--color-focus:#bdd18f;--color-blue:#8dc1ff;--color-on-blue:#0d1b2d;--color-green:#89d298;--color-on-green:#0b2010;--color-orange:#f9a782;--color-on-orange:#2a140a;--color-purple:#d9a8ef;--color-on-purple:#221527;--color-scrim:rgb(0 0 0 / .62);--font-ui:'Sofia Sans',system-ui,-apple-system,'Segoe UI',sans-serif;--font-num:'Sofia Sans Condensed','Sofia Sans',system-ui,sans-serif;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-12:48px;--color-accent-ink:var(--color-on-accent);--radius-event:6px;--radius-control:10px;--radius-card:12px;--radius-sheet:20px;--inset:16px;--shadow:none;--shadow-float:0 0 0 1px var(--color-line);}
+
+html,body{overflow-x:clip}
+.al{scrollbar-color:var(--color-outline) transparent;caret-color:var(--color-accent);container:page/inline-size;background:var(--color-ground);color:var(--color-ink);font-family:var(--font-ui);font-size:14px;line-height:20px;font-variant-numeric:tabular-nums;font-synthesis:none;-webkit-font-smoothing:antialiased}
+.al *,.al *::before,.al *::after{box-sizing:border-box}
+.al :where(h1,h2,h3,p,ol,ul,dl,dd){margin:0;padding:0}
+.al :where(ol,ul){list-style:none}
+.al :where(h1,h2){text-wrap:balance}
+.al :where(button,input,select,textarea){font:inherit;color:inherit}
+.al button{cursor:pointer}
+.al a{text-decoration:none}
+.al :where(a){color:inherit}
+.al ::selection{background:var(--color-accent-tint);color:var(--color-ink)}
+.al .ic{flex:none;display:block}
+.al .num,.al .word,.al .title,.al .dd,.al .hr,.al .lt,.al .tm,.al .nchip,.al .cd,.al .md,.al .pop-tm{font-family:var(--font-num)}
+.al .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.al .sp{flex:1}
+.app{position:relative;transform:translateZ(0);min-height:100dvh;display:flex;flex-direction:column}
+.card{color:var(--color-ink);background:var(--color-surface);border:1px solid var(--color-line);border-radius:var(--radius-card);box-shadow:var(--shadow)}
+.c-blue{--c:var(--color-blue);--on:var(--color-on-blue)}
+.c-green{--c:var(--color-green);--on:var(--color-on-green)}
+.c-orange{--c:var(--color-orange);--on:var(--color-on-orange)}
+.c-purple{--c:var(--color-purple);--on:var(--color-on-purple)}
+
+/* header band */
+@container page (min-width:760px){.hd.dk{position:sticky;inset-block-start:0}}
+.hd{position:static;z-index:20;height:56px;background:var(--color-surface);border-bottom:1px solid var(--color-line);box-shadow:var(--shadow);display:flex;align-items:center;gap:var(--space-2);padding:0 var(--space-4)}
+.word{font-weight:700;font-size:22px;line-height:26px;letter-spacing:.01em;margin:0 var(--space-3) 0 var(--space-1)}
+.btn{height:36px;border-radius:var(--radius-control);border:1px solid var(--color-outline);background:var(--color-surface);padding:0 14px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);white-space:nowrap}
+.btn:hover{background:var(--color-sunk)}
+.btn:active{background:var(--color-line)}
+.create:active{background:color-mix(in srgb,var(--color-accent) 76%,var(--color-ink))}
+.icb:active,.sg:active,.md:active{background:var(--color-line)}
+.al [aria-disabled="true"],.al :disabled{background:var(--color-sunk);color:var(--color-muted);cursor:not-allowed}
+.btn.quiet{border-color:transparent;background:transparent;padding:0 10px}
+.btn.danger{color:var(--color-danger)}
+.btn.quiet:hover{background:var(--color-sunk)}
+.icb{width:36px;height:36px;border-radius:var(--radius-control);border:0;background:transparent;display:inline-flex;align-items:center;justify-content:center;padding:0;flex:none}
+.icb:hover{background:var(--color-sunk)}
+.title{font-weight:600;font-size:22px;line-height:26px;margin:0 0 0 var(--space-2);white-space:nowrap}
+.sf{display:flex;align-items:center;gap:var(--space-2);height:36px;width:224px;border:1px solid var(--color-outline);border-radius:var(--radius-control);background:var(--color-sunk);padding:0 10px;color:var(--color-muted);position:relative}
+.sf input{flex:1;min-width:0;border:0;background:transparent;outline:0;color:var(--color-ink)}
+.sf input::placeholder{color:var(--color-muted);opacity:1}
+.sf:focus-within{outline:2px solid var(--color-focus);outline-offset:2px}
+.seg{display:inline-flex;gap:2px;padding:2px;border:1px solid var(--color-outline);border-radius:12px;background:var(--color-surface)}
+.sg{height:30px;padding:0 14px;border:0;border-radius:9px;background:transparent;font-weight:500;color:var(--color-ink)}
+.sg:hover{background:var(--color-sunk)}
+.sg[aria-pressed="true"]{background:var(--color-accent-tint);color:var(--color-on-accent-tint);font-weight:600;box-shadow:inset 0 0 0 1px var(--color-accent)}
+.create{height:36px;border-radius:var(--radius-control);border:0;background:var(--color-accent);color:var(--color-accent-ink);padding:0 var(--space-4) 0 var(--space-3);font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.create:hover{background:color-mix(in srgb,var(--color-accent) 88%,var(--color-ink))}
+.create.wide{width:100%;height:44px;font-size:16px}
+.create.sv{padding:0 22px}
+.disc{width:44px;height:44px;border:0;background:transparent;display:inline-flex;align-items:center;justify-content:center;padding:0;flex:none}
+.disc span{width:32px;height:32px;border-radius:50%;background:var(--color-accent-tint);color:var(--color-accent-ink);font-weight:600;display:inline-flex;align-items:center;justify-content:center}
+.hd .sib,.tools{display:none}
+.hd.ph,.phb{display:none}
+
+/* desktop body */
+.pg{display:grid;grid-template-columns:304px minmax(0,1fr);gap:var(--space-4);padding:var(--space-4) 28px 28px 0;align-items:start;flex:1}
+.col1{display:flex;flex-direction:column;gap:var(--space-3);min-width:0;padding-left:28px;position:sticky;top:72px;max-height:calc(100dvh - 88px);overflow-y:auto;overscroll-behavior:contain}
+.cw,.gridw,.mm,.dcard{position:relative}
+.grid{overflow:hidden}
+.gh,.ga,.gb{display:grid;grid-template-columns:44px repeat(7,minmax(0,1fr))}
+.dh{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:56px;border-left:1px solid var(--color-line)}
+.dn{font-size:13px;line-height:16px;color:var(--color-muted);font-weight:500}
+.dd{font-weight:600;font-size:22px;line-height:26px;min-width:34px;text-align:center}
+.dh.today{background:var(--color-accent-tint)}
+.dh.today .dn{color:var(--color-on-accent-tint);font-weight:700}
+.dd.tab{background:var(--color-accent);color:var(--color-on-accent);border-radius:8px;padding:0 6px;font-weight:700}
+.ga{background:var(--color-sunk);border-top:1px solid var(--color-line);border-bottom:1px solid var(--color-line);min-height:32px}
+.ga .lab{font-size:12px;line-height:16px;color:var(--color-muted);display:flex;align-items:center;justify-content:flex-end;padding-right:6px}
+.ga .cell{border-left:1px solid var(--color-line);padding:var(--space-1) 3px}
+.ad{display:flex;align-items:center;height:24px;border-radius:var(--radius-event);padding:0 6px;background:var(--c);color:var(--on);font-weight:600;font-size:13px;line-height:18px;white-space:nowrap}
+.gb{position:relative;height:636px}
+.gut{position:relative}
+.hr{position:absolute;right:6px;transform:translateY(-50%);font-weight:500;font-size:12px;line-height:16px;color:var(--color-muted)}
+.hl{position:absolute;left:44px;right:0;height:1px;background:var(--color-line);pointer-events:none}
+.hl.half{background:color-mix(in srgb,var(--color-line) 30%,transparent)}
+.col{position:relative;border-left:1px solid var(--color-line)}
+.col.today{background:color-mix(in srgb,var(--color-accent-tint) 42%,transparent)}
+.ev{position:absolute;left:2px;right:2px;border-radius:var(--radius-event);background:var(--c);color:var(--on);overflow:hidden;display:flex;min-width:0}
+.ev.two{flex-direction:column;justify-content:flex-start;padding:var(--space-1) 5px 0}
+.ev.one{flex-direction:row;align-items:center;gap:var(--space-1);padding:0 5px;white-space:nowrap}
+.ev .t{font-weight:600;font-size:13px;line-height:18px}
+.ev .tm{font-weight:500;font-size:12px;line-height:16px}
+.ev.mid{padding:0 var(--space-1) 0 5px;justify-content:center}
+.ev.mid .tm{line-height:14px}
+.ev.one{container:ev/inline-size}
+@container ev (max-width:119px){.tm{display:none}}
+.ev.sel{outline:2px solid var(--color-ink);outline-offset:2px;z-index:3}
+.nowline{position:absolute;left:0;right:0;height:2px;background:var(--color-now);z-index:2;pointer-events:none;top:132px}
+.nchip{font-weight:600;font-size:12px;line-height:16px;background:var(--color-now);color:var(--color-on-now);border-radius:6px;padding:2px 5px}
+.gchip{position:absolute;right:3px;transform:translateY(-50%);z-index:3}
+
+/* the left column */
+.ph2{display:flex;align-items:center;gap:var(--space-1);margin-bottom:var(--space-2)}
+.ph2 h2{font-size:18px;line-height:24px;font-weight:600;flex:1}
+.ph2 h2.num{font-weight:600}
+.mm,.cc{padding:var(--space-3)}
+.mh,.mw{display:grid;grid-template-columns:repeat(7,1fr)}
+.mh span{font-size:12px;line-height:16px;color:var(--color-muted);text-align:center;padding:var(--space-1) 0;font-weight:500}
+.mw{border-radius:8px}
+.mw.shown{background:var(--color-accent-tint)}
+.md{height:28px;border:0;background:transparent;border-radius:8px;font-weight:500;font-size:14px;line-height:20px;padding:0}
+.md.out{color:var(--color-muted)}
+.mw.shown .md{color:var(--color-on-accent-tint)}
+.mw .md.is-today{background:var(--color-accent);color:var(--color-on-accent);font-weight:700}
+.dcard{padding:var(--space-3) var(--space-3) var(--space-1)}
+.dhd{display:flex;align-items:center;gap:var(--space-2)}
+.dcard .dh2{font-size:16px;line-height:22px}
+.dh2{font-size:18px;line-height:24px;font-weight:600}
+.pill{font-size:12px;line-height:16px;font-weight:600;background:var(--color-accent-tint);color:var(--color-on-accent-tint);border-radius:999px;padding:2px var(--space-2)}
+.list{margin:var(--space-2) 0 0}
+.lr{display:grid;grid-template-columns:90px 12px minmax(0,1fr);column-gap:10px;align-items:start;padding:6px 0;border-top:1px solid var(--color-line)}
+.lt{font-weight:500;font-size:14px;line-height:20px;color:var(--color-muted);white-space:nowrap}
+.mk{width:12px;height:12px;border-radius:4px;background:var(--c);margin-top:var(--space-1);display:block;flex:none}
+.mk.lg{width:14px;height:14px;margin-top:0}
+.lb{display:flex;flex-direction:column;min-width:0}
+.lti{font-weight:600;font-size:14px;line-height:20px;overflow-wrap:break-word}
+.ll{display:flex;align-items:center;gap:var(--space-1);font-size:13px;line-height:18px;color:var(--color-muted)}
+.nr{display:flex;align-items:center;padding:6px 0;border-top:1px solid var(--color-line)}
+.nr .nchip{width:90px;text-align:right;background:transparent;color:var(--color-now);padding:0;margin-right:10px;font-size:13px;font-weight:700}
+.nr .nline{flex:1;height:2px;background:var(--color-now);border-radius:2px}
+.cr{display:flex;align-items:center;gap:var(--space-3);min-height:36px;position:relative;font-size:14px}
+.cr input{position:absolute;opacity:0;width:20px;height:20px;margin:0;left:0}
+.cb{width:20px;height:20px;border-radius:6px;border:2px solid var(--c);background:var(--c);color:var(--on);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.cb .ic{width:14px;height:14px;stroke-width:2.5}
+.cr input:focus-visible + .cb{outline:2px solid var(--color-focus);outline-offset:2px}
+.cb.box{border:2px solid var(--color-outline);background:var(--color-sunk);color:transparent}
+.cr input:checked + .cb.box{background:var(--color-accent);border-color:var(--color-accent);color:var(--color-on-accent)}
+
+/* callouts: in the page gutter, 1280 only */
+.co{display:none;position:absolute;width:22px;height:22px;border-radius:50%;background:var(--color-ink);color:var(--color-ground);font-family:var(--font-num);font-weight:700;font-size:13px;line-height:22px;text-align:center}
+@container page (min-width:1200px){.co{display:block}}
+
+/* details popover */
+.pop{position:fixed;z-index:6;width:340px;padding:var(--space-4) var(--space-4) var(--space-3);box-shadow:var(--shadow-float)}
+.pop-top{display:flex;align-items:center;gap:10px}
+.pop-t{flex:1;font-size:22px;line-height:28px;font-weight:600}
+.pop-d{margin-top:6px;font-size:16px;line-height:22px;font-weight:600;padding-left:var(--space-6)}
+.pop-tm{font-size:16px;line-height:22px;font-weight:500;color:var(--color-muted);padding-left:var(--space-6)}
+.dt-rows{margin-top:var(--space-3);display:flex;flex-direction:column;gap:10px}
+.dt-r{display:grid;grid-template-columns:20px minmax(0,1fr);gap:var(--space-3);align-items:start;color:var(--color-muted)}
+.dt-r > span{display:flex;flex-direction:column}
+.dt-k{font-size:12px;line-height:16px;color:var(--color-muted);font-weight:500}
+.dt-v{font-size:14px;line-height:20px;color:var(--color-ink)}
+.pop-f{display:flex;align-items:center;gap:var(--space-2);margin-top:14px;padding-top:10px;border-top:1px solid var(--color-line)}
+.scrim{position:fixed;inset:0;background:var(--color-scrim);z-index:30}
+.sheetw{display:none}
+
+/* the form */
+.dlg{position:fixed;z-index:40;left:50%;top:16px;max-height:calc(100dvh - 32px);transform:translateX(-50%);width:640px;max-width:calc(100% - 32px);background:var(--color-surface);border:1px solid var(--color-line);border-radius:16px;box-shadow:var(--shadow-float);display:flex;flex-direction:column}
+.dlg-h{display:flex;align-items:center;padding:var(--space-3) var(--space-4) var(--space-1) var(--space-6)}
+.dlg-t{flex:1;font-size:22px;line-height:26px;font-weight:600}
+.dlg-b{padding:var(--space-2) var(--space-6) var(--space-4);display:flex;flex-direction:column;gap:var(--space-3);overflow-y:auto;min-height:0}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)}
+.dlg-f,.fbar{display:flex;align-items:center;gap:var(--space-2);padding:14px var(--space-6);border-top:1px solid var(--color-line)}
+.frow{display:grid;grid-template-columns:20px minmax(0,1fr);gap:14px;align-items:start}
+.frow .fi{margin-top:30px;color:var(--color-muted)}
+.fld{display:flex;flex-direction:column;gap:var(--space-1);min-width:0}
+.fl{font-size:13px;line-height:18px;font-weight:600;color:var(--color-muted)}
+.inp{height:40px;width:100%;min-width:0;border:1px solid var(--color-outline);border-radius:var(--radius-control);background:var(--color-sunk);padding:0 var(--space-3);color:var(--color-ink);font-size:16px}
+.inp:focus-visible{outline:2px solid var(--color-focus);outline-offset:2px}
+.inp-title{height:48px;font-size:22px;font-weight:600}
+.ta{height:auto;min-height:72px;padding:10px var(--space-3);resize:vertical;line-height:22px}
+.when{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2) var(--space-3);min-width:0}
+.when .ad-cb{grid-column:1 / -1}
+.when .fld{display:flex;flex-direction:column}
+.dt{display:grid;grid-template-columns:minmax(0,1fr) 88px;gap:var(--space-2)}
+.dt .tm{font-family:var(--font-num);font-size:16px}
+.selw{position:relative;display:block}
+.selw select{appearance:none;-webkit-appearance:none;padding-right:38px}
+.selw select.has-mk{padding-left:34px}
+.selw .chv{position:absolute;right:10px;top:11px;pointer-events:none;color:var(--color-muted)}
+.selmk{position:absolute;left:12px;top:14px;margin:0}
+.ad-cb{min-height:36px}
+input[type="date"],input[type="time"]{font-family:var(--font-num)}
+.fbody,.fbar,.form-h{display:none}
+.fm-desk{display:flex;flex-direction:column;flex:1}
+.pop{top:316px;left:min(calc(364px + (100% - 392px) * 3 / 7 + 10px),calc(100% - 356px))}
+
+/* tablet: the column is the drawer */
+@container page (max-width:1099px){
+  .pg{grid-template-columns:minmax(0,1fr);padding:var(--space-3) var(--space-4) var(--space-6)}
+  .col1{display:none}
+  .hd .menu,.hd .sib{display:inline-flex}
+  .hd .sf,.hd .sdk{display:none}
+  .tools{display:flex;align-items:center;gap:var(--space-2);padding:10px var(--space-4) 0}
+  .co{display:none!important}
+  .pop{top:362px;left:min(calc(60px + (100% - 76px) * 3 / 7 + 10px),calc(100% - 356px))}
+}
+/* phone */
+@container page (max-width:759px){
+  .hd.dk,.tools,.pg{display:none}
+  .hd.ph{display:flex;position:sticky;top:0;padding:0 var(--space-2);gap:var(--space-1)}
+  .hd.ph .icb{width:44px;height:44px;border-radius:12px}
+  .hd.ph .title{font-size:22px;margin:0 0 0 var(--space-1);flex:1}
+  .phb{display:block;flex:1}
+  .strip{position:sticky;top:64px;z-index:10;margin:var(--space-2);padding:6px var(--space-1) var(--space-2);display:flex;gap:2px;border-radius:12px}
+  .chip{flex:1;min-width:0;border:0;background:transparent;padding:0;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:76px}
+  .cbk{width:100%;height:54px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .cn{font-size:12px;line-height:16px;font-weight:500;color:var(--color-muted)}
+  .cd{font-weight:600;font-size:22px;line-height:26px;color:var(--color-ink)}
+  .chip.on .cbk{background:var(--color-accent)}
+  .chip.on .cn,.chip.on .cd{color:var(--color-on-accent)}
+  .chip.on .cd{font-weight:700}
+  .tk{display:flex;gap:2px;align-items:flex-end;height:14px}
+  .tk i{display:block;width:4px;height:14px;border-radius:2px;background:var(--c)}
+  .agenda{display:flex;flex-direction:column;gap:var(--space-2);padding:0 var(--space-2) var(--space-4)}
+  .agenda .list{margin-top:var(--space-1)}
+  .agenda .dcard .dh2{font-size:18px;line-height:24px}
+  .agenda .dcard{padding:var(--space-3) var(--space-4) 0;scroll-margin-top:152px}
+  .dh2{font-size:18px}
+  .lr{grid-template-columns:104px 12px minmax(0,1fr);padding:var(--space-3) 0;min-height:48px}
+  .lt{font-size:16px;line-height:22px}
+  .lti{font-size:16px;line-height:22px}
+  .ll{font-size:14px;line-height:20px}
+  .mk{margin-top:5px}
+  .nr .nchip{width:104px;font-size:14px}
+  .fabw{position:sticky;bottom:calc(64px + var(--inset) + 16px);height:52px;margin-bottom:var(--space-4);display:flex;justify-content:flex-end;padding-right:var(--space-4);z-index:12;pointer-events:none}
+  .fab{pointer-events:auto;height:52px;border-radius:14px;padding:0 var(--space-5) 0 var(--space-4);font-size:16px;box-shadow:var(--shadow)}
+  .bar{position:sticky;bottom:0;z-index:14;display:flex;background:var(--color-surface);border-top:1px solid var(--color-line);box-shadow:var(--shadow);height:calc(64px + var(--inset));padding:var(--space-1) var(--space-2) var(--inset);gap:var(--space-1)}
+  .ri{flex:1;min-height:56px;border:0;background:transparent;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:13px;line-height:16px;color:var(--color-muted);font-weight:500}
+  .ri.on{background:var(--color-accent-tint);color:var(--color-on-accent-tint);font-weight:600;box-shadow:inset 0 0 0 1px var(--color-accent)}
+  .ov .app{height:844px;overflow:hidden}
+  .ov .pop{display:none}
+  .sheetw{display:block}
+  .sheet{position:fixed;z-index:40;left:0;right:0;bottom:0;background:var(--color-surface);border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;border:1px solid var(--color-line);border-bottom:0;box-shadow:var(--shadow-float);padding:var(--space-2) var(--space-5) calc(var(--inset) + var(--space-2))}
+  .sheet .pop-d,.sheet .pop-tm{padding-left:var(--space-6)}
+  .sheet .pop-f{margin-top:14px}
+  .sheet .btn{height:48px;padding:0 18px}
+  .sheet .btn.quiet{padding:0 var(--space-3)}
+  .sheet .icb{width:44px;height:44px}
+  .grab{display:block;width:40px;height:4px;border-radius:2px;background:var(--color-outline);margin:0 auto var(--space-2)}
+  .dlg{display:none}
+  .hd.form-h{display:flex}
+  .fbody{display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-4) var(--space-4) var(--space-5);margin:var(--space-2) var(--space-2) var(--space-4);flex:1;background:var(--color-surface);border:1px solid var(--color-line);border-radius:var(--radius-card);box-shadow:var(--shadow)}
+  .fbar{display:flex;position:sticky;bottom:0;z-index:14;background:var(--color-surface);padding:var(--space-3) var(--space-4) calc(var(--inset) + var(--space-1));gap:var(--space-2)}
+  .fbar .btn,.fbar .create{height:48px}
+  .frow{grid-template-columns:20px minmax(0,1fr);gap:var(--space-3)}
+  .selw{max-width:none}
+  .inp{height:44px}
+  .inp-title{height:52px}
+  .pair,.when{grid-template-columns:1fr}
+  .dt{grid-template-columns:minmax(0,1fr) 112px}
+  .cr.ad-cb{min-height:44px}
+  .cb.box{width:24px;height:24px}
+  .fm-desk{display:none}
+  .fm-ph{display:flex;flex-direction:column;flex:1}
+}
+.sc .app{height:844px;overflow:hidden}
+.sc .hd{position:fixed;left:0;right:0;top:0}
+.sc .strip{position:fixed;left:8px;right:8px;top:64px;margin:0}
+.sc .band{color:var(--color-ink);position:fixed;left:0;right:0;top:56px;height:112px;background:var(--color-ground);z-index:9}
+.sc .clip{position:absolute;inset:0;overflow:hidden}
+.sc .bar{position:fixed;left:0;right:0;bottom:0}
+.sc .fabw{position:fixed;right:0;bottom:96px;margin:0}
+@container page (max-width:379px){.fab{width:56px;height:56px;padding:0;justify-content:center;border-radius:16px}.fab span{display:none}.fabw{height:56px}}
+@container page (min-width:760px){.grab{display:none}.fm-ph{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+body{margin:0}
+</style>
+</head>
+<body>
+<div data-theme="dark" class="al">
+<div class="app"><header class="hd dk">
+<button class="icb menu" type="button" aria-label="Menu"><svg class="ic " viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+<span class="word">Almanac</span>
+<button class="btn" type="button">Today</button>
+<button class="icb" type="button" aria-label="Previous week"><svg class="ic " viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14.5 6-6 6 6 6"></path></svg></button><button class="icb" type="button" aria-label="Next week"><svg class="ic " viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9.5 6 6 6-6 6"></path></svg></button>
+<h1 class="title num">9 ‒ 15 Nov 2026</h1>
+<span class="sp"></span>
+<label class="sf"><span class="vh">Search</span><svg class="ic " viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m20 20-4.2-4.2"></path></svg><input type="search" placeholder="Search" autocomplete="off"></label>
+<button class="icb sib" type="button" aria-label="Search"><svg class="ic " viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m20 20-4.2-4.2"></path></svg></button>
+<div class="seg sdk" role="group" aria-label="View"><button class="sg" type="button" aria-pressed="false">Day</button><button class="sg" type="button" aria-pressed="true">Week</button><button class="sg" type="button" aria-pressed="false">Month</button><button class="sg" type="button" aria-pressed="false">Year</button></div>
+<button class="disc" type="button" aria-label="Account"><span>T</span></button>
+</header>
+<div class="tools"><div class="seg " role="group" aria-label="View"><button class="sg" type="button" aria-pressed="false">Day</button><button class="sg" type="button" aria-pressed="true">Week</button><button class="sg" type="button" aria-pressed="false">Month</button><button class="sg" type="button" aria-pressed="false">Year</button></div><span class="sp"></span><button class="create" type="button"><svg class="ic " viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg><span>Create</span></button></div><header class="hd ph">
+<button class="icb" type="button" aria-label="Menu"><svg class="ic " viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+<h1 class="title num">Nov 2026</h1>
+<button class="icb" type="button" aria-label="Search"><svg class="ic " viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m20 20-4.2-4.2"></path></svg></button>
+<button class="icb" type="button" aria-label="Today, 11 November"><svg class="ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="17" rx="3"></rect><path d="M3.5 9h17M8 2.5v3M16 2.5v3"></path><text x="12" y="18" text-anchor="middle" stroke="none" fill="currentColor" font-size="8.5" font-weight="700" style="font-family:var(--font-num)">11</text></svg></button>
+<button class="disc" type="button" aria-label="Account"><span>T</span></button>
+</header><div class="pg"><aside class="col1" aria-label="Create, dates and calendars">
+<div class="cw"><button class="create wide" type="button"><svg class="ic " viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg><span>Create</span></button><span class="co" style="left:-26px;top:11px" aria-hidden="true">1</span></div>
+<section class="card mm" aria-label="November 2026">
+<div class="ph2"><h2 class="num">November 2026</h2><button class="icb" type="button" aria-label="Previous month"><svg class="ic " viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14.5 6-6 6 6 6"></path></svg></button><button class="icb" type="button" aria-label="Next month"><svg class="ic " viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9.5 6 6 6-6 6"></path></svg></button></div>
+<div class="mh" aria-hidden="true"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div><div class="mw"><button class="md num out" type="button" aria-label="26 October">26</button><button class="md num out" type="button" aria-label="27 October">27</button><button class="md num out" type="button" aria-label="28 October">28</button><button class="md num out" type="button" aria-label="29 October">29</button><button class="md num out" type="button" aria-label="30 October">30</button><button class="md num out" type="button" aria-label="31 October">31</button><button class="md num" type="button" aria-label="1 November">1</button></div><div class="mw"><button class="md num" type="button" aria-label="2 November">2</button><button class="md num" type="button" aria-label="3 November">3</button><button class="md num" type="button" aria-label="4 November">4</button><button class="md num" type="button" aria-label="5 November">5</button><button class="md num" type="button" aria-label="6 November">6</button><button class="md num" type="button" aria-label="7 November">7</button><button class="md num" type="button" aria-label="8 November">8</button></div><div class="mw shown"><button class="md num" type="button" aria-label="9 November">9</button><button class="md num" type="button" aria-label="10 November">10</button><button class="md num is-today" type="button" aria-label="11 November" aria-current="date">11</button><button class="md num" type="button" aria-label="12 November">12</button><button class="md num" type="button" aria-label="13 November">13</button><button class="md num" type="button" aria-label="14 November">14</button><button class="md num" type="button" aria-label="15 November">15</button></div><div class="mw"><button class="md num" type="button" aria-label="16 November">16</button><button class="md num" type="button" aria-label="17 November">17</button><button class="md num" type="button" aria-label="18 November">18</button><button class="md num" type="button" aria-label="19 November">19</button><button class="md num" type="button" aria-label="20 November">20</button><button class="md num" type="button" aria-label="21 November">21</button><button class="md num" type="button" aria-label="22 November">22</button></div><div class="mw"><button class="md num" type="button" aria-label="23 November">23</button><button class="md num" type="button" aria-label="24 November">24</button><button class="md num" type="button" aria-label="25 November">25</button><button class="md num" type="button" aria-label="26 November">26</button><button class="md num" type="button" aria-label="27 November">27</button><button class="md num" type="button" aria-label="28 November">28</button><button class="md num" type="button" aria-label="29 November">29</button></div><div class="mw"><button class="md num" type="button" aria-label="30 November">30</button><button class="md num out" type="button" aria-label="1 December">1</button><button class="md num out" type="button" aria-label="2 December">2</button><button class="md num out" type="button" aria-label="3 December">3</button><button class="md num out" type="button" aria-label="4 December">4</button><button class="md num out" type="button" aria-label="5 December">5</button><button class="md num out" type="button" aria-label="6 December">6</button></div><span class="co" style="left:-26px;top:154px" aria-hidden="true">4</span></section><section class="card cc" aria-label="My calendars">
+<div class="ph2"><h2>My calendars</h2><button class="icb" type="button" aria-label="Add calendar"><svg class="ic " viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button></div>
+<label class="cr"><input type="checkbox" checked=""><span class="cb c-blue"><svg class="ic " viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5.5 12.5 4.2 4.2 8.8-9"></path></svg></span><span>Personal</span></label><label class="cr"><input type="checkbox" checked=""><span class="cb c-green"><svg class="ic " viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5.5 12.5 4.2 4.2 8.8-9"></path></svg></span><span>Work</span></label><label class="cr"><input type="checkbox" checked=""><span class="cb c-orange"><svg class="ic " viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5.5 12.5 4.2 4.2 8.8-9"></path></svg></span><span>Home</span></label><label class="cr"><input type="checkbox" checked=""><span class="cb c-purple"><svg class="ic " viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5.5 12.5 4.2 4.2 8.8-9"></path></svg></span><span>Fitness</span></label>
+</section><section class="card dcard " aria-label="Wednesday, 11 November"><div class="dhd"><h2 class="dh2">Wednesday, 11 November</h2><span class="pill">Today</span></div><ol class="list"><li class="lr"><span class="lt num">07:00 ‒ 07:45</span><span class="mk c-purple" role="img" aria-label="Fitness"></span><span class="lb"><span class="lti">Run</span></span></li><li class="lr"><span class="lt num">09:30 ‒ 10:00</span><span class="mk c-green" role="img" aria-label="Work"></span><span class="lb"><span class="lti">Team standup</span></span></li><li class="nr"><span class="nchip">10:30</span><span class="nline"></span></li><li class="lr"><span class="lt num">11:00 ‒ 12:00</span><span class="mk c-green" role="img" aria-label="Work"></span><span class="lb"><span class="lti">Design review</span><span class="ll"><svg class="ic " viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"></path><circle cx="12" cy="10" r="2.2"></circle></svg>Room 2</span></span></li><li class="lr"><span class="lt num">17:30 ‒ 18:15</span><span class="mk c-orange" role="img" aria-label="Home"></span><span class="lb"><span class="lti">Groceries</span></span></li><li class="lr"><span class="lt num">20:00 ‒ 21:00</span><span class="mk c-blue" role="img" aria-label="Personal"></span><span class="lb"><span class="lti">Read</span></span></li></ol><span class="co" style="left:-26px;top:16px" aria-hidden="true">2</span></section></aside><div class="gridw"><section class="grid card" aria-label="Week of 9 to 15 November 2026">
+<div class="gh"><div></div><div class="dh"><span class="dn">Mon</span><span class="dd num">9</span></div><div class="dh"><span class="dn">Tue</span><span class="dd num">10</span></div><div class="dh today"><span class="dn">Wed</span><span class="dd num tab">11</span></div><div class="dh"><span class="dn">Thu</span><span class="dd num">12</span></div><div class="dh"><span class="dn">Fri</span><span class="dd num">13</span></div><div class="dh"><span class="dn">Sat</span><span class="dd num">14</span></div><div class="dh"><span class="dn">Sun</span><span class="dd num">15</span></div></div>
+<div class="ga"><div class="lab">All day</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"><a class="ad c-orange" href="#">Anniversary</a></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+<div class="gb"><div class="hl" style="top:12px"></div><div class="hl half" style="top:36px"></div><div class="hl" style="top:60px"></div><div class="hl half" style="top:84px"></div><div class="hl" style="top:108px"></div><div class="hl half" style="top:132px"></div><div class="hl" style="top:156px"></div><div class="hl half" style="top:180px"></div><div class="hl" style="top:204px"></div><div class="hl half" style="top:228px"></div><div class="hl" style="top:252px"></div><div class="hl half" style="top:276px"></div><div class="hl" style="top:300px"></div><div class="hl half" style="top:324px"></div><div class="hl" style="top:348px"></div><div class="hl half" style="top:372px"></div><div class="hl" style="top:396px"></div><div class="hl half" style="top:420px"></div><div class="hl" style="top:444px"></div><div class="hl half" style="top:468px"></div><div class="hl" style="top:492px"></div><div class="hl half" style="top:516px"></div><div class="hl" style="top:540px"></div><div class="hl half" style="top:564px"></div><div class="hl" style="top:588px"></div><div class="hl half" style="top:612px"></div><div class="hl" style="top:636px"></div><div class="gut"><span class="hr num" style="top:12px">08:00</span><span class="hr num" style="top:60px">09:00</span><span class="hr num" style="top:108px">10:00</span><span class="hr num" style="top:156px">11:00</span><span class="hr num" style="top:204px">12:00</span><span class="hr num" style="top:252px">13:00</span><span class="hr num" style="top:300px">14:00</span><span class="hr num" style="top:348px">15:00</span><span class="hr num" style="top:396px">16:00</span><span class="hr num" style="top:444px">17:00</span><span class="hr num" style="top:492px">18:00</span><span class="hr num" style="top:540px">19:00</span><span class="hr num" style="top:588px">20:00</span><span class="nchip gchip" style="top:132px">10:30</span></div><div class="col"><a class="ev one c-green" href="#" style="top:85px;height:22px" aria-label="Team standup, 09:30 to 10:00, Work"><span class="t">Team standup</span><span class="tm num">09:30</span></a><a class="ev two c-green" href="#" style="top:301px;height:70px" aria-label="Planning, 14:00 to 15:30, Work"><span class="t">Planning</span><span class="tm num">14:00 ‒ 15:30</span></a></div><div class="col"><a class="ev two c-orange" href="#" style="top:37px;height:46px" aria-label="Dentist, 08:30 to 09:30, Home"><span class="t">Dentist</span><span class="tm num">08:30 ‒ 09:30</span></a><a class="ev one c-green" href="#" style="top:85px;height:22px" aria-label="Team standup, 09:30 to 10:00, Work"><span class="t">Team standup</span><span class="tm num">09:30</span></a></div><div class="col today"><a class="ev one c-green" href="#" style="top:85px;height:22px" aria-label="Team standup, 09:30 to 10:00, Work"><span class="t">Team standup</span><span class="tm num">09:30</span></a><a class="ev two c-green" href="#" style="top:157px;height:46px" aria-label="Design review, 11:00 to 12:00, Work"><span class="t">Design review</span><span class="tm num">11:00 ‒ 12:00</span></a><a class="ev two mid c-orange" href="#" style="top:469px;height:34px" aria-label="Groceries, 17:30 to 18:15, Home"><span class="t">Groceries</span><span class="tm num">17:30</span></a><a class="ev two c-blue" href="#" style="top:589px;height:46px" aria-label="Read, 20:00 to 21:00, Personal"><span class="t">Read</span><span class="tm num">20:00 ‒ 21:00</span></a><div class="nowline"></div></div><div class="col"><a class="ev one c-green" href="#" style="top:85px;height:22px" aria-label="Team standup, 09:30 to 10:00, Work"><span class="t">Team standup</span><span class="tm num">09:30</span></a><a class="ev two c-green" href="#" style="top:349px;height:46px" aria-label="Release check, 15:00 to 16:00, Work"><span class="t">Release check</span><span class="tm num">15:00 ‒ 16:00</span></a></div><div class="col"><a class="ev one c-green" href="#" style="top:85px;height:22px" aria-label="Team standup, 09:30 to 10:00, Work"><span class="t">Team standup</span><span class="tm num">09:30</span></a><a class="ev two mid c-green" href="#" style="top:109px;height:34px" aria-label="One to one, 10:00 to 10:45, Work"><span class="t">One to one</span><span class="tm num">10:00</span></a><a class="ev two c-orange" href="#" style="top:541px;height:94px" aria-label="Dinner with Alex, 19:00 to 21:00, Home"><span class="t">Dinner with Alex</span><span class="tm num">19:00 ‒ 21:00</span></a></div><div class="col"><a class="ev two c-purple" href="#" style="top:109px;height:46px" aria-label="Yoga, 10:00 to 11:00, Fitness"><span class="t">Yoga</span><span class="tm num">10:00 ‒ 11:00</span></a></div><div class="col"><a class="ev one c-blue" href="#" style="top:493px;height:22px" aria-label="Call home, 18:00 to 18:30, Personal"><span class="t">Call home</span><span class="tm num">18:00</span></a></div></div>
+</section><span class="co" style="right:-26px;top:589px" aria-hidden="true">3</span></div></div><div class="phb"><div class="strip card" role="group" aria-label="Days of the week"><button class="chip" type="button" aria-label="Mon 9, 2 events"><span class="cbk"><span class="cn">Mon</span><span class="cd num">9</span></span><span class="tk"><i class="c-green"></i><i class="c-green"></i></span></button><button class="chip" type="button" aria-label="Tue 10, 2 events"><span class="cbk"><span class="cn">Tue</span><span class="cd num">10</span></span><span class="tk"><i class="c-orange"></i><i class="c-green"></i></span></button><button class="chip on" type="button" aria-label="Wed 11, 5 events" aria-current="date"><span class="cbk"><span class="cn">Wed</span><span class="cd num">11</span></span><span class="tk"><i class="c-purple"></i><i class="c-green"></i><i class="c-green"></i><i class="c-orange"></i><i class="c-blue"></i></span></button><button class="chip" type="button" aria-label="Thu 12, 3 events"><span class="cbk"><span class="cn">Thu</span><span class="cd num">12</span></span><span class="tk"><i class="c-orange"></i><i class="c-green"></i><i class="c-green"></i></span></button><button class="chip" type="button" aria-label="Fri 13, 4 events"><span class="cbk"><span class="cn">Fri</span><span class="cd num">13</span></span><span class="tk"><i class="c-purple"></i><i class="c-green"></i><i class="c-green"></i><i class="c-orange"></i></span></button><button class="chip" type="button" aria-label="Sat 14, 1 events"><span class="cbk"><span class="cn">Sat</span><span class="cd num">14</span></span><span class="tk"><i class="c-purple"></i></span></button><button class="chip" type="button" aria-label="Sun 15, 1 events"><span class="cbk"><span class="cn">Sun</span><span class="cd num">15</span></span><span class="tk"><i class="c-blue"></i></span></button></div>
+<div class="agenda"><section class="card dcard " id="d-wed" aria-label="Wednesday, 11 November"><div class="dhd"><h2 class="dh2">Wednesday, 11 November</h2><span class="pill">Today</span></div><ol class="list"><li class="lr"><span class="lt num">07:00 ‒ 07:45</span><span class="mk c-purple" role="img" aria-label="Fitness"></span><span class="lb"><span class="lti">Run</span></span></li><li class="lr"><span class="lt num">09:30 ‒ 10:00</span><span class="mk c-green" role="img" aria-label="Work"></span><span class="lb"><span class="lti">Team standup</span></span></li><li class="nr"><span class="nchip">10:30</span><span class="nline"></span></li><li class="lr"><span class="lt num">11:00 ‒ 12:00</span><span class="mk c-green" role="img" aria-label="Work"></span><span class="lb"><span class="lti">Design review</span><span class="ll"><svg class="ic " viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"></path><circle cx="12" cy="10" r="2.2"></circle></svg>Room 2</span></span></li><li class="lr"><span class="lt num">17:30 ‒ 18:15</span><span class="mk c-orange" role="img" aria-label="Home"></span><span class="lb"><span class="lti">Groceries</span></span></li><li class="lr"><span class="lt num">20:00 ‒ 21:00</span><span class="mk c-blue" role="img" aria-label="Personal"></span><span class="lb"><span class="lti">Read</span></span></li></ol></section><section class="card dcard " id="d-thu" aria-label="Thursday, 12 November"><div class="dhd"><h2 class="dh2">Thursday, 12 November</h2></div><ol class="list"><li class="lr"><span class="lt num">All day</span><span class="mk c-orange" role="img" aria-label="Home"></span><span class="lb"><span class="lti">Anniversary</span></span></li><li class="lr"><span class="lt num">09:30 ‒ 10:00</span><span class="mk c-green" role="img" aria-label="Work"></span><span class="lb"><span class="lti">Team standup</span></span></li><li class="lr"><span class="lt num">15:00 ‒ 16:00</span><span class="mk c-green" role="img" aria-label="Work"></span><span class="lb"><span class="lti">Release check</span></span></li></ol></section><section class="card dcard " id="d-fri" aria-label="Friday, 13 November"><div class="dhd"><h2 class="dh2">Friday, 13 November</h2></div><ol class="list"><li class="lr"><span class="lt num">07:00 ‒ 07:45</span><span class="mk c-purple" role="img" aria-label="Fitness"></span><span class="lb"><span class="lti">Run</span></span></li><li class="lr"><span class="lt num">09:30 ‒ 10:00</span><span class="mk c-green" role="img" aria-label="Work"></span><span class="lb"><span class="lti">Team standup</span></span></li><li class="lr"><span class="lt num">10:00 ‒ 10:45</span><span class="mk c-green" role="img" aria-label="Work"></span><span class="lb"><span class="lti">One to one</span></span></li><li class="lr"><span class="lt num">19:00 ‒ 21:00</span><span class="mk c-orange" role="img" aria-label="Home"></span><span class="lb"><span class="lti">Dinner with Alex</span><span class="ll"><svg class="ic " viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"></path><circle cx="12" cy="10" r="2.2"></circle></svg>Corner bistro</span></span></li></ol></section><section class="card dcard " id="d-sat" aria-label="Saturday, 14 November"><div class="dhd"><h2 class="dh2">Saturday, 14 November</h2></div><ol class="list"><li class="lr"><span class="lt num">10:00 ‒ 11:00</span><span class="mk c-purple" role="img" aria-label="Fitness"></span><span class="lb"><span class="lti">Yoga</span></span></li></ol></section><section class="card dcard " id="d-sun" aria-label="Sunday, 15 November"><div class="dhd"><h2 class="dh2">Sunday, 15 November</h2></div><ol class="list"><li class="lr"><span class="lt num">18:00 ‒ 18:30</span><span class="mk c-blue" role="img" aria-label="Personal"></span><span class="lb"><span class="lti">Call home</span></span></li></ol></section></div><div class="fabw"><button class="create fab" type="button" aria-label="Create"><svg class="ic " viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg><span>Create</span></button></div><nav class="bar" aria-label="Views"><button class="ri" type="button"><svg class="ic " viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="16" rx="3"></rect><path d="M3.5 9.5h17"></path><rect x="8" y="13" width="8" height="4" rx="1"></rect></svg><span>Day</span></button><button class="ri on" type="button" aria-current="page"><svg class="ic " viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="16" rx="3"></rect><path d="M3.5 9.5h17M9.2 9.5v11M14.8 9.5v11"></path></svg><span>Week</span></button><button class="ri" type="button"><svg class="ic " viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="16" rx="3"></rect><path d="M3.5 9.5h17M9.2 9.5v11M14.8 9.5v11M3.5 15h17"></path></svg><span>Month</span></button><button class="ri" type="button"><svg class="ic " viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg><span>Year</span></button></nav></div></div>
+</div>
+</body>
+</html>

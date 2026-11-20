@@ -479,3 +479,7 @@ deployed: `node cli.ts almanac all`. How it works:
 ## [2026-11-19] build | Brief 07: Ward 1.1.0, the password to link, a username that can change
 
 Vendored ward-auth 1.1.0 (server and web copies, from 0.3.1). Link Ward and Unlink Ward open a small dialog that asks for the current password; Change username is a new account-menu dialog. Nothing is keyed by the username, so the rename route stays on. Not deployed: `node cli.ts almanac all`. The outcome note is in [the brief](briefs/done/07-linking-ward-asks-for-the-password-and-a-username-can-change.md).
+
+## [2026-11-20] maintenance | The redesign's board page copied into the repo
+
+The estate redesign board is a private canvas, so `design/estate-redesign/` now holds a copy of this app's page on it and the build behind it: the directions, the judges' and the controller's rulings, the critique, the token hand-off, the board's notes, the owner's decisions, the proposed screens (as HTML with renders, or as the board's own artboard sources), and today's shots from before the redesign. It is the design record of brief 05, which built it; its README says what each file is. Prettier and the Docker build skip the folder.
