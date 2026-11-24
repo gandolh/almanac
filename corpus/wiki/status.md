@@ -106,6 +106,9 @@ three lanes.
    and check an event and a repeating one show at the right times. Answer the
    board's question on almanac-06: keep the link shown once, or show it again
    any time.
+8. The image tidy (brief 08): `node cli.ts almanac server`. The build stage
+   installs only the server, on `node:24.22.1-alpine`; the image that runs is
+   the same within a few megabytes.
 
 ## Open
 

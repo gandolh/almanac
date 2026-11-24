@@ -489,3 +489,10 @@ The estate redesign board is a private canvas, so `design/estate-redesign/` now 
 Filed from the estate's infra review. The image's `deps` stage installs only the server's closure instead of
 every workspace (about 80 MB less build cache per cold build on the box), and every base is pinned to
 `node:24.22.1-alpine`. The image that runs doesn't change. Ships with `node cli.ts almanac server`.
+
+## [2026-11-24] brief | 08 The image's build stage installs only the server, on a pinned base
+
+Built. `deps` runs `npm ci -w @almanac/server --include-workspace-root` (368 → 291 MB of `node_modules`; the
+`deps` stage image 973 → 891 MB), and every stage is on `node:24.22.1-alpine`. The final image is 267 MB (265
+before) and turned healthy on scratch data. Ready for deploy: `node cli.ts almanac server`. See
+[briefs/done/08-the-images-build-stage-installs-only-the-server.md](briefs/done/08-the-images-build-stage-installs-only-the-server.md).

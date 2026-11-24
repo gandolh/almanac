@@ -69,3 +69,19 @@ the controller.
 ## Owner steps
 
 - `node cli.ts almanac server` from vps-deploy. The deploy builds the image on the box.
+
+## Outcome
+
+Built 2026-11-24 by the controller (12b3f70). Ready for deploy: `node cli.ts almanac server`.
+
+- **Step 1**, in a `git archive` export: the full `npm ci` leaves 368 MB of `node_modules`; `npm ci -w
+  @almanac/server --include-workspace-root` leaves 291 MB (77 MB less), and `npx tsc -b server` compiles. No
+  extra workspace was needed: `shared` comes with the server.
+- **Step 2**: `deps` runs the scoped install with a comment saying why; the three `FROM` lines are
+  `node:24.22.1-alpine`.
+- **Step 3**, both built on the laptop the same hour: the `deps` stage image 973 MB before, 891 MB after; the
+  final image 265 MB before, 267 MB after. `docker history` differs only in three layer sizes by about 10 kB to
+  1 MB (the pinned Node patch).
+- **Step 4**: the new image on a scratch data folder turned healthy; `/api/health` answered `{"status":"ok"}`;
+  Node is v24.22.1. Test images and the container were removed.
+- `npm run check` exits 0; `bash corpus/lint.sh` passes.
