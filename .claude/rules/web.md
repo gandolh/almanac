@@ -8,6 +8,9 @@ paths:
 - Read the `base-ui` skill before you add or change a component. For UI work
   also read [wiki/web-app.md](../../corpus/wiki/web-app.md) and
   [wiki/overlays.md](../../corpus/wiki/overlays.md).
+- Browsers: Chrome on Android decides what to build; Safari on iPhone,
+  Firefox and desktop Safari must keep working. Before you use a platform
+  feature newer than Baseline Widely available, read the `web-platform` skill.
 - Base UI is imported only from subpaths (`@base-ui/react/dialog`), and only by
   the wrappers in `web/src/components/ui/`. Pages import the wrapper, never
   `@base-ui/react`.
